@@ -1,0 +1,530 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 48;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		DA246CB41F8A6E5E00A75ED1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA246CB31F8A6E5E00A75ED1 /* AppDelegate.swift */; };
+		DA246CB61F8A6E5E00A75ED1 /* WordTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA246CB51F8A6E5E00A75ED1 /* WordTableViewController.swift */; };
+		DA246CB91F8A6E5E00A75ED1 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DA246CB71F8A6E5E00A75ED1 /* Main.storyboard */; };
+		DA246CBB1F8A6E5E00A75ED1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DA246CBA1F8A6E5E00A75ED1 /* Assets.xcassets */; };
+		DA246CBE1F8A6E5E00A75ED1 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DA246CBC1F8A6E5E00A75ED1 /* LaunchScreen.storyboard */; };
+		DA246CCC1F8AA30E00A75ED1 /* NotificationCenter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA246CCB1F8AA30E00A75ED1 /* NotificationCenter.framework */; };
+		DA246CCF1F8AA30E00A75ED1 /* TodayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA246CCE1F8AA30E00A75ED1 /* TodayViewController.swift */; };
+		DA246CD21F8AA30E00A75ED1 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DA246CD01F8AA30E00A75ED1 /* MainInterface.storyboard */; };
+		DA246CD61F8AA30E00A75ED1 /* Widget.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = DA246CC91F8AA30E00A75ED1 /* Widget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		DA246CDE1F8AE3DA00A75ED1 /* WordTestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA246CDD1F8AE3DA00A75ED1 /* WordTestViewController.swift */; };
+		DA4162F41F8BE62600165694 /* WordsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA4162F31F8BE62600165694 /* WordsModel.swift */; };
+		DA4162F61F8C219500165694 /* GradientButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA4162F51F8C219500165694 /* GradientButton.swift */; };
+		DAC884BA219C8710005C6588 /* SearchWordViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAC884B9219C8710005C6588 /* SearchWordViewController.swift */; };
+		DAEC8DCE219DF691009097C2 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAEC8DCD219DF691009097C2 /* Settings.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		DA246CD41F8AA30E00A75ED1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DA246CA81F8A6E5E00A75ED1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DA246CC81F8AA30E00A75ED1;
+			remoteInfo = Widget;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		DA246CDA1F8AA30E00A75ED1 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				DA246CD61F8AA30E00A75ED1 /* Widget.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		DA246CB01F8A6E5E00A75ED1 /* LearnWords.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LearnWords.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DA246CB31F8A6E5E00A75ED1 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		DA246CB51F8A6E5E00A75ED1 /* WordTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordTableViewController.swift; sourceTree = "<group>"; };
+		DA246CB81F8A6E5E00A75ED1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		DA246CBA1F8A6E5E00A75ED1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		DA246CBD1F8A6E5E00A75ED1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		DA246CBF1F8A6E5E00A75ED1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		DA246CC91F8AA30E00A75ED1 /* Widget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = Widget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		DA246CCB1F8AA30E00A75ED1 /* NotificationCenter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NotificationCenter.framework; path = System/Library/Frameworks/NotificationCenter.framework; sourceTree = SDKROOT; };
+		DA246CCE1F8AA30E00A75ED1 /* TodayViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayViewController.swift; sourceTree = "<group>"; };
+		DA246CD11F8AA30E00A75ED1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
+		DA246CD31F8AA30E00A75ED1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		DA246CDB1F8AB75900A75ED1 /* LearnWords.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LearnWords.entitlements; sourceTree = "<group>"; };
+		DA246CDC1F8AD1C200A75ED1 /* Widget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Widget.entitlements; sourceTree = "<group>"; };
+		DA246CDD1F8AE3DA00A75ED1 /* WordTestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordTestViewController.swift; sourceTree = "<group>"; };
+		DA4162F31F8BE62600165694 /* WordsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordsModel.swift; sourceTree = "<group>"; };
+		DA4162F51F8C219500165694 /* GradientButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientButton.swift; sourceTree = "<group>"; };
+		DAC884B9219C8710005C6588 /* SearchWordViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchWordViewController.swift; sourceTree = "<group>"; };
+		DAEC8DCD219DF691009097C2 /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		DA246CAD1F8A6E5E00A75ED1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DA246CC61F8AA30E00A75ED1 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DA246CCC1F8AA30E00A75ED1 /* NotificationCenter.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		DA246CA71F8A6E5E00A75ED1 = {
+			isa = PBXGroup;
+			children = (
+				DA246CB21F8A6E5E00A75ED1 /* LearnWords */,
+				DA246CCD1F8AA30E00A75ED1 /* Widget */,
+				DA246CCA1F8AA30E00A75ED1 /* Frameworks */,
+				DA246CB11F8A6E5E00A75ED1 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		DA246CB11F8A6E5E00A75ED1 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				DA246CB01F8A6E5E00A75ED1 /* LearnWords.app */,
+				DA246CC91F8AA30E00A75ED1 /* Widget.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		DA246CB21F8A6E5E00A75ED1 /* LearnWords */ = {
+			isa = PBXGroup;
+			children = (
+				DA246CDB1F8AB75900A75ED1 /* LearnWords.entitlements */,
+				DAC884B9219C8710005C6588 /* SearchWordViewController.swift */,
+				DAEC8DCD219DF691009097C2 /* Settings.swift */,
+				DA246CB31F8A6E5E00A75ED1 /* AppDelegate.swift */,
+				DA246CB51F8A6E5E00A75ED1 /* WordTableViewController.swift */,
+				DA4162F51F8C219500165694 /* GradientButton.swift */,
+				DA4162F31F8BE62600165694 /* WordsModel.swift */,
+				DA246CDD1F8AE3DA00A75ED1 /* WordTestViewController.swift */,
+				DA246CB71F8A6E5E00A75ED1 /* Main.storyboard */,
+				DA246CBA1F8A6E5E00A75ED1 /* Assets.xcassets */,
+				DA246CBC1F8A6E5E00A75ED1 /* LaunchScreen.storyboard */,
+				DA246CBF1F8A6E5E00A75ED1 /* Info.plist */,
+			);
+			path = LearnWords;
+			sourceTree = "<group>";
+		};
+		DA246CCA1F8AA30E00A75ED1 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				DA246CCB1F8AA30E00A75ED1 /* NotificationCenter.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		DA246CCD1F8AA30E00A75ED1 /* Widget */ = {
+			isa = PBXGroup;
+			children = (
+				DA246CDC1F8AD1C200A75ED1 /* Widget.entitlements */,
+				DA246CCE1F8AA30E00A75ED1 /* TodayViewController.swift */,
+				DA246CD01F8AA30E00A75ED1 /* MainInterface.storyboard */,
+				DA246CD31F8AA30E00A75ED1 /* Info.plist */,
+			);
+			path = Widget;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		DA246CAF1F8A6E5E00A75ED1 /* LearnWords */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DA246CC21F8A6E5E00A75ED1 /* Build configuration list for PBXNativeTarget "LearnWords" */;
+			buildPhases = (
+				DA246CAC1F8A6E5E00A75ED1 /* Sources */,
+				DA246CAD1F8A6E5E00A75ED1 /* Frameworks */,
+				DA246CAE1F8A6E5E00A75ED1 /* Resources */,
+				DA246CDA1F8AA30E00A75ED1 /* Embed App Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DA246CD51F8AA30E00A75ED1 /* PBXTargetDependency */,
+			);
+			name = LearnWords;
+			productName = LearnWords;
+			productReference = DA246CB01F8A6E5E00A75ED1 /* LearnWords.app */;
+			productType = "com.apple.product-type.application";
+		};
+		DA246CC81F8AA30E00A75ED1 /* Widget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DA246CD71F8AA30E00A75ED1 /* Build configuration list for PBXNativeTarget "Widget" */;
+			buildPhases = (
+				DA246CC51F8AA30E00A75ED1 /* Sources */,
+				DA246CC61F8AA30E00A75ED1 /* Frameworks */,
+				DA246CC71F8AA30E00A75ED1 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Widget;
+			productName = Widget;
+			productReference = DA246CC91F8AA30E00A75ED1 /* Widget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		DA246CA81F8A6E5E00A75ED1 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 0900;
+				LastUpgradeCheck = 0940;
+				ORGANIZATIONNAME = Paul;
+				TargetAttributes = {
+					DA246CAF1F8A6E5E00A75ED1 = {
+						CreatedOnToolsVersion = 9.0;
+						LastSwiftMigration = 1010;
+						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.ApplicationGroups.iOS = {
+								enabled = 1;
+							};
+						};
+					};
+					DA246CC81F8AA30E00A75ED1 = {
+						CreatedOnToolsVersion = 9.0;
+						LastSwiftMigration = 1010;
+						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.ApplicationGroups.iOS = {
+								enabled = 1;
+							};
+						};
+					};
+				};
+			};
+			buildConfigurationList = DA246CAB1F8A6E5E00A75ED1 /* Build configuration list for PBXProject "LearnWords" */;
+			compatibilityVersion = "Xcode 8.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = DA246CA71F8A6E5E00A75ED1;
+			productRefGroup = DA246CB11F8A6E5E00A75ED1 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				DA246CAF1F8A6E5E00A75ED1 /* LearnWords */,
+				DA246CC81F8AA30E00A75ED1 /* Widget */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		DA246CAE1F8A6E5E00A75ED1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DA246CBE1F8A6E5E00A75ED1 /* LaunchScreen.storyboard in Resources */,
+				DA246CBB1F8A6E5E00A75ED1 /* Assets.xcassets in Resources */,
+				DA246CB91F8A6E5E00A75ED1 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DA246CC71F8AA30E00A75ED1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DA246CD21F8AA30E00A75ED1 /* MainInterface.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		DA246CAC1F8A6E5E00A75ED1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DAC884BA219C8710005C6588 /* SearchWordViewController.swift in Sources */,
+				DA4162F61F8C219500165694 /* GradientButton.swift in Sources */,
+				DAEC8DCE219DF691009097C2 /* Settings.swift in Sources */,
+				DA246CDE1F8AE3DA00A75ED1 /* WordTestViewController.swift in Sources */,
+				DA246CB61F8A6E5E00A75ED1 /* WordTableViewController.swift in Sources */,
+				DA246CB41F8A6E5E00A75ED1 /* AppDelegate.swift in Sources */,
+				DA4162F41F8BE62600165694 /* WordsModel.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DA246CC51F8AA30E00A75ED1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DA246CCF1F8AA30E00A75ED1 /* TodayViewController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		DA246CD51F8AA30E00A75ED1 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DA246CC81F8AA30E00A75ED1 /* Widget */;
+			targetProxy = DA246CD41F8AA30E00A75ED1 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		DA246CB71F8A6E5E00A75ED1 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				DA246CB81F8A6E5E00A75ED1 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		DA246CBC1F8A6E5E00A75ED1 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				DA246CBD1F8A6E5E00A75ED1 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		DA246CD01F8AA30E00A75ED1 /* MainInterface.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				DA246CD11F8AA30E00A75ED1 /* Base */,
+			);
+			name = MainInterface.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		DA246CC01F8A6E5E00A75ED1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		DA246CC11F8A6E5E00A75ED1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		DA246CC31F8A6E5E00A75ED1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = LearnWords/LearnWords.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = WEJF495R4D;
+				INFOPLIST_FILE = LearnWords/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = club.laconic.LearnWords;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		DA246CC41F8A6E5E00A75ED1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = LearnWords/LearnWords.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = WEJF495R4D;
+				INFOPLIST_FILE = LearnWords/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = club.laconic.LearnWords;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		DA246CD81F8AA30E00A75ED1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Widget/Widget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = WEJF495R4D;
+				INFOPLIST_FILE = Widget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = club.laconic.LearnWords.Widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		DA246CD91F8AA30E00A75ED1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Widget/Widget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = WEJF495R4D;
+				INFOPLIST_FILE = Widget/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = club.laconic.LearnWords.Widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		DA246CAB1F8A6E5E00A75ED1 /* Build configuration list for PBXProject "LearnWords" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DA246CC01F8A6E5E00A75ED1 /* Debug */,
+				DA246CC11F8A6E5E00A75ED1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DA246CC21F8A6E5E00A75ED1 /* Build configuration list for PBXNativeTarget "LearnWords" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DA246CC31F8A6E5E00A75ED1 /* Debug */,
+				DA246CC41F8A6E5E00A75ED1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DA246CD71F8AA30E00A75ED1 /* Build configuration list for PBXNativeTarget "Widget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DA246CD81F8AA30E00A75ED1 /* Debug */,
+				DA246CD91F8AA30E00A75ED1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = DA246CA81F8A6E5E00A75ED1 /* Project object */;
+}
