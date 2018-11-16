@@ -92,13 +92,13 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "LearnWords/SearchWordViewController.swift"
-            timestampString = "564056435.8575211"
+            timestampString = "564064933.118457"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "51"
             endingLineNumber = "51"
-            landmarkName = "unknown"
-            landmarkType = "0">
+            landmarkName = "textInputMode"
+            landmarkType = "24">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -108,13 +108,13 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "LearnWords/SearchWordViewController.swift"
-            timestampString = "564056435.857599"
+            timestampString = "564064933.118951"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "33"
             endingLineNumber = "33"
-            landmarkName = "unknown"
-            landmarkType = "0">
+            landmarkName = "forcedPrimaryLanguage"
+            landmarkType = "24">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

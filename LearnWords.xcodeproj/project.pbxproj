@@ -20,6 +20,7 @@
 		DA4162F41F8BE62600165694 /* WordsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA4162F31F8BE62600165694 /* WordsModel.swift */; };
 		DA4162F61F8C219500165694 /* GradientButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA4162F51F8C219500165694 /* GradientButton.swift */; };
 		DAC884BA219C8710005C6588 /* SearchWordViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAC884B9219C8710005C6588 /* SearchWordViewController.swift */; };
+		DAD5E0D6219EF1400084FD1A /* Images.imagecatalog in Resources */ = {isa = PBXBuildFile; fileRef = DAD5E0D5219EF1400084FD1A /* Images.imagecatalog */; };
 		DAEC8DCE219DF691009097C2 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAEC8DCD219DF691009097C2 /* Settings.swift */; };
 /* End PBXBuildFile section */
 
@@ -66,6 +67,7 @@
 		DA4162F31F8BE62600165694 /* WordsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordsModel.swift; sourceTree = "<group>"; };
 		DA4162F51F8C219500165694 /* GradientButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientButton.swift; sourceTree = "<group>"; };
 		DAC884B9219C8710005C6588 /* SearchWordViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchWordViewController.swift; sourceTree = "<group>"; };
+		DAD5E0D5219EF1400084FD1A /* Images.imagecatalog */ = {isa = PBXFileReference; lastKnownFileType = folder.imagecatalog; path = Images.imagecatalog; sourceTree = "<group>"; };
 		DAEC8DCD219DF691009097C2 /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -122,6 +124,7 @@
 				DA246CBA1F8A6E5E00A75ED1 /* Assets.xcassets */,
 				DA246CBC1F8A6E5E00A75ED1 /* LaunchScreen.storyboard */,
 				DA246CBF1F8A6E5E00A75ED1 /* Info.plist */,
+				DAD5E0D5219EF1400084FD1A /* Images.imagecatalog */,
 			);
 			path = LearnWords;
 			sourceTree = "<group>";
@@ -241,6 +244,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DA246CBE1F8A6E5E00A75ED1 /* LaunchScreen.storyboard in Resources */,
+				DAD5E0D6219EF1400084FD1A /* Images.imagecatalog in Resources */,
 				DA246CBB1F8A6E5E00A75ED1 /* Assets.xcassets in Resources */,
 				DA246CB91F8A6E5E00A75ED1 /* Main.storyboard in Resources */,
 			);
