@@ -50,11 +50,14 @@
                             <outlet property="delegate" destination="Jy4-wo-DD5" id="l7n-1B-dbM"/>
                         </connections>
                     </tableView>
+                    <toolbarItems>
+                        <barButtonItem title="Typing" id="rCS-Y7-FK2"/>
+                    </toolbarItems>
                     <navigationItem key="navigationItem" id="geZ-fh-F0l">
                         <leftBarButtonItems>
                             <barButtonItem title="⊕" id="D43-dR-dXq" userLabel="Add word simple">
                                 <connections>
-                                    <action selector="addNewWord" destination="Jy4-wo-DD5" id="pl5-eh-ow9"/>
+                                    <action selector="addNewWord:" destination="Jy4-wo-DD5" id="bxf-Rt-2rX"/>
                                 </connections>
                             </barButtonItem>
                             <barButtonItem systemItem="add" id="xjF-U8-td1">
@@ -76,6 +79,7 @@
                             </barButtonItem>
                         </rightBarButtonItems>
                     </navigationItem>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Zv8-fy-9oC" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -90,22 +94,22 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillProportionally" spacingType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="be5-a6-mYM">
-                                <rect key="frame" x="10" y="84" width="355" height="563"/>
+                                <rect key="frame" x="10" y="114" width="355" height="489"/>
                                 <subviews>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" text="Self test? " textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nai-6a-wCb">
-                                        <rect key="frame" x="0.0" y="0.0" width="355" height="52"/>
-                                        <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Word" textAlignment="center" lineBreakMode="wordWrap" baselineAdjustment="none" minimumFontSize="30" translatesAutoresizingMaskIntoConstraints="NO" id="yxM-vR-ero">
+                                        <rect key="frame" x="0.0" y="0.0" width="355" height="143"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="100"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Promt" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yxM-vR-ero">
-                                        <rect key="frame" x="0.0" y="60" width="355" height="287"/>
-                                        <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Word" textAlignment="center" lineBreakMode="wordWrap" baselineAdjustment="none" minimumFontSize="30" translatesAutoresizingMaskIntoConstraints="NO" id="s4E-Gx-k1b">
+                                        <rect key="frame" x="0.0" y="151" width="355" height="122"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="100"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="keD-qV-ddK" customClass="GradientButton" customModule="LearnWords" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="355" width="355" height="100"/>
+                                        <rect key="frame" x="0.0" y="281" width="355" height="100"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="41"/>
                                         <inset key="contentEdgeInsets" minX="10" minY="10" maxX="10" maxY="10"/>
                                         <state key="normal" title="Look Up">
@@ -124,7 +128,7 @@
                                         </connections>
                                     </button>
                                     <stackView opaque="NO" tag="10" contentMode="scaleToFill" distribution="fillEqually" spacingType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="hj9-L7-bfX">
-                                        <rect key="frame" x="0.0" y="463" width="355" height="100"/>
+                                        <rect key="frame" x="0.0" y="389" width="355" height="100"/>
                                         <subviews>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="643-wN-0oS" userLabel="Forgot" customClass="GradientButton" customModule="LearnWords" customModuleProvider="target">
                                                 <rect key="frame" x="0.0" y="0.0" width="173.5" height="100"/>
@@ -174,20 +178,34 @@
                                     <constraint firstItem="keD-qV-ddK" firstAttribute="height" secondItem="Djr-xr-GdQ" secondAttribute="height" id="JLb-4J-WwI"/>
                                 </constraints>
                             </stackView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" text="Self test? " textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nai-6a-wCb">
+                                <rect key="frame" x="10" y="64" width="355" height="40"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="40" id="eBx-dU-AyJ"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="0M9-Kp-HX4" firstAttribute="bottom" secondItem="be5-a6-mYM" secondAttribute="bottom" constant="20" id="4JU-PH-Jr6"/>
-                            <constraint firstItem="be5-a6-mYM" firstAttribute="top" relation="lessThanOrEqual" secondItem="0M9-Kp-HX4" secondAttribute="top" constant="20" id="H6b-YX-e8F"/>
+                            <constraint firstItem="be5-a6-mYM" firstAttribute="top" secondItem="nai-6a-wCb" secondAttribute="bottom" constant="10" id="5Wc-rv-2WL"/>
+                            <constraint firstItem="nai-6a-wCb" firstAttribute="leading" secondItem="be5-a6-mYM" secondAttribute="leading" id="By6-jD-uyl"/>
+                            <constraint firstItem="nai-6a-wCb" firstAttribute="trailing" secondItem="be5-a6-mYM" secondAttribute="trailing" id="NEO-Cx-rL8"/>
                             <constraint firstItem="0M9-Kp-HX4" firstAttribute="trailing" secondItem="yxM-vR-ero" secondAttribute="trailing" constant="10" id="dKD-BH-zja"/>
+                            <constraint firstItem="nai-6a-wCb" firstAttribute="top" secondItem="0M9-Kp-HX4" secondAttribute="top" id="gas-Ec-BgC"/>
                             <constraint firstItem="yxM-vR-ero" firstAttribute="leading" secondItem="0M9-Kp-HX4" secondAttribute="leading" constant="10" id="m3d-b1-bhp"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="0M9-Kp-HX4"/>
                     </view>
                     <connections>
                         <outlet property="forgotButton" destination="643-wN-0oS" id="Zer-Jd-FkI"/>
+                        <outlet property="knowButton" destination="Djr-xr-GdQ" id="KnZ-pd-yFM"/>
                         <outlet property="prompt" destination="yxM-vR-ero" id="YNR-pw-8Fd"/>
                         <outlet property="stackView" destination="be5-a6-mYM" id="BMt-9I-GsX"/>
+                        <outlet property="wordDefinition" destination="s4E-Gx-k1b" id="BbK-q1-pCN"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="SRw-lQ-ISg" userLabel="First Responder" sceneMemberID="firstResponder"/>

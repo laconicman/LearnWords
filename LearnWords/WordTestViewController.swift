@@ -5,7 +5,9 @@
 //  Created by Paul on 09.10.2017.
 //  Copyright © 2017 Paul. All rights reserved.
 //
-// TO_DO Different animation for right and wrong answers
+// TO_DO: Different animation for right and wrong answers
+// TO_DO: Show translation under the word instead of replacing it. Done
+// TO_DO: Show translation in red (black) if forgot (plus some animation, native lang prounosation or even taptic), in green if know.
 
 
 import UIKit
@@ -40,11 +42,12 @@ final class WordTestViewController: UIViewController, AVSpeechSynthesizerDelegat
     @IBAction func knowButtonAction(_ sender: UIButton) {
         if !wordsInTest.isEmpty {
             var shownWord = wordsInTest.remove(at: 0)
-            //showAnswer(for: shownWord)
+            
             shownWord.known += 1
             shownWords.append(shownWord)
             //disable buttons and ShowNextButton Instead and autoSkip
-            prepareForNextQuestion()
+            //prepareForNextQuestion()
+            showAnswer(for: shownWord, isKnown: true)
         }
         
         if UIReferenceLibraryViewController.dictionaryHasDefinition(forTerm: prompt.text ?? "") {
@@ -88,7 +91,7 @@ final class WordTestViewController: UIViewController, AVSpeechSynthesizerDelegat
 //        showingQuestion = !showingQuestion
         if !wordsInTest.isEmpty {
             var shownWord = wordsInTest.remove(at: 0)
-            showAnswer(for: shownWord)
+            showAnswer(for: shownWord, isKnown: false)
             shownWord.unknow += 1
             shownWords.append(shownWord)
         }
@@ -140,14 +143,14 @@ final class WordTestViewController: UIViewController, AVSpeechSynthesizerDelegat
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        navigationController?.hidesBarsOnTap = true
+        navigationController?.hidesBarsOnTap = false
         
         askQuestion()
     }
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        navigationController?.hidesBarsOnTap = true
+        navigationController?.hidesBarsOnTap = false
     }
     
     @objc func nextTapped() {
@@ -162,24 +165,24 @@ final class WordTestViewController: UIViewController, AVSpeechSynthesizerDelegat
         
     }
     
-    func showAnswer(for shownWord: WordAndStat) {
+    func showAnswer(for shownWord: WordAndStat, isKnown: Bool = false) {
         
-        UIView.transition(with: prompt,
-                          duration: 0.75,
+        UIView.transition(with: wordDefinition,
+                          duration: isKnown ? 0.75 : 1.0,
                           options: [.transitionCrossDissolve],
                           animations: { [weak self] in
                             self?.knowButton?.isEnabled = false
                             self?.knowButton?.layer.opacity = 0.1
                             self?.forgotButton?.isEnabled = false
-                            self?.prompt.attributedText = NSAttributedString(
+                            self?.wordDefinition.attributedText = NSAttributedString(
                                 string: shownWord.pair.components(separatedBy: "::")[0],
-                                attributes: [.foregroundColor: UIColor(red: 0, green: 0.7, blue: 0, alpha: 1)])
+                                attributes: [.foregroundColor: isKnown ? UIColor(red: 0, green: 0.7, blue: 0, alpha: 1) : UIColor(red: 0.7, green: 0.0, blue: 0, alpha: 1)])
                             // prompt.textColor = UIColor(red: 0, green: 0.7, blue: 0, alpha: 1)
         }) { [weak self] (ended) in
             self?.knowButton?.isEnabled = true
             self?.knowButton?.layer.opacity = 1
             self?.forgotButton?.isEnabled = true
-            self?.prepareForNextQuestion()
+            self?.prepareForNextQuestion(withPrewiousKnown: isKnown)
         }
         //            prompt.text = wordsInTest[questionCounter].components(separatedBy: "::")[0]
         //            prompt.textColor = UIColor(red: 0, green: 0.7, blue: 0, alpha: 1)
@@ -190,6 +193,10 @@ final class WordTestViewController: UIViewController, AVSpeechSynthesizerDelegat
         guard !wordsInTest.isEmpty else { return }
         prompt.attributedText = NSAttributedString(string: wordsInTest[0].pair.components(separatedBy: "::")[1])
         utteranceString = (prompt.attributedText?.string as NSString?)!
+        wordDefinition.attributedText = NSAttributedString(
+            string: "?",
+            attributes: [.foregroundColor: UIColor(red: 0, green: 0.7, blue: 0.7, alpha: 1)])
+        // prompt.textColor = UIColor(red: 0, green: 0.7, blue: 0, alpha: 1)
         let utterance = AVSpeechUtterance(attributedString: NSAttributedString(string: utteranceString as String))
         //var utterance =  AVSpeechUtterance(string: prompt.text ?? "")
         //We can get voices that are present in system and then use set them either with identifiers or by using default for language
@@ -265,7 +272,7 @@ final class WordTestViewController: UIViewController, AVSpeechSynthesizerDelegat
         prompt.attributedText = NSAttributedString(string: self.utteranceString as String)
     }
 
-    func prepareForNextQuestion() {
+    func prepareForNextQuestion(withPrewiousKnown: Bool = true) {
         let animation = UIViewPropertyAnimator(duration: 0.5, curve: .easeInOut) { [unowned self] in
             self.stackView.transform =  CGAffineTransform(scaleX: 0.8, y: 0.8)
             //self.stackView.transform =  CGAffineTransform(rotationAngle: 0.3*CGFloat.pi)
@@ -273,9 +280,10 @@ final class WordTestViewController: UIViewController, AVSpeechSynthesizerDelegat
         }
         animation.addCompletion { [unowned self] position in
             self.prompt.textColor = UIColor.black
+            self.wordDefinition.textColor = UIColor(red: 0, green: 0.7, blue: 0, alpha: 0)
             self.askQuestion()
         }
-        animation.startAnimation()
+        animation.startAnimation(afterDelay: withPrewiousKnown ? 0.1 : 2.0)
     }
     
     override func didReceiveMemoryWarning() {

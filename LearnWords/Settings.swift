@@ -13,6 +13,6 @@ let kLastSearchKey = "LastSearch"
 
 // Create standard defaults
 // TODO: Check this: looks like it is never called
-func registerDefaults() {
-    UserDefaults.standard.register(defaults: [:])
-}
+//func registerDefaults() {
+//    UserDefaults.standard.register(defaults: [:])
+//}
