@@ -28,12 +28,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "LearnWords/WordTestViewController.swift"
-            timestampString = "564003548.31964"
+            timestampString = "564511372.680722"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "238"
-            endingLineNumber = "238"
-            landmarkName = "askQuestion()"
+            startingLineNumber = "253"
+            endingLineNumber = "253"
+            landmarkName = "speechSynthesizer(_:willSpeakRangeOfSpeechString:utterance:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -44,12 +44,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "LearnWords/WordTestViewController.swift"
-            timestampString = "564003548.319725"
+            timestampString = "564511372.681354"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "75"
-            endingLineNumber = "75"
-            landmarkName = "knowButtonAction(_:)"
+            startingLineNumber = "90"
+            endingLineNumber = "90"
+            landmarkName = "forgotButtonAction(_:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -60,12 +60,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "LearnWords/WordTestViewController.swift"
-            timestampString = "564003548.319792"
+            timestampString = "564511372.681863"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "73"
-            endingLineNumber = "73"
-            landmarkName = "knowButtonAction(_:)"
+            startingLineNumber = "88"
+            endingLineNumber = "88"
+            landmarkName = "forgotButtonAction(_:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -76,12 +76,12 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "LearnWords/WordTestViewController.swift"
-            timestampString = "564003548.319858"
+            timestampString = "564511372.682312"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "72"
-            endingLineNumber = "72"
-            landmarkName = "knowButtonAction(_:)"
+            startingLineNumber = "87"
+            endingLineNumber = "87"
+            landmarkName = "forgotButtonAction(_:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -92,7 +92,7 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "LearnWords/SearchWordViewController.swift"
-            timestampString = "564064933.118457"
+            timestampString = "564505935.001543"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "51"
@@ -108,13 +108,45 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "LearnWords/SearchWordViewController.swift"
-            timestampString = "564064933.118951"
+            timestampString = "564505935.002046"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "33"
             endingLineNumber = "33"
             landmarkName = "forcedPrimaryLanguage"
             landmarkType = "24">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "LearnWords/WordTestViewController.swift"
+            timestampString = "564511372.68293"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "51"
+            endingLineNumber = "51"
+            landmarkName = "knowButtonAction(_:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "LearnWords/WordTestViewController.swift"
+            timestampString = "564511372.683326"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "50"
+            endingLineNumber = "50"
+            landmarkName = "knowButtonAction(_:)"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

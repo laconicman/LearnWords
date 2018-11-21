@@ -20,7 +20,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Next lines should do the same, but they don't work for some reasons
 //        if let navigationBarBackground = UIImage(named: "navigationBarBackground") {
 //            UINavigationBar.appearance().backgroundColor = UIColor(patternImage: navigationBarBackground)
-        }
+//        }
         return true
     }
 

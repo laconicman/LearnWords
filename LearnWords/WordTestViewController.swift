@@ -14,7 +14,7 @@ import AVFoundation
 
 final class WordTestViewController: UIViewController, AVSpeechSynthesizerDelegate {
 
-    private lazy var sytheiser = AVSpeechSynthesizer() //Make it global, to avoid initialization for evere vc creation
+    private lazy var sytheiser = AVSpeechSynthesizer() //Make it global, to avoid initialization for every vc creation
     private var utteranceString: NSString = ""
     
     @IBOutlet weak var wordDefinition: UILabel! //?
@@ -24,20 +24,37 @@ final class WordTestViewController: UIViewController, AVSpeechSynthesizerDelegat
     @IBOutlet weak var knowButton: UIButton!
     @IBOutlet weak var forgotButton: UIButton!
     
+    
+    @IBAction func lookUpAction(_ sender: UIButton) {
+        if UIReferenceLibraryViewController.dictionaryHasDefinition(forTerm: prompt.text ?? "") {
+            let rlvc = UIReferenceLibraryViewController(term: prompt.text!)
+            //rlvc.editButtonItem what is this
+            //rlvc.setEditing(true, animated: true)
+            rlvc.modalPresentationStyle = .popover //no effect on iphone
+            //wordDefinition.text =  rlvc.editButtonItem.title
+            present(rlvc, animated: true)
+        }
+    }
+    
+    
     @IBAction func knowButtonAction(_ sender: UIButton) {
-//        if !wordsInTest.isEmpty {
-//            var shownWord = wordsInTest.remove(at: 0)
-//            showAnswer(for: shownWord)
-//            shownWord.known += 1
-//            shownWords.append(shownWord)
-//            //disable buttons and ShowNextButton Instead and autoSkip
-//            prepareForNextQuestion()
-//        }
+        if !wordsInTest.isEmpty {
+            var shownWord = wordsInTest.remove(at: 0)
+            //showAnswer(for: shownWord)
+            shownWord.known += 1
+            shownWords.append(shownWord)
+            //disable buttons and ShowNextButton Instead and autoSkip
+            prepareForNextQuestion()
+        }
         
         if UIReferenceLibraryViewController.dictionaryHasDefinition(forTerm: prompt.text ?? "") {
             let rlvc = UIReferenceLibraryViewController(term: prompt.text!)
             //rlvc.editButtonItem what is this
             //rlvc.setEditing(true, animated: true)
+            //rlvc.modalPresentationStyle = .popover //no effect on iphone
+            //wordDefinition.text =  rlvc.editButtonItem.title
+            //present(rlvc, animated: true)
+            
             if let definitionValues = rlvc.value(forKey: "_definitionValues") as? NSArray {
                 var definitions = [NSAttributedString]()
                 
@@ -54,7 +71,7 @@ final class WordTestViewController: UIViewController, AVSpeechSynthesizerDelegat
                 var i=0
                 definitions[0].string.enumerateLines { (line, stop) in
                     print("\(line) i=\(i) stop=\(stop)")
-                    if i<1 {
+                    if i<10 {
                         i += 1
                     } else {
                         stop = true
@@ -62,9 +79,7 @@ final class WordTestViewController: UIViewController, AVSpeechSynthesizerDelegat
                 }
                 
                 //print(t ?? "no value")
-                //rlvc.modalPresentationStyle = .popover //no effect on iphone
-                //wordDefinition.text =  rlvc.editButtonItem.title
-                //   present(rlvc, animated: true)
+
             }
         }
     }
@@ -105,16 +120,16 @@ final class WordTestViewController: UIViewController, AVSpeechSynthesizerDelegat
         
         //Lets practice loops, typecasts, optionals
         // Buttons are inside the stack
-        for chv in (stackView.viewWithTag(10)?.subviews)! {
-            if let bt = chv as? UIButton {
-
-                bt.layer.borderWidth = 1
-                bt.layer.borderColor = UIColor.lightGray.cgColor
-                bt.layer.cornerRadius = 5
-                // Or if you prefer custom colors
-                //bt.layer.borderColor = UIColor(red: 1.0, green: 0.6, blue: 0.2, alpha: 0.6).cgColor
-            }
-        }
+//        for chv in (stackView.viewWithTag(10)?.subviews)! {
+//            if let bt = chv as? UIButton {
+//
+//                bt.layer.borderWidth = 1
+//                bt.layer.borderColor = UIColor.lightGray.cgColor
+//                bt.layer.cornerRadius = 5
+//                // Or if you prefer custom colors
+//                //bt.layer.borderColor = UIColor(red: 1.0, green: 0.6, blue: 0.2, alpha: 0.6).cgColor
+//            }
+//        }
         
         
         if ProcessInfo().isOperatingSystemAtLeast(OperatingSystemVersion(majorVersion: 11, minorVersion: 0, patchVersion: 0)) {
@@ -153,17 +168,17 @@ final class WordTestViewController: UIViewController, AVSpeechSynthesizerDelegat
                           duration: 0.75,
                           options: [.transitionCrossDissolve],
                           animations: { [weak self] in
-                            self?.knowButton.isEnabled = false
-                            self?.knowButton.layer.opacity = 0.1
-                            self?.forgotButton.isEnabled = false
+                            self?.knowButton?.isEnabled = false
+                            self?.knowButton?.layer.opacity = 0.1
+                            self?.forgotButton?.isEnabled = false
                             self?.prompt.attributedText = NSAttributedString(
                                 string: shownWord.pair.components(separatedBy: "::")[0],
                                 attributes: [.foregroundColor: UIColor(red: 0, green: 0.7, blue: 0, alpha: 1)])
                             // prompt.textColor = UIColor(red: 0, green: 0.7, blue: 0, alpha: 1)
         }) { [weak self] (ended) in
-            self?.knowButton.isEnabled = true
-            self?.knowButton.layer.opacity = 1
-            self?.forgotButton.isEnabled = true
+            self?.knowButton?.isEnabled = true
+            self?.knowButton?.layer.opacity = 1
+            self?.forgotButton?.isEnabled = true
             self?.prepareForNextQuestion()
         }
         //            prompt.text = wordsInTest[questionCounter].components(separatedBy: "::")[0]
