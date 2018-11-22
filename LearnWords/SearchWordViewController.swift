@@ -65,9 +65,9 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
     
     // Create standard defaults
     // TODO: Check this: looks like it is never called
-    static func registerDefaults() {
-        UserDefaults.standard.register(defaults: [:])
-    }
+//    static func registerDefaults() {
+//        UserDefaults.standard.register(defaults: [:])
+//    }
     // API:
     enum SearchedObject {
         case original(lang: String, word: String)

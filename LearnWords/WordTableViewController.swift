@@ -22,6 +22,9 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
     var secondaryLanguage = ""
     let searchController = LocalizedUISearchController(searchResultsController: nil)
 
+    @IBAction func goToSettings(_ sender: UIBarButtonItem) {
+        gotoAppSettings()
+    }
     override func viewDidLoad() {
         super.viewDidLoad()
         //Some tests to discover various language tests found in system:
@@ -29,6 +32,8 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         print("UITextChecker.availableLanguages \n", UITextChecker.availableLanguages)
         print("UITextInputMode.activeInputModes.map{$0.primaryLanguage...} \n", UITextInputMode.activeInputModes.map{$0.primaryLanguage ?? "primaryLanguage undefined"})
         print("Bundle.main.bundleIdentifier \n", Bundle.main.bundleIdentifier ?? "")
+        
+        //UserDefaults.standard //NSUserDefaults_Log_Nonsensical_Suites (suiteName: Bundle.main.bundleIdentifier)
         //We can get voices that are present in system and then use set them either with identifiers or by using default for language
         //let voices = AVSpeechSynthesisVoice.speechVoices()
         //utterance.voice = AVSpeechSynthesisVoice(identifier: voice[0])
@@ -167,9 +172,8 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
                                        preferredStyle: .alert)
             
             // create a "Go to Settings" button that opens standart settings
-            let settingsAction = UIAlertAction(title: NSLocalizedString("Settings", comment: ""), style: .default) { (action: UIAlertAction!) in
-                let url = URL(string: UIApplication.openSettingsURLString) //+ "root=General&path=Network"
-                if url != nil, UIApplication.shared.canOpenURL(url!) {UIApplication.shared.open(url!) }
+            let settingsAction = UIAlertAction(title: NSLocalizedString("Settings", comment: ""), style: .default) { [weak self] (action: UIAlertAction!) in
+                self?.gotoAppSettings()
             }
             
             ac.addAction(settingsAction)
@@ -177,7 +181,11 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
             
             present(ac, animated: true)
         }
-
+    }
+    
+    private func gotoAppSettings() {
+        let url = URL(string: UIApplication.openSettingsURLString) //+ "root=General&path=Network"
+        if url != nil, UIApplication.shared.canOpenURL(url!) {UIApplication.shared.open(url!) }
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {

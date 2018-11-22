@@ -13,7 +13,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
-
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         UINavigationBar.appearance().setBackgroundImage(UIImage(named: "navigationBarBackground"), for: .default)
@@ -21,6 +20,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //        if let navigationBarBackground = UIImage(named: "navigationBarBackground") {
 //            UINavigationBar.appearance().backgroundColor = UIColor(patternImage: navigationBarBackground)
 //        }
+        //All this is optional. Works fine without this stuff
+//        if let path = Bundle.main.path(forResource: "Root", ofType: "plist"),
+//            let settingsDict = NSDictionary(contentsOfFile: path) as Dictionary {
+//            UserDefaults.standard.register(defaults: settingsDict)
+//        }
+//        UserDefaults.standard.register(defaults: [:])
+//        UserDefaults.standard.synchronize()
+        print(UserDefaults.standard.double(forKey: "pitchMultiplierPreference"))
+        
         return true
     }
 

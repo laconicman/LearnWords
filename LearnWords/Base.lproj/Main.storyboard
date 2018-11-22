@@ -67,6 +67,11 @@
                             </barButtonItem>
                         </leftBarButtonItems>
                         <rightBarButtonItems>
+                            <barButtonItem systemItem="organize" id="Ieh-AL-JGj">
+                                <connections>
+                                    <action selector="goToSettings:" destination="Jy4-wo-DD5" id="kNY-Mq-mFd"/>
+                                </connections>
+                            </barButtonItem>
                             <barButtonItem systemItem="refresh" id="cUB-K9-wGo" userLabel="Test button">
                                 <connections>
                                     <action selector="autoPlayTest:" destination="Jy4-wo-DD5" id="RIf-cj-5hW"/>

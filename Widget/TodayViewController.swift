@@ -30,16 +30,22 @@ class TodayViewController: UIViewController, NCWidgetProviding, UITableViewDataS
         }
         
         
-        if let defaults = UserDefaults(suiteName: "group.club.laconic.LearnWords") {
-            if let savedWords = defaults.object(forKey: "Words") as? [String] {
-                words = savedWords
-            }
-        }
     }
 
     
     
     func widgetActiveDisplayModeDidChange(_ activeDisplayMode: NCWidgetDisplayMode, withMaximumSize maxSize: CGSize) {
+        
+        if let defaults = UserDefaults(suiteName: "group.club.laconic.LearnWords") {
+            if let savedWords = defaults.stringArray(forKey: "Words") {
+                print("Loaded words: \(savedWords)")
+                //            if let savedWords = defaults.object(forKey: "Words") as? [String] {
+                words = savedWords
+            } else {
+                print("Failed to load user defaults from: group.club.laconic.LearnWords")
+            }
+        }
+        
         if activeDisplayMode == .compact {
             preferredContentSize = CGSize(width: 0, height: 110)
         } else {
@@ -93,11 +99,23 @@ class TodayViewController: UIViewController, NCWidgetProviding, UITableViewDataS
     func widgetPerformUpdate(completionHandler: (@escaping (NCUpdateResult) -> Void)) {
         // Perform any setup necessary in order to update the view.
         
+        if let defaults = UserDefaults(suiteName: "group.club.laconic.LearnWords") {
+            if let savedWords = defaults.stringArray(forKey: "Words") {
+                print(savedWords)
+                //            if let savedWords = defaults.object(forKey: "Words") as? [String] {
+                words = savedWords
+                completionHandler(NCUpdateResult.newData)
+            }
+        } else {
+            print("No user defaults")
+            completionHandler(NCUpdateResult.failed)
+        }
+        
         // If an error is encountered, use NCUpdateResult.Failed
         // If there's no update required, use NCUpdateResult.NoData
         // If there's an update, use NCUpdateResult.NewData
         
-        completionHandler(NCUpdateResult.newData)
+
     }
     
 }
