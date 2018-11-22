@@ -210,9 +210,9 @@ final class WordTestViewController: UIViewController, AVSpeechSynthesizerDelegat
         
         utterance.rate = 0.35
         
-        //we can set pre and post utterance delay
-        //utterance.pitchMultiplier = 0.5
+        utterance.pitchMultiplier = UserDefaults.standard.float(forKey: "pitchMultiplierPreference")
        // utterance.rate = AVSpeechUtteranceMinimumSpeechRate * 2
+        //we can set pre and post utterance delay
         utterance.preUtteranceDelay = 0.1
         utterance.postUtteranceDelay = 0.1
         

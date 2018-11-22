@@ -11,8 +11,64 @@ import Foundation
 let kRecentSearchesKey = "RecentSearches"
 let kLastSearchKey = "LastSearch"
 
-// Create standard defaults
-// TODO: Check this: looks like it is never called
-//func registerDefaults() {
-//    UserDefaults.standard.register(defaults: [:])
-//}
+// Usefull links
+// parsing the whole settings bundle stucture:
+// https://stackoverflow.com/questions/46453789/swift-4-settings-bundle-get-defaults
+// with Decodable:
+//https://stackoverflow.com/questions/24045570/how-do-i-get-a-plist-as-a-dictionary-in-swift
+// Unfortunatery it is not recommended to write root.plist directly
+// register while init, easy get/set wrapper:
+// https://forums.developer.apple.com/thread/73266
+
+class LWUserDefaults {
+    
+    static var standard = LWUserDefaults()
+    
+   static func registerDefaultsFromSettingsBundle()
+    {
+        let settingsUrl = Bundle.main.url(forResource: "Settings", withExtension: "bundle")!.appendingPathComponent("Root.plist")
+        let settingsPlist = NSDictionary(contentsOf:settingsUrl)!
+        let preferences = settingsPlist["PreferenceSpecifiers"] as! [NSDictionary]
+        
+        var defaultsToRegister = Dictionary<String, Any>()
+        
+        for preference in preferences {
+
+            guard let key = preference["Key"] as? String else {
+                print("Key not found")
+                continue
+            }
+            if let maxVal = preference["MaximumValue"] as? String {
+                preference.setValue(10, forKey: "MaximumValue")
+            }
+            defaultsToRegister[key] = preference
+            print(preference)
+        }
+        //userDefaults.register(defaults: defaultsToRegister)
+    }
+    
+    private init() {
+        let urlData = NSKeyedArchiver.archivedData(withRootObject: URL(string: "https://www.google.co.uk")!)
+      //  self.userDefaults.register(defaults: ["SearchEngine": urlData, "WJW": 10])
+        
+    }
+    
+    private let userDefaults = UserDefaults.standard
+    
+    var searchEngine: URL? {
+        get {
+            return self.userDefaults.url(forKey: "SearchEngine")
+        }
+        set {
+            self.userDefaults.set(newValue, forKey: "SearchEngine")
+        }
+    }
+    var utteranceRatePreference: Float? {
+        get {
+            return self.userDefaults.float(forKey: "utteranceRatePreference")
+        }
+        set {
+            self.userDefaults.set(newValue, forKey: "utteranceRatePreference")
+        }
+    }
+}

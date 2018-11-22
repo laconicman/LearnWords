@@ -28,7 +28,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //        UserDefaults.standard.register(defaults: [:])
 //        UserDefaults.standard.synchronize()
         print(UserDefaults.standard.double(forKey: "pitchMultiplierPreference"))
-        
+       // print(UserDefaults.standard.setValue((10.0 as Any), forKeyPath: "pitchMultiplierPreference\MaximumValue"))
+        LWUserDefaults.registerDefaultsFromSettingsBundle()
         return true
     }
 
