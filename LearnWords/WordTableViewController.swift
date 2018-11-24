@@ -55,16 +55,16 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
 
         setupSearchController(placeholder: NSLocalizedString("Search words in sets", comment: "placeholder"), hideWhenAppear: true)
 
-            if let savedWords = userDefaults?.stringArray(forKey: "Words")  {
+            if let savedWords = userDefaultsGroup?.stringArray(forKey: "Words")  {
                 wordsAndStat = (savedWords.compactMap{($0,0,0,0)} )
             } else {
                 saveInitialValues()
             }
-        if let languageListPreferences = userDefaults?.stringArray(forKey: "LanguageList")  {
+        if let languageListPreferences = userDefaultsGroup?.stringArray(forKey: "LanguageList")  {
             primaryLanguage = languageListPreferences[0]
             //secondaryLanguage = languageListPreferences[1]
         } else {
-            userDefaults?.set(UITextInputMode.activeInputModes.compactMap{$0.primaryLanguage}.filter{!$0.contains("emoji")}, forKey: "LanguageList")
+            userDefaultsGroup?.set(UITextInputMode.activeInputModes.compactMap{$0.primaryLanguage}.filter{!$0.contains("emoji")}, forKey: "LanguageList")
         }
         
 /*            if let savedWords = defaults.object(forKey: "knownWords") as? [String] {
@@ -111,7 +111,7 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
     }
     
     private func saveWordsOnly(_ wordsAndStat: [WordAndStat]) {
-        userDefaults?.set(wordsAndStat.map{$0.pair}, forKey: "Words")
+        userDefaultsGroup?.set(wordsAndStat.map{$0.pair}, forKey: "Words")
 //            defaults.set(knownWords, forKey: "knownWords")
 
     }

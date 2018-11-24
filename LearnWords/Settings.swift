@@ -11,6 +11,9 @@ import Foundation
 let kRecentSearchesKey = "RecentSearches"
 let kLastSearchKey = "LastSearch"
 
+let userDefaultsGroup = UserDefaults(suiteName: "group.club.laconic.LearnWords")
+//let userDefaults: UserDefaults? = LWUserDefaults.standard.userDefaults
+
 // Usefull links
 // parsing the whole settings bundle stucture:
 // https://stackoverflow.com/questions/46453789/swift-4-settings-bundle-get-defaults
@@ -20,11 +23,13 @@ let kLastSearchKey = "LastSearch"
 // register while init, easy get/set wrapper:
 // https://forums.developer.apple.com/thread/73266
 
+//Make use of it in future
+/*
 class LWUserDefaults {
     
     static var standard = LWUserDefaults()
     
-   static func registerDefaultsFromSettingsBundle()
+    func registerDefaultsFromSettingsBundle()
     {
         let settingsUrl = Bundle.main.url(forResource: "Settings", withExtension: "bundle")!.appendingPathComponent("Root.plist")
         let settingsPlist = NSDictionary(contentsOf:settingsUrl)!
@@ -33,27 +38,27 @@ class LWUserDefaults {
         var defaultsToRegister = Dictionary<String, Any>()
         
         for preference in preferences {
-
             guard let key = preference["Key"] as? String else {
-                print("Key not found")
+                print("Key not fount")
                 continue
             }
-            if let maxVal = preference["MaximumValue"] as? String {
-                preference.setValue(10, forKey: "MaximumValue")
-            }
-            defaultsToRegister[key] = preference
-            print(preference)
+            defaultsToRegister[key] = preference["DefaultValue"]
+            debugPrint(key, " ", preference["DefaultValue"])
         }
-        //userDefaults.register(defaults: defaultsToRegister)
+        //userDefaults.register(defaults: defaultsToRegister) //This is done automatically for standart
+        userDefaultsGroup.register(defaults: defaultsToRegister) //This is what you probably want!
+
     }
     
     private init() {
         let urlData = NSKeyedArchiver.archivedData(withRootObject: URL(string: "https://www.google.co.uk")!)
-      //  self.userDefaults.register(defaults: ["SearchEngine": urlData, "WJW": 10])
+       //self.userDefaults.register(defaults: ["SearchEngine": urlData, "WJW": 10])
+        registerDefaultsFromSettingsBundle()
         
     }
     
-    private let userDefaults = UserDefaults.standard
+    let userDefaultsGroup = UserDefaults(suiteName: "group.club.laconic.LearnWords")
+    let userDefaults = UserDefaults.standard
     
     var searchEngine: URL? {
         get {
@@ -63,12 +68,22 @@ class LWUserDefaults {
             self.userDefaults.set(newValue, forKey: "SearchEngine")
         }
     }
-    var utteranceRatePreference: Float? {
+    var utteranceRatePreference: Double {
         get {
-            return self.userDefaults.float(forKey: "utteranceRatePreference")
+            return self.userDefaults.double(forKey: "utteranceRatePreference")
         }
         set {
             self.userDefaults.set(newValue, forKey: "utteranceRatePreference")
         }
     }
+    
+    var pitchMultiplierPreference: Double {
+        get {
+            return self.userDefaults.double(forKey: "pitchMultiplierPreference")
+        }
+        set {
+            self.userDefaults.set(newValue, forKey: "pitchMultiplierPreferencee")
+        }
+    }
 }
+*/

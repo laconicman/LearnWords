@@ -12,7 +12,7 @@
 			<key>Type</key>
 			<string>PSTitleValueSpecifier</string>
 			<key>Title</key>
-			<string></string>
+			<string>Just a title</string>
 			<key>Key</key>
 			<string></string>
 		</dict>
@@ -86,7 +86,7 @@
 			<key>Key</key>
 			<string>pitchMultiplierPreference</string>
 			<key>DefaultValue</key>
-			<integer>1</integer>
+			<real>1.1</real>
 			<key>MinimumValue</key>
 			<real>0.5</real>
 			<key>MaximumValue</key>
@@ -108,9 +108,9 @@
 			<key>DefaultValue</key>
 			<real>0.35</real>
 			<key>MinimumValue</key>
-			<integer>0</integer>
+			<real>0.2</real>
 			<key>MaximumValue</key>
-			<integer>1</integer>
+			<real>0.9</real>
 		</dict>
 	</array>
 </dict>

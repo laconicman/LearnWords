@@ -15,7 +15,7 @@ class LocalizedUISearchController: UISearchController{
     
     override var textInputMode: UITextInputMode?{
         for inputMode in UITextInputMode.activeInputModes{
-            print("inputMode.primaryLanguage: \(inputMode.primaryLanguage)")
+            print("inputMode.primaryLanguage: \(inputMode.primaryLanguage ?? "Undefined")")
             if (inputMode.primaryLanguage?.hasPrefix("ru"))! {
                 return inputMode
             }
@@ -29,7 +29,7 @@ class UILocalizedSearchController: UISearchController{
     // or
     private var forcedPrimaryLanguage = UITextInputMode.activeInputModes.first?.primaryLanguage { //or computed var
         didSet {
-            debugPrint("forcedPrimaryLanguage", forcedPrimaryLanguage)
+            debugPrint("forcedPrimaryLanguage", forcedPrimaryLanguage ?? "Undefined")
             for inputMode in UITextInputMode.activeInputModes{
                 if (inputMode.primaryLanguage?.hasPrefix(forcedPrimaryLanguage ?? "")) ?? false {
                     _textInputMode = inputMode
@@ -91,7 +91,7 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
     }
     private var kRecentSearchesKey: String { return "RecentSearchesFor_" + searchLanguage }
     //private var kLastSearchKey: String { return "LastSearchFor_" + searchLanguage }
-    private lazy var recentSearches: [String] = (userDefaults?.stringArray(forKey: kRecentSearchesKey)) ?? []
+    private lazy var recentSearches: [String] = (userDefaultsGroup?.stringArray(forKey: kRecentSearchesKey)) ?? []
     
     let themeTint = UIColor.orange // UIColor(white: 0.9, alpha: 0.9)
     
@@ -350,7 +350,7 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
         if recentSearches.count > 10 {
             recentSearches.removeLast()
         }
-        userDefaults?.set(recentSearches, forKey: kRecentSearchesKey)
+        userDefaultsGroup?.set(recentSearches, forKey: kRecentSearchesKey)
     }
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "Add Translation", let cell = (sender as? UITableViewCell) {

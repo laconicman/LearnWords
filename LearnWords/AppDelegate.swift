@@ -27,9 +27,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //        }
 //        UserDefaults.standard.register(defaults: [:])
 //        UserDefaults.standard.synchronize()
-        print(UserDefaults.standard.double(forKey: "pitchMultiplierPreference"))
-       // print(UserDefaults.standard.setValue((10.0 as Any), forKeyPath: "pitchMultiplierPreference\MaximumValue"))
-        LWUserDefaults.registerDefaultsFromSettingsBundle()
+        print("UserDefaults.standard.double(forKey: pitchMultiplierPreference) = " + String(UserDefaults.standard.double(forKey: "pitchMultiplierPreference")))
+        print("UserDefaults.standard.double(forKey: utteranceRatePreference) = " + String(UserDefaults.standard.double(forKey: "utteranceRatePreference")))
+        print("userDefaultsGroup.double(forKey: pitchMultiplierPreference) = " + String(userDefaultsGroup?.double(forKey: "pitchMultiplierPreference") ?? 99))
+        print("userDefaultsGroup.double(forKey: utteranceRatePreference) = " + String(userDefaultsGroup?.double(forKey: "utteranceRatePreference") ?? 99))
+        //print(UserDefaults.standard.setValue((10.0 as Any), forKeyPath: "pitchMultiplierPreference\MaximumValue"))
+        //Experiments with Settings register() method
+        //print(LWUserDefaults.standard.utteranceRatePreference)
+        //print(LWUserDefaults.standard.pitchMultiplierPreference)
         return true
     }
 

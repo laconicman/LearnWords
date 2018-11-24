@@ -11,4 +11,3 @@ typealias WordAndStat = (pair: String, known: Int, unknow: Int, skiped: Int)
 var wordsAndStat = [WordAndStat]() // The whole word pair database
 var shownWords = [WordAndStat]() // Word pair shown during last session
 
-let userDefaults = UserDefaults(suiteName: "group.club.laconic.LearnWords")
