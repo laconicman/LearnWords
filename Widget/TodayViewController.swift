@@ -36,8 +36,8 @@ class TodayViewController: UIViewController, NCWidgetProviding, UITableViewDataS
     
     func widgetActiveDisplayModeDidChange(_ activeDisplayMode: NCWidgetDisplayMode, withMaximumSize maxSize: CGSize) {
         
-        if let defaults = UserDefaults(suiteName: "group.club.laconic.LearnWords") {
-            if let savedWords = defaults.stringArray(forKey: "Words") {
+        if let userDefaultsGroup = UserDefaults(suiteName: "group.club.laconic.LearnWords") {
+            if let savedWords = userDefaultsGroup.stringArray(forKey: "Words") {
                 print("Loaded words: \(savedWords)")
                 //            if let savedWords = defaults.object(forKey: "Words") as? [String] {
                 words = savedWords

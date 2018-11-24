@@ -94,6 +94,19 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         super.viewDidAppear(animated)
         tableView.reloadData() //beter do animated insertion or deletion here
         checkInstalledLocales()
+        NotificationCenter.default.addObserver(self, selector: #selector(defaultsChanged), name: UserDefaults.didChangeNotification, object: nil)
+        defaultsChanged()
+    }
+    
+    
+    @objc func defaultsChanged(){
+        if UserDefaults.standard.bool(forKey: "redThemeSwitch") {
+            self.view.backgroundColor = UIColor.red
+            
+        }
+        else {
+            self.view.backgroundColor = UIColor.green
+        }
     }
     
     private func saveInitialValues () {
