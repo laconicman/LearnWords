@@ -15,6 +15,8 @@
 			<string>Just a title</string>
 			<key>Key</key>
 			<string></string>
+			<key>DefaultValue</key>
+			<string>Just</string>
 		</dict>
 		<dict>
 			<key>Type</key>
@@ -78,7 +80,7 @@
 			<key>Title</key>
 			<string>Pitch</string>
 			<key>Key</key>
-			<string>pitchTitlePreference</string>
+			<string>pitchMultiplierTitlePreference</string>
 		</dict>
 		<dict>
 			<key>Type</key>
@@ -98,7 +100,9 @@
 			<key>Title</key>
 			<string>Rate</string>
 			<key>Key</key>
-			<string>utteranceRateTitlePreference</string>
+			<string>rateTitlePreference</string>
+			<key>DefaultValue</key>
+			<string></string>
 		</dict>
 		<dict>
 			<key>Type</key>
@@ -111,6 +115,8 @@
 			<real>0.2</real>
 			<key>MaximumValue</key>
 			<real>0.9</real>
+			<key>MinimumValueImage</key>
+			<string></string>
 		</dict>
 		<dict>
 			<key>Type</key>
@@ -121,6 +127,30 @@
 			<string>redThemeSwitch</string>
 			<key>DefaultValue</key>
 			<false/>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSRadioGroupSpecifier</string>
+			<key>Title</key>
+			<string>RadioGroupSpecifier</string>
+			<key>Key</key>
+			<string>tkey</string>
+			<key>FooterText</key>
+			<string>footer</string>
+			<key>DefaultValue</key>
+			<string>radio group default</string>
+			<key>Values</key>
+			<array>
+				<string>en-US</string>
+				<string>ru-RU</string>
+				<string>es-ES</string>
+			</array>
+			<key>Titles</key>
+			<array>
+				<string>English</string>
+				<string>Russian</string>
+				<string>Spanish</string>
+			</array>
 		</dict>
 	</array>
 </dict>

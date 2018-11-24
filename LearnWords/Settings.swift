@@ -11,8 +11,9 @@ import Foundation
 let kRecentSearchesKey = "RecentSearches"
 let kLastSearchKey = "LastSearch"
 
-let userDefaultsGroup = UserDefaults(suiteName: "group.club.laconic.LearnWords")
-//let userDefaults: UserDefaults? = LWUserDefaults.standard.userDefaults
+//let userDefaultsGroup = UserDefaults(suiteName: "group.club.laconic.LearnWords")
+let userDefaultsGroup = LWUserDefaults.standard.userDefaultsGroup
+let userDefaults = LWUserDefaults.standard.userDefaults
 
 // Usefull links
 // parsing the whole settings bundle stucture:
@@ -24,7 +25,7 @@ let userDefaultsGroup = UserDefaults(suiteName: "group.club.laconic.LearnWords")
 // https://forums.developer.apple.com/thread/73266
 
 //Make use of it in future
-/*
+
 class LWUserDefaults {
     
     static var standard = LWUserDefaults()
@@ -43,16 +44,18 @@ class LWUserDefaults {
                 continue
             }
             defaultsToRegister[key] = preference["DefaultValue"]
-            debugPrint(key, " ", preference["DefaultValue"])
+            debugPrint(key, " ", preference["DefaultValue"] ?? "Undefined value in preference")
         }
-        //userDefaults.register(defaults: defaultsToRegister) //This is done automatically for standart
-        userDefaultsGroup.register(defaults: defaultsToRegister) //This is what you probably want!
+        userDefaults.register(defaults: defaultsToRegister) //This is NOT done automatically for the first launch
+        print("userDefaults.register")
+        //userDefaultsGroup?.register(defaults: defaultsToRegister) //This is what you probably want!
 
     }
     
     private init() {
-        let urlData = NSKeyedArchiver.archivedData(withRootObject: URL(string: "https://www.google.co.uk")!)
+       //let urlData = NSKeyedArchiver.archivedData(withRootObject: URL(string: "https://www.google.co.uk")!)
        //self.userDefaults.register(defaults: ["SearchEngine": urlData, "WJW": 10])
+        // TODO: register only if first launch
         registerDefaultsFromSettingsBundle()
         
     }
@@ -60,14 +63,16 @@ class LWUserDefaults {
     let userDefaultsGroup = UserDefaults(suiteName: "group.club.laconic.LearnWords")
     let userDefaults = UserDefaults.standard
     
-    var searchEngine: URL? {
-        get {
-            return self.userDefaults.url(forKey: "SearchEngine")
-        }
-        set {
-            self.userDefaults.set(newValue, forKey: "SearchEngine")
-        }
-    }
+//    var searchEngine: URL? {
+//        get {
+//            return self.userDefaults.url(forKey: "SearchEngine")
+//        }
+//        set {
+//            self.userDefaults.set(newValue, forKey: "SearchEngine")
+//        }
+//    }
+    
+    
     var utteranceRatePreference: Double {
         get {
             return self.userDefaults.double(forKey: "utteranceRatePreference")
@@ -86,4 +91,4 @@ class LWUserDefaults {
         }
     }
 }
-*/
+

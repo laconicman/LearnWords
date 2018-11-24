@@ -33,6 +33,15 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         print("UITextInputMode.activeInputModes.map{$0.primaryLanguage...} \n", UITextInputMode.activeInputModes.map{$0.primaryLanguage ?? "primaryLanguage undefined"})
         print("Bundle.main.bundleIdentifier \n", Bundle.main.bundleIdentifier ?? "")
         
+        //Some tests for user defaults
+        //let appDefaults = [String:AnyObject]()
+        //UserDefaults.standard.register(defaults: appDefaults)
+
+        print("UserDefaults.standard.double(forKey: pitchMultiplierPreference) = " + String(UserDefaults.standard.double(forKey: "pitchMultiplierPreference")))
+        print("UserDefaults.standard.double(forKey: utteranceRatePreference) = " + String(UserDefaults.standard.double(forKey: "utteranceRatePreference")))
+        print("userDefaultsGroup.double(forKey: pitchMultiplierPreference) = " + String(userDefaultsGroup?.double(forKey: "pitchMultiplierPreference") ?? 99))
+        print("userDefaultsGroup.double(forKey: utteranceRatePreference) = " + String(userDefaultsGroup?.double(forKey: "utteranceRatePreference") ?? 99))
+        
         //UserDefaults.standard //NSUserDefaults_Log_Nonsensical_Suites (suiteName: Bundle.main.bundleIdentifier)
         //We can get voices that are present in system and then use set them either with identifiers or by using default for language
         //let voices = AVSpeechSynthesisVoice.speechVoices()
