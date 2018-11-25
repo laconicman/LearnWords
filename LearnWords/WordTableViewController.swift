@@ -8,6 +8,7 @@
 // TODO: Consider NSSpellChecker
 // Bundle.main.preferredLocalizations.swapAt(0, 2)
 // Consider UserDefaults AppLanguages
+// Show help or tutorial on first launch
 
 import UIKit
 
@@ -16,10 +17,9 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
     // MARK: searchController variables
     var filteredWords = [WordAndStat]() //? move to model?
     var wordsInTable : [WordAndStat] { // A subset of word pairs to display in tableView
-        return (searchController.isActive && searchController.searchBar.text != "") ? filteredWords : wordsAndStat
+        return (searchController.isActive && searchController.searchBar.text != "") ? filteredWords : Storage.wordsAndStat
     }
-    var primaryLanguage = "en-EN"
-    var secondaryLanguage = ""
+
     let searchController = LocalizedUISearchController(searchResultsController: nil)
 
     @IBAction func goToSettings(_ sender: UIBarButtonItem) {
@@ -34,8 +34,6 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         print("Bundle.main.bundleIdentifier \n", Bundle.main.bundleIdentifier ?? "")
         
         //Some tests for user defaults
-        //let appDefaults = [String:AnyObject]()
-        //UserDefaults.standard.register(defaults: appDefaults)
 
         print("UserDefaults.standard.double(forKey: pitchMultiplierPreference) = " + String(UserDefaults.standard.double(forKey: "pitchMultiplierPreference")))
         print("UserDefaults.standard.double(forKey: utteranceRatePreference) = " + String(UserDefaults.standard.double(forKey: "utteranceRatePreference")))
@@ -65,16 +63,10 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         setupSearchController(placeholder: NSLocalizedString("Search words in sets", comment: "placeholder"), hideWhenAppear: true)
 
             if let savedWords = userDefaultsGroup?.stringArray(forKey: "Words")  {
-                wordsAndStat = (savedWords.compactMap{($0,0,0,0)} )
+                Storage.wordsAndStat = (savedWords.compactMap{($0,0,0,0)} )
             } else {
-                saveInitialValues()
+                Storage.saveInitialValues()
             }
-        if let languageListPreferences = userDefaultsGroup?.stringArray(forKey: "LanguageList")  {
-            primaryLanguage = languageListPreferences[0]
-            //secondaryLanguage = languageListPreferences[1]
-        } else {
-            userDefaultsGroup?.set(UITextInputMode.activeInputModes.compactMap{$0.primaryLanguage}.filter{!$0.contains("emoji")}, forKey: "LanguageList")
-        }
         
 /*            if let savedWords = defaults.object(forKey: "knownWords") as? [String] {
                 knownWords = savedWords
@@ -95,8 +87,6 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         let titleAttributes = [NSAttributedString.Key.font: headlineFont]
         navigationController?.navigationBar.titleTextAttributes = titleAttributes
         // title = "LearnWords" //better do this in IB
-        print("primaryLanguage: \(primaryLanguage)")
-        print("secondaryLanguage: \(secondaryLanguage)")
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -105,6 +95,10 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         checkInstalledLocales()
         NotificationCenter.default.addObserver(self, selector: #selector(defaultsChanged), name: UserDefaults.didChangeNotification, object: nil)
         defaultsChanged()
+        // Some checks:
+        print("LWUserDefaults.standard.languageToStudyPreference: " + (LWUserDefaults.standard.languageToStudyPreference ?? "Undefined"))
+        print("LWUserDefaults.standard.nativeLanguagePreference: " + (LWUserDefaults.standard.nativeLanguagePreference ?? "Undefined"))
+        tableView.reloadData() //inefficient
     }
     
     
@@ -117,27 +111,6 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
             self.view.backgroundColor = UIColor.green
         }
     }
-    
-    private func saveInitialValues () {
-        wordsAndStat.append(("медведь::bear",0,0,0))
-        wordsAndStat.append(("верблюд::camel",0,0,0))
-        wordsAndStat.append(("корова::cow",0,0,0))
-        wordsAndStat.append(("лиса::fox",0,0,0))
-        wordsAndStat.append(("коза::goat",0,0,0))
-        wordsAndStat.append(("обезьяна::monkey",0,0,0))
-        wordsAndStat.append(("свинья::pig",0,0,0))
-        wordsAndStat.append(("кролик::rabbit",0,0,0))
-        wordsAndStat.append(("овца::sheep",0,0,0))
-        
-        saveWordsOnly(wordsAndStat)
-    }
-    
-    private func saveWordsOnly(_ wordsAndStat: [WordAndStat]) {
-        userDefaultsGroup?.set(wordsAndStat.map{$0.pair}, forKey: "Words")
-//            defaults.set(knownWords, forKey: "knownWords")
-
-    }
-    
     
     @IBAction func addNewWord(_ sender: UIBarButtonItem) {
         // create our alert controller
@@ -159,20 +132,15 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
             let secondWord = ac.textFields?[1].text ?? ""
             
             // submit the English and French word to the insertFlashcard() method
-            self.insertFlashcard(first: firstWord, second: secondWord)
+            if let indexOfInsertedRow = Storage.insertFlashcard(first: firstWord, second: secondWord) {
+                //TODO: Check for duplicates and alphabetically sort
+                let newIndexPath = IndexPath(row: indexOfInsertedRow, section: 0)
+                self.tableView.insertRows(at: [newIndexPath], with: .automatic)
+            }
         }
         ac.addAction(submitAction)
         ac.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: "AlertAction title"), style: .cancel))
         present(ac, animated: true)
-    }
-    
-    func insertFlashcard(first: String, second: String) {
-        guard first.count > 0 && second.count > 0 else { return }
-        //TODO: Check for duplicates and alphabetically sort
-        let newIndexPath = IndexPath(row: wordsAndStat.count, section: 0)
-        wordsAndStat.append(("\(first)::\(second)",0,0,0))
-        tableView.insertRows(at: [newIndexPath], with: .automatic)
-        saveWordsOnly(wordsAndStat)
     }
     
 //    @objc func startTest() {
@@ -186,23 +154,39 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
     }
 
     private func checkInstalledLocales() {
-        let languageIDs = UITextInputMode.activeInputModes.compactMap{$0.primaryLanguage}
-        if languageIDs.count < 3 {
+        /*if let languageListPreferences = userDefaultsGroup?.stringArray(forKey: "LanguageList")  {
+            primaryLanguage = languageListPreferences[0]
+            //secondaryLanguage = languageListPreferences[1]
+        } else {
+            userDefaultsGroup?.set(UITextInputMode.activeInputModes.compactMap{$0.primaryLanguage}.filter{!$0.contains("emoji")}, forKey: "LanguageList")
+        } */
+        let languageIDs = UITextInputMode.activeInputModes.compactMap{ $0.primaryLanguage }
+        
+        var checkResultsMessage :String?
+        if let secondaryLanguage = LWUserDefaults.standard.languageToStudyPreference, !languageIDs.contains(secondaryLanguage) {
+            checkResultsMessage = NSLocalizedString("Keyboard for language to study (\(secondaryLanguage)) is not installed now. ", comment: "Alert message, langID inside")
+        }
+        if let primaryLanguage = LWUserDefaults.standard.nativeLanguagePreference, !languageIDs.contains(primaryLanguage) {
+            checkResultsMessage = (checkResultsMessage ?? "") + NSLocalizedString("Keyboard for native learner's language (\(primaryLanguage)) is not installed now. ", comment: "Alert message, langID inside")
+        }
+        checkResultsMessage?.append(NSLocalizedString("You may add Keyboards from system General Settings pane.", comment: ""))
+        
+        if checkResultsMessage != nil {
             // If user only has English and Emodsi they woun't be able to add translations
             let ac = UIAlertController(title: NSLocalizedString("Check installed languages", comment: "Alert title"),
-                                       message: NSLocalizedString("Looks like you only have ", comment: "Alert message, langID appended") + languageIDs.joined(separator: ", "),
+                                       message: checkResultsMessage! + NSLocalizedString("Looks like you only have those keyboards:", comment: "Alert message, langID appended") + languageIDs.joined(separator: ", "),
                                        preferredStyle: .alert)
             
             // create a "Go to Settings" button that opens standart settings
             let settingsAction = UIAlertAction(title: NSLocalizedString("Settings", comment: ""), style: .default) { [weak self] (action: UIAlertAction!) in
                 self?.gotoAppSettings()
             }
-            
             ac.addAction(settingsAction)
             ac.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: "AlertAction title"), style: .cancel))
-            
             present(ac, animated: true)
+
         }
+        
     }
     
     private func gotoAppSettings() {
@@ -248,9 +232,12 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         guard !(searchController.isActive && searchController.searchBar.text != "") else {return}
         if editingStyle == .delete {
-            wordsAndStat.remove(at: indexPath.row)
+            //TODO: Move operating functions to model
+            Storage.wordsAndStat.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .automatic)
-            saveWordsOnly(wordsAndStat)
+            // TODO: Replace with saveCurrentWordSet
+            Storage.saveWordsOnly(Storage.wordsAndStat)
+
         }
     }
     // MARK: SearchController for filtering WordTableView
@@ -268,7 +255,7 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
     }
     
     func filterRows(for searchText: String) {
-        filteredWords = wordsAndStat.filter{$0.pair.lowercased().contains(searchText.lowercased())}
+        filteredWords = Storage.wordsAndStat.filter{$0.pair.lowercased().contains(searchText.lowercased())}
         tableView.reloadData()
     }
     
@@ -277,12 +264,15 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         switch segue.identifier {
         case "StartTest":
             if let wordTestVC = segue.destination as? WordTestViewController {
-                wordTestVC.wordsInTest = wordsAndStat
+                wordTestVC.wordsInTest = Storage.wordsAndStat
             }
         case "AddWord":
-            if let searchWordVC = segue.destination as? SearchWordViewController {
-                searchWordVC.searchedObject = .original(lang: primaryLanguage, word: "")
+            if let searchWordVC = segue.destination as? SearchWordViewController, let languageToStudy = LWUserDefaults.standard.languageToStudyPreference {
+                searchWordVC.searchedObject = .original(lang: languageToStudy, word: "")
             }
+            // TODO: with standart row features
+//        case: "EditWord"
+//        case: "MoveWordToSet"
         default:
             break
         }

@@ -44,7 +44,7 @@ final class WordTestViewController: UIViewController, AVSpeechSynthesizerDelegat
             var shownWord = wordsInTest.remove(at: 0)
             
             shownWord.known += 1
-            shownWords.append(shownWord)
+            Storage.shownWords.append(shownWord)
             //disable buttons and ShowNextButton Instead and autoSkip
             //prepareForNextQuestion()
             showAnswer(for: shownWord, isKnown: true)
@@ -93,7 +93,7 @@ final class WordTestViewController: UIViewController, AVSpeechSynthesizerDelegat
             var shownWord = wordsInTest.remove(at: 0)
             showAnswer(for: shownWord, isKnown: false)
             shownWord.unknow += 1
-            shownWords.append(shownWord)
+            Storage.shownWords.append(shownWord)
         }
     }
     
@@ -158,7 +158,7 @@ final class WordTestViewController: UIViewController, AVSpeechSynthesizerDelegat
         if !wordsInTest.isEmpty {
             var knownWord = wordsInTest.remove(at: 0)
             knownWord.skiped += 1
-            shownWords.append(knownWord)
+            Storage.shownWords.append(knownWord)
             askQuestion()
         }
         //prepareForNextQuestion()

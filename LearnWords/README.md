@@ -21,4 +21,16 @@ https://medium.com/@abhimuralidharan/adding-settings-to-your-ios-app-cecef8c5497
 Боролся со странным багом виджете связанным с обновлением данных и вот этой штукой:
 if let defaults = UserDefaults(suiteName: "group.club.laconic.LearnWords") 
 В результате сейчас всё избыточно и неоптимально
-В ре
+
+24.10.19 14:30
+Выяснилось, что Settings.bundle только отрисовывает в панели системных настроек. При первом запуске ничего не записывает  БД, хотя если настройки изменились с панели, то тогда да - в перситент.
+Есть специальный  метод register(defaults). Его надо вручную вызывать. Тогда в настройках возникает domain для fallback, но это не persistent storage.
+Реализован изящный механизм, встроенный в инициализатор класса, синхронизирующий fallback defaults с root.plist (из Settings.bundle).
+А если что-то записано в персистент, то оно имеет приоритет.
+Выяснилось, что standard и site  - это разные settings, но оба они fallback to registered(defaults).
+Найден скрытый, но рабочий RadioButton
+
+Чтобы уведомлять программу об изменении настроек реализован наблюдатель NotificationCenter.default.addObserver(self, selector: #selector(defaultsChanged), name: UserDefaults.didChangeNotification. Сейчас он во viewDidAppear главного controllera, чтобы не тормозить появление первого экрана.
+
+24.10.19 18:30
+Более прав

@@ -27,7 +27,7 @@ class LocalizedUISearchController: UISearchController{
 class UILocalizedSearchController: UISearchController{
     private var _textInputMode: UITextInputMode?
     // or
-    private var forcedPrimaryLanguage = UITextInputMode.activeInputModes.first?.primaryLanguage { //or computed var
+    var forcedPrimaryLanguage = LWUserDefaults.standard.languageToStudyPreference { //or computed var
         didSet {
             debugPrint("forcedPrimaryLanguage", forcedPrimaryLanguage ?? "Undefined")
             for inputMode in UITextInputMode.activeInputModes{
@@ -57,6 +57,11 @@ class UILocalizedSearchController: UISearchController{
             _textInputMode = newValue
         }
     }
+    
+    override var canBecomeFirstResponder: Bool {
+        return true
+    }
+    
 }
 
 
@@ -73,13 +78,27 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
         case original(lang: String, word: String)
         case translation(orig_lang: String, orig_word: String, dest_lang: String, translations: [String])
     }
-    var searchedObject = SearchedObject.original(lang: "en", word: "") //UITextInputMode.activeInputModes.compactMap{$0.primaryLanguage}
+    var searchedObject = SearchedObject.original(lang: LWUserDefaults.standard.languageToStudyPreference ?? "en", word: "") {
+            didSet {
+                switch searchedObject {
+                case .original(lang: let lang, word: _):
+                    //searchLanguage = lang
+                    tableView.allowsMultipleSelection = false
+                case .translation(orig_lang: _, orig_word: _, dest_lang: let lang, translations: _):
+                    tableView.allowsMultipleSelection = true
+                    //searchLanguage = lang
+                }
+            }
+        }
+    
+    
+    //UITextInputMode.activeInputModes.compactMap{$0.primaryLanguage}
     
     // Keep an instance of UITextChecker for getting suggested words from word fragments.
     // This is the autocorrect word list, not the actual dictionary list, so it will return some words without definitions.
     private let textChecker = UITextChecker() // Use global?
     private var suggestions = [String]()
-    private var searchLanguage: String { get {
+    var searchLanguage: String { get { //TODO: move to searchedObject.didSet?
         switch searchedObject {
         case .original(lang: let lang, word: _):
             return lang
@@ -89,13 +108,18 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
         }
         }
     }
+    
     private var kRecentSearchesKey: String { return "RecentSearchesFor_" + searchLanguage }
     //private var kLastSearchKey: String { return "LastSearchFor_" + searchLanguage }
     private lazy var recentSearches: [String] = (userDefaultsGroup?.stringArray(forKey: kRecentSearchesKey)) ?? []
     
     let themeTint = UIColor.orange // UIColor(white: 0.9, alpha: 0.9)
     
-    let searchController = LocalizedUISearchController(searchResultsController: nil)
+    lazy var searchController: UILocalizedSearchController = {
+        let  sc = UILocalizedSearchController(searchResultsController: nil)
+        sc.forcedPrimaryLanguage = searchLanguage
+        return sc
+    }()
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -121,6 +145,20 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
     
     @objc func startTest() {
         debugPrint(#function)
+        switch searchedObject { //Add emoji flags
+        case .original:
+            break
+        case .translation(orig_lang: _, orig_word: let foreignWord, dest_lang: _, translations: var _):
+//            for indexPath in tableView?.indexPathsForSelectedRows ?? [] {
+//                if let stc = tableView.cellForRow(at: indexPath), let translation = stc.textLabel?.text {
+//                translations += [translation]
+//            }
+//        }
+        _ = Storage.insertFlashcard(first: searchController.searchBar.text!, second: foreignWord)
+        // take care to refresh words table?
+        // insertFlashcard(first: translations[0], second: foreignWord)
+        self.presentingViewController?.dismiss(animated: true)
+    }
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -161,7 +199,9 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
             cell.detailTextLabel?.text = lang
         case (.translation, 1):
             if let searchText = searchController.searchBar.text, !searchText.isEmpty {
+                if suggestions.indices.contains(indexPath.row) { //Check why this may happen
                 cell.textLabel?.text = suggestions[indexPath.row]
+                }
             } else {
                 cell.textLabel?.text = recentSearches[indexPath.row]
             }
@@ -225,6 +265,7 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
             }
         }
     }
+    
     
 //    func sectionIndexTitles(for tableView: UITableView) -> [String]? {
 //        Implement this
@@ -354,14 +395,18 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
     }
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "Add Translation", let cell = (sender as? UITableViewCell) {
-            if let wordSearchVC = segue.destination as? SearchWordViewController {
+            if let wordSearchVC = segue.destination as? SearchWordViewController,
+                let languageToStudy = LWUserDefaults.standard.languageToStudyPreference,
+                let nativeLanguage = LWUserDefaults.standard.nativeLanguagePreference {
                 //wordSearchVC.language = "ru" //Bundle.main.preferredLocalizations[1]
                 wordSearchVC.searchedObject = .translation(
-                    orig_lang: "en",
+                    orig_lang: languageToStudy,
                     orig_word: cell.textLabel?.text ?? "?",
-                    dest_lang: "ru",
+                    dest_lang: nativeLanguage,
                     translations: [])
             }
+        } else if segue.identifier == "Add Word Pair" {
+            //TODO:
         }
     }
 

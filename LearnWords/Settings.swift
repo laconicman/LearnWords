@@ -24,9 +24,9 @@ let userDefaults = LWUserDefaults.standard.userDefaults
 // register while init, easy get/set wrapper:
 // https://forums.developer.apple.com/thread/73266
 
-//Make use of it in future
+//Keep in sync with Root.plist in Settings.bundle
 
-class LWUserDefaults {
+final class LWUserDefaults {
     
     static var standard = LWUserDefaults()
     
@@ -40,7 +40,7 @@ class LWUserDefaults {
         
         for preference in preferences {
             guard let key = preference["Key"] as? String else {
-                print("Key not fount")
+                debugPrint("Key not found in preferences")
                 continue
             }
             defaultsToRegister[key] = preference["DefaultValue"]
@@ -58,6 +58,10 @@ class LWUserDefaults {
         // TODO: register only if first launch
         registerDefaultsFromSettingsBundle()
         
+        
+        // TO_DO: if first launch set native and dictionary langs
+        // nativeLanguagePreference = UITextInputMode.activeInputModes.first?.primaryLanguage
+        // languageToStudyPreference.UITextInputMode.activeInputModes.filter{ $0.contains("emoji") }.last?.primaryLanguage
     }
     
     let userDefaultsGroup = UserDefaults(suiteName: "group.club.laconic.LearnWords")
@@ -88,6 +92,24 @@ class LWUserDefaults {
         }
         set {
             self.userDefaults.set(newValue, forKey: "pitchMultiplierPreferencee")
+        }
+    }
+    
+    var languageToStudyPreference: String? {
+        get {
+            return self.userDefaults.string(forKey: "languageToStudyPreference")
+        }
+        set {
+            self.userDefaults.set(newValue, forKey: "languageToStudyPreference")
+        }
+    }
+    
+    var nativeLanguagePreference: String? {
+        get {
+            return self.userDefaults.string(forKey: "nativeLanguagePreference")
+        }
+        set {
+            self.userDefaults.set(newValue, forKey: "nativeLanguagePreference")
         }
     }
 }
