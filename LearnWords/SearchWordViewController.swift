@@ -148,7 +148,8 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
         switch searchedObject { //Add emoji flags
         case .original:
             break
-        case .translation(orig_lang: _, orig_word: let foreignWord, dest_lang: _, translations: var _):
+        case .translation(orig_lang: _, orig_word: let foreignWord, dest_lang: _, translations: _):
+            // TODO: make an opportunity to select words - move them to defifnitions section
 //            for indexPath in tableView?.indexPathsForSelectedRows ?? [] {
 //                if let stc = tableView.cellForRow(at: indexPath), let translation = stc.textLabel?.text {
 //                translations += [translation]

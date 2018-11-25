@@ -28,6 +28,7 @@ final class WordTestViewController: UIViewController, AVSpeechSynthesizerDelegat
     
     
     @IBAction func lookUpAction(_ sender: UIButton) {
+        // TODO: If it is the first time, then show "The app relies on system dictionries, . They can be used ofline. Make sure you have downloaded the dictionaries you need. To add or remove didctionaries use Manage Dictionaries button on the next screen" "Remind me next time" "Got it"
         if UIReferenceLibraryViewController.dictionaryHasDefinition(forTerm: prompt.text ?? "") {
             let rlvc = UIReferenceLibraryViewController(term: prompt.text!)
             //rlvc.editButtonItem what is this
