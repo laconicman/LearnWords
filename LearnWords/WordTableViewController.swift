@@ -20,7 +20,7 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         return (searchController.isActive && searchController.searchBar.text != "") ? filteredWords : Storage.wordsAndStat
     }
 
-    let searchController = LocalizedUISearchController(searchResultsController: nil)
+    let searchController = UISearchController(searchResultsController: nil)
 
     @IBAction func goToSettings(_ sender: UIBarButtonItem) {
         gotoAppSettings()

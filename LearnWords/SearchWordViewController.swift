@@ -11,20 +11,60 @@
 
 import UIKit
 
-class LocalizedUISearchController: UISearchController{
-    
-    override var textInputMode: UITextInputMode?{
-        for inputMode in UITextInputMode.activeInputModes{
-            print("inputMode.primaryLanguage: \(inputMode.primaryLanguage ?? "Undefined")")
-            if (inputMode.primaryLanguage?.hasPrefix("ru"))! {
-                return inputMode
-            }
-        }
-        return super.textInputMode
-    }
-}
+//class LocalizedUISearchController: UISearchController{
+//
+//    override var textInputMode: UITextInputMode?{
+//        for inputMode in UITextInputMode.activeInputModes{
+//            print("inputMode.primaryLanguage: \(inputMode.primaryLanguage ?? "Undefined")")
+//            if (inputMode.primaryLanguage?.hasPrefix("ru"))! {
+//                return inputMode
+//            }
+//        }
+//        return super.textInputMode
+//    }
+//}
+//
+//class UILocalizedSearchController: UISearchController{
+//    private var _textInputMode: UITextInputMode?
+//    // or
+//    var forcedPrimaryLanguage = LWUserDefaults.standard.languageToStudyPreference { //or computed var
+//        didSet {
+//            debugPrint("forcedPrimaryLanguage", forcedPrimaryLanguage ?? "Undefined")
+//            for inputMode in UITextInputMode.activeInputModes{
+//                if (inputMode.primaryLanguage?.hasPrefix(forcedPrimaryLanguage ?? "")) ?? false {
+//                    _textInputMode = inputMode
+//                    break
+//                }
+//// TODO: correct the logic
+////              _textInputMode = nil //reset if Language is not found
+////              forcedPrimaryLanguage = oldValue or UITextInputMode.activeInputModes.first?.primaryLanguage
+//            }
+//        }
+//    }
+//
+//    func setTextInputModePrimaryLanguage(by prefix: String) {
+//        forcedPrimaryLanguage = prefix
+//    }
+//    override var textInputMode: UITextInputMode?
+//        {
+//        get { //prioty 1 if is set
+//            if let definedTextInputMode = _textInputMode {
+//                return definedTextInputMode
+//            } // fallback to default if not manually set by var o funk
+//            return super.textInputMode
+//        }
+//        set {
+//            _textInputMode = newValue
+//        }
+//    }
+//
+//    override var canBecomeFirstResponder: Bool {
+//        return true
+//    }
+//
+//}
 
-class UILocalizedSearchController: UISearchController{
+class LWLocalizedSearchBar: UISearchBar {
     private var _textInputMode: UITextInputMode?
     // or
     var forcedPrimaryLanguage = LWUserDefaults.standard.languageToStudyPreference { //or computed var
@@ -41,7 +81,7 @@ class UILocalizedSearchController: UISearchController{
             }
         }
     }
-    
+
     func setTextInputModePrimaryLanguage(by prefix: String) {
         forcedPrimaryLanguage = prefix
     }
@@ -57,13 +97,12 @@ class UILocalizedSearchController: UISearchController{
             _textInputMode = newValue
         }
     }
-    
+
     override var canBecomeFirstResponder: Bool {
         return true
     }
-    
-}
 
+}
 
 
 class SearchWordViewController: UITableViewController, UISearchBarDelegate {
@@ -115,11 +154,18 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
     
     let themeTint = UIColor.orange // UIColor(white: 0.9, alpha: 0.9)
     
-    lazy var searchController: UILocalizedSearchController = {
-        let  sc = UILocalizedSearchController(searchResultsController: nil)
-        sc.forcedPrimaryLanguage = searchLanguage
-        return sc
-    }()
+//    lazy var searchController: UILocalizedSearchController = {
+//        let  sc = UILocalizedSearchController(searchResultsController: nil)
+//        sc.forcedPrimaryLanguage = searchLanguage
+//        return sc
+//    }()
+    
+    lazy var searchBar: LWLocalizedSearchBar = {
+                let  sb = LWLocalizedSearchBar()
+                sb.forcedPrimaryLanguage = searchLanguage
+                sb.sizeToFit()
+                return sb
+            }()
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -127,7 +173,7 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupSearchController()
+        //setupSearchController()
         // tableView.keyboardDismissMode = .onDrag
         
         switch searchedObject {
@@ -140,7 +186,18 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
             //language = o_lang
             navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(startTest))
         }
+        // searchController.becomeFirstResponder // display the keyboard right away
 
+        // Search bar setup.Move to didAppear?
+        searchBar.delegate = self;
+        searchBar.searchBarStyle = .prominent // use the prominent style to get a white background
+        searchBar.autocapitalizationType = .none
+        // searchBar.prompt = "Foreign word"
+        searchBar.placeholder = "start typing"
+        //navigationItem.titleView = searchBar
+        searchBar.sizeToFit()
+        tableView.tableHeaderView = searchBar
+        //navigationItem.titleView = searchBar
     }
     
     @objc func startTest() {
@@ -155,7 +212,7 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
 //                translations += [translation]
 //            }
 //        }
-        _ = Storage.insertFlashcard(first: searchController.searchBar.text!, second: foreignWord)
+        _ = Storage.insertFlashcard(first: searchBar.text!, second: foreignWord)
         // take care to refresh words table?
         // insertFlashcard(first: translations[0], second: foreignWord)
         self.presentingViewController?.dismiss(animated: true)
@@ -164,7 +221,8 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        searchController.becomeFirstResponder // display the keyboard right away
+        searchBar.becomeFirstResponder()
+       // searchBar.setNeedsFocusUpdate()
     }
     
     //------------------------------------------------------------------------------
@@ -190,7 +248,7 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
         let cell = tableView.dequeueReusableCell(withIdentifier: "WordCell", for: indexPath)
         switch (searchedObject, indexPath.section) {
         case (.original, 0):
-            if let searchText = searchController.searchBar.text, !searchText.isEmpty {
+            if let searchText = searchBar.text, !searchText.isEmpty {
                 cell.textLabel?.text = suggestions[indexPath.row]
             } else {
                 cell.textLabel?.text = recentSearches[indexPath.row]
@@ -199,7 +257,7 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
             cell.textLabel?.text = word
             cell.detailTextLabel?.text = lang
         case (.translation, 1):
-            if let searchText = searchController.searchBar.text, !searchText.isEmpty {
+            if let searchText = searchBar.text, !searchText.isEmpty {
                 if suggestions.indices.contains(indexPath.row) { //Check why this may happen
                 cell.textLabel?.text = suggestions[indexPath.row]
                 }
@@ -220,7 +278,7 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
         //    if (searchText && searchText.length > 0)    // if the search bar has some text in it
         switch searchedObject {
         case .original:
-            if searchController.isActive && searchController.searchBar.text != "" {
+            if searchBar.text != "" { // searchBar.isFocused &&
                 return suggestions.count;        // show suggestions
             } else {
                 return recentSearches.count;
@@ -230,7 +288,7 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
             case 0:
                 return 1
             case 1:
-                if searchController.isActive && searchController.searchBar.text != "" {
+                if  searchBar.text != "" { //searchBar.isFocused &&
                     return suggestions.count;        // show suggestions
                 } else {
                     return recentSearches.count;
@@ -271,49 +329,57 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
 //    func sectionIndexTitles(for tableView: UITableView) -> [String]? {
 //        Implement this
 //    }
-    func setupSearchController() {
-        /** Search presents a view controller by applying normal view controller presentation semantics.
-         This means that the presentation moves up the view controller hierarchy until it finds the root
-         view controller or one that defines a presentation context.
-         */
-        
-        /** Specify that this view controller determines how the search controller is presented.
-         The search controller should be presented modally and match the physical size of this view controller.
-         */
-
-        definesPresentationContext = true
-        debugPrint(#function, " - ", searchLanguage)
-        //searchController.setTextInputModePrimaryLanguage(by: searchLanguage)
-        searchController.searchResultsUpdater = self
-        // searchController.searchBar.barTintColor = themeTint
-        searchController.searchBar.placeholder = NSLocalizedString("New word", comment: "placeholder for adding new word to vocabulary")
-        searchController.hidesNavigationBarDuringPresentation = false
-        searchController.searchBar.searchBarStyle = .prominent // use the prominent style to get a white background
-        searchController.searchBar.autocapitalizationType = .none;
-        
-        // Idea from official Apple sample:
-        // https://developer.apple.com/documentation/uikit/view_controllers/displaying_searchable_content_by_using_a_search_controller
-        if #available(iOS 13.0, *) {
-            // For iOS 11 and later, place the search bar in the navigation bar.
-            navigationItem.searchController = searchController
-            
-            // Make the search bar always visible.
-            navigationItem.hidesSearchBarWhenScrolling = false
-        } else {
-            // For iOS 10 and earlier, place the search controller's search bar in the table view's header.
-            tableView.tableHeaderView = searchController.searchBar
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if let term = searchBar.text {
+            filterRowsForSearchedText(term)
         }
-        
-        //searchController.delegate = self
-        searchController.dimsBackgroundDuringPresentation = false // The default is true.
-        searchController.searchBar.delegate = self // Monitor when the search button is tapped.
-        // Ideas from Compact Dictionary
-        // Another thing that should work from iOS 9 to 12 is:
-        //navigationItem.titleView = searchController.searchBar
-        // but this needs checking. Besides we will loose NavigationBar.title if use this.
-        searchController.searchBar.becomeFirstResponder // display the keyboard right away
+        debugPrint(#function)
     }
     
+//    func setupSearchController() {
+//        /** Search presents a view controller by applying normal view controller presentation semantics.
+//         This means that the presentation moves up the view controller hierarchy until it finds the root
+//         view controller or one that defines a presentation context.
+//         */
+//
+//        /** Specify that this view controller determines how the search controller is presented.
+//         The search controller should be presented modally and match the physical size of this view controller.
+//         */
+//
+//        definesPresentationContext = true
+//        debugPrint(#function, " - ", searchLanguage)
+//        //searchController.setTextInputModePrimaryLanguage(by: searchLanguage)
+//        searchController.searchResultsUpdater = self
+//        // searchController.searchBar.barTintColor = themeTint
+//        searchController.searchBar.placeholder = NSLocalizedString("New word", comment: "placeholder for adding new word to vocabulary")
+//        searchController.hidesNavigationBarDuringPresentation = false
+//        searchController.searchBar.searchBarStyle = .prominent // use the prominent style to get a white background
+//        searchController.searchBar.autocapitalizationType = .none;
+//
+//        // Idea from official Apple sample:
+//        // https://developer.apple.com/documentation/uikit/view_controllers/displaying_searchable_content_by_using_a_search_controller
+//        if #available(iOS 13.0, *) {
+//            // For iOS 11 and later, place the search bar in the navigation bar.
+//            navigationItem.searchController = searchController
+//
+//            // Make the search bar always visible.
+//            navigationItem.hidesSearchBarWhenScrolling = false
+//        } else {
+//            // For iOS 10 and earlier, place the search controller's search bar in the table view's header.
+//            tableView.tableHeaderView = searchController.searchBar
+//        }
+//
+//        //searchController.delegate = self
+//        searchController.dimsBackgroundDuringPresentation = false // The default is true.
+//        searchController.searchBar.delegate = self // Monitor when the search button is tapped.
+//        // Ideas from Compact Dictionary
+//        // Another thing that should work from iOS 9 to 12 is:
+//        //navigationItem.titleView = searchController.searchBar
+//        // but this needs checking. Besides we will loose NavigationBar.title if use this.
+//        searchController.searchBar.becomeFirstResponder // display the keyboard right away
+//    }
+//
   
     //------------------------------------------------------------------------------
     // As each new character is typed in the search bar, get new suggestions
@@ -331,7 +397,7 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
         } else { // for all languages except English
             suggestions = unfilteredSuggestions
         }
-        
+        debugPrint(suggestions)
         tableView.reloadData()
     }
     // MARK: - UISearchBarDelegate
@@ -414,13 +480,13 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
     
 }
 
-extension SearchWordViewController: UISearchResultsUpdating {
-    func updateSearchResults(for searchController: UISearchController) {
-        if let term = searchController.searchBar.text {
-            filterRowsForSearchedText(term)
-        }
-    }
-}
+//extension SearchWordViewController: UISearchResultsUpdating {
+//    func updateSearchResults(for searchController: UISearchController) {
+//        if let term = searchController.searchBar.text {
+//            filterRowsForSearchedText(term)
+//        }
+//    }
+//}
 // TODO: Those are ugly
 extension String {
     func fullRange() -> NSRange {
