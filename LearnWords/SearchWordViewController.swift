@@ -6,6 +6,7 @@
 //  Copyright © 2018 Laconic. All rights reserved.
 //
 // TODO: Limit search term to one word at least for suggestions, maybe visually
+// This is solved in TableSearch example from Apple
 // TODO: Add tableView Animation
 // TODO: Introduce constants for languages (hint: use system ones)
 
@@ -152,7 +153,7 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
     //private var kLastSearchKey: String { return "LastSearchFor_" + searchLanguage }
     private lazy var recentSearches: [String] = (userDefaultsGroup?.stringArray(forKey: kRecentSearchesKey)) ?? []
     
-    let themeTint = UIColor.orange // UIColor(white: 0.9, alpha: 0.9)
+//    let themeTint = UIColor.orange // UIColor(white: 0.9, alpha: 0.9)
     
 //    lazy var searchController: UILocalizedSearchController = {
 //        let  sc = UILocalizedSearchController(searchResultsController: nil)
@@ -161,11 +162,23 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
 //    }()
     
     lazy var searchBar: LWLocalizedSearchBar = {
-                let  sb = LWLocalizedSearchBar()
-                sb.forcedPrimaryLanguage = searchLanguage
-                sb.sizeToFit()
-                return sb
-            }()
+        let  sb = LWLocalizedSearchBar()
+        sb.searchBarStyle = .prominent
+        sb.showsSearchResultsButton = true //TODO : in future
+        // sb.keyboardType = .alphabet //this limits to English alphabet only
+        sb.autocapitalizationType = .none
+        // sb.showsBookmarkButton = true
+        switch searchedObject {
+        case .original:
+            sb.returnKeyType = .continue
+        case .translation:
+            sb.returnKeyType = .done
+        }
+        sb.returnKeyType = .next
+        sb.forcedPrimaryLanguage = searchLanguage
+        sb.sizeToFit()
+        return sb
+    }()
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -205,18 +218,19 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
         switch searchedObject { //Add emoji flags
         case .original:
             break
-        case .translation(orig_lang: _, orig_word: let foreignWord, dest_lang: _, translations: _):
+        case .translation(orig_lang: _, orig_word: let foreignWord, dest_lang: _, translations: _): break
             // TODO: make an opportunity to select words - move them to defifnitions section
 //            for indexPath in tableView?.indexPathsForSelectedRows ?? [] {
 //                if let stc = tableView.cellForRow(at: indexPath), let translation = stc.textLabel?.text {
 //                translations += [translation]
 //            }
 //        }
-        _ = Storage.insertFlashcard(first: searchBar.text!, second: foreignWord)
+
         // take care to refresh words table?
         // insertFlashcard(first: translations[0], second: foreignWord)
-        self.presentingViewController?.dismiss(animated: true)
+
     }
+        searchBarSearchButtonClicked(searchBar)
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -230,7 +244,7 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
     // Variations for regular and compact size class environments
     //------------------------------------------------------------------------------
     private func presentReferenceViewControllerWithTerm(_ term: String) {
-        addToRecentSearches(term)
+
         debugPrint(#function)
     }
     
@@ -387,7 +401,7 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
     // but never have definitions)
     //------------------------------------------------------------------------------
     func filterRowsForSearchedText(_ searchText: String) {
-        let unfilteredSuggestions = textChecker.completions(forPartialWordRange: searchText.fullRange(), in: searchText, language: searchLanguage ) ?? []
+        let unfilteredSuggestions = textChecker.completions(forPartialWordRange: searchText.fullNSRange(), in: searchText, language: searchLanguage ) ?? []
         //let guesses = textChecker.guesses(forWordRange: searchText.fullRange(), in: searchText, language: language ) ?? []
         //unfilteredSuggestions.append(contentsOf: guesses)
         //can play with animation here later
@@ -398,6 +412,8 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
             suggestions = unfilteredSuggestions
         }
         debugPrint(suggestions)
+        debugPrint("searchText ",(searchText as NSString).substring(with: searchText.fullNSRange()), " ", NSStringFromRange(searchText.fullNSRange()))
+        
         tableView.reloadData()
     }
     // MARK: - UISearchBarDelegate
@@ -407,8 +423,28 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         debugPrint(#function)
         if let term = searchBar.text {
-            presentReferenceViewControllerWithTerm(term)
+            addToRecentSearches(term)
+            // check for term to exist
+            if UIReferenceLibraryViewController.dictionaryHasDefinition(forTerm: term) {
+
+            } else {
+                // put up a faiding alert : Unknown word. Are you sure you typed it right?
+            }
+            switch searchedObject {
+            case .original(lang: let lang, word: _):
+                searchedObject = .original(lang: lang, word: term)
+                performSegue(withIdentifier: "Add Translation", sender: searchBar)
+            case .translation(orig_lang: let ol, orig_word: let ow, dest_lang: let dl, translations: let tls):
+                searchedObject = .translation(orig_lang: ol, orig_word: ow, dest_lang: dl, translations: (tls + [term]))
+                //check duplicates
+                //TODO: deal with array of terms, store languages, init as unlearned
+                _ = Storage.insertFlashcard(first: term, second: ow)
+                performSegue(withIdentifier: "Add Word Pair", sender: searchBar)
+            }
+
+            //presentReferenceViewControllerWithTerm(term)
         }
+        //presentingViewController?.dismiss(animated: true)
     }
     
 //    func searchBarShouldBeginEditing(_ searchBar: UISearchBar) -> Bool {
@@ -459,21 +495,32 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
             recentSearches.removeLast()
         }
         userDefaultsGroup?.set(recentSearches, forKey: kRecentSearchesKey)
+
     }
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == "Add Translation", let cell = (sender as? UITableViewCell) {
+
+        if segue.identifier == "Add Translation" { //, searchedObject = .original(lang: termLanguage, word: termToDefine) - underused word
             if let wordSearchVC = segue.destination as? SearchWordViewController,
                 let languageToStudy = LWUserDefaults.standard.languageToStudyPreference,
                 let nativeLanguage = LWUserDefaults.standard.nativeLanguagePreference {
                 //wordSearchVC.language = "ru" //Bundle.main.preferredLocalizations[1]
+                let termToDefine: String // use searchedObject = .original(lang: termLanguage instead
+                if let cell = (sender as? UITableViewCell) {
+                    termToDefine = cell.textLabel?.text ?? "?"
+                } else if let sb = (sender as? UISearchBar) {
+                    termToDefine = sb.text ?? "?"
+                } else { termToDefine = "?" }
                 wordSearchVC.searchedObject = .translation(
                     orig_lang: languageToStudy,
-                    orig_word: cell.textLabel?.text ?? "?",
+                    orig_word: termToDefine,
                     dest_lang: nativeLanguage,
                     translations: [])
             }
         } else if segue.identifier == "Add Word Pair" {
-            //TODO:
+
+            if let wordTest = segue.destination as? WordTestViewController {
+                // Do someting to scroll to new word definition and flash-highlight it
+            }
         }
     }
 
@@ -489,8 +536,11 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
 //}
 // TODO: Those are ugly
 extension String {
-    func fullRange() -> NSRange {
+    func fullRange1() -> NSRange {
         return NSMakeRange(0, self.count)
+    }
+    func fullNSRange() -> NSRange {
+        return NSRange(self.startIndex.encodedOffset ..< self.endIndex.encodedOffset)
     }
 }
 
@@ -498,10 +548,19 @@ extension String {
     func fullRange2() -> Range<String.Index> {
         return Range(uncheckedBounds: (lower: self.startIndex, upper: self.endIndex))
     }
+    func fullRange5() -> NSRange? {
+        return NSRange(self)
+    }
+    func fullRange6() -> NSRange {
+        return NSRangeFromString(self)
+    }
+    func fullRange7() -> NSRange {
+        return NSRange(self.startIndex.encodedOffset ..< self.endIndex.encodedOffset)
+    }
 }
 
 extension String {
-    var fullRange3:Range<String.Index> { return startIndex..<endIndex }
+    var fullRange3: Range<String.Index> { return startIndex..<endIndex }
 }
 // Usage
 //let swiftRange = "abc".fullRange
