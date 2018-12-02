@@ -16,6 +16,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         UINavigationBar.appearance().setBackgroundImage(UIImage(named: "navigationBarBackground"), for: .default)
+        // Further customization
+        UINavigationBar.appearance().tintColor = UIColor.orange
+        UITabBar.appearance().tintColor = UIColor.orange
+        // UITabBar.appearance().backgroundColor
         // Next lines should do the same, but they don't work for some reasons
 //        if let navigationBarBackground = UIImage(named: "navigationBarBackground") {
 //            UINavigationBar.appearance().backgroundColor = UIColor(patternImage: navigationBarBackground)

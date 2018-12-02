@@ -273,7 +273,8 @@
                             <outlet property="delegate" destination="Bgt-6g-kOE" id="2SU-81-hPo"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" id="3tX-Sd-ToH"/>
+                    <toolbarItems/>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="axZ-t2-ulR" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -322,6 +323,7 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
+        <segue reference="Wvl-R6-hnO"/>
         <segue reference="2Ii-3h-c3T"/>
     </inferredMetricsTieBreakers>
 </document>

@@ -189,16 +189,16 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
         //setupSearchController()
         // tableView.keyboardDismissMode = .onDrag
         
-        switch searchedObject {
+        /* switch searchedObject {
         case .translation(orig_lang: _, orig_word: _, dest_lang: _, translations: _):
             //language = d_lang
-            let cancelButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(startTest))
-            let doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(startTest))
+            let cancelButton = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(AddWordOrDefinition))
+            let doneButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(AddWordOrDefinition))
             navigationItem.rightBarButtonItems = [cancelButton, doneButton]
         case.original(_, _):
             //language = o_lang
-            navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(startTest))
-        }
+            navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .cancel, target: self, action: #selector(AddWordOrDefinition))
+        } */
         // searchController.becomeFirstResponder // display the keyboard right away
 
         // Search bar setup.Move to didAppear?
@@ -213,7 +213,7 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
         //navigationItem.titleView = searchBar
     }
     
-    @objc func startTest() {
+    @objc func AddWordOrDefinition() {
         debugPrint(#function)
         switch searchedObject { //Add emoji flags
         case .original:
@@ -500,6 +500,7 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
 
         if segue.identifier == "Add Translation" { //, searchedObject = .original(lang: termLanguage, word: termToDefine) - underused word
+            
             if let wordSearchVC = segue.destination as? SearchWordViewController,
                 let languageToStudy = LWUserDefaults.standard.languageToStudyPreference,
                 let nativeLanguage = LWUserDefaults.standard.nativeLanguagePreference {
