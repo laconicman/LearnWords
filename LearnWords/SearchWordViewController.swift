@@ -263,7 +263,17 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
         switch (searchedObject, indexPath.section) {
         case (.original, 0):
             if let searchText = searchBar.text, !searchText.isEmpty {
-                cell.textLabel?.text = suggestions[indexPath.row]
+                
+                let suggestion = suggestions[indexPath.row]
+                if let searchTextRangeInSuggestion = suggestion.range(of: searchText) {
+                    let searchTextNSRangeInSuggestion = NSRange(searchTextRangeInSuggestion, in: suggestion)
+                    let suggestionWithAttributes = NSMutableAttributedString(string: suggestion)
+                    suggestionWithAttributes.addAttribute(.foregroundColor, value: UIColor(red: 0, green: 0.1, blue: 0.7, alpha: 1), range: searchTextNSRangeInSuggestion)
+                    cell.textLabel?.attributedText = suggestionWithAttributes
+                } else {
+                    cell.textLabel?.text = suggestion
+                }
+                
             } else {
                 cell.textLabel?.text = recentSearches[indexPath.row]
             }

@@ -260,7 +260,7 @@ final class WordTestViewController: UIViewController, AVSpeechSynthesizerDelegat
         
         let mutableAttributedString = NSMutableAttributedString(string: utteranceString as String)
         mutableAttributedString.addAttribute(.foregroundColor, value: UIColor.red, range: characterRange)
-        prompt.attributedText = mutableAttributedString;
+        prompt.attributedText = mutableAttributedString
     }
     
     func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didStart utterance: AVSpeechUtterance) {

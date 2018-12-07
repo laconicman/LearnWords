@@ -48,3 +48,11 @@ SearchViewController.swift теперь обходится одним лишь s
 Для новой конструкции устанавливается primaryInputLanguage - аналогично тому, как это делалось при наличии search controller. 
 Улучшена работа с Range, NSRange и тесты продолжаются (подбор слов).
 
+06.12.18
+Есть идея использовать:
+class func preferredFontDescriptor(withTextStyle: UIFont.TextStyle, compatibleWith: UITraitCollection?) -> UIFontDescriptor
+Returns a font descriptor containing the text style and the content size category specified by the provided trait collection.
+Сразу нужный размер в зависимости от текущего размера View
+
+07.12.18
+Добавлена цветовая подсветка части искомого слова, всё благодаря изучению Range и NSRange.
