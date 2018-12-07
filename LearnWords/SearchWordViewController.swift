@@ -263,7 +263,7 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
         switch (searchedObject, indexPath.section) {
         case (.original, 0):
             if let searchText = searchBar.text, !searchText.isEmpty {
-                
+                //TODO: move to function that outputs NSAttributedString
                 let suggestion = suggestions[indexPath.row]
                 if let searchTextRangeInSuggestion = suggestion.range(of: searchText) {
                     let searchTextNSRangeInSuggestion = NSRange(searchTextRangeInSuggestion, in: suggestion)
@@ -283,7 +283,15 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
         case (.translation, 1):
             if let searchText = searchBar.text, !searchText.isEmpty {
                 if suggestions.indices.contains(indexPath.row) { //Check why this may happen
-                cell.textLabel?.text = suggestions[indexPath.row]
+                    //Shorter and better than in previous case
+                    let suggestion = suggestions[indexPath.row]
+                    if let searchTextNSRangeInSuggestion = suggestion.range(of: searchText)?.nsRange {
+                        let suggestionWithAttributes = NSMutableAttributedString(string: suggestion)
+                        suggestionWithAttributes.addAttribute(.foregroundColor, value: UIColor(red: 0, green: 0.1, blue: 0.7, alpha: 1), range: searchTextNSRangeInSuggestion)
+                        cell.textLabel?.attributedText = suggestionWithAttributes
+                    } else {
+                        cell.textLabel?.text = suggestions[indexPath.row]
+                    }
                 }
             } else {
                 cell.textLabel?.text = recentSearches[indexPath.row]
@@ -568,6 +576,13 @@ extension String {
     func fullRange7() -> NSRange {
         return NSRange(self.startIndex.encodedOffset ..< self.endIndex.encodedOffset)
     }
+    func nsRange(of substring: String) -> NSRange? {
+        if let rangeOfSubstring = self.range(of: substring) {
+            return NSRange(rangeOfSubstring, in: self)
+        } else {
+           return nil
+        }
+    }
 }
 
 extension String {
@@ -580,3 +595,15 @@ extension String {
 
 //And when you need NSRange from String in Swift 4:
 //NSRange(string.startIndex.encodedOffset ..< string.endIndex.encodedOffset)
+
+extension NSRange {
+    public init(_ range: Range<String.Index>) {
+        self.init(location: range.lowerBound.encodedOffset, length: range.upperBound.encodedOffset - range.lowerBound.encodedOffset)
+    }
+}
+
+extension Range where Bound == String.Index {
+    var nsRange: NSRange {
+        return NSRange(location: self.lowerBound.encodedOffset, length: self.upperBound.encodedOffset - self.lowerBound.encodedOffset)
+    }
+}
