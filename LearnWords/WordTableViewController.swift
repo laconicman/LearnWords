@@ -9,6 +9,7 @@
 // Bundle.main.preferredLocalizations.swapAt(0, 2)
 // Consider UserDefaults AppLanguages
 // Show help or tutorial on first launch
+// Play with UISwipeActionsConfiguration to configure row swipe actions
 
 import UIKit
 
