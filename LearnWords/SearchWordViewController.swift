@@ -151,7 +151,7 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
     
     private var kRecentSearchesKey: String { return "RecentSearchesFor_" + searchLanguage }
     //private var kLastSearchKey: String { return "LastSearchFor_" + searchLanguage }
-    private lazy var recentSearches: [String] = (userDefaultsGroup?.stringArray(forKey: kRecentSearchesKey)) ?? []
+    private lazy var recentSearches: [String] = (userDefaultsGroup.stringArray(forKey: kRecentSearchesKey)) ?? []
     
 //    let themeTint = UIColor.orange // UIColor(white: 0.9, alpha: 0.9)
     
@@ -512,7 +512,7 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
         if recentSearches.count > 10 {
             recentSearches.removeLast()
         }
-        userDefaultsGroup?.set(recentSearches, forKey: kRecentSearchesKey)
+        userDefaultsGroup.set(recentSearches, forKey: kRecentSearchesKey)
 
     }
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {

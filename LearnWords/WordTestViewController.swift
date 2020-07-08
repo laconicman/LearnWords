@@ -93,7 +93,7 @@ final class WordTestViewController: UIViewController, AVSpeechSynthesizerDelegat
         if !wordsInTest.isEmpty {
             var shownWord = wordsInTest.remove(at: 0)
             showAnswer(for: shownWord, isKnown: false)
-            shownWord.unknow += 1
+            shownWord.unknown += 1
             Storage.shownWords.append(shownWord)
         }
     }

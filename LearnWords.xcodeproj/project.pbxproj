@@ -19,6 +19,7 @@
 		DA246CDE1F8AE3DA00A75ED1 /* WordTestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA246CDD1F8AE3DA00A75ED1 /* WordTestViewController.swift */; };
 		DA4162F41F8BE62600165694 /* WordsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA4162F31F8BE62600165694 /* WordsModel.swift */; };
 		DA4162F61F8C219500165694 /* GradientButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA4162F51F8C219500165694 /* GradientButton.swift */; };
+		DA86ADF423489FF7007E3221 /* String+.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA86ADF323489FF7007E3221 /* String+.swift */; };
 		DA88CB8421A687C00094D1F8 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = DA88CB8321A687BF0094D1F8 /* Settings.bundle */; };
 		DA88CB8521A687C00094D1F8 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = DA88CB8321A687BF0094D1F8 /* Settings.bundle */; };
 		DAC884BA219C8710005C6588 /* SearchWordViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAC884B9219C8710005C6588 /* SearchWordViewController.swift */; };
@@ -68,6 +69,7 @@
 		DA246CDD1F8AE3DA00A75ED1 /* WordTestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordTestViewController.swift; sourceTree = "<group>"; };
 		DA4162F31F8BE62600165694 /* WordsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordsModel.swift; sourceTree = "<group>"; };
 		DA4162F51F8C219500165694 /* GradientButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientButton.swift; sourceTree = "<group>"; };
+		DA86ADF323489FF7007E3221 /* String+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+.swift"; sourceTree = "<group>"; };
 		DA88CB8321A687BF0094D1F8 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 		DA88CB8621A6A9F40094D1F8 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		DAC884B9219C8710005C6588 /* SearchWordViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchWordViewController.swift; sourceTree = "<group>"; };
@@ -138,6 +140,7 @@
 		DA246CCA1F8AA30E00A75ED1 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				DA86ADF323489FF7007E3221 /* String+.swift */,
 				DA246CCB1F8AA30E00A75ED1 /* NotificationCenter.framework */,
 			);
 			name = Frameworks;
@@ -278,6 +281,7 @@
 				DAEC8DCE219DF691009097C2 /* Settings.swift in Sources */,
 				DA246CDE1F8AE3DA00A75ED1 /* WordTestViewController.swift in Sources */,
 				DA246CB61F8A6E5E00A75ED1 /* WordTableViewController.swift in Sources */,
+				DA86ADF423489FF7007E3221 /* String+.swift in Sources */,
 				DA246CB41F8A6E5E00A75ED1 /* AppDelegate.swift in Sources */,
 				DA4162F41F8BE62600165694 /* WordsModel.swift in Sources */,
 			);

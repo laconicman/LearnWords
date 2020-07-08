@@ -6,6 +6,11 @@ You can install adiditonal voices of higher quality and choose on your taste.
 This is done through Settings > General > Accessibility > VoiceOver > Speech
 https://support.apple.com/en-us/HT202362
 
+## TODO
+05.10.19
+Генерацию всех Locale и соответсвующих флагов для настроек.
+
+make common settings for app and extensions
 
 ## Журнал
 22.11.18 14:30
@@ -56,3 +61,6 @@ Returns a font descriptor containing the text style and the content size categor
 
 07.12.18
 Добавлена цветовая подсветка части искомого слова, всё благодаря изучению Range и NSRange.
+
+05.10.19
+Более логичная работа с NSRange - почти все ухищрения заменены нормальными стандартными средствами.

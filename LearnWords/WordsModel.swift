@@ -7,7 +7,7 @@
 //
 
 import Foundation
-typealias WordAndStat = (pair: String, known: Int, unknow: Int, skiped: Int)
+typealias WordAndStat = (pair: String, known: Int, unknown: Int, skiped: Int)
 struct Storage {
     static var wordsAndStat = [WordAndStat]() // The whole word pair database
     static var shownWords = [WordAndStat]() // Word pair shown during last session
@@ -27,7 +27,7 @@ struct Storage {
     }
     
     static func saveWordsOnly(_ wordsAndStat: [WordAndStat]) {
-        userDefaultsGroup?.set(wordsAndStat.map{$0.pair}, forKey: "Words")
+        userDefaultsGroup.set(wordsAndStat.map{$0.pair}, forKey: "Words")
         //            defaults.set(knownWords, forKey: "knownWords")
         
     }

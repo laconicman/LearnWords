@@ -11,15 +11,16 @@ import Foundation
 let kRecentSearchesKey = "RecentSearches"
 let kLastSearchKey = "LastSearch"
 
-//let userDefaultsGroup = UserDefaults(suiteName: "group.club.laconic.LearnWords")
+// TODO: make common settings for app and extensions
+// let userDefaultsGroup = UserDefaults(suiteName: "group.club.laconic.LearnWords")
 let userDefaultsGroup = LWUserDefaults.standard.userDefaultsGroup
-let userDefaults = LWUserDefaults.standard.userDefaults
+// let userDefaults = LWUserDefaults.standard.userDefaults
 
 // Usefull links
 // parsing the whole settings bundle stucture:
 // https://stackoverflow.com/questions/46453789/swift-4-settings-bundle-get-defaults
 // with Decodable:
-//https://stackoverflow.com/questions/24045570/how-do-i-get-a-plist-as-a-dictionary-in-swift
+// https://stackoverflow.com/questions/24045570/how-do-i-get-a-plist-as-a-dictionary-in-swift
 // Unfortunatery it is not recommended to write root.plist directly
 // register while init, easy get/set wrapper:
 // https://forums.developer.apple.com/thread/73266
@@ -32,6 +33,9 @@ final class LWUserDefaults {
     
     func registerDefaultsFromSettingsBundle()
     {
+        // This seems to do the same thing as user defaults
+//        CFPreferencesSetAppValue("languageToStudyPreference" as CFString, ["a", "b", "c"] as CFArray, kCFPreferencesCurrentApplication)
+//        CFPreferencesAppSynchronize(kCFPreferencesCurrentApplication)
         let settingsUrl = Bundle.main.url(forResource: "Settings", withExtension: "bundle")!.appendingPathComponent("Root.plist")
         let settingsPlist = NSDictionary(contentsOf:settingsUrl)!
         let preferences = settingsPlist["PreferenceSpecifiers"] as! [NSDictionary]
@@ -46,8 +50,8 @@ final class LWUserDefaults {
             defaultsToRegister[key] = preference["DefaultValue"]
             debugPrint(key, " ", preference["DefaultValue"] ?? "Undefined value in preference")
         }
-        userDefaults.register(defaults: defaultsToRegister) //This is NOT done automatically for the first launch
-        print("userDefaults.register")
+        userDefaultsGroup.register(defaults: defaultsToRegister) //This is NOT done automatically for the first launch
+        print("userDefaultsGroup.register")
         //userDefaultsGroup?.register(defaults: defaultsToRegister) //This is what you probably want!
 
     }
@@ -64,8 +68,8 @@ final class LWUserDefaults {
         // languageToStudyPreference.UITextInputMode.activeInputModes.filter{ $0.contains("emoji") }.last?.primaryLanguage
     }
     
-    let userDefaultsGroup = UserDefaults(suiteName: "group.club.laconic.LearnWords")
-    let userDefaults = UserDefaults.standard
+    let userDefaultsGroup = UserDefaults(suiteName: "group.club.laconic.LearnWords") ?? UserDefaults.standard
+//    let userDefaults = UserDefaults.standard
     
 //    var searchEngine: URL? {
 //        get {
@@ -79,37 +83,37 @@ final class LWUserDefaults {
     
     var utteranceRatePreference: Double {
         get {
-            return self.userDefaults.double(forKey: "utteranceRatePreference")
+            return self.userDefaultsGroup.double(forKey: "utteranceRatePreference")
         }
         set {
-            self.userDefaults.set(newValue, forKey: "utteranceRatePreference")
+            self.userDefaultsGroup.set(newValue, forKey: "utteranceRatePreference")
         }
     }
     
     var pitchMultiplierPreference: Double {
         get {
-            return self.userDefaults.double(forKey: "pitchMultiplierPreference")
+            return self.userDefaultsGroup.double(forKey: "pitchMultiplierPreference")
         }
         set {
-            self.userDefaults.set(newValue, forKey: "pitchMultiplierPreferencee")
+            self.userDefaultsGroup.set(newValue, forKey: "pitchMultiplierPreferencee")
         }
     }
     
     var languageToStudyPreference: String? {
         get {
-            return self.userDefaults.string(forKey: "languageToStudyPreference")
+            return self.userDefaultsGroup.string(forKey: "languageToStudyPreference")
         }
         set {
-            self.userDefaults.set(newValue, forKey: "languageToStudyPreference")
+            self.userDefaultsGroup.set(newValue, forKey: "languageToStudyPreference")
         }
     }
     
     var nativeLanguagePreference: String? {
         get {
-            return self.userDefaults.string(forKey: "nativeLanguagePreference")
+            return self.userDefaultsGroup.string(forKey: "nativeLanguagePreference")
         }
         set {
-            self.userDefaults.set(newValue, forKey: "nativeLanguagePreference")
+            self.userDefaultsGroup.set(newValue, forKey: "nativeLanguagePreference")
         }
     }
 }
