@@ -22,6 +22,10 @@
 		DA86ADF423489FF7007E3221 /* String+.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA86ADF323489FF7007E3221 /* String+.swift */; };
 		DA88CB8421A687C00094D1F8 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = DA88CB8321A687BF0094D1F8 /* Settings.bundle */; };
 		DA88CB8521A687C00094D1F8 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = DA88CB8321A687BF0094D1F8 /* Settings.bundle */; };
+		DAA16D6924B60673003C28FD /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DAA16D6824B60673003C28FD /* Media.xcassets */; };
+		DAA16D6B24B60673003C28FD /* ActionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAA16D6A24B60673003C28FD /* ActionViewController.swift */; };
+		DAA16D6E24B60673003C28FD /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DAA16D6C24B60673003C28FD /* MainInterface.storyboard */; };
+		DAA16D7224B60673003C28FD /* ImportAsDictAction.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = DAA16D6624B60673003C28FD /* ImportAsDictAction.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		DAC884BA219C8710005C6588 /* SearchWordViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAC884B9219C8710005C6588 /* SearchWordViewController.swift */; };
 		DAD5E0D6219EF1400084FD1A /* Images.imagecatalog in Resources */ = {isa = PBXBuildFile; fileRef = DAD5E0D5219EF1400084FD1A /* Images.imagecatalog */; };
 		DAEC8DCE219DF691009097C2 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAEC8DCD219DF691009097C2 /* Settings.swift */; };
@@ -35,6 +39,13 @@
 			remoteGlobalIDString = DA246CC81F8AA30E00A75ED1;
 			remoteInfo = Widget;
 		};
+		DAA16D7024B60673003C28FD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DA246CA81F8A6E5E00A75ED1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DAA16D6524B60673003C28FD;
+			remoteInfo = ImportAsDictAction;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -45,6 +56,7 @@
 			dstSubfolderSpec = 13;
 			files = (
 				DA246CD61F8AA30E00A75ED1 /* Widget.appex in Embed App Extensions */,
+				DAA16D7224B60673003C28FD /* ImportAsDictAction.appex in Embed App Extensions */,
 			);
 			name = "Embed App Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -72,6 +84,11 @@
 		DA86ADF323489FF7007E3221 /* String+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+.swift"; sourceTree = "<group>"; };
 		DA88CB8321A687BF0094D1F8 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 		DA88CB8621A6A9F40094D1F8 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		DAA16D6624B60673003C28FD /* ImportAsDictAction.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ImportAsDictAction.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		DAA16D6824B60673003C28FD /* Media.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Media.xcassets; sourceTree = "<group>"; };
+		DAA16D6A24B60673003C28FD /* ActionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionViewController.swift; sourceTree = "<group>"; };
+		DAA16D6D24B60673003C28FD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
+		DAA16D6F24B60673003C28FD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DAC884B9219C8710005C6588 /* SearchWordViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchWordViewController.swift; sourceTree = "<group>"; };
 		DAD5E0D5219EF1400084FD1A /* Images.imagecatalog */ = {isa = PBXFileReference; lastKnownFileType = folder.imagecatalog; path = Images.imagecatalog; sourceTree = "<group>"; };
 		DAEC8DCD219DF691009097C2 /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
@@ -93,6 +110,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		DAA16D6324B60673003C28FD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -101,6 +125,7 @@
 			children = (
 				DA246CB21F8A6E5E00A75ED1 /* LearnWords */,
 				DA246CCD1F8AA30E00A75ED1 /* Widget */,
+				DAA16D6724B60673003C28FD /* ImportAsDictAction */,
 				DA246CCA1F8AA30E00A75ED1 /* Frameworks */,
 				DA246CB11F8A6E5E00A75ED1 /* Products */,
 			);
@@ -111,6 +136,7 @@
 			children = (
 				DA246CB01F8A6E5E00A75ED1 /* LearnWords.app */,
 				DA246CC91F8AA30E00A75ED1 /* Widget.appex */,
+				DAA16D6624B60673003C28FD /* ImportAsDictAction.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -157,6 +183,17 @@
 			path = Widget;
 			sourceTree = "<group>";
 		};
+		DAA16D6724B60673003C28FD /* ImportAsDictAction */ = {
+			isa = PBXGroup;
+			children = (
+				DAA16D6824B60673003C28FD /* Media.xcassets */,
+				DAA16D6A24B60673003C28FD /* ActionViewController.swift */,
+				DAA16D6C24B60673003C28FD /* MainInterface.storyboard */,
+				DAA16D6F24B60673003C28FD /* Info.plist */,
+			);
+			path = ImportAsDictAction;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -173,6 +210,7 @@
 			);
 			dependencies = (
 				DA246CD51F8AA30E00A75ED1 /* PBXTargetDependency */,
+				DAA16D7124B60673003C28FD /* PBXTargetDependency */,
 			);
 			name = LearnWords;
 			productName = LearnWords;
@@ -196,13 +234,30 @@
 			productReference = DA246CC91F8AA30E00A75ED1 /* Widget.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		DAA16D6524B60673003C28FD /* ImportAsDictAction */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DAA16D7324B60673003C28FD /* Build configuration list for PBXNativeTarget "ImportAsDictAction" */;
+			buildPhases = (
+				DAA16D6224B60673003C28FD /* Sources */,
+				DAA16D6324B60673003C28FD /* Frameworks */,
+				DAA16D6424B60673003C28FD /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ImportAsDictAction;
+			productName = ImportAsDictAction;
+			productReference = DAA16D6624B60673003C28FD /* ImportAsDictAction.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
 		DA246CA81F8A6E5E00A75ED1 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 0900;
+				LastSwiftUpdateCheck = 1150;
 				LastUpgradeCheck = 0940;
 				ORGANIZATIONNAME = Paul;
 				TargetAttributes = {
@@ -226,6 +281,10 @@
 							};
 						};
 					};
+					DAA16D6524B60673003C28FD = {
+						CreatedOnToolsVersion = 11.5;
+						ProvisioningStyle = Automatic;
+					};
 				};
 			};
 			buildConfigurationList = DA246CAB1F8A6E5E00A75ED1 /* Build configuration list for PBXProject "LearnWords" */;
@@ -243,6 +302,7 @@
 			targets = (
 				DA246CAF1F8A6E5E00A75ED1 /* LearnWords */,
 				DA246CC81F8AA30E00A75ED1 /* Widget */,
+				DAA16D6524B60673003C28FD /* ImportAsDictAction */,
 			);
 		};
 /* End PBXProject section */
@@ -266,6 +326,15 @@
 			files = (
 				DA88CB8521A687C00094D1F8 /* Settings.bundle in Resources */,
 				DA246CD21F8AA30E00A75ED1 /* MainInterface.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DAA16D6424B60673003C28FD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DAA16D6924B60673003C28FD /* Media.xcassets in Resources */,
+				DAA16D6E24B60673003C28FD /* MainInterface.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -295,6 +364,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		DAA16D6224B60673003C28FD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DAA16D6B24B60673003C28FD /* ActionViewController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -302,6 +379,11 @@
 			isa = PBXTargetDependency;
 			target = DA246CC81F8AA30E00A75ED1 /* Widget */;
 			targetProxy = DA246CD41F8AA30E00A75ED1 /* PBXContainerItemProxy */;
+		};
+		DAA16D7124B60673003C28FD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DAA16D6524B60673003C28FD /* ImportAsDictAction */;
+			targetProxy = DAA16D7024B60673003C28FD /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -326,6 +408,14 @@
 			isa = PBXVariantGroup;
 			children = (
 				DA246CD11F8AA30E00A75ED1 /* Base */,
+			);
+			name = MainInterface.storyboard;
+			sourceTree = "<group>";
+		};
+		DAA16D6C24B60673003C28FD /* MainInterface.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				DAA16D6D24B60673003C28FD /* Base */,
 			);
 			name = MainInterface.storyboard;
 			sourceTree = "<group>";
@@ -510,6 +600,43 @@
 			};
 			name = Release;
 		};
+		DAA16D7424B60673003C28FD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = WEJF495R4D;
+				INFOPLIST_FILE = ImportAsDictAction/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = club.laconic.LearnWords.ImportAsDictAction;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		DAA16D7524B60673003C28FD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = WEJF495R4D;
+				INFOPLIST_FILE = ImportAsDictAction/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = club.laconic.LearnWords.ImportAsDictAction;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -536,6 +663,15 @@
 			buildConfigurations = (
 				DA246CD81F8AA30E00A75ED1 /* Debug */,
 				DA246CD91F8AA30E00A75ED1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DAA16D7324B60673003C28FD /* Build configuration list for PBXNativeTarget "ImportAsDictAction" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DAA16D7424B60673003C28FD /* Debug */,
+				DAA16D7524B60673003C28FD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

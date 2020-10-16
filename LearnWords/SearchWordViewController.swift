@@ -420,11 +420,13 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
     //------------------------------------------------------------------------------
     func filterRowsForSearchedText(_ searchText: String) {
         let unfilteredSuggestions = textChecker.completions(forPartialWordRange: searchText.fullNSRange(), in: searchText, language: searchLanguage ) ?? []
-        //let guesses = textChecker.guesses(forWordRange: searchText.fullRange(), in: searchText, language: language ) ?? []
-        //unfilteredSuggestions.append(contentsOf: guesses)
+        // TODO: - Why not? Try add guesses as contjoin. Limit additional work to powerful devices only
+//        let guesses = Set(textChecker.guesses(forWordRange: searchText.fullNSRange(), in: searchText, language: searchLanguage ) ?? [])
+//        unfilteredSuggestions.append(contentsOf: guesses.subtracting(unfilteredSuggestions))
         //can play with animation here later
         if searchLanguage.hasPrefix("en") { // for english only: if the word does not end in ' or 's
             // use the filtered list of suggested words for English
+            // TODO: - use lema instead
             suggestions = unfilteredSuggestions.filter{!($0.hasSuffix("'") || $0.hasSuffix("'s"))}
         } else { // for all languages except English
             suggestions = unfilteredSuggestions

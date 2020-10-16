@@ -10,7 +10,15 @@ https://support.apple.com/en-us/HT202362
 05.10.19
 Генерацию всех Locale и соответсвующих флагов для настроек.
 
-make common settings for app and extensions
+08.07.20
+Импорт текста словаря через Action Extension. Предусмотреть разные разделители, выбор разделителя.
+
+Прописать процедуру первого запуска
+https://developer.apple.com/documentation/uikit/app_and_environment/responding_to_the_launch_of_your_app/performing_one-time_setup_for_your_app
+Внимание: для групповых файлов (`containerURL(forSecurityApplicationGroupIdentifier:)`) нужно создать директорию: https://developer.apple.com/documentation/foundation/filemanager/1412643-containerurl
+
+Добавить произношение из widget-а. Например, long press на слове или переводе.
+В краткой версии widget-а дать интерфейс добавления слова.
 
 ## Журнал
 22.11.18 14:30
@@ -64,3 +72,9 @@ Returns a font descriptor containing the text style and the content size categor
 
 05.10.19
 Более логичная работа с NSRange - почти все ухищрения заменены нормальными стандартными средствами.
+
+08.07.20
+Все UserDefaults теперь групповые: UserDefaults(suiteName: "group.club.laconic.LearnWords")
+
+16.10.20
+Добавлены догадки в список предлагаемых слов, но пока закоментарены
