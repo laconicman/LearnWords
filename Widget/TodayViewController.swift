@@ -23,15 +23,19 @@ class TodayViewController: UIViewController, NCWidgetProviding, UITableViewDataS
         if let widgetActiveDisplayMode = extensionContext?.widgetActiveDisplayMode {
             if let widgetSize = extensionContext?.widgetMaximumSize(for: widgetActiveDisplayMode) {
                 if widgetActiveDisplayMode == .compact {
-                    tableView.rowHeight = widgetSize.height / 2 //Use Mod here and font size
+                    tableView.rowHeight = widgetSize.height / 2 // TODO: Use Mod here and font size
                     print("Widget size: \(widgetSize)")
+                } else if  widgetActiveDisplayMode == .expanded {
+                    if widgetSize.height > tableView.contentSize.height {
+                        self.preferredContentSize = CGSize(width: 0, height: 80)
+                    }
                 }
             }
         }
         
         
     }
-
+    
     
     
     func widgetActiveDisplayModeDidChange(_ activeDisplayMode: NCWidgetDisplayMode, withMaximumSize maxSize: CGSize) {

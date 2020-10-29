@@ -571,10 +571,13 @@ extension String {
     func fullRange2() -> Range<String.Index> {
         return Range(uncheckedBounds: (lower: self.startIndex, upper: self.endIndex))
     }
+    //Stays here as a riminder
+//    func fullNSRangeBad() -> NSRange {
+//        return NSRange(self) ?? NSRange(location: 0, length: 0)
+//    }
     func fullNSRange() -> NSRange {
-        return NSRange(self) ?? NSRange(location: 0, length: 0)
+      NSRange(location: 0, length: self.utf16.count)
     }
-
     /* Deprecated
     func fullRange7() -> NSRange {
         return NSRange(self.startIndex.encodedOffset ..< self.endIndex.encodedOffset)
