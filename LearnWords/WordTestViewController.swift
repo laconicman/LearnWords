@@ -5,9 +5,9 @@
 //  Created by Paul on 09.10.2017.
 //  Copyright © 2017 Paul. All rights reserved.
 //
-// TO_DO: Different animation for right and wrong answers
-// TO_DO: Show translation under the word instead of replacing it. Done
-// TO_DO: Show translation in red (black) if forgot (plus some animation, native lang prounosation or even taptic), in green if know.
+// TODO: Different animation for right and wrong answers
+// TODO: Show translation under the word instead of replacing it. Done
+// TODO: Show translation in red (black) if forgot (plus some animation, native lang prounosation or even taptic), in green if know.
 
 
 import UIKit
@@ -89,6 +89,9 @@ final class WordTestViewController: UIViewController, AVSpeechSynthesizerDelegat
     }
     
     @IBAction func forgotButtonAction(_ sender: UIButton) {
+        // TODO: haptic feedback - wrap into function and use elsewhere
+        let generator = UINotificationFeedbackGenerator()
+        generator.notificationOccurred(.warning)
 //        showingQuestion = !showingQuestion
         if !wordsInTest.isEmpty {
             var shownWord = wordsInTest.remove(at: 0)
@@ -109,7 +112,8 @@ final class WordTestViewController: UIViewController, AVSpeechSynthesizerDelegat
         super.viewDidLoad()
 
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .fastForward, target: self, action: #selector(nextTapped))
-        wordsInTest = GKRandomSource.sharedRandom().arrayByShufflingObjects(in: wordsInTest) as! [WordAndStat]
+        wordsInTest = Storage.wordsAndStat.shuffled()
+        // wordsInTest = GKRandomSource.sharedRandom().arrayByShufflingObjects(in: wordsInTest) as! [WordAndStat]
         //showingQuestion = true
         
         title = "TEST"
@@ -173,7 +177,7 @@ final class WordTestViewController: UIViewController, AVSpeechSynthesizerDelegat
                           options: [.transitionCrossDissolve],
                           animations: { [weak self] in
                             self?.knowButton?.isEnabled = false
-                            self?.knowButton?.layer.opacity = 0.1
+                            if isKnown { self?.knowButton?.layer.opacity = 0.1 }
                             self?.forgotButton?.isEnabled = false
                             self?.wordDefinition.attributedText = NSAttributedString(
                                 string: shownWord.pair.components(separatedBy: "::")[0],
@@ -181,7 +185,7 @@ final class WordTestViewController: UIViewController, AVSpeechSynthesizerDelegat
                             // prompt.textColor = UIColor(red: 0, green: 0.7, blue: 0, alpha: 1)
         }) { [weak self] (ended) in
             self?.knowButton?.isEnabled = true
-            self?.knowButton?.layer.opacity = 1
+            if isKnown { self?.knowButton?.layer.opacity = 1 }
             self?.forgotButton?.isEnabled = true
             self?.prepareForNextQuestion(withPrewiousKnown: isKnown)
         }

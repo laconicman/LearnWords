@@ -20,6 +20,15 @@ https://developer.apple.com/documentation/uikit/app_and_environment/responding_t
 Добавить произношение из widget-а. Например, long press на слове или переводе.
 В краткой версии widget-а дать интерфейс добавления слова.
 
+02.05.21 
+Словарь противоположного направления (в обратную сторону):
+https://pythonworld.ru/primery-programm/zadacha-pro-slovar.html
+
+08.05.21
+Клавиатура, в которой только нужные символы
+https://github.com/isaced/ISEmojiView
+
+
 ## Журнал
 22.11.18 14:30
 Добавлены настройки через стандарный интерфейс Settings программ в iOS.

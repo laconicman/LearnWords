@@ -263,10 +263,10 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
     // MARK: UIStoryboardSegues
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         switch segue.identifier {
-        case "StartTest":
-            if let wordTestVC = segue.destination as? WordTestViewController {
-                wordTestVC.wordsInTest = Storage.wordsAndStat
-            }
+//        case "StartTest":
+//            if let wordTestVC = segue.destination as? WordTestViewController {
+//                wordTestVC.wordsInTest = Storage.wordsAndStat
+//            }
         case "AddWord":
             if let searchWordVC = segue.destination as? SearchWordViewController, let languageToStudy = LWUserDefaults.standard.languageToStudyPreference {
                 searchWordVC.searchedObject = .original(lang: languageToStudy, word: "")

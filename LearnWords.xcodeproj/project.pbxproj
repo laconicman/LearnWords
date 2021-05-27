@@ -17,6 +17,8 @@
 		DA246CD21F8AA30E00A75ED1 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DA246CD01F8AA30E00A75ED1 /* MainInterface.storyboard */; };
 		DA246CD61F8AA30E00A75ED1 /* Widget.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = DA246CC91F8AA30E00A75ED1 /* Widget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		DA246CDE1F8AE3DA00A75ED1 /* WordTestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA246CDD1F8AE3DA00A75ED1 /* WordTestViewController.swift */; };
+		DA2E2CE7265E865A00EF285C /* WordDictationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA2E2CE6265E865900EF285C /* WordDictationController.swift */; };
+		DA2E2CF5265E9AA200EF285C /* TabBarControllerHome.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA2E2CF4265E9AA200EF285C /* TabBarControllerHome.swift */; };
 		DA4162F41F8BE62600165694 /* WordsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA4162F31F8BE62600165694 /* WordsModel.swift */; };
 		DA4162F61F8C219500165694 /* GradientButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA4162F51F8C219500165694 /* GradientButton.swift */; };
 		DA86ADF423489FF7007E3221 /* String+.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA86ADF323489FF7007E3221 /* String+.swift */; };
@@ -79,8 +81,11 @@
 		DA246CDB1F8AB75900A75ED1 /* LearnWords.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LearnWords.entitlements; sourceTree = "<group>"; };
 		DA246CDC1F8AD1C200A75ED1 /* Widget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Widget.entitlements; sourceTree = "<group>"; };
 		DA246CDD1F8AE3DA00A75ED1 /* WordTestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordTestViewController.swift; sourceTree = "<group>"; };
+		DA2E2CE6265E865900EF285C /* WordDictationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordDictationController.swift; sourceTree = "<group>"; };
+		DA2E2CF4265E9AA200EF285C /* TabBarControllerHome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarControllerHome.swift; sourceTree = "<group>"; };
 		DA4162F31F8BE62600165694 /* WordsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordsModel.swift; sourceTree = "<group>"; };
 		DA4162F51F8C219500165694 /* GradientButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientButton.swift; sourceTree = "<group>"; };
+		DA554C6826593A1100C67BE0 /* ImportAsDictAction.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ImportAsDictAction.entitlements; sourceTree = "<group>"; };
 		DA86ADF323489FF7007E3221 /* String+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+.swift"; sourceTree = "<group>"; };
 		DA88CB8321A687BF0094D1F8 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 		DA88CB8621A6A9F40094D1F8 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
@@ -152,6 +157,8 @@
 				DA4162F51F8C219500165694 /* GradientButton.swift */,
 				DA4162F31F8BE62600165694 /* WordsModel.swift */,
 				DA246CDD1F8AE3DA00A75ED1 /* WordTestViewController.swift */,
+				DA2E2CE6265E865900EF285C /* WordDictationController.swift */,
+				DA2E2CF4265E9AA200EF285C /* TabBarControllerHome.swift */,
 				DA88CB8321A687BF0094D1F8 /* Settings.bundle */,
 				DA246CB71F8A6E5E00A75ED1 /* Main.storyboard */,
 				DA246CBA1F8A6E5E00A75ED1 /* Assets.xcassets */,
@@ -186,6 +193,7 @@
 		DAA16D6724B60673003C28FD /* ImportAsDictAction */ = {
 			isa = PBXGroup;
 			children = (
+				DA554C6826593A1100C67BE0 /* ImportAsDictAction.entitlements */,
 				DAA16D6824B60673003C28FD /* Media.xcassets */,
 				DAA16D6A24B60673003C28FD /* ActionViewController.swift */,
 				DAA16D6C24B60673003C28FD /* MainInterface.storyboard */,
@@ -349,7 +357,9 @@
 				DA4162F61F8C219500165694 /* GradientButton.swift in Sources */,
 				DAEC8DCE219DF691009097C2 /* Settings.swift in Sources */,
 				DA246CDE1F8AE3DA00A75ED1 /* WordTestViewController.swift in Sources */,
+				DA2E2CF5265E9AA200EF285C /* TabBarControllerHome.swift in Sources */,
 				DA246CB61F8A6E5E00A75ED1 /* WordTableViewController.swift in Sources */,
+				DA2E2CE7265E865A00EF285C /* WordDictationController.swift in Sources */,
 				DA86ADF423489FF7007E3221 /* String+.swift in Sources */,
 				DA246CB41F8A6E5E00A75ED1 /* AppDelegate.swift in Sources */,
 				DA4162F41F8BE62600165694 /* WordsModel.swift in Sources */,
@@ -603,11 +613,13 @@
 		DAA16D7424B60673003C28FD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_ENTITLEMENTS = ImportAsDictAction/ImportAsDictAction.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = WEJF495R4D;
 				INFOPLIST_FILE = ImportAsDictAction/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -622,11 +634,13 @@
 		DAA16D7524B60673003C28FD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_ENTITLEMENTS = ImportAsDictAction/ImportAsDictAction.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = WEJF495R4D;
 				INFOPLIST_FILE = ImportAsDictAction/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = club.laconic.LearnWords.ImportAsDictAction;

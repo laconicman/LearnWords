@@ -55,6 +55,36 @@ class ActionViewController: UIViewController {
     }
 
     @IBAction func openApp(_ sender: Any) {
-                self.extensionContext?.open(URL(string: UIApplication.openSettingsURLString)!, completionHandler: nil)
+        // TODO: open specific view controller instead of app settings
+                self.extensionContext?.open(URL(string: "learnWords://ViewController")!/*URL(string:  UIApplication.openSettingsURLString)!*/, completionHandler: nil)
+  //      _ = openURL(url: NSURL(string:"learnWords://")!)
+        //UIApplication.shared.openURL(URL(string:"learnWords://")!)
+    }
+    
+    
+    func openURL(url: NSURL) -> Bool {
+        do {
+            let application = try self.sharedApplication()
+            application.performSelector(inBackground: "openURL:", with: url) // Yes, without selector
+            return true
+        }
+        catch {
+            return false
+        }
+    }
+
+    func sharedApplication() throws -> UIApplication {
+        var responder: UIResponder? = self
+        while responder != nil {
+            if let application = responder as? UIApplication {
+                return application
+            }
+
+            responder = responder?.next
+        }
+
+        throw NSError(domain: #function, code: 1, userInfo: nil)
     }
 }
+
+

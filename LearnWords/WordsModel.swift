@@ -8,12 +8,13 @@
 
 import Foundation
 typealias WordAndStat = (pair: String, known: Int, unknown: Int, skiped: Int)
+// TODO: Make codable to become capable of storing sets of words in files (Another option - move to CoreData)
 struct Storage {
     static var wordsAndStat = [WordAndStat]() // The whole word pair database
     static var shownWords = [WordAndStat]() // Word pair shown during last session
     
     static func saveInitialValues () {
-        wordsAndStat.append(("медведь::bear",0,0,0))
+        wordsAndStat.append(("медведь::bear",0,0,0)) // TODO: Change format to somethig like "медведь - bear, bear2"
         wordsAndStat.append(("верблюд::camel",0,0,0))
         wordsAndStat.append(("корова::cow",0,0,0))
         wordsAndStat.append(("лиса::fox",0,0,0))

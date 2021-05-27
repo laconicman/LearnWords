@@ -64,9 +64,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
 
+    // FIXME: This is unused for now, but can be helpfull in future
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
         let urlPath : String = url.absoluteString
-        print(urlPath)
+        print(#function, urlPath)
         if urlPath.contains("HomeVC"){
             //here go to firstViewController view controller
             self.window = UIWindow(frame: UIScreen.main.bounds)

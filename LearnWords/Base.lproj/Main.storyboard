@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16097" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="sgx-Ki-m89">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="sgx-Ki-m89">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="Stack View standard spacing" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -14,7 +16,7 @@
             <objects>
                 <tableViewController storyboardIdentifier="WordTable" title="LearnWords" id="Jy4-wo-DD5" customClass="WordTableViewController" customModule="LearnWords" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="Gah-Cb-jna">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="647"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <prototypes>
@@ -86,9 +88,9 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Zv8-fy-9oC" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1215.2" y="146.17691154422789"/>
+            <point key="canvasLocation" x="1319" y="145"/>
         </scene>
-        <!--Item-->
+        <!--Test-->
         <scene sceneID="wxh-pH-4nn">
             <objects>
                 <viewController storyboardIdentifier="WordTest" id="hhD-xo-ClW" customClass="WordTestViewController" customModule="LearnWords" customModuleProvider="target" sceneMemberID="viewController">
@@ -97,33 +99,33 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillProportionally" spacingType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="be5-a6-mYM">
-                                <rect key="frame" x="10" y="57" width="355" height="541"/>
+                                <rect key="frame" x="20" y="106.5" width="335" height="442.5"/>
                                 <subviews>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Word" textAlignment="center" lineBreakMode="wordWrap" baselineAdjustment="none" minimumFontSize="30" translatesAutoresizingMaskIntoConstraints="NO" id="yxM-vR-ero">
-                                        <rect key="frame" x="0.0" y="0.0" width="355" height="158.5"/>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Word" textAlignment="center" lineBreakMode="wordWrap" baselineAdjustment="none" minimumFontSize="15" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="yxM-vR-ero">
+                                        <rect key="frame" x="0.0" y="0.0" width="335" height="140"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="100"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Word" textAlignment="center" lineBreakMode="wordWrap" baselineAdjustment="none" minimumFontSize="30" translatesAutoresizingMaskIntoConstraints="NO" id="s4E-Gx-k1b">
-                                        <rect key="frame" x="0.0" y="166.5" width="355" height="158.5"/>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Word" textAlignment="center" lineBreakMode="wordWrap" baselineAdjustment="none" minimumFontSize="15" translatesAutoresizingMaskIntoConstraints="NO" id="s4E-Gx-k1b">
+                                        <rect key="frame" x="0.0" y="148" width="335" height="140.5"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="100"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="keD-qV-ddK" customClass="GradientButton" customModule="LearnWords" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="333" width="355" height="100"/>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="keD-qV-ddK" customClass="GradientButton" customModule="LearnWords" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="296.5" width="335" height="69"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="41"/>
                                         <inset key="contentEdgeInsets" minX="10" minY="10" maxX="10" maxY="10"/>
                                         <state key="normal" title="Look Up">
-                                            <color key="titleColor" cocoaTouchSystemColor="darkTextColor"/>
+                                            <color key="titleColor" systemColor="darkTextColor"/>
                                         </state>
                                         <userDefinedRuntimeAttributes>
                                             <userDefinedRuntimeAttribute type="color" keyPath="startColor">
                                                 <color key="value" red="0.95056845143371393" green="0.95278642183081264" blue="0.97680455450000003" alpha="0.2492572623" colorSpace="custom" customColorSpace="sRGB"/>
                                             </userDefinedRuntimeAttribute>
                                             <userDefinedRuntimeAttribute type="color" keyPath="endColor">
-                                                <color key="value" red="0.3018201465842274" green="0.49333062140031658" blue="1" alpha="0.24768926056338028" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <color key="value" systemColor="systemGray5Color"/>
                                             </userDefinedRuntimeAttribute>
                                         </userDefinedRuntimeAttributes>
                                         <connections>
@@ -131,14 +133,14 @@
                                         </connections>
                                     </button>
                                     <stackView opaque="NO" tag="10" contentMode="scaleToFill" distribution="fillEqually" spacingType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="hj9-L7-bfX">
-                                        <rect key="frame" x="0.0" y="441" width="355" height="100"/>
+                                        <rect key="frame" x="0.0" y="373.5" width="335" height="69"/>
                                         <subviews>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="643-wN-0oS" userLabel="Forgot" customClass="GradientButton" customModule="LearnWords" customModuleProvider="target">
-                                                <rect key="frame" x="0.0" y="0.0" width="173.5" height="100"/>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="643-wN-0oS" userLabel="Forgot" customClass="GradientButton" customModule="LearnWords" customModuleProvider="target">
+                                                <rect key="frame" x="0.0" y="0.0" width="163.5" height="69"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="40"/>
                                                 <inset key="contentEdgeInsets" minX="10" minY="10" maxX="10" maxY="10"/>
                                                 <state key="normal" title="Forgot">
-                                                    <color key="titleColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <color key="titleColor" systemColor="darkTextColor"/>
                                                 </state>
                                                 <userDefinedRuntimeAttributes>
                                                     <userDefinedRuntimeAttribute type="color" keyPath="startColor">
@@ -152,12 +154,12 @@
                                                     <action selector="forgotButtonAction:" destination="hhD-xo-ClW" eventType="touchUpInside" id="n17-Na-u0i"/>
                                                 </connections>
                                             </button>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Djr-xr-GdQ" customClass="GradientButton" customModule="LearnWords" customModuleProvider="target">
-                                                <rect key="frame" x="181.5" y="0.0" width="173.5" height="100"/>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Djr-xr-GdQ" customClass="GradientButton" customModule="LearnWords" customModuleProvider="target">
+                                                <rect key="frame" x="171.5" y="0.0" width="163.5" height="69"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="41"/>
                                                 <inset key="contentEdgeInsets" minX="10" minY="10" maxX="10" maxY="10"/>
                                                 <state key="normal" title="Know">
-                                                    <color key="titleColor" cocoaTouchSystemColor="darkTextColor"/>
+                                                    <color key="titleColor" systemColor="darkTextColor"/>
                                                 </state>
                                                 <userDefinedRuntimeAttributes>
                                                     <userDefinedRuntimeAttribute type="color" keyPath="startColor">
@@ -173,7 +175,7 @@
                                             </button>
                                         </subviews>
                                         <constraints>
-                                            <constraint firstAttribute="height" constant="100" id="TKy-er-IOr"/>
+                                            <constraint firstAttribute="height" relation="lessThanOrEqual" constant="100" id="TKy-er-IOr"/>
                                         </constraints>
                                     </stackView>
                                 </subviews>
@@ -182,7 +184,7 @@
                                 </constraints>
                             </stackView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" text="Self test? " textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nai-6a-wCb">
-                                <rect key="frame" x="10" y="0.0" width="355" height="47"/>
+                                <rect key="frame" x="116" y="44" width="143" height="52.5"/>
                                 <constraints>
                                     <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="40" id="eBx-dU-AyJ"/>
                                 </constraints>
@@ -191,19 +193,20 @@
                                 <nil key="highlightedColor"/>
                             </label>
                         </subviews>
+                        <viewLayoutGuide key="safeArea" id="0M9-Kp-HX4"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="0M9-Kp-HX4" firstAttribute="bottom" secondItem="be5-a6-mYM" secondAttribute="bottom" constant="20" id="4JU-PH-Jr6"/>
                             <constraint firstItem="be5-a6-mYM" firstAttribute="top" secondItem="nai-6a-wCb" secondAttribute="bottom" constant="10" id="5Wc-rv-2WL"/>
-                            <constraint firstItem="nai-6a-wCb" firstAttribute="leading" secondItem="be5-a6-mYM" secondAttribute="leading" id="By6-jD-uyl"/>
-                            <constraint firstItem="nai-6a-wCb" firstAttribute="trailing" secondItem="be5-a6-mYM" secondAttribute="trailing" id="NEO-Cx-rL8"/>
-                            <constraint firstItem="0M9-Kp-HX4" firstAttribute="trailing" secondItem="yxM-vR-ero" secondAttribute="trailing" constant="10" id="dKD-BH-zja"/>
+                            <constraint firstItem="nai-6a-wCb" firstAttribute="centerX" secondItem="0M9-Kp-HX4" secondAttribute="centerX" id="CAT-aA-tpA"/>
+                            <constraint firstItem="be5-a6-mYM" firstAttribute="leading" secondItem="0M9-Kp-HX4" secondAttribute="leading" constant="20" id="MaU-SK-q2j"/>
+                            <constraint firstItem="0M9-Kp-HX4" firstAttribute="trailing" secondItem="be5-a6-mYM" secondAttribute="trailing" constant="20" id="cjz-an-V7b"/>
                             <constraint firstItem="nai-6a-wCb" firstAttribute="top" secondItem="0M9-Kp-HX4" secondAttribute="top" id="gas-Ec-BgC"/>
-                            <constraint firstItem="yxM-vR-ero" firstAttribute="leading" secondItem="0M9-Kp-HX4" secondAttribute="leading" constant="10" id="m3d-b1-bhp"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="0M9-Kp-HX4"/>
                     </view>
-                    <tabBarItem key="tabBarItem" title="Item" id="qgO-cL-wpb"/>
+                    <tabBarItem key="tabBarItem" title="Test" image="graduationcap" catalog="system" id="qgO-cL-wpb">
+                        <imageReference key="selectedImage" image="graduationcap.fill" catalog="system" symbolScale="default"/>
+                    </tabBarItem>
                     <connections>
                         <outlet property="forgotButton" destination="643-wN-0oS" id="Zer-Jd-FkI"/>
                         <outlet property="knowButton" destination="Djr-xr-GdQ" id="KnZ-pd-yFM"/>
@@ -216,11 +219,11 @@
             </objects>
             <point key="canvasLocation" x="2448.8000000000002" y="-134.48275862068968"/>
         </scene>
-        <!--Item-->
+        <!--Navigation Controller-->
         <scene sceneID="CkW-Ng-bgh">
             <objects>
                 <navigationController storyboardIdentifier="Navigation" automaticallyAdjustsScrollViewInsets="NO" id="tq9-1q-YoH" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Item" id="a8m-gm-wVa"/>
+                    <tabBarItem key="tabBarItem" systemItem="recents" id="a8m-gm-wVa"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="P3p-4R-uLE">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
@@ -243,7 +246,7 @@
             <objects>
                 <tableViewController id="Bgt-6g-kOE" customClass="SearchWordViewController" customModule="LearnWords" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="cZM-IK-3Lk">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="647"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <prototypes>
@@ -285,7 +288,7 @@
             <objects>
                 <tableViewController id="3Og-N0-BZi" customClass="SearchWordViewController" customModule="LearnWords" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="nhv-dM-E9i">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="647"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <prototypes>
@@ -319,12 +322,12 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="6QF-we-F1D" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3172" y="527.58620689655174"/>
+            <point key="canvasLocation" x="454" y="940"/>
         </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="Gbo-FL-GdA">
             <objects>
-                <tabBarController automaticallyAdjustsScrollViewInsets="NO" id="sgx-Ki-m89" sceneMemberID="viewController">
+                <tabBarController storyboardIdentifier="homeVC" automaticallyAdjustsScrollViewInsets="NO" id="sgx-Ki-m89" sceneMemberID="viewController">
                     <toolbarItems/>
                     <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="PFz-wA-9KJ">
                         <rect key="frame" x="0.0" y="0.0" width="1000" height="1000"/>
@@ -334,15 +337,175 @@
                     <connections>
                         <segue destination="tq9-1q-YoH" kind="relationship" relationship="viewControllers" id="gc3-ug-0So"/>
                         <segue destination="hhD-xo-ClW" kind="relationship" relationship="viewControllers" id="feE-RX-9M7"/>
+                        <segue destination="29i-mr-9oh" kind="relationship" relationship="viewControllers" id="dVH-Um-5cz"/>
                     </connections>
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="5H9-2w-P3z" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="503" y="-621"/>
         </scene>
+        <!--Translation-->
+        <scene sceneID="8CF-no-xpW">
+            <objects>
+                <viewController storyboardIdentifier="WordTranslation" id="29i-mr-9oh" customClass="WordDictationController" customModule="LearnWords" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="YEe-JB-Tt3">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillProportionally" spacingType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="DrO-BH-om0">
+                                <rect key="frame" x="20" y="50" width="335" height="548"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Word" textAlignment="center" lineBreakMode="wordWrap" baselineAdjustment="none" minimumFontSize="15" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8WT-Dx-fov">
+                                        <rect key="frame" x="0.0" y="0.0" width="335" height="158"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="80"/>
+                                        <nil key="textColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="Translation" borderStyle="roundedRect" textAlignment="center" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="VvQ-x8-gCl">
+                                        <rect key="frame" x="0.0" y="166" width="335" height="166"/>
+                                        <color key="backgroundColor" systemColor="systemGray5Color"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="75"/>
+                                        <textInputTraits key="textInputTraits" autocorrectionType="no" spellCheckingType="no"/>
+                                    </textField>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ph3-GE-3p7" customClass="GradientButton" customModule="LearnWords" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="340" width="335" height="100"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="41"/>
+                                        <inset key="contentEdgeInsets" minX="10" minY="10" maxX="10" maxY="10"/>
+                                        <state key="normal" title="Look Up">
+                                            <color key="titleColor" systemColor="darkTextColor"/>
+                                        </state>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="startColor">
+                                                <color key="value" red="0.95056845140000001" green="0.95278642179999995" blue="0.97680455450000003" alpha="0.2492572623" colorSpace="custom" customColorSpace="sRGB"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="color" keyPath="endColor">
+                                                <color key="value" systemColor="systemGray5Color"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                        <connections>
+                                            <action selector="lookupAction:" destination="29i-mr-9oh" eventType="touchUpInside" id="koQ-J2-X9R"/>
+                                        </connections>
+                                    </button>
+                                    <stackView opaque="NO" tag="10" contentMode="scaleToFill" distribution="fillEqually" spacingType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="yoT-gC-ICa">
+                                        <rect key="frame" x="0.0" y="448" width="335" height="100"/>
+                                        <subviews>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Q8X-kw-NHO" userLabel="Forgot" customClass="GradientButton" customModule="LearnWords" customModuleProvider="target">
+                                                <rect key="frame" x="0.0" y="0.0" width="163.5" height="100"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="40"/>
+                                                <inset key="contentEdgeInsets" minX="10" minY="10" maxX="10" maxY="10"/>
+                                                <state key="normal" title="Forgot">
+                                                    <color key="titleColor" systemColor="darkTextColor"/>
+                                                </state>
+                                                <userDefinedRuntimeAttributes>
+                                                    <userDefinedRuntimeAttribute type="color" keyPath="startColor">
+                                                        <color key="value" red="1" green="0.14913141730000001" blue="0.0" alpha="0.2485695423" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="color" keyPath="endColor">
+                                                        <color key="value" red="0.99999600649999998" green="1" blue="1" alpha="0.24768926059999999" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                </userDefinedRuntimeAttributes>
+                                                <connections>
+                                                    <action selector="forgotButtonAction:" destination="29i-mr-9oh" eventType="touchUpInside" id="KPe-rk-d2y"/>
+                                                </connections>
+                                            </button>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="bDd-aK-Z4N" customClass="GradientButton" customModule="LearnWords" customModuleProvider="target">
+                                                <rect key="frame" x="171.5" y="0.0" width="163.5" height="100"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="41"/>
+                                                <inset key="contentEdgeInsets" minX="10" minY="10" maxX="10" maxY="10"/>
+                                                <state key="normal" title="Know">
+                                                    <color key="titleColor" systemColor="darkTextColor"/>
+                                                </state>
+                                                <userDefinedRuntimeAttributes>
+                                                    <userDefinedRuntimeAttribute type="color" keyPath="startColor">
+                                                        <color key="value" red="0.0" green="0.97680455450000003" blue="0.0" alpha="0.2492572623" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="color" keyPath="endColor">
+                                                        <color key="value" red="0.99999600649999998" green="1" blue="1" alpha="0.24768926059999999" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                </userDefinedRuntimeAttributes>
+                                                <connections>
+                                                    <action selector="knowButtonAction:" destination="29i-mr-9oh" eventType="touchUpInside" id="x5X-zb-5Th"/>
+                                                </connections>
+                                            </button>
+                                        </subviews>
+                                        <constraints>
+                                            <constraint firstAttribute="height" relation="lessThanOrEqual" constant="100" id="fG9-GM-efN"/>
+                                        </constraints>
+                                    </stackView>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="ph3-GE-3p7" firstAttribute="height" secondItem="bDd-aK-Z4N" secondAttribute="height" id="i3g-Xd-q5V"/>
+                                </constraints>
+                            </stackView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" text="Dictation" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lFy-rg-dGI">
+                                <rect key="frame" x="122" y="0.0" width="131" height="40"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" relation="lessThanOrEqual" constant="40" id="yJ7-kQ-Gaa"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="Ftf-Jx-RTh"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="Ftf-Jx-RTh" firstAttribute="trailing" secondItem="DrO-BH-om0" secondAttribute="trailing" constant="20" id="HqG-Pm-weM"/>
+                            <constraint firstItem="lFy-rg-dGI" firstAttribute="centerX" secondItem="Ftf-Jx-RTh" secondAttribute="centerX" id="V5i-2S-tad"/>
+                            <constraint firstItem="DrO-BH-om0" firstAttribute="top" secondItem="lFy-rg-dGI" secondAttribute="bottom" constant="10" id="kCt-fG-hfC"/>
+                            <constraint firstItem="lFy-rg-dGI" firstAttribute="top" secondItem="Ftf-Jx-RTh" secondAttribute="top" id="qQx-zE-DV8"/>
+                            <constraint firstItem="DrO-BH-om0" firstAttribute="leading" secondItem="Ftf-Jx-RTh" secondAttribute="leading" constant="20" id="rsY-b0-PYK"/>
+                            <constraint firstItem="Ftf-Jx-RTh" firstAttribute="bottom" secondItem="DrO-BH-om0" secondAttribute="bottom" constant="20" id="yvr-JO-6uS"/>
+                        </constraints>
+                    </view>
+                    <tabBarItem key="tabBarItem" title="Translation" image="graduationcap" catalog="system" id="sb0-IX-DDx">
+                        <imageReference key="selectedImage" image="graduationcap.fill" catalog="system" symbolScale="default"/>
+                    </tabBarItem>
+                    <connections>
+                        <outlet property="foreignWord" destination="8WT-Dx-fov" id="WQv-3b-ouB"/>
+                        <outlet property="forgotButton" destination="Q8X-kw-NHO" id="xAV-9C-Ub2"/>
+                        <outlet property="knowButton" destination="bDd-aK-Z4N" id="Yvw-Gz-jl2"/>
+                        <outlet property="stackView" destination="DrO-BH-om0" id="myR-ak-lkJ"/>
+                        <outlet property="translationInput" destination="VvQ-x8-gCl" id="LuH-ux-2Z1"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="D3v-Vw-2e4" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1943" y="-838"/>
+        </scene>
     </scenes>
+    <designables>
+        <designable name="643-wN-0oS">
+            <size key="intrinsicContentSize" width="131" height="68"/>
+        </designable>
+        <designable name="Djr-xr-GdQ">
+            <size key="intrinsicContentSize" width="119" height="69"/>
+        </designable>
+        <designable name="Q8X-kw-NHO">
+            <size key="intrinsicContentSize" width="131" height="68"/>
+        </designable>
+        <designable name="bDd-aK-Z4N">
+            <size key="intrinsicContentSize" width="119" height="69"/>
+        </designable>
+        <designable name="keD-qV-ddK">
+            <size key="intrinsicContentSize" width="167" height="69"/>
+        </designable>
+        <designable name="ph3-GE-3p7">
+            <size key="intrinsicContentSize" width="167" height="69"/>
+        </designable>
+    </designables>
     <inferredMetricsTieBreakers>
-        <segue reference="feE-RX-9M7"/>
-        <segue reference="2Ii-3h-c3T"/>
+        <segue reference="W5r-Vf-tT8"/>
+        <segue reference="1Cz-UI-kqB"/>
     </inferredMetricsTieBreakers>
+    <resources>
+        <image name="graduationcap" catalog="system" width="128" height="106"/>
+        <image name="graduationcap.fill" catalog="system" width="128" height="108"/>
+        <systemColor name="darkTextColor">
+            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemGray5Color">
+            <color red="0.89803921568627454" green="0.89803921568627454" blue="0.91764705882352937" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </systemColor>
+    </resources>
 </document>
