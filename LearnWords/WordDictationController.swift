@@ -44,7 +44,7 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        underKeyboardLayoutConstraint.setup(stackBottomConstraint, view: view, minMargin: 0)
         //navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .fastForward, target: self, action: #selector(nextTapped))
         wordsInTest = Storage.wordsAndStat.shuffled()
         title = "Translate"
@@ -68,6 +68,8 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var knowButton: UIButton!
     @IBOutlet weak var forgotButton: UIButton!
     
+    @IBOutlet weak var stackBottomConstraint: NSLayoutConstraint!
+    let underKeyboardLayoutConstraint = UnderKeyboardLayoutConstraint()
     @IBAction func lookupAction(_ sender: UIButton) {
         // TODO: If it is the first time, then show "The app relies on system dictionries, . They can be used ofline. Make sure you have downloaded the dictionaries you need. To add or remove didctionaries use Manage Dictionaries button on the next screen" "Remind me next time" "Got it"
         // TODO: show alert if no definition

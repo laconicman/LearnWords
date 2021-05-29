@@ -29,7 +29,8 @@ class ActionViewController: UIViewController {
                             if let strongTextView = weakTextView {
                                 if let gotText = textItem as? String {
                                     strongTextView.text = gotText
-                                    // parse as dict
+                                    // parse as dict later, for now - just save
+                                    UserDefaults(suiteName: "group.club.laconic.LearnWords")?.set(gotText, forKey: "ImportedText")
                                 }
                             }
                         }
@@ -56,8 +57,8 @@ class ActionViewController: UIViewController {
 
     @IBAction func openApp(_ sender: Any) {
         // TODO: open specific view controller instead of app settings
-                self.extensionContext?.open(URL(string: "learnWords://ViewController")!/*URL(string:  UIApplication.openSettingsURLString)!*/, completionHandler: nil)
-  //      _ = openURL(url: NSURL(string:"learnWords://")!)
+                //self.extensionContext?.open(URL(string: "learnWords://ViewController")!/*URL(string:  UIApplication.openSettingsURLString)!*/, completionHandler: nil)
+        _ = openURL(url: NSURL(string:"learnWords://shareaction")!)
         //UIApplication.shared.openURL(URL(string:"learnWords://")!)
     }
     

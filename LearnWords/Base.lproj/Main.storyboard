@@ -315,7 +315,7 @@
         <!--Tab Bar Controller-->
         <scene sceneID="Gbo-FL-GdA">
             <objects>
-                <tabBarController storyboardIdentifier="homeVC" automaticallyAdjustsScrollViewInsets="NO" id="sgx-Ki-m89" sceneMemberID="viewController">
+                <tabBarController storyboardIdentifier="HomeTabBar" automaticallyAdjustsScrollViewInsets="NO" id="sgx-Ki-m89" sceneMemberID="viewController">
                     <toolbarItems/>
                     <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="PFz-wA-9KJ">
                         <rect key="frame" x="0.0" y="0.0" width="1000" height="1000"/>
@@ -344,31 +344,23 @@
                                 <rect key="frame" x="20" y="44" width="335" height="554"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Word" textAlignment="center" lineBreakMode="wordWrap" baselineAdjustment="none" minimumFontSize="15" translatesAutoresizingMaskIntoConstraints="NO" id="8WT-Dx-fov">
-                                        <rect key="frame" x="0.0" y="0.0" width="335" height="159.5"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="80"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="335" height="154"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="70"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="type in translation" borderStyle="roundedRect" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="VvQ-x8-gCl">
-                                        <rect key="frame" x="0.0" y="167.5" width="335" height="170.5"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="75"/>
+                                        <rect key="frame" x="0.0" y="162" width="335" height="176"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="70"/>
                                         <textInputTraits key="textInputTraits" autocorrectionType="no" spellCheckingType="no"/>
                                     </textField>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ph3-GE-3p7" customClass="GradientButton" customModule="LearnWords" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="346" width="335" height="100"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="41"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="36"/>
                                         <inset key="contentEdgeInsets" minX="10" minY="10" maxX="10" maxY="10"/>
                                         <state key="normal" title="Look Up">
                                             <color key="titleColor" systemColor="darkTextColor"/>
                                         </state>
-                                        <userDefinedRuntimeAttributes>
-                                            <userDefinedRuntimeAttribute type="color" keyPath="startColor">
-                                                <color key="value" red="0.95056845140000001" green="0.95278642179999995" blue="0.97680455450000003" alpha="0.2492572623" colorSpace="custom" customColorSpace="sRGB"/>
-                                            </userDefinedRuntimeAttribute>
-                                            <userDefinedRuntimeAttribute type="color" keyPath="endColor">
-                                                <color key="value" systemColor="systemGray5Color"/>
-                                            </userDefinedRuntimeAttribute>
-                                        </userDefinedRuntimeAttributes>
                                         <connections>
                                             <action selector="lookupAction:" destination="29i-mr-9oh" eventType="touchUpInside" id="koQ-J2-X9R"/>
                                         </connections>
@@ -378,7 +370,7 @@
                                         <subviews>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Q8X-kw-NHO" userLabel="Forgot" customClass="GradientButton" customModule="LearnWords" customModuleProvider="target">
                                                 <rect key="frame" x="0.0" y="0.0" width="163.5" height="100"/>
-                                                <fontDescription key="fontDescription" type="system" pointSize="40"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="36"/>
                                                 <inset key="contentEdgeInsets" minX="10" minY="10" maxX="10" maxY="10"/>
                                                 <state key="normal" title="Forgot">
                                                     <color key="titleColor" systemColor="darkTextColor"/>
@@ -397,7 +389,7 @@
                                             </button>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="bDd-aK-Z4N" customClass="GradientButton" customModule="LearnWords" customModuleProvider="target">
                                                 <rect key="frame" x="171.5" y="0.0" width="163.5" height="100"/>
-                                                <fontDescription key="fontDescription" type="system" pointSize="41"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="36"/>
                                                 <inset key="contentEdgeInsets" minX="10" minY="10" maxX="10" maxY="10"/>
                                                 <state key="normal" title="Know">
                                                     <color key="titleColor" systemColor="darkTextColor"/>
@@ -439,6 +431,7 @@
                         <outlet property="foreignWord" destination="8WT-Dx-fov" id="WQv-3b-ouB"/>
                         <outlet property="forgotButton" destination="Q8X-kw-NHO" id="xAV-9C-Ub2"/>
                         <outlet property="knowButton" destination="bDd-aK-Z4N" id="Yvw-Gz-jl2"/>
+                        <outlet property="stackBottomConstraint" destination="yvr-JO-6uS" id="aAC-KY-eri"/>
                         <outlet property="stackView" destination="DrO-BH-om0" id="myR-ak-lkJ"/>
                         <outlet property="translationInput" destination="VvQ-x8-gCl" id="LuH-ux-2Z1"/>
                     </connections>
@@ -499,20 +492,20 @@
             <size key="intrinsicContentSize" width="119" height="69"/>
         </designable>
         <designable name="Q8X-kw-NHO">
-            <size key="intrinsicContentSize" width="131" height="68"/>
+            <size key="intrinsicContentSize" width="120" height="63"/>
         </designable>
         <designable name="bDd-aK-Z4N">
-            <size key="intrinsicContentSize" width="119" height="69"/>
+            <size key="intrinsicContentSize" width="107" height="63"/>
         </designable>
         <designable name="keD-qV-ddK">
             <size key="intrinsicContentSize" width="167" height="69"/>
         </designable>
         <designable name="ph3-GE-3p7">
-            <size key="intrinsicContentSize" width="167" height="69"/>
+            <size key="intrinsicContentSize" width="149" height="63"/>
         </designable>
     </designables>
     <inferredMetricsTieBreakers>
-        <segue reference="W5r-Vf-tT8"/>
+        <segue reference="feE-RX-9M7"/>
         <segue reference="1Cz-UI-kqB"/>
     </inferredMetricsTieBreakers>
     <resources>

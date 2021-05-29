@@ -68,13 +68,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
         let urlPath : String = url.absoluteString
         print(#function, urlPath)
-        if urlPath.contains("HomeVC"){
+        if urlPath.contains("shareaction"){
             //here go to firstViewController view controller
             self.window = UIWindow(frame: UIScreen.main.bounds)
             
             let storyboard = UIStoryboard(name: "Main", bundle: nil)
             
-            let initialViewController = storyboard.instantiateViewController(withIdentifier: "homeVC")
+            let initialViewController = storyboard.instantiateViewController(withIdentifier: "HomeTabBar")
+            if let tbc = (initialViewController as? UITabBarController) {
+                tbc.selectedIndex = 1
+            }
             
             self.window?.rootViewController = initialViewController
             self.window?.makeKeyAndVisible()
