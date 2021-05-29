@@ -448,7 +448,7 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
             if UIReferenceLibraryViewController.dictionaryHasDefinition(forTerm: term) {
 
             } else {
-                // put up a faiding alert : Unknown word. Are you sure you typed it right?
+                // TODO: put up a faiding alert : Unknown word. Are you sure you typed it right?
             }
             switch searchedObject {
             case .original(lang: let lang, word: _):
@@ -538,9 +538,13 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
                     translations: [])
             }
         } else if segue.identifier == "Add Word Pair" {
-            let term: String
+            var term: String = ""
             if let cell = (sender as? UITableViewCell) {
                 term = cell.textLabel?.text ?? "?"
+            } else if let sb = (sender as? UISearchBar) {
+                if sb.text == nil { return }
+                term = sb.text!
+            }
                 
                 switch searchedObject {
                 case .original(lang: let lang, word: _):
@@ -554,7 +558,7 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
             if let wordTest = segue.destination as? WordTestViewController {
                 // Do someting to scroll to new word definition and flash-highlight it
             }
-        }
+        
     }
     }
 
