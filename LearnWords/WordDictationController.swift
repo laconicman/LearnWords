@@ -20,8 +20,10 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
     var answerMatched: Bool = false {
         didSet {
             if answerMatched == true {
-                // showAnswer(for: shownWord, isKnown: true)
-                knowButtonAction(knowButton)
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: {
+                    self.afterAnswer(isKnown: true)
+                })
                 
             }
         }
@@ -34,12 +36,11 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        afterAnswer(isKnown: false)
         textField.resignFirstResponder()
+        return true
     }
-    
-//    func textFieldDidBeginEditing(_ textField: UITextField) {
-//        knowButtonAction(knowButton)
-//    }
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -56,7 +57,7 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         navigationController?.hidesBarsOnTap = false
-        
+        if wordsInTest.isEmpty { wordsInTest = Storage.wordsAndStat.shuffled() }
         askQuestion()
     }
     
@@ -79,16 +80,31 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
             present(rlvc, animated: true)
         }
     }
-    @IBAction func knowButtonAction(_ sender: UIButton) {
+    
+    
+    func afterAnswer(isKnown: Bool) {
         if !wordsInTest.isEmpty {
             shownWord = wordsInTest.remove(at: 0)
 
-            shownWord.known += 1
+            isKnown ? shownWord.increaseKnown() : shownWord.decreaseKnown()
             Storage.shownWords.append(shownWord)
 //            //disable buttons and ShowNextButton Instead and autoSkip
 //            //prepareForNextQuestion()
-            showAnswer(for: shownWord, isKnown: true)
+            showAnswer(for: shownWord, isKnown: isKnown)
+        } else {
+            navigationController?.tabBarController?.selectedIndex = 0
         }
+    }
+    
+    @IBAction func knowButtonAction(_ sender: UIButton) {
+       afterAnswer(isKnown: true)
+    }
+    
+    @IBAction func forgotButtonAction(_ sender: UIButton) {
+        // TODO: haptic feedback - wrap into function and use elsewhere
+        let generator = UINotificationFeedbackGenerator()
+        generator.notificationOccurred(.warning)
+        afterAnswer(isKnown: false)
     }
     
     func showAnswer(for shownWord: WordAndStat, isKnown: Bool = false) {
@@ -100,10 +116,10 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
                             self?.knowButton?.isEnabled = false
                             if isKnown { self?.knowButton?.layer.opacity = 0.1 }
                             self?.forgotButton?.isEnabled = false
-//                            self?.translationInput.attributedText = NSAttributedString(
-//                                string: shownWord.pair.components(separatedBy: "::")[0],
-//                                attributes: [.foregroundColor: isKnown ? UIColor(red: 0, green: 0.7, blue: 0, alpha: 1) : UIColor(red: 0.7, green: 0.0, blue: 0, alpha: 1)])
-                            self?.translationInput.textColor = UIColor(red: 0, green: 0.7, blue: 0, alpha: 1)
+                            self?.translationInput.attributedText = NSAttributedString(
+                                string: shownWord.pair.components(separatedBy: "::")[0],
+                                attributes: [.foregroundColor: isKnown ? UIColor(red: 0, green: 0.7, blue: 0, alpha: 1) : UIColor(red: 0.7, green: 0.0, blue: 0, alpha: 1)])
+                            self?.translationInput.textColor = isKnown ? UIColor(red: 0, green: 0.7, blue: 0, alpha: 1) : UIColor(red: 0.7, green: 0.0, blue: 0, alpha: 1)
         }) { [weak self] (ended) in
             self?.knowButton?.isEnabled = true
             if isKnown { self?.knowButton?.layer.opacity = 1 }
@@ -114,29 +130,17 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
         //            prompt.textColor = UIColor(red: 0, green: 0.7, blue: 0, alpha: 1)
     }
     
-
-    
-    @IBAction func forgotButtonAction(_ sender: UIButton) {
-        // TODO: haptic feedback - wrap into function and use elsewhere
-        let generator = UINotificationFeedbackGenerator()
-        generator.notificationOccurred(.warning)
-//        showingQuestion = !showingQuestion
-        if !wordsInTest.isEmpty {
-            var shownWord = wordsInTest.remove(at: 0)
-            showAnswer(for: shownWord, isKnown: false)
-            shownWord.unknown += 1
-            Storage.shownWords.append(shownWord)
-        }
-    }
-    
     
     func askQuestion() {
         //foreignWord.text = wordsInTest[questionCounter].components(separatedBy: "::")[1]
-        guard !wordsInTest.isEmpty else { return }
+        guard !wordsInTest.isEmpty else {
+            navigationController?.tabBarController?.selectedIndex = 0
+            return
+        }
         foreignWord.attributedText = NSAttributedString(string: wordsInTest[0].pair.components(separatedBy: "::")[1])
         utteranceString = (foreignWord.attributedText?.string as NSString?)!
         translationInput.attributedPlaceholder = NSAttributedString(
-            string: "?",
+            string: "type in translation",
             attributes: [.foregroundColor: UIColor(red: 0, green: 0.7, blue: 0.7, alpha: 1)])
         translationInput.text = ""
         translationInput.textColor = .black
@@ -151,11 +155,12 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
         //let  lang = utterance.voice?.language
         // Another way to get BCP-47 the code for the user’s current locale (as in Settings) This is a class func
         //let currentLang = AVSpeechSynthesisVoice.currentLanguageCode()
+        // FIXME: UserDefaults.standard.float(forKey: "utteranceRatePreference")
+        utterance.rate = Float(LWUserDefaults.standard.utteranceRatePreference)
+        print(AVSpeechUtteranceMinimumSpeechRate, AVSpeechUtteranceMaximumSpeechRate)
         
-        utterance.rate = 0.35
-        
-        utterance.pitchMultiplier = UserDefaults.standard.float(forKey: "pitchMultiplierPreference")
-       // utterance.rate = AVSpeechUtteranceMinimumSpeechRate * 2
+        utterance.pitchMultiplier = Float(LWUserDefaults.standard.pitchMultiplierPreference)
+
         //we can set pre and post utterance delay
         utterance.preUtteranceDelay = 0.1
         utterance.postUtteranceDelay = 0.1

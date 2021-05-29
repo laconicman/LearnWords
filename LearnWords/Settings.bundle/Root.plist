@@ -81,6 +81,8 @@
 			<string>Pitch</string>
 			<key>Key</key>
 			<string>pitchMultiplierTitlePreference</string>
+			<key>DefaultValue</key>
+			<string></string>
 		</dict>
 		<dict>
 			<key>Type</key>
@@ -90,9 +92,9 @@
 			<key>DefaultValue</key>
 			<real>1.1</real>
 			<key>MinimumValue</key>
-			<real>0.5</real>
+			<real>0.7</real>
 			<key>MaximumValue</key>
-			<real>1.5</real>
+			<real>1.9</real>
 		</dict>
 		<dict>
 			<key>Type</key>
@@ -114,9 +116,7 @@
 			<key>MinimumValue</key>
 			<real>0.2</real>
 			<key>MaximumValue</key>
-			<real>0.9</real>
-			<key>MinimumValueImage</key>
-			<string></string>
+			<real>0.8</real>
 		</dict>
 		<dict>
 			<key>Type</key>

@@ -28,6 +28,16 @@ https://pythonworld.ru/primery-programm/zadacha-pro-slovar.html
 Клавиатура, в которой только нужные символы
 https://github.com/isaced/ISEmojiView
 
+28.05.21
+Импортирование содержимого буфера в качестве массива слов.
+..Code/Dictionary/Kotoba-master/code/Kotoba.xcodeproj
+Там же: icloud, импорт из текстовых файлов
+
+Схема БД
+https://stackoverflow.com/questions/16914185/how-to-design-a-database-for-translation-dictionary
+
+Singleton, FileManager.default.containerURL(forSecurityApplicationGroupIdentifier:
+..Code/ViewsAndControllers/ActionExtensionFinal/Bookmark/
 
 ## Журнал
 22.11.18 14:30

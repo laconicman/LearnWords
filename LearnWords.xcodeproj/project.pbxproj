@@ -19,6 +19,7 @@
 		DA246CDE1F8AE3DA00A75ED1 /* WordTestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA246CDD1F8AE3DA00A75ED1 /* WordTestViewController.swift */; };
 		DA2E2CE7265E865A00EF285C /* WordDictationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA2E2CE6265E865900EF285C /* WordDictationController.swift */; };
 		DA2E2CF5265E9AA200EF285C /* TabBarControllerHome.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA2E2CF4265E9AA200EF285C /* TabBarControllerHome.swift */; };
+		DA2E2D0E26612B8B00EF285C /* UserDefaults+Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA2E2D0D26612B8A00EF285C /* UserDefaults+Codable.swift */; };
 		DA4162F41F8BE62600165694 /* WordsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA4162F31F8BE62600165694 /* WordsModel.swift */; };
 		DA4162F61F8C219500165694 /* GradientButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA4162F51F8C219500165694 /* GradientButton.swift */; };
 		DA86ADF423489FF7007E3221 /* String+.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA86ADF323489FF7007E3221 /* String+.swift */; };
@@ -83,6 +84,7 @@
 		DA246CDD1F8AE3DA00A75ED1 /* WordTestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordTestViewController.swift; sourceTree = "<group>"; };
 		DA2E2CE6265E865900EF285C /* WordDictationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordDictationController.swift; sourceTree = "<group>"; };
 		DA2E2CF4265E9AA200EF285C /* TabBarControllerHome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarControllerHome.swift; sourceTree = "<group>"; };
+		DA2E2D0D26612B8A00EF285C /* UserDefaults+Codable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDefaults+Codable.swift"; sourceTree = "<group>"; };
 		DA4162F31F8BE62600165694 /* WordsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordsModel.swift; sourceTree = "<group>"; };
 		DA4162F51F8C219500165694 /* GradientButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientButton.swift; sourceTree = "<group>"; };
 		DA554C6826593A1100C67BE0 /* ImportAsDictAction.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ImportAsDictAction.entitlements; sourceTree = "<group>"; };
@@ -159,6 +161,7 @@
 				DA246CDD1F8AE3DA00A75ED1 /* WordTestViewController.swift */,
 				DA2E2CE6265E865900EF285C /* WordDictationController.swift */,
 				DA2E2CF4265E9AA200EF285C /* TabBarControllerHome.swift */,
+				DA2E2D0D26612B8A00EF285C /* UserDefaults+Codable.swift */,
 				DA88CB8321A687BF0094D1F8 /* Settings.bundle */,
 				DA246CB71F8A6E5E00A75ED1 /* Main.storyboard */,
 				DA246CBA1F8A6E5E00A75ED1 /* Assets.xcassets */,
@@ -358,6 +361,7 @@
 				DAEC8DCE219DF691009097C2 /* Settings.swift in Sources */,
 				DA246CDE1F8AE3DA00A75ED1 /* WordTestViewController.swift in Sources */,
 				DA2E2CF5265E9AA200EF285C /* TabBarControllerHome.swift in Sources */,
+				DA2E2D0E26612B8B00EF285C /* UserDefaults+Codable.swift in Sources */,
 				DA246CB61F8A6E5E00A75ED1 /* WordTableViewController.swift in Sources */,
 				DA2E2CE7265E865A00EF285C /* WordDictationController.swift in Sources */,
 				DA86ADF423489FF7007E3221 /* String+.swift in Sources */,

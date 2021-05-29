@@ -44,7 +44,8 @@ final class WordTestViewController: UIViewController, AVSpeechSynthesizerDelegat
         if !wordsInTest.isEmpty {
             var shownWord = wordsInTest.remove(at: 0)
             
-            shownWord.known += 1
+            // shownWord.known += 1
+            shownWord.increaseKnown()
             Storage.shownWords.append(shownWord)
             //disable buttons and ShowNextButton Instead and autoSkip
             //prepareForNextQuestion()
@@ -116,7 +117,7 @@ final class WordTestViewController: UIViewController, AVSpeechSynthesizerDelegat
         // wordsInTest = GKRandomSource.sharedRandom().arrayByShufflingObjects(in: wordsInTest) as! [WordAndStat]
         //showingQuestion = true
         
-        title = "TEST"
+        title = "Test"
         
         stackView.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
         stackView.alpha = 0
@@ -195,7 +196,10 @@ final class WordTestViewController: UIViewController, AVSpeechSynthesizerDelegat
     
     func askQuestion() {
         //prompt.text = wordsInTest[questionCounter].components(separatedBy: "::")[1]
-        guard !wordsInTest.isEmpty else { return }
+        guard !wordsInTest.isEmpty else {
+            navigationController?.tabBarController?.selectedIndex = 0
+            return
+        }
         prompt.attributedText = NSAttributedString(string: wordsInTest[0].pair.components(separatedBy: "::")[1])
         utteranceString = (prompt.attributedText?.string as NSString?)!
         wordDefinition.attributedText = NSAttributedString(
@@ -213,7 +217,7 @@ final class WordTestViewController: UIViewController, AVSpeechSynthesizerDelegat
         // Another way to get BCP-47 the code for the user’s current locale (as in Settings) This is a class func
         //let currentLang = AVSpeechSynthesisVoice.currentLanguageCode()
         
-        utterance.rate = 0.35
+        utterance.rate = UserDefaults.standard.float(forKey: "utteranceRatePreference")
         
         utterance.pitchMultiplier = UserDefaults.standard.float(forKey: "pitchMultiplierPreference")
        // utterance.rate = AVSpeechUtteranceMinimumSpeechRate * 2

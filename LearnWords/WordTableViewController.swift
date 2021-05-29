@@ -63,8 +63,8 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
 
         setupSearchController(placeholder: NSLocalizedString("Search words in sets", comment: "placeholder"), hideWhenAppear: true)
 
-        if let savedWords = userDefaultsGroup.stringArray(forKey: "Words")  {
-                Storage.wordsAndStat = (savedWords.compactMap{($0,0,0,0)} )
+        if let savedWords: [WordAndStat] = userDefaultsGroup.decodeAndLoad("WordsAndStat") { // userDefaultsGroup.stringArray(forKey: "Words")  {
+                Storage.wordsAndStat = savedWords // (savedWords.compactMap{($0,0,0,0)} )
             } else {
                 Storage.saveInitialValues()
             }
@@ -237,7 +237,7 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
             Storage.wordsAndStat.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .automatic)
             // TODO: Replace with saveCurrentWordSet
-            Storage.saveWordsOnly(Storage.wordsAndStat)
+            Storage.saveWords(Storage.wordsAndStat)
 
         }
     }
