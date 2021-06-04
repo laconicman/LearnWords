@@ -60,6 +60,7 @@ class ActionViewController: UIViewController {
                 //self.extensionContext?.open(URL(string: "learnWords://ViewController")!/*URL(string:  UIApplication.openSettingsURLString)!*/, completionHandler: nil)
         _ = openURL(url: NSURL(string:"learnWords://shareaction")!)
         //UIApplication.shared.openURL(URL(string:"learnWords://")!)
+        self.extensionContext!.completeRequest(returningItems: self.extensionContext!.inputItems, completionHandler: nil)
     }
     
     

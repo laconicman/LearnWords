@@ -20,6 +20,8 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
     var wordsInTable : [WordAndStat] { // A subset of word pairs to display in tableView
         return (searchController.isActive && searchController.searchBar.text != "") ? filteredWords : Storage.wordsAndStat
     }
+    var importedWords = [WordAndStat]()
+    var importedWord = ""
 
     let searchController = UISearchController(searchResultsController: nil)
 
@@ -73,6 +75,30 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
                 knownWords = savedWords
             }*/
 
+        if let importedString = UserDefaults(suiteName: "group.club.laconic.LearnWords")?.string(forKey: "ImportedText") {
+            if  importedString.aproxWordCount > 1 {
+                let dictionaryEntries = split(importedString, by: "\n;")
+                importedWords = dictionaryEntries.compactMap( {
+                    let e = split($0, by: "|:")
+                    if e.first?.isEmpty ?? true || e.last?.isEmpty ?? true || e.count != 2 { return nil }
+                    let pair = e[0].trimmingCharacters(in: .whitespaces) + "::" + e[1].trimmingCharacters(in: .whitespaces)
+                    return WordAndStat(pair: pair.lowercased(), known: 0, unknown: 0, skiped: 0)
+                })
+                // TODO: Create a screen to verify and select `importedWords`. Check for duplicates
+                importedWords = importedWords.filter({ (impW) -> Bool in
+                    Storage.wordsAndStat.contains { (storedW) -> Bool in
+                        impW.pair == storedW.pair
+                    }
+                })
+                Storage.wordsAndStat.append(contentsOf: importedWords)
+            } else {
+                // import one word
+                importedWord = lemmas(from: importedString).first ?? ""
+                performSegue(withIdentifier: "AddWord", sender: self)
+            }
+            UserDefaults(suiteName: "group.club.laconic.LearnWords")?.removeObject(forKey: "ImportedText")
+        }
+            
             //  print("$\(PRODUCT_BUNDLE_IDENTIFIER)")
 
         // For features avalible after iOS 11 In is coomented out because it is ugly
@@ -178,7 +204,7 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
                                        message: checkResultsMessage! + NSLocalizedString("Looks like you only have those keyboards:", comment: "Alert message, langID appended") + languageIDs.joined(separator: ", "),
                                        preferredStyle: .alert)
             
-            // create a "Go to Settings" button that opens standart settings
+            // TODO: create a "Go to Settings" button that opens standart settings
             let settingsAction = UIAlertAction(title: NSLocalizedString("Settings", comment: ""), style: .default) { [weak self] (action: UIAlertAction!) in
                 self?.gotoAppSettings()
             }
@@ -191,8 +217,11 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
     }
     
     private func gotoAppSettings() {
-        let url = URL(string: UIApplication.openSettingsURLString) //+ "root=General&path=Network"
-        if url != nil, UIApplication.shared.canOpenURL(url!) {UIApplication.shared.open(url!) }
+        if let url = URL(string: UIApplication.openSettingsURLString) { //+ "root=General&path=Network"
+            if UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.open(url)
+            }
+        }
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -269,7 +298,8 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
 //            }
         case "AddWord":
             if let searchWordVC = segue.destination as? SearchWordViewController, let languageToStudy = LWUserDefaults.standard.languageToStudyPreference {
-                searchWordVC.searchedObject = .original(lang: languageToStudy, word: "")
+                searchWordVC.searchedObject = .original(lang: languageToStudy, word: importedWord)
+                searchWordVC.navigationItem.backButtonTitle = NSLocalizedString("К слову", comment: "backButtonTitle")
             }
             // TODO: with standart row features
 //        case: "EditWord"
@@ -285,5 +315,32 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
             filterRows(for: term)
         }
     }
+    
+    func split(_ str: String, by oneOfTheCharacters: String) -> [String] {
+        let separatorSet = CharacterSet(charactersIn: oneOfTheCharacters)
+        return str.components(separatedBy: separatorSet).map({ $0.trimmingCharacters(in: .whitespaces)}).filter( { !$0.isEmpty })
+    }
+    
+    func lemmas(from str: String) -> [String] {
+        let tagger = NSLinguisticTagger(tagSchemes: [.tokenType, .lemma], options: 0)
+        let options: NSLinguisticTagger.Options = [.omitPunctuation, .omitWhitespace]
+        let range = NSRange(location: 0, length: str.utf16.count)
+        tagger.string = str
+        var l = [String]()
+        tagger.enumerateTags(in: range, unit: .word, scheme: .lemma, options: options) { tag, _, _ in
+            if let lemma = tag?.rawValue {
+                l.append(lemma)
+            }
+        }
+        return l
+    }
 
+}
+
+extension String {
+    private var regexMatchWords: NSRegularExpression? { try? NSRegularExpression(pattern: "\\w+") }
+    var aproxWordCount: Int {
+        guard let regex = regexMatchWords else { return 0 }
+        return regex.numberOfMatches(in: self, range: NSRange(self.startIndex..., in: self))
+    }
 }

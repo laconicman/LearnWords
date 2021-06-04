@@ -57,10 +57,11 @@ struct Storage {
     }
     
     static func insertFlashcard(first: String, second: String) ->  Int? {
+        // TODO: Check for duplicates before inserting
         guard first.count > 0 && second.count > 0 else { return nil}
         let rowPosition = wordsAndStat.count //TODO: change it - sort somehow
         // wordsAndStat.append(("\(first)::\(second)",0,0,0))
-        wordsAndStat.append(WordAndStat(pair: "\(first)::\(second)", known: 0, unknown: 0, skiped: 0))
+        wordsAndStat.append(WordAndStat(pair: "\(first)::\(second)".lowercased(), known: 0, unknown: 0, skiped: 0))
         saveWords(wordsAndStat)
         return rowPosition
     }

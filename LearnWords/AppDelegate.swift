@@ -74,13 +74,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             
             let storyboard = UIStoryboard(name: "Main", bundle: nil)
             
-            let initialViewController = storyboard.instantiateViewController(withIdentifier: "HomeTabBar")
-            if let tbc = (initialViewController as? UITabBarController) {
-                tbc.selectedIndex = 1
-            }
+            weak var initialViewController = storyboard.instantiateViewController(withIdentifier: "HomeTabBar")
             
             self.window?.rootViewController = initialViewController
             self.window?.makeKeyAndVisible()
+            // FIXME: This is a kext
+//            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: {
+//                if let tbc = (initialViewController as? UITabBarController) {
+//                    tbc.selectedIndex = 1
+//                }
+//            })
+            
             return true
         }
         return false

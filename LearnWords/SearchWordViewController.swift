@@ -121,8 +121,9 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
     var searchedObject = SearchedObject.original(lang: LWUserDefaults.standard.languageToStudyPreference ?? "en", word: "") {
             didSet {
                 switch searchedObject {
-                case .original(lang: let lang, word: _):
+                case .original(lang: let lang, word: let word):
                     //searchLanguage = lang
+                    searchBar.text = word
                     tableView.allowsMultipleSelection = false
                 case .translation(orig_lang: _, orig_word: _, dest_lang: let lang, translations: _):
                     tableView.allowsMultipleSelection = true

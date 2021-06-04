@@ -5,6 +5,7 @@ Learn words makes use of system voices. The  standart quality is good enough, bu
 You can install adiditonal voices of higher quality and choose on your taste. 
 This is done through Settings > General > Accessibility > VoiceOver > Speech
 https://support.apple.com/en-us/HT202362
+Три кнопки в ряд и использовать пиктограммы вместо текста 
 
 ## TODO
 05.10.19
@@ -38,6 +39,8 @@ https://stackoverflow.com/questions/16914185/how-to-design-a-database-for-transl
 
 Singleton, FileManager.default.containerURL(forSecurityApplicationGroupIdentifier:
 ..Code/ViewsAndControllers/ActionExtensionFinal/Bookmark/
+
+Распознавание импортируемого текста на слова, если все слова на одном языке. Иначе распознавать как словарь. 
 
 ## Журнал
 22.11.18 14:30
@@ -97,3 +100,25 @@ Returns a font descriptor containing the text style and the content size categor
 
 16.10.20
 Добавлены догадки в список предлагаемых слов, но пока закоментарены
+
+4.06.21
+Добавлен импорт словарей и отдельных единичных слов.
+
+
+## Сырые мысли
+Спорные идеи
+ При первом запуске создаётся профиль пользователя: родной язык - изучаемый язык. В дальнейшем такой можно создавать ещё профили. Минус этой идеи то, что языки - это характеристика сета. Взято из MemoWord.
+
+Два режима: учение и самопроверка. Учение: текст, на слух - затем определение и термин визуально, на слух все. Самопроверка - аналогично  
+Хорошие идеи
+ Одному слову термину может соответствовать несколько определений. При тестировании любое из определений генерирует верный ответ, равно как несколько определений через разделитель (,;).
+
+Использовать haptic для ошибок 
+
+
+ Показывать кнопку получения слов из буфера обмена на экране добавления слова. 
+
+
+Передавать словари или слова при помощи action extension FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.com.appcoda.Bookmark"
+Как в проекте Bookmarks   Разобраться с записью в общий для программы её расширения файл или в UserDefaults.
+Упражнение - озвучить слово - фонетика, произношение.

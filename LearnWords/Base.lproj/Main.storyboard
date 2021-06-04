@@ -54,6 +54,7 @@
                         <barButtonItem title="Typing" id="rCS-Y7-FK2"/>
                     </toolbarItems>
                     <navigationItem key="navigationItem" id="geZ-fh-F0l">
+                        <barButtonItem key="backBarButtonItem" title="К словарю" id="nGA-b0-mC0"/>
                         <leftBarButtonItems>
                             <barButtonItem title="⊕" id="D43-dR-dXq" userLabel="Add word simple">
                                 <connections>
@@ -99,22 +100,22 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillProportionally" spacingType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="be5-a6-mYM">
-                                <rect key="frame" x="20" y="44" width="335" height="554"/>
+                                <rect key="frame" x="20" y="44" width="335" height="603"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Word" textAlignment="center" lineBreakMode="wordWrap" baselineAdjustment="none" minimumFontSize="15" translatesAutoresizingMaskIntoConstraints="NO" id="yxM-vR-ero">
-                                        <rect key="frame" x="0.0" y="0.0" width="335" height="161"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="335" height="175"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="80"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Word" textAlignment="center" lineBreakMode="wordWrap" baselineAdjustment="none" minimumFontSize="15" translatesAutoresizingMaskIntoConstraints="NO" id="s4E-Gx-k1b">
-                                        <rect key="frame" x="0.0" y="169" width="335" height="169"/>
+                                        <rect key="frame" x="0.0" y="183" width="335" height="204"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="80"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="keD-qV-ddK" customClass="GradientButton" customModule="LearnWords" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="346" width="335" height="100"/>
+                                        <rect key="frame" x="0.0" y="395" width="335" height="100"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="41"/>
                                         <inset key="contentEdgeInsets" minX="10" minY="10" maxX="10" maxY="10"/>
                                         <state key="normal" title="Look Up">
@@ -133,7 +134,7 @@
                                         </connections>
                                     </button>
                                     <stackView opaque="NO" tag="10" contentMode="scaleToFill" distribution="fillEqually" spacingType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="hj9-L7-bfX">
-                                        <rect key="frame" x="0.0" y="454" width="335" height="100"/>
+                                        <rect key="frame" x="0.0" y="503" width="335" height="100"/>
                                         <subviews>
                                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="643-wN-0oS" userLabel="Forgot" customClass="GradientButton" customModule="LearnWords" customModuleProvider="target">
                                                 <rect key="frame" x="0.0" y="0.0" width="163.5" height="100"/>
@@ -229,7 +230,7 @@
             </objects>
             <point key="canvasLocation" x="503.19999999999999" y="145.27736131934034"/>
         </scene>
-        <!--Search Word View Controller-->
+        <!--Изучаемое слово-->
         <scene sceneID="iax-N0-AlK">
             <objects>
                 <tableViewController id="Bgt-6g-kOE" customClass="SearchWordViewController" customModule="LearnWords" customModuleProvider="target" sceneMemberID="viewController">
@@ -265,13 +266,14 @@
                         </connections>
                     </tableView>
                     <toolbarItems/>
+                    <navigationItem key="navigationItem" title="Изучаемое слово" id="5bW-fz-PeB"/>
                     <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="axZ-t2-ulR" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2448.8000000000002" y="527.58620689655174"/>
         </scene>
-        <!--Search Word View Controller-->
+        <!--Перевод-->
         <scene sceneID="3lg-9F-JPF">
             <objects>
                 <tableViewController id="3Og-N0-BZi" customClass="SearchWordViewController" customModule="LearnWords" customModuleProvider="target" sceneMemberID="viewController">
@@ -306,7 +308,7 @@
                             <outlet property="delegate" destination="3Og-N0-BZi" id="t73-Iu-lFR"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" id="4AK-rv-ykj"/>
+                    <navigationItem key="navigationItem" title="Перевод" id="4AK-rv-ykj"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="6QF-we-F1D" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -513,8 +515,9 @@
         </designable>
     </designables>
     <inferredMetricsTieBreakers>
-        <segue reference="feE-RX-9M7"/>
-        <segue reference="1Cz-UI-kqB"/>
+        <segue reference="S09-2G-whQ"/>
+        <segue reference="W5r-Vf-tT8"/>
+        <segue reference="2Ii-3h-c3T"/>
     </inferredMetricsTieBreakers>
     <resources>
         <image name="graduationcap" catalog="system" width="128" height="106"/>

@@ -6,6 +6,8 @@
 //  Copyright © 2021 Paul. All rights reserved.
 //
 
+// TODO: Add segmented control "Text|Sound|Both" (можно в виде иконок)
+
 import UIKit
 import AVFoundation
 
