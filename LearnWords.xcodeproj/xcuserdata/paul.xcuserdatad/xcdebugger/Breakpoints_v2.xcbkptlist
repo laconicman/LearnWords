@@ -336,8 +336,8 @@
             filePath = "LearnWords/WordDictationController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "261"
-            endingLineNumber = "261"
+            startingLineNumber = "238"
+            endingLineNumber = "238"
             landmarkName = "prepareForNextQuestion(withPrewiousKnown:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -419,22 +419,6 @@
             startingLineNumber = "144"
             endingLineNumber = "144"
             landmarkName = "afterAnswer(isKnown:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "9BB6047D-F6C0-4C1A-842C-91FD5B0210E7"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "LearnWords/WordDictationController.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "211"
-            endingLineNumber = "211"
-            landmarkName = "askQuestion()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

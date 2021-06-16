@@ -187,7 +187,7 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
             return
         }
         foreignWord.attributedText = NSAttributedString(string: wordsInTest[0].pair.components(separatedBy: "::")[1])
-        utteranceString = (foreignWord.attributedText?.string as NSString?)!
+        LWSpeechSynth.standard.speak(utteranceString: foreignWord.attributedText!)
         translationInput.isUserInteractionEnabled = true
         translationInput.attributedPlaceholder = NSAttributedString(
             string: "type in translation",
@@ -195,29 +195,6 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
         translationInput.text = ""
         translationInput.textColor = .black
         // foreignWord.textColor = UIColor(red: 0, green: 0.7, blue: 0, alpha: 1)
-        let utterance = AVSpeechUtterance(attributedString: NSAttributedString(string: utteranceString as String))
-        //var utterance =  AVSpeechUtterance(string: foreignWord.text ?? "")
-        //We can get voices that are present in system and then use set them either with identifiers or by using default for language
-        //let voices = AVSpeechSynthesisVoice.speechVoices()
-        //utterance.voice = AVSpeechSynthesisVoice(identifier: voice[0])
-        // TODO: set from settings
-        utterance.voice = AVSpeechSynthesisVoice(language: "en-GB")
-        //we can check (get only)
-        //let  lang = utterance.voice?.language
-        // Another way to get BCP-47 the code for the user’s current locale (as in Settings) This is a class func
-        //let currentLang = AVSpeechSynthesisVoice.currentLanguageCode()
-        // FIXME: UserDefaults.standard.float(forKey: "utteranceRatePreference")
-        utterance.rate = Float(LWUserDefaults.standard.utteranceRatePreference)
-        print(AVSpeechUtteranceMinimumSpeechRate, AVSpeechUtteranceMaximumSpeechRate)
-        
-        utterance.pitchMultiplier = Float(LWUserDefaults.standard.pitchMultiplierPreference)
-
-        //we can set pre and post utterance delay
-        utterance.preUtteranceDelay = 0.1
-        utterance.postUtteranceDelay = 0.1
-        
-        sytheiser.stopSpeaking(at: .immediate)
-        sytheiser.speak(utterance)
 
 
 //        let rlvc = UIReferenceLibraryViewController(term: "apple")
