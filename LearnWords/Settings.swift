@@ -8,8 +8,9 @@
 
 import Foundation
 
-let kRecentSearchesKey = "RecentSearches"
-let kLastSearchKey = "LastSearch"
+private let kRecentSearchesKey = "RecentSearches"
+private let kLastSearchKey = "LastSearch"
+private let dictionaryPromptDisplayed = "firstUseDictionaryPromptDisplayed"
 
 // TODO: make common settings for app and extensions
 // let userDefaultsGroup = UserDefaults(suiteName: "group.club.laconic.LearnWords")
@@ -115,6 +116,17 @@ final class LWUserDefaults {
         set {
             self.userDefaultsGroup.set(newValue, forKey: "nativeLanguagePreference")
         }
+    }
+    
+    var shouldDisplayFirstUseDictionaryPrompt: Bool {
+        get {
+            !self.userDefaultsGroup.bool(forKey: dictionaryPromptDisplayed)
+        }
+    }
+
+    func didDisplayFirstUseDictionaryPrompt()
+    {
+        self.userDefaultsGroup.set(true, forKey: dictionaryPromptDisplayed)
     }
 }
 

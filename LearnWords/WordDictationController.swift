@@ -22,8 +22,8 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
     var answerMatched: Bool = false {
         didSet {
             if answerMatched == true {
-                
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: {
+                translationInput.isUserInteractionEnabled = false
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: {
                     self.afterAnswer(isKnown: true)
                 })
                 
@@ -32,7 +32,8 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
     }
     
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        answerMatched = textField.text?.replacingCharacters(in: Range(range, in: textField.text!)!, with: string) == wordsInTest[0].pair.components(separatedBy: "::")[0]
+        let answer = textField.text?.replacingCharacters(in: Range(range, in: textField.text!)!, with: string).lowercased().trimmingCharacters(in: .whitespaces)
+        answerMatched = answer == wordsInTest[0].pair.components(separatedBy: "::")[0]
         print("Answer matched \(answerMatched)", string, textField.text, wordsInTest[0].pair.components(separatedBy: "::")[0])
         return true
     }
@@ -73,18 +74,62 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var stackBottomConstraint: NSLayoutConstraint!
     let underKeyboardLayoutConstraint = UnderKeyboardLayoutConstraint()
     @IBAction func lookupAction(_ sender: UIButton) {
-        // TODO: If it is the first time, then show "The app relies on system dictionries, . They can be used ofline. Make sure you have downloaded the dictionaries you need. To add or remove didctionaries use Manage Dictionaries button on the next screen" "Remind me next time" "Got it"
-        // TODO: show alert if no definition
-        if UIReferenceLibraryViewController.dictionaryHasDefinition(forTerm: foreignWord.text ?? "") {
-            let rlvc = UIReferenceLibraryViewController(term: foreignWord.text!)
-            //rlvc.editButtonItem what is this
-            //rlvc.setEditing(true, animated: true)
-            rlvc.modalPresentationStyle = .popover //no effect on iphone
-            //wordDefinition.text =  rlvc.editButtonItem.title
-            present(rlvc, animated: true)
+        guard let term = foreignWord.text, !term.isEmpty else { return }
+        // self.searchingIndicator.startAnimating()
+        let dictionaryViewController = UIReferenceLibraryViewController(term: term)
+        self.present(dictionaryViewController, animated: true)
+            //debugLog("presented dictionary view controlller")
+            
+            DispatchQueue.main.async
+            { [weak self] in
+                //debugLog("checking definition")
+                if UIReferenceLibraryViewController.dictionaryHasDefinition(forTerm: term) || !(self?.isReal(word: term) ?? false) { return }
+                //debugLog("hasDefinition = \(hasDefinition)")
+                // Prompt the user to set up their iOS dictionaries, the first time they use this only
+                //if LWUserDefaults.standard.shouldDisplayFirstUseDictionaryPrompt
+                //{
+                    // debugLog("First-time lookup. Let's see if the user has dictionaries set up...")
+                    // TODO: cherck for proper term in target language
+                    // if !UIReferenceLibraryViewController.dictionaryHasDefinition(forTerm: "OK")
+                    // {
+                        // debugLog("No dictionaries set up. Prompting user.")
+                        let alert = UIAlertController(
+                            title: NSLocalizedString("DICTIONARY_TITLE", comment: "Title for dictionary prompt"),
+                            message: NSLocalizedString("DICTIONARY_MESSAGE", comment: "Message for dictionary prompt"),
+                            preferredStyle: .alert)
+                        alert.addAction(UIAlertAction(
+                            title: NSLocalizedString("DICTIONARY_ACTION", comment: "Action for dictionary prompt"),
+                            style: .default,
+                            handler: nil))
+                        dictionaryViewController.present(alert, animated: true, completion: nil)
+                    // }
+
+                    // Update preferences to silence this prompt next time
+                    // LWUserDefaults.standard.didDisplayFirstUseDictionaryPrompt()
+                //}
+            
         }
+        
+//        // TODO: If it is the first time, then show "The app relies on system dictionries, . They can be used ofline. Make sure you have downloaded the dictionaries you need. To add or remove didctionaries use Manage Dictionaries button on the next screen" "Remind me next time" "Got it"
+//        // TODO: show alert if no definition
+//        if UIReferenceLibraryViewController.dictionaryHasDefinition(forTerm: foreignWord.text ?? "") {
+//            let rlvc = UIReferenceLibraryViewController(term: foreignWord.text!)
+//            //rlvc.editButtonItem what is this
+//            //rlvc.setEditing(true, animated: true)
+//            rlvc.modalPresentationStyle = .popover //no effect on iphone
+//            //wordDefinition.text =  rlvc.editButtonItem.title
+//            present(rlvc, animated: true)
+//        }
     }
     
+    func isReal(word: String) -> Bool {
+        let checker = UITextChecker()
+        let range = NSRange(location: 0, length: word.utf16.count)
+        // guard let range = NSRange(word) else { return false }
+        // TODO: set language from settings
+        let misspelledRange = checker.rangeOfMisspelledWord(in: word, range: range, startingAt: 0, wrap: false, language: "en")
+        return misspelledRange.location == NSNotFound
+    }
     
     func afterAnswer(isKnown: Bool) {
         if !wordsInTest.isEmpty {
@@ -118,15 +163,15 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
                           options: [.transitionCrossDissolve],
                           animations: { [weak self] in
                             self?.knowButton?.isEnabled = false
-                            if isKnown { self?.knowButton?.layer.opacity = 0.1 }
                             self?.forgotButton?.isEnabled = false
+                            if isKnown { self?.knowButton?.layer.opacity = 0.1 } else { self?.forgotButton?.layer.opacity = 0.1 }
                             self?.translationInput.attributedText = NSAttributedString(
                                 string: shownWord.pair.components(separatedBy: "::")[0],
                                 attributes: [.foregroundColor: isKnown ? UIColor(red: 0, green: 0.7, blue: 0, alpha: 1) : UIColor(red: 0.7, green: 0.0, blue: 0, alpha: 1)])
                             self?.translationInput.textColor = isKnown ? UIColor(red: 0, green: 0.7, blue: 0, alpha: 1) : UIColor(red: 0.7, green: 0.0, blue: 0, alpha: 1)
         }) { [weak self] (ended) in
             self?.knowButton?.isEnabled = true
-            if isKnown { self?.knowButton?.layer.opacity = 1 }
+            if isKnown { self?.knowButton?.layer.opacity = 1 } else { self?.forgotButton?.layer.opacity = 1 }
             self?.forgotButton?.isEnabled = true
             self?.prepareForNextQuestion(withPrewiousKnown: isKnown)
         }
@@ -143,6 +188,7 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
         }
         foreignWord.attributedText = NSAttributedString(string: wordsInTest[0].pair.components(separatedBy: "::")[1])
         utteranceString = (foreignWord.attributedText?.string as NSString?)!
+        translationInput.isUserInteractionEnabled = true
         translationInput.attributedPlaceholder = NSAttributedString(
             string: "type in translation",
             attributes: [.foregroundColor: UIColor(red: 0, green: 0.7, blue: 0.7, alpha: 1)])
@@ -154,6 +200,7 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
         //We can get voices that are present in system and then use set them either with identifiers or by using default for language
         //let voices = AVSpeechSynthesisVoice.speechVoices()
         //utterance.voice = AVSpeechSynthesisVoice(identifier: voice[0])
+        // TODO: set from settings
         utterance.voice = AVSpeechSynthesisVoice(language: "en-GB")
         //we can check (get only)
         //let  lang = utterance.voice?.language

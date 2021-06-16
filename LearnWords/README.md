@@ -17,6 +17,7 @@ https://support.apple.com/en-us/HT202362
 Прописать процедуру первого запуска
 https://developer.apple.com/documentation/uikit/app_and_environment/responding_to_the_launch_of_your_app/performing_one-time_setup_for_your_app
 Внимание: для групповых файлов (`containerURL(forSecurityApplicationGroupIdentifier:)`) нужно создать директорию: https://developer.apple.com/documentation/foundation/filemanager/1412643-containerurl
+См. проект Code/ViewsAndControllers/ActionExtensionFinal/Bookmark/Bookmark.xcodeproj.
 
 Добавить произношение из widget-а. Например, long press на слове или переводе.
 В краткой версии widget-а дать интерфейс добавления слова.
@@ -33,6 +34,10 @@ https://github.com/isaced/ISEmojiView
 Импортирование содержимого буфера в качестве массива слов.
 ..Code/Dictionary/Kotoba-master/code/Kotoba.xcodeproj
 Там же: icloud, импорт из текстовых файлов
+
+07.06.21
+Больше действий над строкой таблицы
+https://useyourloaf.com/blog/table-swipe-actions/
 
 Схема БД
 https://stackoverflow.com/questions/16914185/how-to-design-a-database-for-translation-dictionary

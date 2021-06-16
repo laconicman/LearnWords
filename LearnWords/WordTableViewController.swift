@@ -10,6 +10,7 @@
 // Consider UserDefaults AppLanguages
 // Show help or tutorial on first launch
 // Play with UISwipeActionsConfiguration to configure row swipe actions
+// Add look up button to navbar
 
 import UIKit
 
@@ -86,7 +87,7 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
                 })
                 // TODO: Create a screen to verify and select `importedWords`. Check for duplicates
                 importedWords = importedWords.filter({ (impW) -> Bool in
-                    Storage.wordsAndStat.contains { (storedW) -> Bool in
+                    Storage.wordsAndStat.contains { (storedW) -> Bool in // TODO: make temporary `Set`
                         impW.pair == storedW.pair
                     }
                 })
@@ -98,7 +99,7 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
             }
             UserDefaults(suiteName: "group.club.laconic.LearnWords")?.removeObject(forKey: "ImportedText")
         }
-            
+        navigationItem.rightBarButtonItems?.insert(editButtonItem, at: 0)
             //  print("$\(PRODUCT_BUNDLE_IDENTIFIER)")
 
         // For features avalible after iOS 11 In is coomented out because it is ugly
@@ -317,7 +318,7 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
     }
     
     func split(_ str: String, by oneOfTheCharacters: String) -> [String] {
-        let separatorSet = CharacterSet(charactersIn: oneOfTheCharacters)
+        let separatorSet = CharacterSet(charactersIn: oneOfTheCharacters) // consider .union(.newlines)
         return str.components(separatedBy: separatorSet).map({ $0.trimmingCharacters(in: .whitespaces)}).filter( { !$0.isEmpty })
     }
     
