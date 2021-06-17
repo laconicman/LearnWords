@@ -13,9 +13,6 @@ import AVFoundation
 
 final class WordDictationController: UIViewController, UITextFieldDelegate {
     
-    private lazy var sytheiser = AVSpeechSynthesizer() //Make it global, to avoid initialization for every vc creation
-    private var utteranceString: NSString = ""
-    
     var wordsInTest = [WordAndStat]()
     var shownWord: WordAndStat!
     
@@ -140,7 +137,7 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
 //            //disable buttons and ShowNextButton Instead and autoSkip
 //            //prepareForNextQuestion()
             showAnswer(for: shownWord, isKnown: isKnown)
-        } else {
+        } else { // this never happens for now
             navigationController?.tabBarController?.selectedIndex = 0
         }
     }

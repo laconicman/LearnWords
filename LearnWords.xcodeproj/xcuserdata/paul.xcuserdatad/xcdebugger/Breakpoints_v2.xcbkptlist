@@ -27,23 +27,6 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "EEE321C8-6F2C-48D1-8340-48025B421434"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "LearnWords/WordTestViewController.swift"
-            timestampString = "565897380.584078"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "93"
-            endingLineNumber = "93"
-            landmarkName = "forgotButtonAction(_:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             uuid = "39315FE8-D614-4D83-B6D6-9EA709B072D4"
             shouldBeEnabled = "No"
             ignoreCount = "0"
@@ -52,8 +35,8 @@
             timestampString = "565897380.584141"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "91"
-            endingLineNumber = "91"
+            startingLineNumber = "104"
+            endingLineNumber = "104"
             landmarkName = "forgotButtonAction(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -69,8 +52,8 @@
             timestampString = "565897380.5842"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "89"
-            endingLineNumber = "89"
+            startingLineNumber = "102"
+            endingLineNumber = "102"
             landmarkName = "forgotButtonAction(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -86,8 +69,8 @@
             timestampString = "565897380.58426"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "53"
-            endingLineNumber = "53"
+            startingLineNumber = "66"
+            endingLineNumber = "66"
             landmarkName = "knowButtonAction(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -103,8 +86,8 @@
             timestampString = "565897380.584318"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "52"
-            endingLineNumber = "52"
+            startingLineNumber = "65"
+            endingLineNumber = "65"
             landmarkName = "knowButtonAction(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -287,8 +270,8 @@
             filePath = "LearnWords/WordDictationController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "181"
-            endingLineNumber = "181"
+            startingLineNumber = "178"
+            endingLineNumber = "178"
             landmarkName = "askQuestion()"
             landmarkType = "7">
          </BreakpointContent>
@@ -303,8 +286,8 @@
             filePath = "LearnWords/WordDictationController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "183"
-            endingLineNumber = "183"
+            startingLineNumber = "180"
+            endingLineNumber = "180"
             landmarkName = "askQuestion()"
             landmarkType = "7">
          </BreakpointContent>
@@ -319,8 +302,8 @@
             filePath = "LearnWords/WordDictationController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "236"
-            endingLineNumber = "236"
+            startingLineNumber = "233"
+            endingLineNumber = "233"
             landmarkName = "prepareForNextQuestion(withPrewiousKnown:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -335,8 +318,8 @@
             filePath = "LearnWords/WordDictationController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "115"
-            endingLineNumber = "115"
+            startingLineNumber = "112"
+            endingLineNumber = "112"
             landmarkName = "lookupAction(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -383,8 +366,8 @@
             filePath = "LearnWords/WordDictationController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "135"
-            endingLineNumber = "135"
+            startingLineNumber = "132"
+            endingLineNumber = "132"
             landmarkName = "afterAnswer(isKnown:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -399,8 +382,8 @@
             filePath = "LearnWords/WordDictationController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "144"
-            endingLineNumber = "144"
+            startingLineNumber = "141"
+            endingLineNumber = "141"
             landmarkName = "afterAnswer(isKnown:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -415,8 +398,8 @@
             filePath = "LearnWords/WordTestViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "159"
-            endingLineNumber = "159"
+            startingLineNumber = "162"
+            endingLineNumber = "162"
             landmarkName = "nextTapped()"
             landmarkType = "7">
          </BreakpointContent>

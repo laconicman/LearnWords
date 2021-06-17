@@ -23,7 +23,6 @@ final class WordTestViewController: UIViewController {
     @IBOutlet weak var knowButton: UIButton!
     @IBOutlet weak var forgotButton: UIButton!
     
-    
     @IBAction func lookUpAction(_ sender: UIButton) {
         // TODO: If it is the first time, then show "The app relies on system dictionries, . They can be used ofline. Make sure you have downloaded the dictionaries you need. To add or remove didctionaries use Manage Dictionaries button on the next screen" "Remind me next time" "Got it"
         if UIReferenceLibraryViewController.dictionaryHasDefinition(forTerm: prompt.text ?? "") {
@@ -36,19 +35,33 @@ final class WordTestViewController: UIViewController {
         }
     }
     
+    var wordsInTest = [WordAndStat]()
+    var shownWord: WordAndStat!
+    var questionCounter: Int {
+        return wordsInTest.count
+    }
+ //   var showingQuestion = true
+ //   var reflibvc: ReferenceLibraryViewController
+
+    
+    func afterAnswer(isKnown: Bool) {
+        if !wordsInTest.isEmpty {
+            shownWord = wordsInTest.remove(at: 0)
+
+            isKnown ? shownWord.increaseKnown() : shownWord.decreaseKnown()
+            Storage.shownWords.append(shownWord)
+//            //disable buttons and ShowNextButton Instead and autoSkip
+//            //prepareForNextQuestion()
+            showAnswer(for: shownWord, isKnown: isKnown)
+        } else { // this never happens for now
+            navigationController?.tabBarController?.selectedIndex = 0
+        }
+    }
+    
     
     @IBAction func knowButtonAction(_ sender: UIButton) {
-        if !wordsInTest.isEmpty {
-            var shownWord = wordsInTest.remove(at: 0)
-            
-            // shownWord.known += 1
-            shownWord.increaseKnown()
-            Storage.shownWords.append(shownWord)
-            //disable buttons and ShowNextButton Instead and autoSkip
-            //prepareForNextQuestion()
-            showAnswer(for: shownWord, isKnown: true)
-        }
-        
+        afterAnswer(isKnown: true)
+        /*
         if UIReferenceLibraryViewController.dictionaryHasDefinition(forTerm: prompt.text ?? "") {
             let rlvc = UIReferenceLibraryViewController(term: prompt.text!)
             //rlvc.editButtonItem what is this
@@ -83,26 +96,16 @@ final class WordTestViewController: UIViewController {
                 //print(t ?? "no value")
 
             }
-        }
+        }*/
     }
     
     @IBAction func forgotButtonAction(_ sender: UIButton) {
         haptic(feedback: .warning)
         //        showingQuestion = !showingQuestion
-        if !wordsInTest.isEmpty {
-            var shownWord = wordsInTest.remove(at: 0)
-            showAnswer(for: shownWord, isKnown: false)
-            shownWord.unknown += 1
-            Storage.shownWords.append(shownWord)
-        }
+        afterAnswer(isKnown: false)
     }
     
-    var wordsInTest = [WordAndStat]()
-    var questionCounter: Int {
-        return wordsInTest.count
-    }
- //   var showingQuestion = true
- //   var reflibvc: ReferenceLibraryViewController
+
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -173,7 +176,7 @@ final class WordTestViewController: UIViewController {
                           options: [.transitionCrossDissolve],
                           animations: { [weak self] in
                             self?.knowButton?.isEnabled = false
-                            if isKnown { self?.knowButton?.layer.opacity = 0.1 }
+                            if isKnown { self?.knowButton?.layer.opacity = 0.1 } else { self?.forgotButton?.layer.opacity = 0.1 }
                             self?.forgotButton?.isEnabled = false
                             self?.wordDefinition.attributedText = NSAttributedString(
                                 string: shownWord.pair.components(separatedBy: "::")[0],
@@ -181,7 +184,7 @@ final class WordTestViewController: UIViewController {
                             // prompt.textColor = UIColor(red: 0, green: 0.7, blue: 0, alpha: 1)
         }) { [weak self] (ended) in
             self?.knowButton?.isEnabled = true
-            if isKnown { self?.knowButton?.layer.opacity = 1 }
+            if isKnown { self?.knowButton?.layer.opacity = 1 } else { self?.forgotButton?.layer.opacity = 1 }
             self?.forgotButton?.isEnabled = true
             self?.prepareForNextQuestion(withPrewiousKnown: isKnown)
         }
