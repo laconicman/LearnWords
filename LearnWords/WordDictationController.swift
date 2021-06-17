@@ -150,9 +150,7 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
     }
     
     @IBAction func forgotButtonAction(_ sender: UIButton) {
-        // TODO: haptic feedback - wrap into function and use elsewhere
-        let generator = UINotificationFeedbackGenerator()
-        generator.notificationOccurred(.warning)
+        haptic(feedback: .warning)
         afterAnswer(isKnown: false)
     }
     

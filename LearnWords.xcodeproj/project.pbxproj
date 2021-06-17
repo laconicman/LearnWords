@@ -22,6 +22,7 @@
 		DA2E2D0E26612B8B00EF285C /* UserDefaults+Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA2E2D0D26612B8A00EF285C /* UserDefaults+Codable.swift */; };
 		DA2E2D1826623F0700EF285C /* UnderKeyboardDistrib.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA2E2D1726623F0700EF285C /* UnderKeyboardDistrib.swift */; };
 		DA2E2D90267A540900EF285C /* LWSpeechSynth.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA2E2D8F267A540900EF285C /* LWSpeechSynth.swift */; };
+		DA2E2D9B267B683400EF285C /* HapticFeedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA2E2D9A267B683400EF285C /* HapticFeedback.swift */; };
 		DA4162F41F8BE62600165694 /* WordsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA4162F31F8BE62600165694 /* WordsModel.swift */; };
 		DA4162F61F8C219500165694 /* GradientButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA4162F51F8C219500165694 /* GradientButton.swift */; };
 		DA86ADF423489FF7007E3221 /* String+.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA86ADF323489FF7007E3221 /* String+.swift */; };
@@ -89,6 +90,7 @@
 		DA2E2D0D26612B8A00EF285C /* UserDefaults+Codable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDefaults+Codable.swift"; sourceTree = "<group>"; };
 		DA2E2D1726623F0700EF285C /* UnderKeyboardDistrib.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UnderKeyboardDistrib.swift; sourceTree = "<group>"; };
 		DA2E2D8F267A540900EF285C /* LWSpeechSynth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LWSpeechSynth.swift; sourceTree = "<group>"; };
+		DA2E2D9A267B683400EF285C /* HapticFeedback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticFeedback.swift; sourceTree = "<group>"; };
 		DA4162F31F8BE62600165694 /* WordsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordsModel.swift; sourceTree = "<group>"; };
 		DA4162F51F8C219500165694 /* GradientButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientButton.swift; sourceTree = "<group>"; };
 		DA554C6826593A1100C67BE0 /* ImportAsDictAction.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ImportAsDictAction.entitlements; sourceTree = "<group>"; };
@@ -159,6 +161,7 @@
 				DAC884B9219C8710005C6588 /* SearchWordViewController.swift */,
 				DAEC8DCD219DF691009097C2 /* Settings.swift */,
 				DA2E2D8F267A540900EF285C /* LWSpeechSynth.swift */,
+				DA2E2D9A267B683400EF285C /* HapticFeedback.swift */,
 				DA246CB31F8A6E5E00A75ED1 /* AppDelegate.swift */,
 				DA246CB51F8A6E5E00A75ED1 /* WordTableViewController.swift */,
 				DA4162F51F8C219500165694 /* GradientButton.swift */,
@@ -363,6 +366,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DAC884BA219C8710005C6588 /* SearchWordViewController.swift in Sources */,
+				DA2E2D9B267B683400EF285C /* HapticFeedback.swift in Sources */,
 				DA4162F61F8C219500165694 /* GradientButton.swift in Sources */,
 				DAEC8DCE219DF691009097C2 /* Settings.swift in Sources */,
 				DA246CDE1F8AE3DA00A75ED1 /* WordTestViewController.swift in Sources */,

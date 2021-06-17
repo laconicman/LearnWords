@@ -14,10 +14,7 @@ import UIKit
 import GameplayKit
 import AVFoundation
 
-final class WordTestViewController: UIViewController, AVSpeechSynthesizerDelegate {
-
-    private lazy var sytheiser = AVSpeechSynthesizer() //Make it global, to avoid initialization for every vc creation
-    private var utteranceString: NSString = ""
+final class WordTestViewController: UIViewController {
     
     @IBOutlet weak var wordDefinition: UILabel! //?
     @IBOutlet weak var stackView: UIStackView!
@@ -90,10 +87,8 @@ final class WordTestViewController: UIViewController, AVSpeechSynthesizerDelegat
     }
     
     @IBAction func forgotButtonAction(_ sender: UIButton) {
-        // TODO: haptic feedback - wrap into function and use elsewhere
-        let generator = UINotificationFeedbackGenerator()
-        generator.notificationOccurred(.warning)
-//        showingQuestion = !showingQuestion
+        haptic(feedback: .warning)
+        //        showingQuestion = !showingQuestion
         if !wordsInTest.isEmpty {
             var shownWord = wordsInTest.remove(at: 0)
             showAnswer(for: shownWord, isKnown: false)
@@ -201,33 +196,11 @@ final class WordTestViewController: UIViewController, AVSpeechSynthesizerDelegat
             return
         }
         prompt.attributedText = NSAttributedString(string: wordsInTest[0].pair.components(separatedBy: "::")[1])
-        utteranceString = (prompt.attributedText?.string as NSString?)!
+        LWSpeechSynth.standard.speak(utteranceString: prompt.attributedText!)
         wordDefinition.attributedText = NSAttributedString(
             string: "?",
             attributes: [.foregroundColor: UIColor(red: 0, green: 0.7, blue: 0.7, alpha: 1)])
         // prompt.textColor = UIColor(red: 0, green: 0.7, blue: 0, alpha: 1)
-        let utterance = AVSpeechUtterance(attributedString: NSAttributedString(string: utteranceString as String))
-        //var utterance =  AVSpeechUtterance(string: prompt.text ?? "")
-        //We can get voices that are present in system and then use set them either with identifiers or by using default for language
-        //let voices = AVSpeechSynthesisVoice.speechVoices()
-        //utterance.voice = AVSpeechSynthesisVoice(identifier: voice[0])
-        utterance.voice = AVSpeechSynthesisVoice(language: "en-GB")
-        //we can check (get only)
-        //let  lang = utterance.voice?.language
-        // Another way to get BCP-47 the code for the user’s current locale (as in Settings) This is a class func
-        //let currentLang = AVSpeechSynthesisVoice.currentLanguageCode()
-        
-        utterance.rate = UserDefaults.standard.float(forKey: "utteranceRatePreference")
-        
-        utterance.pitchMultiplier = UserDefaults.standard.float(forKey: "pitchMultiplierPreference")
-       // utterance.rate = AVSpeechUtteranceMinimumSpeechRate * 2
-        //we can set pre and post utterance delay
-        utterance.preUtteranceDelay = 0.1
-        utterance.postUtteranceDelay = 0.1
-        
-        sytheiser.stopSpeaking(at: .immediate)
-        sytheiser.speak(utterance)
-
 
 //        let rlvc = UIReferenceLibraryViewController(term: "apple")
 //
@@ -257,29 +230,7 @@ final class WordTestViewController: UIViewController, AVSpeechSynthesizerDelegat
     
     }
     
-    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, willSpeakRangeOfSpeechString characterRange: NSRange, utterance: AVSpeechUtterance) {
 
-//        let mutableAttributedString = NSMutableAttributedString(string: self.utteranceString as String)
-//        //This looks better
-//        //let mutableAttributedString = utterance.attributedSpeechString
-//        mutableAttributedString.addAttribute(.foregroundColor, value: UIColor.red, range: characterRange)
-//        self.prompt.attributedText = mutableAttributedString
-//        print(mutableAttributedString)
-        
-        let mutableAttributedString = NSMutableAttributedString(string: utteranceString as String)
-        mutableAttributedString.addAttribute(.foregroundColor, value: UIColor.red, range: characterRange)
-        prompt.attributedText = mutableAttributedString
-    }
-    
-    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didStart utterance: AVSpeechUtterance) {
-        prompt.attributedText = NSAttributedString(string: self.utteranceString as String)
-    }
-    
-
-    
-    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
-        prompt.attributedText = NSAttributedString(string: self.utteranceString as String)
-    }
 
     func prepareForNextQuestion(withPrewiousKnown: Bool = true) {
         let animation = UIViewPropertyAnimator(duration: 0.5, curve: .easeInOut) { [unowned self] in

@@ -30,10 +30,12 @@ final class LWSpeechSynth {
         // Another way to get BCP-47 the code for the user’s current locale (as in Settings) This is a class func
         //let currentLang = AVSpeechSynthesisVoice.currentLanguageCode()
         // FIXME: UserDefaults.standard.float(forKey: "utteranceRatePreference")
-        utterance.rate = Float(LWUserDefaults.standard.utteranceRatePreference)
-        print(AVSpeechUtteranceMinimumSpeechRate, AVSpeechUtteranceMaximumSpeechRate)
-        
-        utterance.pitchMultiplier = Float(LWUserDefaults.standard.pitchMultiplierPreference)
+//        utterance.rate = Float(LWUserDefaults.standard.utteranceRatePreference)
+//        print(AVSpeechUtteranceMinimumSpeechRate, AVSpeechUtteranceMaximumSpeechRate)
+//
+//        utterance.pitchMultiplier = Float(LWUserDefaults.standard.pitchMultiplierPreference)
+        utterance.rate = UserDefaults.standard.float(forKey: "utteranceRatePreference")
+        utterance.pitchMultiplier = UserDefaults.standard.float(forKey: "pitchMultiplierPreference")
 
         //we can set pre and post utterance delay
         utterance.preUtteranceDelay = 0.1
