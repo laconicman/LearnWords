@@ -54,7 +54,7 @@
                         <barButtonItem title="Typing" id="rCS-Y7-FK2"/>
                     </toolbarItems>
                     <navigationItem key="navigationItem" id="geZ-fh-F0l">
-                        <barButtonItem key="backBarButtonItem" title="К словарю" id="nGA-b0-mC0"/>
+                        <barButtonItem key="backBarButtonItem" title="Current set" id="nGA-b0-mC0"/>
                         <leftBarButtonItems>
                             <barButtonItem title="⊕" id="D43-dR-dXq" userLabel="Add word simple">
                                 <connections>
@@ -68,14 +68,15 @@
                             </barButtonItem>
                         </leftBarButtonItems>
                         <rightBarButtonItems>
-                            <barButtonItem systemItem="organize" id="Ieh-AL-JGj">
+                            <barButtonItem title="Settings" id="Ieh-AL-JGj">
                                 <connections>
                                     <action selector="goToSettings:" destination="Jy4-wo-DD5" id="kNY-Mq-mFd"/>
                                 </connections>
                             </barButtonItem>
-                            <barButtonItem systemItem="refresh" id="cUB-K9-wGo" userLabel="Test button">
+                            <barButtonItem systemItem="organize" id="cUB-K9-wGo" userLabel="gotoWordSets">
                                 <connections>
-                                    <action selector="autoPlayTest:" destination="Jy4-wo-DD5" id="RIf-cj-5hW"/>
+                                    <action selector="gotoWordSets:" destination="Jy4-wo-DD5" id="RIf-cj-5hW"/>
+                                    <segue destination="IOT-Jj-vto" kind="show" identifier="gotoWordSets" id="9Q1-zW-Ehu"/>
                                 </connections>
                             </barButtonItem>
                             <barButtonItem systemItem="play" id="aKw-EN-Uxi">
@@ -274,6 +275,50 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="axZ-t2-ulR" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2448.8000000000002" y="527.58620689655174"/>
+        </scene>
+        <!--Word Sets-->
+        <scene sceneID="oDn-hz-Rcx">
+            <objects>
+                <tableViewController hidesBottomBarWhenPushed="YES" id="IOT-Jj-vto" customClass="WordSetsTableViewController" customModule="LearnWords" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="6Q5-9e-K1K">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="647"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="wordSetsCell" textLabel="39l-aE-DmA" style="IBUITableViewCellStyleDefault" id="UT5-Il-mip">
+                                <rect key="frame" x="0.0" y="28" width="375" height="43.5"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="UT5-Il-mip" id="e9k-V0-t91">
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="39l-aE-DmA">
+                                            <rect key="frame" x="16" y="0.0" width="343" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                            <nil key="textColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                </tableViewCellContentView>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="IOT-Jj-vto" id="6yh-AI-Y60"/>
+                            <outlet property="delegate" destination="IOT-Jj-vto" id="fFX-GY-Izj"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" title="Word Sets" id="vYV-WR-kC4">
+                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="LDX-PH-WrW">
+                            <connections>
+                                <action selector="addNewWord:" destination="IOT-Jj-vto" id="Icv-XQ-4Na"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Cb8-NG-CBm" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3385" y="536"/>
         </scene>
         <!--Перевод-->
         <scene sceneID="3lg-9F-JPF">
@@ -529,6 +574,9 @@
         <image name="keyboard.badge.ellipsis" catalog="system" width="128" height="80"/>
         <systemColor name="darkTextColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="systemGray5Color">
             <color red="0.89803921568627454" green="0.89803921568627454" blue="0.91764705882352937" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

@@ -128,5 +128,25 @@ final class LWUserDefaults {
     {
         self.userDefaultsGroup.set(true, forKey: dictionaryPromptDisplayed)
     }
+    
+//    private let setsKey = "setsKey"
+//    var wordSets: [String]? {
+//        get {
+//            return self.userDefaultsGroup.stringArray(forKey: setsKey)
+//        }
+//        set {
+//            self.userDefaultsGroup.set(newValue, forKey: setsKey)
+//        }
+//    }
+    
+//    private let currentSetKey = "currentSetKey"
+//    var currentWordSet: String? {
+//        get {
+//            return self.userDefaultsGroup.string(forKey: currentSetKey)
+//        }
+//        set {
+//            self.userDefaultsGroup.set(newValue, forKey: currentSetKey)
+//        }
+//    }
 }
 

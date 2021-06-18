@@ -29,6 +29,11 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
     @IBAction func goToSettings(_ sender: UIBarButtonItem) {
         gotoAppSettings()
     }
+    // TODO: Make set selection screen
+    @IBAction func unwindSegue(segue: UIStoryboardSegue) {
+        
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         //Some tests to discover various language tests found in system:
@@ -66,8 +71,8 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
 
         setupSearchController(placeholder: NSLocalizedString("Search words in sets", comment: "placeholder"), hideWhenAppear: true)
 
-        if let savedWords: [WordAndStat] = userDefaultsGroup.decodeAndLoad("WordsAndStat") { // userDefaultsGroup.stringArray(forKey: "Words")  {
-                Storage.wordsAndStat = savedWords // (savedWords.compactMap{($0,0,0,0)} )
+        if let savedWords: [WordAndStat] = userDefaultsGroup.decodeAndLoad(Storage.currentWordSet) {
+                Storage.wordsAndStat = savedWords
             } else {
                 Storage.saveInitialValues()
             }
@@ -177,8 +182,8 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
 //        navigationController?.pushViewController(vc, animated: true)
 //    }
     
-    @IBAction func autoPlayTest(_ sender: UIBarButtonItem) {
-        navigationItem.rightBarButtonItems?[1].isEnabled = !(navigationItem.rightBarButtonItems?[1].isEnabled)!
+    @IBAction func gotoWordSets(_ sender: UIBarButtonItem) {
+        // navigationItem.rightBarButtonItems?[1].isEnabled = !(navigationItem.rightBarButtonItems?[1].isEnabled)!
     }
 
     private func checkInstalledLocales() {

@@ -29,6 +29,31 @@ struct WordAndStat: Codable {
 struct Storage {
     static var wordsAndStat = [WordAndStat]() // The whole word pair database
     static var shownWords = [WordAndStat]() // Word pair shown during last session
+    private static var initialSet = "WordsAndStat"
+    private static let setsKey = "setsKey"
+    static var wordSets: [String] {
+        get {
+            return userDefaultsGroup.stringArray(forKey: setsKey) ?? [initialSet]
+        }
+        set {
+            userDefaultsGroup.set(newValue, forKey: setsKey)
+        }
+    }
+    
+    private static let currentSetKey = "currentSetKey"
+    static var currentWordSet: String {
+        get {
+            return userDefaultsGroup.string(forKey: currentSetKey) ?? initialSet
+        }
+        set {
+            userDefaultsGroup.set(newValue, forKey: currentSetKey)
+            if let savedWords: [WordAndStat] = userDefaultsGroup.decodeAndLoad(newValue) {
+                    Storage.wordsAndStat = savedWords
+                } else {
+                    Storage.wordsAndStat = []
+                }
+        }
+    }
     
     static func saveInitialValues () {
         wordsAndStat.append(WordAndStat(pair: "медведь::bear",known: 0,unknown: 0,skiped: 0)) // TODO: Change format to somethig like "медведь - bear, bear2"
@@ -42,6 +67,7 @@ struct Storage {
         wordsAndStat.append(WordAndStat(pair: "овца::sheep",known: 0,unknown: 0,skiped: 0))
         
         saveWords(wordsAndStat)
+        // wordSets = [initialSet] Not sure if its needed
     }
     
 //    static func saveWordsOnly(_ wordsAndStat: [WordAndStat]) {
@@ -51,7 +77,7 @@ struct Storage {
 //    }
     
     static func saveWords(_ wordsAndStat: [WordAndStat]) {
-        userDefaultsGroup.encodeAndSave(wordsAndStat, "WordsAndStat")
+        userDefaultsGroup.encodeAndSave(wordsAndStat, currentWordSet)
         //            defaults.set(knownWords, forKey: "knownWords")
         
     }
@@ -64,6 +90,14 @@ struct Storage {
         wordsAndStat.append(WordAndStat(pair: "\(first)::\(second)".lowercased(), known: 0, unknown: 0, skiped: 0))
         saveWords(wordsAndStat)
         return rowPosition
+    }
+    
+    static func insertWordSet(name: String) -> Int? {
+        var wsa = wordSets
+        wsa.append(name)
+        let wsaSet = Set(wsa)
+        wordSets = Array(wsaSet).sorted()
+        return wordSets.index(of: name)
     }
 }
 

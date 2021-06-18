@@ -23,6 +23,7 @@
 		DA2E2D1826623F0700EF285C /* UnderKeyboardDistrib.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA2E2D1726623F0700EF285C /* UnderKeyboardDistrib.swift */; };
 		DA2E2D90267A540900EF285C /* LWSpeechSynth.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA2E2D8F267A540900EF285C /* LWSpeechSynth.swift */; };
 		DA2E2D9B267B683400EF285C /* HapticFeedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA2E2D9A267B683400EF285C /* HapticFeedback.swift */; };
+		DA2E2DA3267CB63E00EF285C /* WordSetsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA2E2DA2267CB63E00EF285C /* WordSetsTableViewController.swift */; };
 		DA4162F41F8BE62600165694 /* WordsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA4162F31F8BE62600165694 /* WordsModel.swift */; };
 		DA4162F61F8C219500165694 /* GradientButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA4162F51F8C219500165694 /* GradientButton.swift */; };
 		DA86ADF423489FF7007E3221 /* String+.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA86ADF323489FF7007E3221 /* String+.swift */; };
@@ -91,6 +92,7 @@
 		DA2E2D1726623F0700EF285C /* UnderKeyboardDistrib.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UnderKeyboardDistrib.swift; sourceTree = "<group>"; };
 		DA2E2D8F267A540900EF285C /* LWSpeechSynth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LWSpeechSynth.swift; sourceTree = "<group>"; };
 		DA2E2D9A267B683400EF285C /* HapticFeedback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticFeedback.swift; sourceTree = "<group>"; };
+		DA2E2DA2267CB63E00EF285C /* WordSetsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordSetsTableViewController.swift; sourceTree = "<group>"; };
 		DA4162F31F8BE62600165694 /* WordsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordsModel.swift; sourceTree = "<group>"; };
 		DA4162F51F8C219500165694 /* GradientButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientButton.swift; sourceTree = "<group>"; };
 		DA554C6826593A1100C67BE0 /* ImportAsDictAction.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ImportAsDictAction.entitlements; sourceTree = "<group>"; };
@@ -173,6 +175,7 @@
 				DA2E2D1726623F0700EF285C /* UnderKeyboardDistrib.swift */,
 				DA88CB8321A687BF0094D1F8 /* Settings.bundle */,
 				DA246CB71F8A6E5E00A75ED1 /* Main.storyboard */,
+				DA2E2DA2267CB63E00EF285C /* WordSetsTableViewController.swift */,
 				DA246CBA1F8A6E5E00A75ED1 /* Assets.xcassets */,
 				DA246CBC1F8A6E5E00A75ED1 /* LaunchScreen.storyboard */,
 				DA246CBF1F8A6E5E00A75ED1 /* Info.plist */,
@@ -375,6 +378,7 @@
 				DA2E2D0E26612B8B00EF285C /* UserDefaults+Codable.swift in Sources */,
 				DA246CB61F8A6E5E00A75ED1 /* WordTableViewController.swift in Sources */,
 				DA2E2CE7265E865A00EF285C /* WordDictationController.swift in Sources */,
+				DA2E2DA3267CB63E00EF285C /* WordSetsTableViewController.swift in Sources */,
 				DA86ADF423489FF7007E3221 /* String+.swift in Sources */,
 				DA2E2D90267A540900EF285C /* LWSpeechSynth.swift in Sources */,
 				DA246CB41F8A6E5E00A75ED1 /* AppDelegate.swift in Sources */,
