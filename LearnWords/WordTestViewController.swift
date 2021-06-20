@@ -112,6 +112,7 @@ final class WordTestViewController: UIViewController {
 
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .fastForward, target: self, action: #selector(nextTapped))
         wordsInTest = Storage.wordsAndStat.shuffled()
+        Storage.shownWords = []
         // wordsInTest = GKRandomSource.sharedRandom().arrayByShufflingObjects(in: wordsInTest) as! [WordAndStat]
         //showingQuestion = true
         
@@ -195,6 +196,8 @@ final class WordTestViewController: UIViewController {
     func askQuestion() {
         //prompt.text = wordsInTest[questionCounter].components(separatedBy: "::")[1]
         guard !wordsInTest.isEmpty else {
+            Storage.saveWords(Storage.shownWords)
+            Storage.wordsAndStat = Storage.shownWords
             navigationController?.tabBarController?.selectedIndex = 0
             return
         }

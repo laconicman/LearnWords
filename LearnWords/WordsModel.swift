@@ -37,6 +37,12 @@ struct Storage {
         }
         set {
             userDefaultsGroup.set(newValue, forKey: setsKey)
+//            let nvs = Set(newValue) // newValue = wordSets? WTF
+//            if nvs.isStrictSubset(of: wordSets) { // new is less - delete object
+//                for ws in nvs.intersection(wordSets) {
+//                    userDefaultsGroup.removeObject(forKey: ws)
+//                }
+//            }
         }
     }
     
@@ -98,6 +104,13 @@ struct Storage {
         let wsaSet = Set(wsa)
         wordSets = Array(wsaSet).sorted()
         return wordSets.index(of: name)
+    }
+    static func removeWordSet(at index: Int) {
+        let removed = wordSets.remove(at: index)
+        if currentWordSet == removed, let wsf = wordSets.first {
+            currentWordSet = wsf
+        }
+        userDefaultsGroup.removeObject(forKey: removed)
     }
 }
 

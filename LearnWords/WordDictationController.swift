@@ -47,7 +47,8 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
         underKeyboardLayoutConstraint.setup(stackBottomConstraint, view: view, minMargin: 0)
         //navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .fastForward, target: self, action: #selector(nextTapped))
         wordsInTest = Storage.wordsAndStat.shuffled()
-        title = "Translate"
+        Storage.shownWords = []
+        // title = "Translate"
         stackView.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
         stackView.alpha = 0
         translationInput.clearsOnBeginEditing = true
@@ -178,6 +179,8 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
     func askQuestion() {
         //foreignWord.text = wordsInTest[questionCounter].components(separatedBy: "::")[1]
         guard !wordsInTest.isEmpty else {
+            Storage.saveWords(Storage.shownWords)
+            Storage.wordsAndStat = Storage.shownWords
             navigationController?.tabBarController?.selectedIndex = 0
             return
         }

@@ -131,7 +131,7 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         // Some checks:
         print("LWUserDefaults.standard.languageToStudyPreference: " + (LWUserDefaults.standard.languageToStudyPreference ?? "Undefined"))
         print("LWUserDefaults.standard.nativeLanguagePreference: " + (LWUserDefaults.standard.nativeLanguagePreference ?? "Undefined"))
-        tableView.reloadData() //inefficient
+        // tableView.reloadData() //inefficient
     }
     
     
@@ -244,8 +244,14 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         let word = wordsInTable[indexPath.row]
         let split = word.pair.components(separatedBy: "::")
 
-        cell.textLabel?.text = split[0]
-        cell.detailTextLabel?.text = ""
+        
+        if #available(iOS 13.0, *) {
+            cell.textLabel?.text = split[0]
+            cell.imageView?.image = UIImage(systemName: "\(word.known).square")
+        } else {
+            cell.textLabel?.text = "\(word.known) \(split[0])"
+        }
+        cell.detailTextLabel?.text = split[1]
         
         return cell
     }
@@ -305,7 +311,7 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         case "AddWord":
             if let searchWordVC = segue.destination as? SearchWordViewController, let languageToStudy = LWUserDefaults.standard.languageToStudyPreference {
                 searchWordVC.searchedObject = .original(lang: languageToStudy, word: importedWord)
-                searchWordVC.navigationItem.backButtonTitle = NSLocalizedString("К слову", comment: "backButtonTitle")
+                searchWordVC.navigationItem.backButtonTitle = NSLocalizedString("Word", comment: "backButtonTitle")
             }
             // TODO: with standart row features
 //        case: "EditWord"

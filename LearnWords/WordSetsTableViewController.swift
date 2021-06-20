@@ -75,8 +75,10 @@ class WordSetsTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            Storage.wordSets.remove(at: indexPath.row)
+            Storage.removeWordSet(at: indexPath.row)
+            
             tableView.deleteRows(at: [indexPath], with: .automatic)
+            tableView.reloadData() // just for selection
         }
     }
     
