@@ -44,6 +44,7 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .fastForward, target: self, action: #selector(nextTapped))
         underKeyboardLayoutConstraint.setup(stackBottomConstraint, view: view, minMargin: 0)
         //navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .fastForward, target: self, action: #selector(nextTapped))
         wordsInTest = Storage.wordsAndStat.shuffled()
@@ -150,6 +151,18 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
     @IBAction func forgotButtonAction(_ sender: UIButton) {
         haptic(feedback: .warning)
         afterAnswer(isKnown: false)
+    }
+    
+    @objc func nextTapped() {
+//        showingQuestion = true
+        if !wordsInTest.isEmpty {
+            var knownWord = wordsInTest.remove(at: 0)
+            knownWord.skiped += 1
+            Storage.shownWords.append(knownWord)
+            askQuestion()
+        }
+        //prepareForNextQuestion()
+        
     }
     
     func showAnswer(for shownWord: WordAndStat, isKnown: Bool = false) {

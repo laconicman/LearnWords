@@ -116,8 +116,6 @@ final class WordTestViewController: UIViewController {
         // wordsInTest = GKRandomSource.sharedRandom().arrayByShufflingObjects(in: wordsInTest) as! [WordAndStat]
         //showingQuestion = true
         
-        title = "Test"
-        
         stackView.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
         stackView.alpha = 0
         
