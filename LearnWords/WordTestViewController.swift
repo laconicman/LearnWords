@@ -178,7 +178,7 @@ final class WordTestViewController: UIViewController {
                             if isKnown { self?.knowButton?.layer.opacity = 0.1 } else { self?.forgotButton?.layer.opacity = 0.1 }
                             self?.forgotButton?.isEnabled = false
                             self?.wordDefinition.attributedText = NSAttributedString(
-                                string: shownWord.pair.components(separatedBy: "::")[0],
+                                string: shownWord.pair.components(separatedBy: "::")[1],
                                 attributes: [.foregroundColor: isKnown ? UIColor(red: 0, green: 0.7, blue: 0, alpha: 1) : UIColor(red: 0.7, green: 0.0, blue: 0, alpha: 1)])
                             // prompt.textColor = UIColor(red: 0, green: 0.7, blue: 0, alpha: 1)
         }) { [weak self] (ended) in
@@ -199,8 +199,8 @@ final class WordTestViewController: UIViewController {
             navigationController?.popToRootViewController(animated: true)
             return
         }
-        prompt.attributedText = NSAttributedString(string: wordsInTest[0].pair.components(separatedBy: "::")[1])
-        LWSpeechSynth.standard.speak(utteranceString: prompt.attributedText!)
+        prompt.attributedText = NSAttributedString(string: wordsInTest[0].pair.components(separatedBy: "::")[0])
+        LWSpeechSynth.standard.speak(utteranceString: prompt.attributedText!, language: LWUserDefaults.standard.languageToStudyPreference!)
         wordDefinition.attributedText = NSAttributedString(
             string: "?",
             attributes: [.foregroundColor: UIColor(red: 0, green: 0.7, blue: 0.7, alpha: 1)])

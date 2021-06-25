@@ -554,7 +554,7 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
                     searchedObject = .translation(orig_lang: ol, orig_word: ow, dest_lang: dl, translations: (tls + [term]))
                     //check duplicates
                     //TODO: deal with array of terms, store languages, init as unlearned
-                    _ = Storage.insertFlashcard(first: term, second: ow)
+                    _ = Storage.insertFlashcard(foreign: ow, native: term)
             }
             if let wordTest = segue.destination as? WordTestViewController {
                 // Do someting to scroll to new word definition and flash-highlight it

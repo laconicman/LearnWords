@@ -137,16 +137,20 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
         
         // Create a recognition task for the speech recognition session.
         // Keep a reference to the task so that it can be canceled.
-        recognitionTask = speechRecognizer.recognitionTask(with: recognitionRequest) { [unowned self] result, error in
+        recognitionTask = speechRecognizer.recognitionTask(with: recognitionRequest) { /*[unowned self]*/ result, error in
             var isFinal = false
             
             if let result = result {
                 // Update the text view with the results.
-                self.recognized.text = result.bestTranscription.formattedString
+                self.recognized.text = result.bestTranscription.formattedString.lowercased()
                 isFinal = result.isFinal
                 print("Text \(result.bestTranscription.formattedString)")
-                if result.bestTranscription.formattedString.contains(self.wordsInTest[0].pair.components(separatedBy: "::")[0]) && isFinal {
+                if !self.wordsInTest.isEmpty,  result.bestTranscription.formattedString.lowercased().contains(self.wordsInTest[0].pair.components(separatedBy: "::")[0]) /* && isFinal */ {
+                    self.recognized.text = self.wordsInTest[0].pair.components(separatedBy: "::")[0]
+                    self.recordButtonTapped() // stop the audio
                     self.afterAnswer(isKnown: true)
+                } else {
+                   // self.recognized.text = ""
                 }
             }
             
@@ -229,7 +233,7 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
             return
         }
         prompt.attributedText = NSAttributedString(string: wordsInTest[0].pair.components(separatedBy: "::")[1])
-        LWSpeechSynth.standard.speak(utteranceString: prompt.attributedText!)
+        LWSpeechSynth.standard.speak(utteranceString: prompt.attributedText!, language: LWUserDefaults.standard.nativeLanguagePreference!)
         recognized.attributedText = NSAttributedString(
             string: "speak the translation",
             attributes: [.foregroundColor: UIColor(red: 0, green: 0.7, blue: 0.7, alpha: 1)])

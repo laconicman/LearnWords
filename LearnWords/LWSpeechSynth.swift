@@ -17,14 +17,14 @@ final class LWSpeechSynth {
     private init() {
     }
     
-    func speak(utteranceString: NSAttributedString) {
+    func speak(utteranceString: NSAttributedString, language: String) {
         let utterance = AVSpeechUtterance(attributedString: utteranceString)
         //var utterance =  AVSpeechUtterance(string: foreignWord.text ?? "")
         //We can get voices that are present in system and then use set them either with identifiers or by using default for language
         //let voices = AVSpeechSynthesisVoice.speechVoices()
         //utterance.voice = AVSpeechSynthesisVoice(identifier: voice[0])
         // TODO: set from settings
-        utterance.voice = AVSpeechSynthesisVoice(language: "en-GB")
+        utterance.voice = AVSpeechSynthesisVoice(language: language)
         //we can check (get only)
         //let  lang = utterance.voice?.language
         // Another way to get BCP-47 the code for the user’s current locale (as in Settings) This is a class func

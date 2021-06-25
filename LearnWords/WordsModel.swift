@@ -62,15 +62,15 @@ struct Storage {
     }
     
     static func saveInitialValues () {
-        wordsAndStat.append(WordAndStat(pair: "медведь::bear",known: 0,unknown: 0,skiped: 0)) // TODO: Change format to somethig like "медведь - bear, bear2"
-        wordsAndStat.append(WordAndStat(pair: "верблюд::camel",known: 0,unknown: 0,skiped: 0))
-        wordsAndStat.append(WordAndStat(pair: "корова::cow",known: 0,unknown: 0,skiped: 0))
-        wordsAndStat.append(WordAndStat(pair: "лиса::fox",known: 0,unknown: 0,skiped: 0))
-        wordsAndStat.append(WordAndStat(pair: "коза::goat",known: 0,unknown: 0,skiped: 0))
-        wordsAndStat.append(WordAndStat(pair: "обезьяна::monkey",known: 0,unknown: 0,skiped: 0))
-        wordsAndStat.append(WordAndStat(pair: "свинья::pig",known: 0,unknown: 0,skiped: 0))
-        wordsAndStat.append(WordAndStat(pair: "кролик::rabbit",known: 0,unknown: 0,skiped: 0))
-        wordsAndStat.append(WordAndStat(pair: "овца::sheep",known: 0,unknown: 0,skiped: 0))
+        wordsAndStat.append(WordAndStat(pair: "bear::медведь",known: 0,unknown: 0,skiped: 0)) // TODO: Change format to somethig like "медведь - bear, bear2"
+        wordsAndStat.append(WordAndStat(pair: "camel::верблюд", known: 0,unknown: 0,skiped: 0))
+        wordsAndStat.append(WordAndStat(pair: "cow::корова", known: 0,unknown: 0,skiped: 0))
+        wordsAndStat.append(WordAndStat(pair: "fox::лиса", known: 0,unknown: 0,skiped: 0))
+        wordsAndStat.append(WordAndStat(pair: "goat::коза", known: 0,unknown: 0,skiped: 0))
+        wordsAndStat.append(WordAndStat(pair: "monkey::обезьяна", known: 0,unknown: 0,skiped: 0))
+        wordsAndStat.append(WordAndStat(pair: "pig::свинья", known: 0,unknown: 0,skiped: 0))
+        wordsAndStat.append(WordAndStat(pair: "rabbit::кролик", known: 0,unknown: 0,skiped: 0))
+        wordsAndStat.append(WordAndStat(pair: "sheep::овца", known: 0,unknown: 0,skiped: 0))
         
         saveWords(wordsAndStat)
         // wordSets = [initialSet] Not sure if its needed
@@ -88,12 +88,12 @@ struct Storage {
         
     }
     
-    static func insertFlashcard(first: String, second: String) ->  Int? {
+    static func insertFlashcard(foreign: String, native: String) ->  Int? {
         // TODO: Check for duplicates before inserting
-        guard first.count > 0 && second.count > 0 else { return nil}
+        guard foreign.count > 0 && native.count > 0 else { return nil}
         let rowPosition = wordsAndStat.count //TODO: change it - sort somehow
         // wordsAndStat.append(("\(first)::\(second)",0,0,0))
-        wordsAndStat.append(WordAndStat(pair: "\(first)::\(second)".lowercased(), known: 0, unknown: 0, skiped: 0))
+        wordsAndStat.append(WordAndStat(pair: "\(foreign)::\(native)".lowercased(), known: 0, unknown: 0, skiped: 0))
         saveWords(wordsAndStat)
         return rowPosition
     }

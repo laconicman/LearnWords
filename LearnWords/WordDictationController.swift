@@ -198,7 +198,7 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
             return
         }
         foreignWord.attributedText = NSAttributedString(string: wordsInTest[0].pair.components(separatedBy: "::")[1])
-        LWSpeechSynth.standard.speak(utteranceString: foreignWord.attributedText!)
+        LWSpeechSynth.standard.speak(utteranceString: foreignWord.attributedText!, language: LWUserDefaults.standard.nativeLanguagePreference!)
         translationInput.isUserInteractionEnabled = true
         translationInput.attributedPlaceholder = NSAttributedString(
             string: "type in translation",

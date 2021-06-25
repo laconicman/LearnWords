@@ -155,11 +155,11 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         
         // add two text fields, one for English and one for French
         ac.addTextField { textField in
-            textField.placeholder = NSLocalizedString("Russian", comment: "Russian language")
+            textField.placeholder = NSLocalizedString(LWUserDefaults.standard.languageToStudyPreference!, comment: "Foreing language")
         }
         
         ac.addTextField { (textField) in
-            textField.placeholder = NSLocalizedString("English", comment: "English language")
+            textField.placeholder = NSLocalizedString(LWUserDefaults.standard.nativeLanguagePreference!, comment: "Native language")
         }
         
         // create an "Add Word" button that submits the user's input
@@ -169,7 +169,7 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
             let secondWord = ac.textFields?[1].text ?? ""
             
             // submit the English and French word to the insertFlashcard() method
-            if let indexOfInsertedRow = Storage.insertFlashcard(first: firstWord, second: secondWord) {
+            if let indexOfInsertedRow = Storage.insertFlashcard(foreign: firstWord, native: secondWord) {
                 //TODO: Check for duplicates and alphabetically sort
                 let newIndexPath = IndexPath(row: indexOfInsertedRow, section: 0)
                 self.tableView.insertRows(at: [newIndexPath], with: .automatic)
