@@ -194,7 +194,7 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
         guard !wordsInTest.isEmpty else {
             Storage.saveWords(Storage.shownWords)
             Storage.wordsAndStat = Storage.shownWords
-            navigationController?.tabBarController?.selectedIndex = 0
+            navigationController?.popToRootViewController(animated: true)
             return
         }
         foreignWord.attributedText = NSAttributedString(string: wordsInTest[0].pair.components(separatedBy: "::")[1])

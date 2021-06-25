@@ -83,7 +83,7 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
 
         if let importedString = UserDefaults(suiteName: "group.club.laconic.LearnWords")?.string(forKey: "ImportedText") {
             if  importedString.aproxWordCount > 1 {
-                let dictionaryEntries = split(importedString, by: "\n;")
+                let dictionaryEntries = split(importedString, by: "\n" + ";" + "\u{2028}")
                 importedWords = dictionaryEntries.compactMap( {
                     let e = split($0, by: "|:")
                     if e.first?.isEmpty ?? true || e.last?.isEmpty ?? true || e.count != 2 { return nil }
@@ -92,11 +92,12 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
                 })
                 // TODO: Create a screen to verify and select `importedWords`. Check for duplicates
                 importedWords = importedWords.filter({ (impW) -> Bool in
-                    Storage.wordsAndStat.contains { (storedW) -> Bool in // TODO: make temporary `Set`
+                    !Storage.wordsAndStat.contains { (storedW) -> Bool in // TODO: make temporary `Set`
                         impW.pair == storedW.pair
                     }
                 })
                 Storage.wordsAndStat.append(contentsOf: importedWords)
+                Storage.saveWords(Storage.wordsAndStat)
             } else {
                 // import one word
                 importedWord = lemmas(from: importedString).first ?? ""
@@ -131,12 +132,15 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         // Some checks:
         print("LWUserDefaults.standard.languageToStudyPreference: " + (LWUserDefaults.standard.languageToStudyPreference ?? "Undefined"))
         print("LWUserDefaults.standard.nativeLanguagePreference: " + (LWUserDefaults.standard.nativeLanguagePreference ?? "Undefined"))
+        print("UserDefaults.standard.string(forKey: 'languageToStudyPreference'): " + (UserDefaults.standard.string(forKey: "languageToStudyPreference") ?? "Undefined"))
+        print("UserDefaults.standard.string(forKey: 'nativeLanguagePreference'): " + (UserDefaults.standard.string(forKey: "nativeLanguagePreference") ?? "Undefined"))
         // tableView.reloadData() //inefficient
     }
     
     
     @objc func defaultsChanged(){
-        if UserDefaults.standard.bool(forKey: "redThemeSwitch") {
+        checkInstalledLocales()
+        if userDefaults.bool(forKey: "redThemeSwitch") {
             self.view.backgroundColor = UIColor.red
             
         }
@@ -212,7 +216,7 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
             
             // TODO: create a "Go to Settings" button that opens standart settings
             let settingsAction = UIAlertAction(title: NSLocalizedString("Settings", comment: ""), style: .default) { [weak self] (action: UIAlertAction!) in
-                self?.gotoAppSettings()
+                gotoAppSettings()
             }
             ac.addAction(settingsAction)
             ac.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: "AlertAction title"), style: .cancel))
@@ -222,13 +226,7 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         
     }
     
-    private func gotoAppSettings() {
-        if let url = URL(string: UIApplication.openSettingsURLString) { //+ "root=General&path=Network"
-            if UIApplication.shared.canOpenURL(url) {
-                UIApplication.shared.open(url)
-            }
-        }
-    }
+
     
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 1

@@ -29,6 +29,7 @@
 		DA86ADF423489FF7007E3221 /* String+.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA86ADF323489FF7007E3221 /* String+.swift */; };
 		DA88CB8421A687C00094D1F8 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = DA88CB8321A687BF0094D1F8 /* Settings.bundle */; };
 		DA88CB8521A687C00094D1F8 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = DA88CB8321A687BF0094D1F8 /* Settings.bundle */; };
+		DA9156282684CBCE00CAEB26 /* WordPhoneticsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA9156272684CBCE00CAEB26 /* WordPhoneticsViewController.swift */; };
 		DAA16D6924B60673003C28FD /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DAA16D6824B60673003C28FD /* Media.xcassets */; };
 		DAA16D6B24B60673003C28FD /* ActionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAA16D6A24B60673003C28FD /* ActionViewController.swift */; };
 		DAA16D6E24B60673003C28FD /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DAA16D6C24B60673003C28FD /* MainInterface.storyboard */; };
@@ -99,6 +100,7 @@
 		DA86ADF323489FF7007E3221 /* String+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+.swift"; sourceTree = "<group>"; };
 		DA88CB8321A687BF0094D1F8 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 		DA88CB8621A6A9F40094D1F8 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		DA9156272684CBCE00CAEB26 /* WordPhoneticsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordPhoneticsViewController.swift; sourceTree = "<group>"; };
 		DAA16D6624B60673003C28FD /* ImportAsDictAction.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ImportAsDictAction.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		DAA16D6824B60673003C28FD /* Media.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Media.xcassets; sourceTree = "<group>"; };
 		DAA16D6A24B60673003C28FD /* ActionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionViewController.swift; sourceTree = "<group>"; };
@@ -176,6 +178,7 @@
 				DA88CB8321A687BF0094D1F8 /* Settings.bundle */,
 				DA246CB71F8A6E5E00A75ED1 /* Main.storyboard */,
 				DA2E2DA2267CB63E00EF285C /* WordSetsTableViewController.swift */,
+				DA9156272684CBCE00CAEB26 /* WordPhoneticsViewController.swift */,
 				DA246CBA1F8A6E5E00A75ED1 /* Assets.xcassets */,
 				DA246CBC1F8A6E5E00A75ED1 /* LaunchScreen.storyboard */,
 				DA246CBF1F8A6E5E00A75ED1 /* Info.plist */,
@@ -380,6 +383,7 @@
 				DA2E2CE7265E865A00EF285C /* WordDictationController.swift in Sources */,
 				DA2E2DA3267CB63E00EF285C /* WordSetsTableViewController.swift in Sources */,
 				DA86ADF423489FF7007E3221 /* String+.swift in Sources */,
+				DA9156282684CBCE00CAEB26 /* WordPhoneticsViewController.swift in Sources */,
 				DA2E2D90267A540900EF285C /* LWSpeechSynth.swift in Sources */,
 				DA246CB41F8A6E5E00A75ED1 /* AppDelegate.swift in Sources */,
 				DA4162F41F8BE62600165694 /* WordsModel.swift in Sources */,

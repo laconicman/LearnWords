@@ -196,7 +196,7 @@ final class WordTestViewController: UIViewController {
         guard !wordsInTest.isEmpty else {
             Storage.saveWords(Storage.shownWords)
             Storage.wordsAndStat = Storage.shownWords
-            navigationController?.tabBarController?.selectedIndex = 0
+            navigationController?.popToRootViewController(animated: true)
             return
         }
         prompt.attributedText = NSAttributedString(string: wordsInTest[0].pair.components(separatedBy: "::")[1])

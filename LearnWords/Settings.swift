@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 private let kRecentSearchesKey = "RecentSearches"
 private let kLastSearchKey = "LastSearch"
@@ -15,7 +16,7 @@ private let dictionaryPromptDisplayed = "firstUseDictionaryPromptDisplayed"
 // TODO: make common settings for app and extensions
 // let userDefaultsGroup = UserDefaults(suiteName: "group.club.laconic.LearnWords")
 let userDefaultsGroup = LWUserDefaults.standard.userDefaultsGroup
-// let userDefaults = LWUserDefaults.standard.userDefaults
+let userDefaults = LWUserDefaults.standard.userDefaults
 
 // Usefull links
 // parsing the whole settings bundle stucture:
@@ -51,15 +52,14 @@ final class LWUserDefaults {
             defaultsToRegister[key] = preference["DefaultValue"]
             debugPrint(key, " ", preference["DefaultValue"] ?? "Undefined value in preference")
         }
-        userDefaultsGroup.register(defaults: defaultsToRegister) //This is NOT done automatically for the first launch
+        //userDefaultsGroup.register(defaults: defaultsToRegister) //This is NOT done automatically for the first launch
+        userDefaults.register(defaults: defaultsToRegister)
         print("userDefaultsGroup.register")
         //userDefaultsGroup?.register(defaults: defaultsToRegister) //This is what you probably want!
 
     }
     
     private init() {
-       //let urlData = NSKeyedArchiver.archivedData(withRootObject: URL(string: "https://www.google.co.uk")!)
-       //self.userDefaults.register(defaults: ["SearchEngine": urlData, "WJW": 10])
         // TODO: register only if first launch
         registerDefaultsFromSettingsBundle()
         
@@ -70,51 +70,41 @@ final class LWUserDefaults {
     }
     
     let userDefaultsGroup = UserDefaults(suiteName: "group.club.laconic.LearnWords") ?? UserDefaults.standard
-//    let userDefaults = UserDefaults.standard
-    
-//    var searchEngine: URL? {
-//        get {
-//            return self.userDefaults.url(forKey: "SearchEngine")
-//        }
-//        set {
-//            self.userDefaults.set(newValue, forKey: "SearchEngine")
-//        }
-//    }
-    
+    let userDefaults = UserDefaults.standard
     
     var utteranceRatePreference: Double {
         get {
-            return self.userDefaultsGroup.double(forKey: "utteranceRatePreference")
+            return self.userDefaults.double(forKey: "utteranceRatePreference")
         }
         set {
-            self.userDefaultsGroup.set(newValue, forKey: "utteranceRatePreference")
+            self.userDefaults.set(newValue, forKey: "utteranceRatePreference")
         }
     }
     
     var pitchMultiplierPreference: Double {
         get {
-            return self.userDefaultsGroup.double(forKey: "pitchMultiplierPreference")
+            return self.userDefaults.double(forKey: "pitchMultiplierPreference")
         }
         set {
-            self.userDefaultsGroup.set(newValue, forKey: "pitchMultiplierPreferencee")
+            self.userDefaults.set(newValue, forKey: "pitchMultiplierPreferencee")
         }
     }
     
     var languageToStudyPreference: String? {
         get {
-            return self.userDefaultsGroup.string(forKey: "languageToStudyPreference")
+            return self.userDefaults.string(forKey: "languageToStudyPreference")
         }
         set {
-            self.userDefaultsGroup.set(newValue, forKey: "languageToStudyPreference")
+            self.userDefaults.set(newValue, forKey: "languageToStudyPreference")
         }
     }
     
     var nativeLanguagePreference: String? {
         get {
-            return self.userDefaultsGroup.string(forKey: "nativeLanguagePreference")
+            return self.userDefaults.string(forKey: "nativeLanguagePreference")
         }
         set {
-            self.userDefaultsGroup.set(newValue, forKey: "nativeLanguagePreference")
+            self.userDefaults.set(newValue, forKey: "nativeLanguagePreference")
         }
     }
     
@@ -129,13 +119,13 @@ final class LWUserDefaults {
         self.userDefaultsGroup.set(true, forKey: dictionaryPromptDisplayed)
     }
     
-//    private let setsKey = "setsKey"
-//    var wordSets: [String]? {
+//    private let swapLanguageOrderKey = "swapLanguageOrder"
+//    var swapLanguageOrder: Bool {
 //        get {
-//            return self.userDefaultsGroup.stringArray(forKey: setsKey)
+//            return self.userDefaults.bool(forKey: swapLanguageOrderKey)
 //        }
 //        set {
-//            self.userDefaultsGroup.set(newValue, forKey: setsKey)
+//            self.userDefaults.set(newValue, forKey: swapLanguageOrderKey)
 //        }
 //    }
     
@@ -148,5 +138,13 @@ final class LWUserDefaults {
 //            self.userDefaultsGroup.set(newValue, forKey: currentSetKey)
 //        }
 //    }
+    
 }
 
+func gotoAppSettings() {
+    if let url = URL(string: UIApplication.openSettingsURLString) { //+ "root=General&path=Network"
+        if UIApplication.shared.canOpenURL(url) {
+            UIApplication.shared.open(url)
+        }
+    }
+}
