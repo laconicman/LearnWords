@@ -483,9 +483,9 @@
                     </view>
                     <navigationItem key="navigationItem" id="BpE-Jx-lIv"/>
                     <connections>
-                        <outlet property="foreignWord" destination="8WT-Dx-fov" id="WQv-3b-ouB"/>
                         <outlet property="forgotButton" destination="Q8X-kw-NHO" id="xAV-9C-Ub2"/>
                         <outlet property="knowButton" destination="bDd-aK-Z4N" id="Yvw-Gz-jl2"/>
+                        <outlet property="prompt" destination="8WT-Dx-fov" id="WQv-3b-ouB"/>
                         <outlet property="stackBottomConstraint" destination="yvr-JO-6uS" id="aAC-KY-eri"/>
                         <outlet property="stackView" destination="DrO-BH-om0" id="myR-ak-lkJ"/>
                         <outlet property="translationInput" destination="VvQ-x8-gCl" id="LuH-ux-2Z1"/>
@@ -627,13 +627,13 @@
                                 <rect key="frame" x="20" y="44" width="335" height="554"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="252" text="Word" textAlignment="center" lineBreakMode="wordWrap" baselineAdjustment="none" minimumFontSize="15" translatesAutoresizingMaskIntoConstraints="NO" id="P1B-tp-yvT">
-                                        <rect key="frame" x="0.0" y="0.0" width="335" height="154.5"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="335" height="128"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="80"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Speak the translation" textAlignment="center" lineBreakMode="middleTruncation" numberOfLines="0" baselineAdjustment="none" minimumFontSize="15" highlighted="YES" translatesAutoresizingMaskIntoConstraints="NO" id="uEJ-4s-E9l">
-                                        <rect key="frame" x="0.0" y="162.5" width="335" height="116.5"/>
+                                        <rect key="frame" x="0.0" y="136" width="335" height="150"/>
                                         <constraints>
                                             <constraint firstAttribute="height" relation="lessThanOrEqual" constant="150" id="zzA-ZC-SMf"/>
                                         </constraints>
@@ -642,10 +642,10 @@
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <stackView opaque="NO" contentMode="scaleToFill" spacingType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="CLb-nR-u2j">
-                                        <rect key="frame" x="0.0" y="287" width="335" height="83.5"/>
+                                        <rect key="frame" x="0.0" y="294" width="335" height="81"/>
                                         <subviews>
                                             <button opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="251" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qaf-Gn-jV1" customClass="GradientButton" customModule="LearnWords" customModuleProvider="target">
-                                                <rect key="frame" x="0.0" y="0.0" width="163.5" height="83.5"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="163.5" height="81"/>
                                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
                                                 <inset key="contentEdgeInsets" minX="10" minY="10" maxX="10" maxY="10"/>
                                                 <state key="normal" title="Look Up">
@@ -664,7 +664,7 @@
                                                 </connections>
                                             </button>
                                             <button opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="251" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Liq-qX-vPh" customClass="GradientButton" customModule="LearnWords" customModuleProvider="target">
-                                                <rect key="frame" x="171.5" y="0.0" width="163.5" height="83.5"/>
+                                                <rect key="frame" x="171.5" y="0.0" width="163.5" height="81"/>
                                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
                                                 <inset key="contentEdgeInsets" minX="10" minY="10" maxX="10" maxY="10"/>
                                                 <state key="normal" title="Listen">
@@ -688,10 +688,10 @@
                                         </constraints>
                                     </stackView>
                                     <stackView opaque="NO" tag="10" contentMode="scaleToFill" distribution="fillEqually" spacingType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="7ii-cE-rgE">
-                                        <rect key="frame" x="0.0" y="378.5" width="335" height="84"/>
+                                        <rect key="frame" x="0.0" y="383" width="335" height="81.5"/>
                                         <subviews>
                                             <button opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="251" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Bf1-2B-pAQ" userLabel="Forgot" customClass="GradientButton" customModule="LearnWords" customModuleProvider="target">
-                                                <rect key="frame" x="0.0" y="0.0" width="163.5" height="84"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="163.5" height="81.5"/>
                                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
                                                 <inset key="contentEdgeInsets" minX="10" minY="10" maxX="10" maxY="10"/>
                                                 <state key="normal" title="Forgot">
@@ -710,7 +710,7 @@
                                                 </connections>
                                             </button>
                                             <button opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="251" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="x6b-1p-EXm" customClass="GradientButton" customModule="LearnWords" customModuleProvider="target">
-                                                <rect key="frame" x="171.5" y="0.0" width="163.5" height="84"/>
+                                                <rect key="frame" x="171.5" y="0.0" width="163.5" height="81.5"/>
                                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
                                                 <inset key="contentEdgeInsets" minX="10" minY="10" maxX="10" maxY="10"/>
                                                 <state key="normal" title="Know">
@@ -735,7 +735,7 @@
                                         </constraints>
                                     </stackView>
                                     <button opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="249" verticalCompressionResistancePriority="754" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jVV-UW-vd8" customClass="GradientButton" customModule="LearnWords" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="470.5" width="335" height="83.5"/>
+                                        <rect key="frame" x="0.0" y="472.5" width="335" height="81.5"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
                                         <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <state key="normal" title="Recording"/>

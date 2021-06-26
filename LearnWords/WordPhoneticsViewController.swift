@@ -11,7 +11,7 @@ import Speech
 
 class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate {
 
-    // MARK: Properties
+    // MARK: - Properties
     @IBOutlet weak var wordDefinition: UILabel! //?
     @IBOutlet weak var stackView: UIStackView!
     @IBOutlet weak var prompt: UILabel!
@@ -42,7 +42,7 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
     
     @IBOutlet var recordButton: UIButton!
     
-    // MARK: View Controller Lifecycle
+    // MARK: - View Controller Lifecycle
     
     public override func viewDidLoad() {
         super.viewDidLoad()
@@ -63,6 +63,7 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
         navigationController?.hidesBarsOnTap = false
         if wordsInTest.isEmpty { wordsInTest = Storage.wordsAndStat.shuffled() }
         askQuestion()
+        
         // Configure the SFSpeechRecognizer object already
         // stored in a local member variable.
         speechRecognizer.delegate = self
@@ -142,9 +143,11 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
                 print("Text \(result.bestTranscription.formattedString)")
                 print("Transcriptions \(result.transcriptions.map{ $0.formattedString.lowercased() })")
                 if !(self?.wordsInTest.isEmpty ?? true),  result.bestTranscription.formattedString.lowercased().contains(self?.wordsInTest[0].pair.components(separatedBy: "::")[0] ?? "") /* && isFinal */ {
-                    self?.recognized.text = self?.wordsInTest[0].pair.components(separatedBy: "::")[0]
                     self?.recordButtonTapped() // stop the audio
-                    self?.afterAnswer(isKnown: true)
+                    OperationQueue.main.addOperation {
+                        self?.recognized.text = self?.wordsInTest[0].pair.components(separatedBy: "::")[0]
+                        self?.afterAnswer(isKnown: true)
+                    }
                 } else {
                    // self.recognized.text = ""
                 }
@@ -198,7 +201,7 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
         recordButton.tintColor = .black
     }
     
-    // MARK: Interface Builder actions
+    // MARK: - Interface Builder actions
     
     @IBAction func recordButtonTapped() {
         if audioEngine.isRunning {
@@ -218,12 +221,12 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
             }
         }
     }
-    
+    // MARK: - 
     
     
     
     func askQuestion() {
-        //foreignWord.text = wordsInTest[questionCounter].components(separatedBy: "::")[1]
+        //prompt.text = wordsInTest[questionCounter].components(separatedBy: "::")[1]
         guard !wordsInTest.isEmpty else {
             Storage.saveWords(Storage.shownWords)
             Storage.wordsAndStat = Storage.shownWords
@@ -235,7 +238,7 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
         recognized.attributedText = NSAttributedString(
             string: "speak the translation",
             attributes: [.foregroundColor: UIColor(red: 0, green: 0.7, blue: 0.7, alpha: 1)])
-        // foreignWord.textColor = UIColor(red: 0, green: 0.7, blue: 0, alpha: 1)
+        // prompt.textColor = UIColor(red: 0, green: 0.7, blue: 0, alpha: 1)
 
 
 //        let rlvc = UIReferenceLibraryViewController(term: "apple")
@@ -332,7 +335,7 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
             self.stackView.alpha = 0
         }
         animation.addCompletion { [unowned self] position in
-            //self.foreignWord.textColor = UIColor.black
+            //self.prompt.textColor = UIColor.black
             //self.translationInput.textColor = UIColor(red: 0, green: 0.7, blue: 0, alpha: 0)
             self.askQuestion()
         }

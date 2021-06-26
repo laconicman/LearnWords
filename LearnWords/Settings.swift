@@ -54,7 +54,7 @@ final class LWUserDefaults {
         }
         //userDefaultsGroup.register(defaults: defaultsToRegister) //This is NOT done automatically for the first launch
         userDefaults.register(defaults: defaultsToRegister)
-        print("userDefaultsGroup.register")
+
         //userDefaultsGroup?.register(defaults: defaultsToRegister) //This is what you probably want!
 
     }

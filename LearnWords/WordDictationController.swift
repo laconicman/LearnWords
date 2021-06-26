@@ -13,6 +13,19 @@ import AVFoundation
 
 final class WordDictationController: UIViewController, UITextFieldDelegate {
     
+    @IBOutlet weak var prompt: UILabel!
+    @IBOutlet weak var translationInput: UITextField!
+    @IBOutlet weak var stackView: UIStackView!
+    
+    @IBOutlet weak var knowButton: UIButton!
+    @IBOutlet weak var forgotButton: UIButton!
+    
+    @IBOutlet weak var stackBottomConstraint: NSLayoutConstraint!
+    let underKeyboardLayoutConstraint = UnderKeyboardLayoutConstraint()
+    @IBAction func lookupAction(_ sender: UIButton) {
+        lookUp(term: prompt.text ?? "", sender: self)
+    }
+    
     var wordsInTest = [WordAndStat]()
     var shownWord: WordAndStat!
     
@@ -44,14 +57,15 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .fastForward, target: self, action: #selector(nextTapped))
         underKeyboardLayoutConstraint.setup(stackBottomConstraint, view: view, minMargin: 0)
-        //navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .fastForward, target: self, action: #selector(nextTapped))
+        
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .fastForward, target: self, action: #selector(nextTapped))
         wordsInTest = Storage.wordsAndStat.shuffled()
         Storage.shownWords = []
-        // title = "Translate"
+        
         stackView.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
         stackView.alpha = 0
+        
         translationInput.clearsOnBeginEditing = true
         translationInput.delegate = self
     }
@@ -59,24 +73,9 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         navigationController?.hidesBarsOnTap = false
-        if wordsInTest.isEmpty { wordsInTest = Storage.wordsAndStat.shuffled() }
+        // if wordsInTest.isEmpty { wordsInTest = Storage.wordsAndStat.shuffled() }
         askQuestion()
     }
-    
-    @IBOutlet weak var foreignWord: UILabel!
-    @IBOutlet weak var translationInput: UITextField!
-    @IBOutlet weak var stackView: UIStackView!
-    
-    @IBOutlet weak var knowButton: UIButton!
-    @IBOutlet weak var forgotButton: UIButton!
-    
-    @IBOutlet weak var stackBottomConstraint: NSLayoutConstraint!
-    let underKeyboardLayoutConstraint = UnderKeyboardLayoutConstraint()
-    @IBAction func lookupAction(_ sender: UIButton) {
-        lookUp(term: foreignWord.text ?? "", sender: self)
-    }
-    
-
     
     func afterAnswer(isKnown: Bool) {
         if !wordsInTest.isEmpty {
@@ -138,22 +137,22 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
     
     
     func askQuestion() {
-        //foreignWord.text = wordsInTest[questionCounter].components(separatedBy: "::")[1]
+        //prompt.text = wordsInTest[questionCounter].components(separatedBy: "::")[1]
         guard !wordsInTest.isEmpty else {
             Storage.saveWords(Storage.shownWords)
             Storage.wordsAndStat = Storage.shownWords
             navigationController?.popToRootViewController(animated: true)
             return
         }
-        foreignWord.attributedText = NSAttributedString(string: wordsInTest[0].pair.components(separatedBy: "::")[1])
-        LWSpeechSynth.standard.speak(utteranceString: foreignWord.attributedText!, language: LWUserDefaults.standard.nativeLanguagePreference!)
+        prompt.attributedText = NSAttributedString(string: wordsInTest[0].pair.components(separatedBy: "::")[1])
+        LWSpeechSynth.standard.speak(utteranceString: prompt.attributedText!, language: LWUserDefaults.standard.nativeLanguagePreference!)
         translationInput.isUserInteractionEnabled = true
         translationInput.attributedPlaceholder = NSAttributedString(
             string: "type in translation",
             attributes: [.foregroundColor: UIColor(red: 0, green: 0.7, blue: 0.7, alpha: 1)])
         translationInput.text = ""
         translationInput.textColor = .black
-        // foreignWord.textColor = UIColor(red: 0, green: 0.7, blue: 0, alpha: 1)
+        // prompt.textColor = UIColor(red: 0, green: 0.7, blue: 0, alpha: 1)
 
 
 //        let rlvc = UIReferenceLibraryViewController(term: "apple")
@@ -194,7 +193,7 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
             self.stackView.alpha = 0
         }
         animation.addCompletion { [unowned self] position in
-            //self.foreignWord.textColor = UIColor.black
+            //self.prompt.textColor = UIColor.black
             //self.translationInput.textColor = UIColor(red: 0, green: 0.7, blue: 0, alpha: 0)
             self.askQuestion()
         }

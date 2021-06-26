@@ -326,10 +326,7 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         }
     }
     
-    func split(_ str: String, by oneOfTheCharacters: String) -> [String] {
-        let separatorSet = CharacterSet(charactersIn: oneOfTheCharacters) // consider .union(.newlines)
-        return str.components(separatedBy: separatorSet).map({ $0.trimmingCharacters(in: .whitespaces)}).filter( { !$0.isEmpty })
-    }
+
     
     func lemmas(from str: String) -> [String] {
         let tagger = NSLinguisticTagger(tagSchemes: [.tokenType, .lemma], options: 0)

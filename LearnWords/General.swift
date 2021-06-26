@@ -52,3 +52,8 @@ func lookUp(term: String, sender: UIViewController) {
     }
     // TODO: If it is the first time, then show "The app relies on system dictionries, . They can be used ofline. Make sure you have downloaded the dictionaries you need. To add or remove didctionaries use Manage Dictionaries button on the next screen" "Remind me next time" "Got it"
 }
+
+func split(_ str: String, by oneOfTheCharacters: String) -> [String] {
+    let separatorSet = CharacterSet(charactersIn: oneOfTheCharacters) // consider .union(.newlines)
+    return str.components(separatedBy: separatorSet).map({ $0.trimmingCharacters(in: .whitespaces)}).filter( { !$0.isEmpty })
+}

@@ -228,7 +228,7 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
 //        }
 
         // take care to refresh words table?
-        // insertFlashcard(first: translations[0], second: foreignWord)
+        // insertFlashcard(first: translations[0], second: prompt)
 
     }
         searchBarSearchButtonClicked(searchBar)
@@ -238,15 +238,6 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
         super.viewDidAppear(animated)
         searchBar.becomeFirstResponder()
        // searchBar.setNeedsFocusUpdate()
-    }
-    
-    //------------------------------------------------------------------------------
-    // Present a UIReferenceLibraryViewController showing a definition.
-    // Variations for regular and compact size class environments
-    //------------------------------------------------------------------------------
-    private func presentReferenceViewControllerWithTerm(_ term: String) {
-
-        debugPrint(#function)
     }
     
     override func didReceiveMemoryWarning() {

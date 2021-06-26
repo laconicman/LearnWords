@@ -16,6 +16,7 @@ import AVFoundation
 
 final class WordTestViewController: UIViewController {
     
+    // MARK: - Properties
     @IBOutlet weak var wordDefinition: UILabel! //?
     @IBOutlet weak var stackView: UIStackView!
     @IBOutlet weak var prompt: UILabel!
@@ -35,7 +36,7 @@ final class WordTestViewController: UIViewController {
  //   var showingQuestion = true
  //   var reflibvc: ReferenceLibraryViewController
 
-    
+    // MARK: -
     func afterAnswer(isKnown: Bool) {
         if !wordsInTest.isEmpty {
             shownWord = wordsInTest.remove(at: 0)
@@ -50,10 +51,10 @@ final class WordTestViewController: UIViewController {
         }
     }
     
-    
+    // MARK: - Interface Builder actions
     @IBAction func knowButtonAction(_ sender: UIButton) {
         afterAnswer(isKnown: true)
-        /*
+        
         if UIReferenceLibraryViewController.dictionaryHasDefinition(forTerm: prompt.text ?? "") {
             let rlvc = UIReferenceLibraryViewController(term: prompt.text!)
             //rlvc.editButtonItem what is this
@@ -85,10 +86,10 @@ final class WordTestViewController: UIViewController {
                     }
                 }
                 
-                //print(t ?? "no value")
-
+                let dictionaryMain = split(definitions[0].string, by: "\n" + "\u{2028}")[1]
+                print(dictionaryMain)
             }
-        }*/
+        }
     }
     
     @IBAction func forgotButtonAction(_ sender: UIButton) {
@@ -97,7 +98,7 @@ final class WordTestViewController: UIViewController {
         afterAnswer(isKnown: false)
     }
     
-
+    // MARK: - View Controller Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -105,31 +106,10 @@ final class WordTestViewController: UIViewController {
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .fastForward, target: self, action: #selector(nextTapped))
         wordsInTest = Storage.wordsAndStat.shuffled()
         Storage.shownWords = []
-        // wordsInTest = GKRandomSource.sharedRandom().arrayByShufflingObjects(in: wordsInTest) as! [WordAndStat]
-        //showingQuestion = true
         
         stackView.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
         stackView.alpha = 0
-        
-        //let rlvc = storyboard?.instantiateViewController(withIdentifier: "ReferenceLibrary")
-        //let rlvc = ReferenceLibraryViewController(term: "apple")
-        
-        // MARK: - Decoration
-        
-        //Lets practice loops, typecasts, optionals
-        // Buttons are inside the stack
-//        for chv in (stackView.viewWithTag(10)?.subviews)! {
-//            if let bt = chv as? UIButton {
-//
-//                bt.layer.borderWidth = 1
-//                bt.layer.borderColor = UIColor.lightGray.cgColor
-//                bt.layer.cornerRadius = 5
-//                // Or if you prefer custom colors
-//                //bt.layer.borderColor = UIColor(red: 1.0, green: 0.6, blue: 0.2, alpha: 0.6).cgColor
-//            }
-//        }
-        
-        
+
         if ProcessInfo().isOperatingSystemAtLeast(OperatingSystemVersion(majorVersion: 11, minorVersion: 0, patchVersion: 0)) {
             navigationItem.largeTitleDisplayMode = .never
         }
@@ -139,6 +119,7 @@ final class WordTestViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         navigationController?.hidesBarsOnTap = false
+        if wordsInTest.isEmpty { wordsInTest = Storage.wordsAndStat.shuffled() }
         
         askQuestion()
     }
@@ -147,6 +128,8 @@ final class WordTestViewController: UIViewController {
         super.viewDidDisappear(animated)
         navigationController?.hidesBarsOnTap = false
     }
+    
+    // MARK: - 
     
     @objc func nextTapped() {
 //        showingQuestion = true

@@ -19,7 +19,7 @@ final class LWSpeechSynth {
     
     func speak(utteranceString: NSAttributedString, language: String) {
         let utterance = AVSpeechUtterance(attributedString: utteranceString)
-        //var utterance =  AVSpeechUtterance(string: foreignWord.text ?? "")
+        //var utterance =  AVSpeechUtterance(string: prompt.text ?? "")
         //We can get voices that are present in system and then use set them either with identifiers or by using default for language
         //let voices = AVSpeechSynthesisVoice.speechVoices()
         //utterance.voice = AVSpeechSynthesisVoice(identifier: voice[0])
