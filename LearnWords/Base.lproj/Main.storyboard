@@ -630,13 +630,13 @@
                                 <rect key="frame" x="20" y="44" width="335" height="554"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="252" text="Word" textAlignment="center" lineBreakMode="wordWrap" baselineAdjustment="none" minimumFontSize="15" translatesAutoresizingMaskIntoConstraints="NO" id="P1B-tp-yvT">
-                                        <rect key="frame" x="0.0" y="0.0" width="335" height="123"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="335" height="154.5"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="80"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Speak the translation" textAlignment="center" lineBreakMode="middleTruncation" numberOfLines="0" baselineAdjustment="none" minimumFontSize="15" highlighted="YES" translatesAutoresizingMaskIntoConstraints="NO" id="uEJ-4s-E9l">
-                                        <rect key="frame" x="0.0" y="131" width="335" height="150"/>
+                                        <rect key="frame" x="0.0" y="162.5" width="335" height="116.5"/>
                                         <constraints>
                                             <constraint firstAttribute="height" relation="lessThanOrEqual" constant="150" id="zzA-ZC-SMf"/>
                                         </constraints>
@@ -644,31 +644,58 @@
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <button opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="251" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qaf-Gn-jV1" customClass="GradientButton" customModule="LearnWords" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="289" width="335" height="83"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="41"/>
-                                        <inset key="contentEdgeInsets" minX="10" minY="10" maxX="10" maxY="10"/>
-                                        <state key="normal" title="Look Up">
-                                            <color key="titleColor" systemColor="darkTextColor"/>
-                                        </state>
-                                        <userDefinedRuntimeAttributes>
-                                            <userDefinedRuntimeAttribute type="color" keyPath="startColor">
-                                                <color key="value" red="0.95056845140000001" green="0.95278642179999995" blue="0.97680455450000003" alpha="0.2492572623" colorSpace="custom" customColorSpace="sRGB"/>
-                                            </userDefinedRuntimeAttribute>
-                                            <userDefinedRuntimeAttribute type="color" keyPath="endColor">
-                                                <color key="value" systemColor="systemGray5Color"/>
-                                            </userDefinedRuntimeAttribute>
-                                        </userDefinedRuntimeAttributes>
-                                        <connections>
-                                            <action selector="lookUpAction:" destination="4os-y6-JWd" eventType="touchUpInside" id="ZXC-H3-pZA"/>
-                                        </connections>
-                                    </button>
+                                    <stackView opaque="NO" contentMode="scaleToFill" spacingType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="CLb-nR-u2j">
+                                        <rect key="frame" x="0.0" y="287" width="335" height="83.5"/>
+                                        <subviews>
+                                            <button opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="251" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qaf-Gn-jV1" customClass="GradientButton" customModule="LearnWords" customModuleProvider="target">
+                                                <rect key="frame" x="0.0" y="0.0" width="163.5" height="83.5"/>
+                                                <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
+                                                <inset key="contentEdgeInsets" minX="10" minY="10" maxX="10" maxY="10"/>
+                                                <state key="normal" title="Look Up">
+                                                    <color key="titleColor" systemColor="darkTextColor"/>
+                                                </state>
+                                                <userDefinedRuntimeAttributes>
+                                                    <userDefinedRuntimeAttribute type="color" keyPath="startColor">
+                                                        <color key="value" red="0.95056845140000001" green="0.95278642179999995" blue="0.97680455450000003" alpha="0.2492572623" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="color" keyPath="endColor">
+                                                        <color key="value" systemColor="systemGray5Color"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                </userDefinedRuntimeAttributes>
+                                                <connections>
+                                                    <action selector="lookUpAction:" destination="4os-y6-JWd" eventType="touchUpInside" id="ZXC-H3-pZA"/>
+                                                </connections>
+                                            </button>
+                                            <button opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="251" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Liq-qX-vPh" customClass="GradientButton" customModule="LearnWords" customModuleProvider="target">
+                                                <rect key="frame" x="171.5" y="0.0" width="163.5" height="83.5"/>
+                                                <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
+                                                <inset key="contentEdgeInsets" minX="10" minY="10" maxX="10" maxY="10"/>
+                                                <state key="normal" title="Listen">
+                                                    <color key="titleColor" systemColor="darkTextColor"/>
+                                                </state>
+                                                <userDefinedRuntimeAttributes>
+                                                    <userDefinedRuntimeAttribute type="color" keyPath="startColor">
+                                                        <color key="value" red="0.95056845140000001" green="0.95278642179999995" blue="0.97680455450000003" alpha="0.2492572623" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                    <userDefinedRuntimeAttribute type="color" keyPath="endColor">
+                                                        <color key="value" systemColor="systemGray5Color"/>
+                                                    </userDefinedRuntimeAttribute>
+                                                </userDefinedRuntimeAttributes>
+                                                <connections>
+                                                    <action selector="listenAction:" destination="4os-y6-JWd" eventType="touchUpInside" id="CZa-Pw-ObL"/>
+                                                </connections>
+                                            </button>
+                                        </subviews>
+                                        <constraints>
+                                            <constraint firstItem="qaf-Gn-jV1" firstAttribute="width" secondItem="Liq-qX-vPh" secondAttribute="width" id="5Pi-2v-sji"/>
+                                        </constraints>
+                                    </stackView>
                                     <stackView opaque="NO" tag="10" contentMode="scaleToFill" distribution="fillEqually" spacingType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="7ii-cE-rgE">
-                                        <rect key="frame" x="0.0" y="380" width="335" height="83"/>
+                                        <rect key="frame" x="0.0" y="378.5" width="335" height="84"/>
                                         <subviews>
                                             <button opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="251" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Bf1-2B-pAQ" userLabel="Forgot" customClass="GradientButton" customModule="LearnWords" customModuleProvider="target">
-                                                <rect key="frame" x="0.0" y="0.0" width="163.5" height="83"/>
-                                                <fontDescription key="fontDescription" type="system" pointSize="40"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="163.5" height="84"/>
+                                                <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
                                                 <inset key="contentEdgeInsets" minX="10" minY="10" maxX="10" maxY="10"/>
                                                 <state key="normal" title="Forgot">
                                                     <color key="titleColor" systemColor="darkTextColor"/>
@@ -686,8 +713,8 @@
                                                 </connections>
                                             </button>
                                             <button opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="251" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="x6b-1p-EXm" customClass="GradientButton" customModule="LearnWords" customModuleProvider="target">
-                                                <rect key="frame" x="171.5" y="0.0" width="163.5" height="83"/>
-                                                <fontDescription key="fontDescription" type="system" pointSize="41"/>
+                                                <rect key="frame" x="171.5" y="0.0" width="163.5" height="84"/>
+                                                <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
                                                 <inset key="contentEdgeInsets" minX="10" minY="10" maxX="10" maxY="10"/>
                                                 <state key="normal" title="Know">
                                                     <color key="titleColor" systemColor="darkTextColor"/>
@@ -706,11 +733,12 @@
                                             </button>
                                         </subviews>
                                         <constraints>
+                                            <constraint firstItem="Bf1-2B-pAQ" firstAttribute="width" secondItem="x6b-1p-EXm" secondAttribute="width" id="C3c-Di-RtL"/>
                                             <constraint firstAttribute="height" relation="lessThanOrEqual" constant="100" id="c2Y-n1-Bdl"/>
                                         </constraints>
                                     </stackView>
                                     <button opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="249" verticalCompressionResistancePriority="754" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jVV-UW-vd8" customClass="GradientButton" customModule="LearnWords" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="471" width="335" height="83"/>
+                                        <rect key="frame" x="0.0" y="470.5" width="335" height="83.5"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
                                         <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <state key="normal" title="Recording"/>
@@ -720,8 +748,7 @@
                                     </button>
                                 </subviews>
                                 <constraints>
-                                    <constraint firstItem="qaf-Gn-jV1" firstAttribute="height" secondItem="x6b-1p-EXm" secondAttribute="height" id="7LZ-gG-QvV"/>
-                                    <constraint firstItem="7ii-cE-rgE" firstAttribute="top" secondItem="qaf-Gn-jV1" secondAttribute="bottom" constant="8" symbolic="YES" id="HuK-QR-bEP"/>
+                                    <constraint firstItem="x6b-1p-EXm" firstAttribute="height" secondItem="Liq-qX-vPh" secondAttribute="height" id="1pj-W1-FuB"/>
                                     <constraint firstItem="jVV-UW-vd8" firstAttribute="height" secondItem="x6b-1p-EXm" secondAttribute="height" id="rTh-em-sAe"/>
                                 </constraints>
                             </stackView>
@@ -755,10 +782,13 @@
             <size key="intrinsicContentSize" width="131" height="68"/>
         </designable>
         <designable name="Bf1-2B-pAQ">
-            <size key="intrinsicContentSize" width="131" height="68"/>
+            <size key="intrinsicContentSize" width="115" height="61"/>
         </designable>
         <designable name="Djr-xr-GdQ">
             <size key="intrinsicContentSize" width="119" height="69"/>
+        </designable>
+        <designable name="Liq-qX-vPh">
+            <size key="intrinsicContentSize" width="109" height="61"/>
         </designable>
         <designable name="Q8X-kw-NHO">
             <size key="intrinsicContentSize" width="120" height="63"/>
@@ -779,13 +809,13 @@
             <size key="intrinsicContentSize" width="149" height="63"/>
         </designable>
         <designable name="qaf-Gn-jV1">
-            <size key="intrinsicContentSize" width="167" height="69"/>
+            <size key="intrinsicContentSize" width="142" height="61"/>
         </designable>
         <designable name="uBK-Se-mT6">
             <size key="intrinsicContentSize" width="164.5" height="41"/>
         </designable>
         <designable name="x6b-1p-EXm">
-            <size key="intrinsicContentSize" width="119" height="69"/>
+            <size key="intrinsicContentSize" width="103" height="61"/>
         </designable>
         <designable name="y3Z-Kn-fYD">
             <size key="intrinsicContentSize" width="147" height="41"/>
