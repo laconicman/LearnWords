@@ -347,10 +347,4 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
 
 }
 
-extension String {
-    private var regexMatchWords: NSRegularExpression? { try? NSRegularExpression(pattern: "\\w+") }
-    var aproxWordCount: Int {
-        guard let regex = regexMatchWords else { return 0 }
-        return regex.numberOfMatches(in: self, range: NSRange(self.startIndex..., in: self))
-    }
-}
+

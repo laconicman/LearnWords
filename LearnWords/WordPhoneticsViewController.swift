@@ -20,15 +20,7 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
     @IBOutlet weak var forgotButton: UIButton!
     
     @IBAction func lookUpAction(_ sender: UIButton) {
-        // TODO: If it is the first time, then show "The app relies on system dictionries, . They can be used ofline. Make sure you have downloaded the dictionaries you need. To add or remove didctionaries use Manage Dictionaries button on the next screen" "Remind me next time" "Got it"
-        if UIReferenceLibraryViewController.dictionaryHasDefinition(forTerm: prompt.text ?? "") {
-            let rlvc = UIReferenceLibraryViewController(term: prompt.text!)
-            //rlvc.editButtonItem what is this
-            //rlvc.setEditing(true, animated: true)
-            rlvc.modalPresentationStyle = .popover //no effect on iphone
-            //wordDefinition.text =  rlvc.editButtonItem.title
-            present(rlvc, animated: true)
-        }
+        lookUp(term: prompt.text ?? "", sender: self)
     }
     
     @IBAction func listenAction(_ sender: Any) {
@@ -55,7 +47,7 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
     public override func viewDidLoad() {
         super.viewDidLoad()
 
-        // navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .fastForward, target: self, action: #selector(nextTapped))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .fastForward, target: self, action: #selector(nextTapped))
         wordsInTest = Storage.wordsAndStat.shuffled()
         Storage.shownWords = []
         

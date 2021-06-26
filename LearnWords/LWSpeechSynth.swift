@@ -33,9 +33,9 @@ final class LWSpeechSynth {
 //        utterance.rate = Float(LWUserDefaults.standard.utteranceRatePreference)
 //        print(AVSpeechUtteranceMinimumSpeechRate, AVSpeechUtteranceMaximumSpeechRate)
 //
-//        utterance.pitchMultiplier = Float(LWUserDefaults.standard.pitchMultiplierPreference)
-        utterance.rate = UserDefaults.standard.float(forKey: "utteranceRatePreference")
-        utterance.pitchMultiplier = UserDefaults.standard.float(forKey: "pitchMultiplierPreference")
+
+        utterance.rate = Float(LWUserDefaults.standard.utteranceRatePreference)
+        utterance.pitchMultiplier = Float(LWUserDefaults.standard.pitchMultiplierPreference)
 
         //we can set pre and post utterance delay
         utterance.preUtteranceDelay = 0.1

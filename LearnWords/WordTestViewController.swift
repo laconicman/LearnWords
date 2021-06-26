@@ -24,15 +24,7 @@ final class WordTestViewController: UIViewController {
     @IBOutlet weak var forgotButton: UIButton!
     
     @IBAction func lookUpAction(_ sender: UIButton) {
-        // TODO: If it is the first time, then show "The app relies on system dictionries, . They can be used ofline. Make sure you have downloaded the dictionaries you need. To add or remove didctionaries use Manage Dictionaries button on the next screen" "Remind me next time" "Got it"
-        if UIReferenceLibraryViewController.dictionaryHasDefinition(forTerm: prompt.text ?? "") {
-            let rlvc = UIReferenceLibraryViewController(term: prompt.text!)
-            //rlvc.editButtonItem what is this
-            //rlvc.setEditing(true, animated: true)
-            rlvc.modalPresentationStyle = .popover //no effect on iphone
-            //wordDefinition.text =  rlvc.editButtonItem.title
-            present(rlvc, animated: true)
-        }
+        lookUp(term: prompt.text ?? "", sender: self)
     }
     
     var wordsInTest = [WordAndStat]()

@@ -16,7 +16,7 @@
             <objects>
                 <tableViewController storyboardIdentifier="WordTable" title="LearnWords" id="Jy4-wo-DD5" customClass="WordTableViewController" customModule="LearnWords" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="Gah-Cb-jna">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="647"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <color key="tintColor" systemColor="systemOrangeColor"/>
@@ -51,9 +51,7 @@
                             <outlet property="delegate" destination="Jy4-wo-DD5" id="l7n-1B-dbM"/>
                         </connections>
                     </tableView>
-                    <toolbarItems>
-                        <barButtonItem title="Typing" id="rCS-Y7-FK2"/>
-                    </toolbarItems>
+                    <toolbarItems/>
                     <navigationItem key="navigationItem" id="geZ-fh-F0l">
                         <barButtonItem key="backBarButtonItem" title="Current set" id="nGA-b0-mC0"/>
                         <leftBarButtonItems>
@@ -80,7 +78,6 @@
                                     <segue destination="IOT-Jj-vto" kind="show" identifier="gotoWordSets" id="9Q1-zW-Ehu"/>
                                 </connections>
                             </barButtonItem>
-                            <barButtonItem systemItem="play" id="aKw-EN-Uxi"/>
                         </rightBarButtonItems>
                     </navigationItem>
                     <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
@@ -230,12 +227,12 @@
             </objects>
             <point key="canvasLocation" x="503.19999999999999" y="145.27736131934034"/>
         </scene>
-        <!--Изучаемое слово-->
+        <!--Add word to study-->
         <scene sceneID="iax-N0-AlK">
             <objects>
                 <tableViewController id="Bgt-6g-kOE" customClass="SearchWordViewController" customModule="LearnWords" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="cZM-IK-3Lk">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="647"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <prototypes>
@@ -266,7 +263,7 @@
                         </connections>
                     </tableView>
                     <toolbarItems/>
-                    <navigationItem key="navigationItem" title="Изучаемое слово" id="5bW-fz-PeB"/>
+                    <navigationItem key="navigationItem" title="Add word to study" id="5bW-fz-PeB"/>
                     <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="axZ-t2-ulR" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -278,7 +275,7 @@
             <objects>
                 <tableViewController hidesBottomBarWhenPushed="YES" id="IOT-Jj-vto" customClass="WordSetsTableViewController" customModule="LearnWords" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="6Q5-9e-K1K">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="647"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <color key="tintColor" systemColor="systemOrangeColor"/>
@@ -324,7 +321,7 @@
             <objects>
                 <tableViewController id="3Og-N0-BZi" customClass="SearchWordViewController" customModule="LearnWords" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="nhv-dM-E9i">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="647"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <prototypes>
@@ -822,6 +819,7 @@
         </designable>
     </designables>
     <inferredMetricsTieBreakers>
+        <segue reference="S09-2G-whQ"/>
         <segue reference="2Ii-3h-c3T"/>
     </inferredMetricsTieBreakers>
     <resources>
