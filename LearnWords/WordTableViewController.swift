@@ -37,17 +37,17 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
     override func viewDidLoad() {
         super.viewDidLoad()
         //Some tests to discover various language tests found in system:
-        print("Bundle.main.preferredLocalizations \n", Bundle.main.preferredLocalizations)
-        print("UITextChecker.availableLanguages \n", UITextChecker.availableLanguages)
-        print("UITextInputMode.activeInputModes.map{$0.primaryLanguage...} \n", UITextInputMode.activeInputModes.map{$0.primaryLanguage ?? "primaryLanguage undefined"})
-        print("Bundle.main.bundleIdentifier \n", Bundle.main.bundleIdentifier ?? "")
-        
-        //Some tests for user defaults
-
-        print("UserDefaults.standard.double(forKey: pitchMultiplierPreference) = " + String(UserDefaults.standard.double(forKey: "pitchMultiplierPreference")))
-        print("UserDefaults.standard.double(forKey: utteranceRatePreference) = " + String(UserDefaults.standard.double(forKey: "utteranceRatePreference")))
-        print("userDefaultsGroup.double(forKey: pitchMultiplierPreference) = " + String(userDefaultsGroup.double(forKey: "pitchMultiplierPreference")))
-        print("userDefaultsGroup.double(forKey: utteranceRatePreference) = " + String(userDefaultsGroup.double(forKey: "utteranceRatePreference")))
+//        print("Bundle.main.preferredLocalizations \n", Bundle.main.preferredLocalizations)
+//        print("UITextChecker.availableLanguages \n", UITextChecker.availableLanguages)
+//        print("UITextInputMode.activeInputModes.map{$0.primaryLanguage...} \n", UITextInputMode.activeInputModes.map{$0.primaryLanguage ?? "primaryLanguage undefined"})
+//        print("Bundle.main.bundleIdentifier \n", Bundle.main.bundleIdentifier ?? "")
+//
+//        //Some tests for user defaults
+//
+//        print("UserDefaults.standard.double(forKey: pitchMultiplierPreference) = " + String(UserDefaults.standard.double(forKey: "pitchMultiplierPreference")))
+//        print("UserDefaults.standard.double(forKey: utteranceRatePreference) = " + String(UserDefaults.standard.double(forKey: "utteranceRatePreference")))
+//        print("userDefaultsGroup.double(forKey: pitchMultiplierPreference) = " + String(userDefaultsGroup.double(forKey: "pitchMultiplierPreference")))
+//        print("userDefaultsGroup.double(forKey: utteranceRatePreference) = " + String(userDefaultsGroup.double(forKey: "utteranceRatePreference")))
         
         //UserDefaults.standard //NSUserDefaults_Log_Nonsensical_Suites (suiteName: Bundle.main.bundleIdentifier)
         //We can get voices that are present in system and then use set them either with identifiers or by using default for language
@@ -81,7 +81,7 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
                 knownWords = savedWords
             }*/
 
-        if let importedString = UserDefaults(suiteName: "group.club.laconic.LearnWords")?.string(forKey: "ImportedText") {
+        if let importedString = userDefaultsGroup.string(forKey: "ImportedText") {
             if  importedString.aproxWordCount > 1 {
                 let dictionaryEntries = split(importedString, by: "\n" + ";" + "\u{2028}")
                 importedWords = dictionaryEntries.compactMap( {
@@ -103,7 +103,7 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
                 importedWord = lemmas(from: importedString).first ?? ""
                 performSegue(withIdentifier: "AddWord", sender: self)
             }
-            UserDefaults(suiteName: "group.club.laconic.LearnWords")?.removeObject(forKey: "ImportedText")
+            userDefaultsGroup.removeObject(forKey: "ImportedText")
         }
         navigationItem.rightBarButtonItems?.insert(editButtonItem, at: 0)
             //  print("$\(PRODUCT_BUNDLE_IDENTIFIER)")
@@ -130,10 +130,10 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         NotificationCenter.default.addObserver(self, selector: #selector(defaultsChanged), name: UserDefaults.didChangeNotification, object: nil)
         defaultsChanged()
         // Some checks:
-        print("LWUserDefaults.standard.languageToStudyPreference: " + (LWUserDefaults.standard.languageToStudyPreference ?? "Undefined"))
-        print("LWUserDefaults.standard.nativeLanguagePreference: " + (LWUserDefaults.standard.nativeLanguagePreference ?? "Undefined"))
-        print("UserDefaults.standard.string(forKey: 'languageToStudyPreference'): " + (UserDefaults.standard.string(forKey: "languageToStudyPreference") ?? "Undefined"))
-        print("UserDefaults.standard.string(forKey: 'nativeLanguagePreference'): " + (UserDefaults.standard.string(forKey: "nativeLanguagePreference") ?? "Undefined"))
+//        print("LWUserDefaults.standard.languageToStudyPreference: " + (LWUserDefaults.standard.languageToStudyPreference ?? "Undefined"))
+//        print("LWUserDefaults.standard.nativeLanguagePreference: " + (LWUserDefaults.standard.nativeLanguagePreference ?? "Undefined"))
+//        print("UserDefaults.standard.string(forKey: 'languageToStudyPreference'): " + (UserDefaults.standard.string(forKey: "languageToStudyPreference") ?? "Undefined"))
+//        print("UserDefaults.standard.string(forKey: 'nativeLanguagePreference'): " + (UserDefaults.standard.string(forKey: "nativeLanguagePreference") ?? "Undefined"))
         // tableView.reloadData() //inefficient
     }
     
@@ -215,7 +215,7 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
                                        preferredStyle: .alert)
             
             // TODO: create a "Go to Settings" button that opens standart settings
-            let settingsAction = UIAlertAction(title: NSLocalizedString("Settings", comment: ""), style: .default) { [weak self] (action: UIAlertAction!) in
+            let settingsAction = UIAlertAction(title: NSLocalizedString("Settings", comment: ""), style: .default) { /*[weak self]*/ (action: UIAlertAction!) in
                 gotoAppSettings()
             }
             ac.addAction(settingsAction)

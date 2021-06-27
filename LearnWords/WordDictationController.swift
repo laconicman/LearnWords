@@ -44,7 +44,7 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         let answer = textField.text?.replacingCharacters(in: Range(range, in: textField.text!)!, with: string).lowercased().trimmingCharacters(in: .whitespaces)
         answerMatched = answer == wordsInTest[0].pair.components(separatedBy: "::")[0]
-        print("Answer matched \(answerMatched)", string, textField.text, wordsInTest[0].pair.components(separatedBy: "::")[0])
+        // print("Answer matched \(answerMatched)", string, textField.text, wordsInTest[0].pair.components(separatedBy: "::")[0])
         return true
     }
     
@@ -148,7 +148,7 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
         LWSpeechSynth.standard.speak(utteranceString: prompt.attributedText!, language: LWUserDefaults.standard.nativeLanguagePreference!)
         translationInput.isUserInteractionEnabled = true
         translationInput.attributedPlaceholder = NSAttributedString(
-            string: "type in translation",
+            string: NSLocalizedString("type in translation", comment: "Placeholder promt"),
             attributes: [.foregroundColor: UIColor(red: 0, green: 0.7, blue: 0.7, alpha: 1)])
         translationInput.text = ""
         translationInput.textColor = .black

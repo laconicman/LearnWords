@@ -67,9 +67,9 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
         // Configure the SFSpeechRecognizer object already
         // stored in a local member variable.
         speechRecognizer.delegate = self
-        if #available(iOS 13, *) {
-            print("Supports on device recognition \(speechRecognizer.supportsOnDeviceRecognition)")
-        }
+//        if #available(iOS 13, *) {
+//            print("Supports on device recognition \(speechRecognizer.supportsOnDeviceRecognition)")
+//        }
         
         // Asynchronously make the authorization request.
         SFSpeechRecognizer.requestAuthorization { authStatus in
@@ -83,23 +83,23 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
                     
                 case .denied, .restricted:
                     self.recordButton.isEnabled = false
-                    self.recordButton.setTitle("Speech recognition not allowed", for: .disabled)
-                    let ac = UIAlertController(title: NSLocalizedString("Allow speech recognition", comment: ""), message: NSLocalizedString("for phonetic exercises", comment: ""), preferredStyle: .alert)
+                    self.recordButton.setTitle(NSLocalizedString("Speech recognition not allowed", comment: "Button title"), for: .disabled)
+                    let ac = UIAlertController(title: NSLocalizedString("Allow speech recognition", comment: "Alert title"), message: NSLocalizedString("for phonetic exercises", comment: "Alert message"), preferredStyle: .alert)
                     
                     // create an "Add Word" button that submits the user's input
-                    let submitAction = UIAlertAction(title: NSLocalizedString("Allow in settings", comment: ""), style: .default) { [unowned self] (action: UIAlertAction!) in
+                    let submitAction = UIAlertAction(title: NSLocalizedString("Allow in settings", comment: ""), style: .default) { /* [unowned self] */ (action: UIAlertAction!) in
                         gotoAppSettings()
                     }
                     ac.addAction(submitAction)
-                    ac.addAction(UIAlertAction(title: NSLocalizedString("Got it", comment: ""), style: .default))
+                    ac.addAction(UIAlertAction(title: NSLocalizedString("Got it", comment: "Button title"), style: .default))
                     self.present(ac, animated: true)
                     
                 case .notDetermined:
                     self.recordButton.isEnabled = false
-                    self.recordButton.setTitle("Speech recognition permission needed", for: .disabled)
+                    self.recordButton.setTitle(NSLocalizedString("Speech recognition permission needed", comment: "Button title"), for: .disabled)
                     let ac = UIAlertController(title: NSLocalizedString("Allow speech recognition", comment: "for phonetic exercises"), message: nil, preferredStyle: .alert)
 
-                    ac.addAction(UIAlertAction(title: NSLocalizedString("Got it", comment: ""), style: .default))
+                    ac.addAction(UIAlertAction(title: NSLocalizedString("Got it", comment: "Button title"), style: .default))
                     self.present(ac, animated: true)
                     
                 default:
@@ -140,8 +140,8 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
                 // Update the text view with the results.
                 self?.recognized.text = result.bestTranscription.formattedString.lowercased()
                 isFinal = result.isFinal
-                print("Text \(result.bestTranscription.formattedString)")
-                print("Transcriptions \(result.transcriptions.map{ $0.formattedString.lowercased() })")
+                // print("Text \(result.bestTranscription.formattedString)")
+                // print("Transcriptions \(result.transcriptions.map{ $0.formattedString.lowercased() })")
                 if !(self?.wordsInTest.isEmpty ?? true),  result.bestTranscription.formattedString.lowercased().contains(self?.wordsInTest[0].pair.components(separatedBy: "::")[0] ?? "") /* && isFinal */ {
                     self?.recordButtonTapped() // stop the audio
                     OperationQueue.main.addOperation {
@@ -154,7 +154,7 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
             }
             
             if error != nil  || isFinal  {
-                print("Stopping isFinal = \(isFinal). Error = \(String(describing: error))")
+                // print("Stopping isFinal = \(isFinal). Error = \(String(describing: error))")
                 // Stop recognizing speech if there is a problem.
                 self?.audioEngine.stop()
                 inputNode.removeTap(onBus: 0)
@@ -163,7 +163,7 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
                 self?.recognitionTask = nil
 
                 self?.recordButton.isEnabled = true
-                self?.recordButton.setTitle("Start Recording", for: [])
+                self?.recordButton.setTitle(NSLocalizedString("Start Recording", comment: "Button title"), for: [])
                 self?.recordButton.tintColor = .black
                 if error != nil, (error! as NSError).code != 203 {
                     let ac = UIAlertController(title: NSLocalizedString("Speech recognition error", comment: ""), message: error!.localizedDescription + "\n" + (error! as NSError).userInfo.debugDescription, preferredStyle: .alert)
@@ -191,12 +191,11 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
     public func speechRecognizer(_ speechRecognizer: SFSpeechRecognizer, availabilityDidChange available: Bool) {
         if available {
             recordButton.isEnabled = true
-            recordButton.setTitle("Start Recording", for: [])
-            recordButton.tintColor = .black
+            recordButton.setTitle(NSLocalizedString("Start Recording", comment: "Button title"), for: [])
         } else {
             recordButton.isEnabled = false
-            recordButton.setTitle("Recognition Not Available", for: .disabled)
-            print("Unavalible")
+            recordButton.setTitle(NSLocalizedString("Recognition Not Available", comment: "Button title"), for: .disabled)
+            // print("Unavalible")
         }
         recordButton.tintColor = .black
     }
@@ -208,15 +207,15 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
             audioEngine.stop()
             recognitionRequest?.endAudio()
             recordButton.isEnabled = false
-            recordButton.setTitle("Stopping", for: .disabled)
+            recordButton.setTitle(NSLocalizedString("Stopping", comment: "Button title"), for: .disabled)
             recordButton.tintColor = .black
         } else {
             do {
                 try startRecording()
-                recordButton.setTitle("Stop Recording", for: [])
+                recordButton.setTitle(NSLocalizedString("Stop Recording", comment: "Button title"), for: [])
                 recordButton.tintColor = .red
             } catch {
-                recordButton.setTitle("Recording Not Available", for: [])
+                recordButton.setTitle(NSLocalizedString("Recording Not Available", comment: "Button title"), for: [])
                 recordButton.tintColor = .black
             }
         }
@@ -236,7 +235,7 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
         prompt.attributedText = NSAttributedString(string: wordsInTest[0].pair.components(separatedBy: "::")[1])
         LWSpeechSynth.standard.speak(utteranceString: prompt.attributedText!, language: LWUserDefaults.standard.nativeLanguagePreference!)
         recognized.attributedText = NSAttributedString(
-            string: "speak the translation",
+            string: NSLocalizedString("speak the translation", comment: "label prompt"),
             attributes: [.foregroundColor: UIColor(red: 0, green: 0.7, blue: 0.7, alpha: 1)])
         // prompt.textColor = UIColor(red: 0, green: 0.7, blue: 0, alpha: 1)
 

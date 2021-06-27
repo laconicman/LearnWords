@@ -54,7 +54,7 @@ final class WordTestViewController: UIViewController {
     // MARK: - Interface Builder actions
     @IBAction func knowButtonAction(_ sender: UIButton) {
         afterAnswer(isKnown: true)
-        
+        /*
         if UIReferenceLibraryViewController.dictionaryHasDefinition(forTerm: prompt.text ?? "") {
             let rlvc = UIReferenceLibraryViewController(term: prompt.text!)
             //rlvc.editButtonItem what is this
@@ -89,7 +89,7 @@ final class WordTestViewController: UIViewController {
                 let dictionaryMain = split(definitions[0].string, by: "\n" + "\u{2028}")[1]
                 print(dictionaryMain)
             }
-        }
+        } */
     }
     
     @IBAction func forgotButtonAction(_ sender: UIButton) {
