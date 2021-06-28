@@ -103,7 +103,7 @@ struct Storage {
         wsa.append(name)
         let wsaSet = Set(wsa)
         wordSets = Array(wsaSet).sorted()
-        return wordSets.index(of: name)
+        return wordSets.firstIndex(of: name)
     }
     static func removeWordSet(at index: Int) {
         let removed = wordSets.remove(at: index)

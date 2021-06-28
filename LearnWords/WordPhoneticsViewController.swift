@@ -83,7 +83,7 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
                     
                 case .denied, .restricted:
                     self.recordButton.isEnabled = false
-                    self.recordButton.setTitle(NSLocalizedString("Speech recognition not allowed", comment: "Button title"), for: .disabled)
+                    self.recordButton.setTitle(NSLocalizedString("Recognition not allowed", comment: "Button title"), for: .disabled)
                     let ac = UIAlertController(title: NSLocalizedString("Allow speech recognition", comment: "Alert title"), message: NSLocalizedString("for phonetic exercises", comment: "Alert message"), preferredStyle: .alert)
                     
                     // create an "Add Word" button that submits the user's input
@@ -233,7 +233,9 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
             return
         }
         prompt.attributedText = NSAttributedString(string: wordsInTest[0].pair.components(separatedBy: "::")[1])
-        LWSpeechSynth.standard.speak(utteranceString: prompt.attributedText!, language: LWUserDefaults.standard.nativeLanguagePreference!)
+        if LWUserDefaults.standard.pronounceQuestionsPreference {
+            LWSpeechSynth.standard.speak(utteranceString: prompt.attributedText!, language: LWUserDefaults.standard.nativeLanguagePreference!)
+        }
         recognized.attributedText = NSAttributedString(
             string: NSLocalizedString("speak the translation", comment: "label prompt"),
             attributes: [.foregroundColor: UIColor(red: 0, green: 0.7, blue: 0.7, alpha: 1)])
@@ -325,6 +327,10 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
         }
         //            prompt.text = wordsInTest[questionCounter].components(separatedBy: "::")[0]
         //            prompt.textColor = UIColor(red: 0, green: 0.7, blue: 0, alpha: 1)
+        
+        if LWUserDefaults.standard.pronounceAnswersPreference {
+            LWSpeechSynth.standard.speak(utteranceString: wordDefinition.attributedText!, language: LWUserDefaults.standard.languageToStudyPreference!)
+        }
     }
     
     func prepareForNextQuestion(withPrewiousKnown: Bool = true) {

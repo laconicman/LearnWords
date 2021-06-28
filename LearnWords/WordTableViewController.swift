@@ -140,13 +140,17 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
     
     @objc func defaultsChanged(){
         checkInstalledLocales()
-        if userDefaults.bool(forKey: "redThemeSwitch") {
-            self.view.backgroundColor = UIColor.red
-            
-        }
-        else {
-            self.view.backgroundColor = UIColor.green
-        }
+        
+        // TODO: more checks:
+        // checkSpokenLanguages()
+        // checkRecognizedLanguages()
+//        if userDefaults.bool(forKey: "redThemeSwitch") {
+//            self.view.backgroundColor = UIColor.red
+//
+//        }
+//        else {
+//            self.view.backgroundColor = UIColor.green
+//        }
     }
     
     @IBAction func addNewWord(_ sender: UIBarButtonItem) {
@@ -283,7 +287,7 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
     // MARK: SearchController for filtering WordTableView
     private func setupSearchController(placeholder: String = "", hideWhenAppear: Bool = true) { //Unify with searchViewControllers
         definesPresentationContext = true
-        searchController.dimsBackgroundDuringPresentation = false
+        // searchController.dimsBackgroundDuringPresentation = false
         searchController.searchResultsUpdater = self
         searchController.searchBar.barTintColor = UIColor(white: 0.9, alpha: 0.9)
         searchController.searchBar.placeholder = placeholder

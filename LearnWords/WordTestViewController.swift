@@ -164,6 +164,10 @@ final class WordTestViewController: UIViewController {
         }
         //            prompt.text = wordsInTest[questionCounter].components(separatedBy: "::")[0]
         //            prompt.textColor = UIColor(red: 0, green: 0.7, blue: 0, alpha: 1)
+        
+        if LWUserDefaults.standard.pronounceAnswersPreference {
+            LWSpeechSynth.standard.speak(utteranceString: wordDefinition.attributedText!, language: LWUserDefaults.standard.nativeLanguagePreference!)
+        }
     }
     
     func askQuestion() {
@@ -175,7 +179,9 @@ final class WordTestViewController: UIViewController {
             return
         }
         prompt.attributedText = NSAttributedString(string: wordsInTest[0].pair.components(separatedBy: "::")[0])
-        LWSpeechSynth.standard.speak(utteranceString: prompt.attributedText!, language: LWUserDefaults.standard.languageToStudyPreference!)
+        if LWUserDefaults.standard.pronounceQuestionsPreference {
+            LWSpeechSynth.standard.speak(utteranceString: prompt.attributedText!, language: LWUserDefaults.standard.languageToStudyPreference!)
+        }
         wordDefinition.attributedText = NSAttributedString(
             string: "?",
             attributes: [.foregroundColor: UIColor(red: 0, green: 0.7, blue: 0.7, alpha: 1)])

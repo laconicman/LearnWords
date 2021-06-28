@@ -121,11 +121,11 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
     var searchedObject = SearchedObject.original(lang: LWUserDefaults.standard.languageToStudyPreference ?? "en", word: "") {
             didSet {
                 switch searchedObject {
-                case .original(lang: let lang, word: let word):
+                case .original(lang: _, word: let word):
                     //searchLanguage = lang
                     searchBar.text = word
                     tableView.allowsMultipleSelection = false
-                case .translation(orig_lang: _, orig_word: _, dest_lang: let lang, translations: _):
+                case .translation(orig_lang: _, orig_word: _, dest_lang: _, translations: _):
                     tableView.allowsMultipleSelection = true
                     //searchLanguage = lang
                 }
@@ -207,7 +207,7 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
         searchBar.searchBarStyle = .prominent // use the prominent style to get a white background
         searchBar.autocapitalizationType = .none
         // searchBar.prompt = "Foreign word"
-        searchBar.placeholder = "start typing"
+        searchBar.placeholder = NSLocalizedString("Start typing", comment: "placeholder in a searchbar")
         //navigationItem.titleView = searchBar
         searchBar.sizeToFit()
         tableView.tableHeaderView = searchBar
@@ -219,7 +219,7 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
         switch searchedObject { //Add emoji flags
         case .original:
             break
-        case .translation(orig_lang: _, orig_word: let foreignWord, dest_lang: _, translations: _): break
+        case .translation(orig_lang: _, orig_word: _, dest_lang: _, translations: _): break
             // TODO: make an opportunity to select words - move them to defifnitions section
 //            for indexPath in tableView?.indexPathsForSelectedRows ?? [] {
 //                if let stc = tableView.cellForRow(at: indexPath), let translation = stc.textLabel?.text {
@@ -539,7 +539,7 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
             }
                 
                 switch searchedObject {
-                case .original(lang: let lang, word: _):
+                case .original(lang: _, word: _):
                     return
                 case .translation(orig_lang: let ol, orig_word: let ow, dest_lang: let dl, translations: let tls):
                     searchedObject = .translation(orig_lang: ol, orig_word: ow, dest_lang: dl, translations: (tls + [term]))
@@ -547,9 +547,9 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
                     //TODO: deal with array of terms, store languages, init as unlearned
                     _ = Storage.insertFlashcard(foreign: ow, native: term)
             }
-            if let wordTest = segue.destination as? WordTestViewController {
+            // if let wordTest = segue.destination as? WordTestViewController {
                 // Do someting to scroll to new word definition and flash-highlight it
-            }
+            // }
         
     }
     }

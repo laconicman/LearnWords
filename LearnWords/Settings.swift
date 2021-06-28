@@ -86,7 +86,25 @@ final class LWUserDefaults {
             return self.userDefaults.double(forKey: "pitchMultiplierPreference")
         }
         set {
-            self.userDefaults.set(newValue, forKey: "pitchMultiplierPreferencee")
+            self.userDefaults.set(newValue, forKey: "pitchMultiplierPreference")
+        }
+    }
+    
+    var pronounceAnswersPreference: Bool {
+        get {
+            return self.userDefaults.bool(forKey: "pronounceAnswersPreference")
+        }
+        set {
+            self.userDefaults.set(newValue, forKey: "pronounceAnswersPreference")
+        }
+    }
+    
+    var pronounceQuestionsPreference: Bool {
+        get {
+            return self.userDefaults.bool(forKey: "pronounceQuestionsPreference")
+        }
+        set {
+            self.userDefaults.set(newValue, forKey: "pronounceQuestionsPreference")
         }
     }
     

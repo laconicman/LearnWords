@@ -14,7 +14,7 @@
 			<key>Title</key>
 			<string>Just a title</string>
 			<key>Key</key>
-			<string></string>
+			<string>title</string>
 			<key>DefaultValue</key>
 			<string>Just</string>
 		</dict>
@@ -122,35 +122,21 @@
 			<key>Type</key>
 			<string>PSToggleSwitchSpecifier</string>
 			<key>Title</key>
-			<string>Red Theme</string>
+			<string>Pronounce answers</string>
 			<key>Key</key>
-			<string>redThemeSwitch</string>
+			<string>pronounceAnswersPreference</string>
 			<key>DefaultValue</key>
-			<false/>
+			<true/>
 		</dict>
 		<dict>
 			<key>Type</key>
-			<string>PSRadioGroupSpecifier</string>
+			<string>PSToggleSwitchSpecifier</string>
 			<key>Title</key>
-			<string>RadioGroupSpecifier</string>
+			<string>Pronounce questions</string>
 			<key>Key</key>
-			<string>tkey</string>
-			<key>FooterText</key>
-			<string>footer</string>
+			<string>pronounceQuestionsPreference</string>
 			<key>DefaultValue</key>
-			<string>radio group default</string>
-			<key>Values</key>
-			<array>
-				<string>en-US</string>
-				<string>ru-RU</string>
-				<string>es-ES</string>
-			</array>
-			<key>Titles</key>
-			<array>
-				<string>English</string>
-				<string>Russian</string>
-				<string>Spanish</string>
-			</array>
+			<true/>
 		</dict>
 	</array>
 </dict>

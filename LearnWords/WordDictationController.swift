@@ -22,8 +22,13 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
     
     @IBOutlet weak var stackBottomConstraint: NSLayoutConstraint!
     let underKeyboardLayoutConstraint = UnderKeyboardLayoutConstraint()
+    
     @IBAction func lookupAction(_ sender: UIButton) {
         lookUp(term: prompt.text ?? "", sender: self)
+    }
+    
+    @IBAction func listenAction(_ sender: Any) {
+        LWSpeechSynth.standard.speak(utteranceString: NSAttributedString(string: wordsInTest[0].pair.components(separatedBy: "::")[0]), language: LWUserDefaults.standard.languageToStudyPreference!)
     }
     
     var wordsInTest = [WordAndStat]()
@@ -133,6 +138,10 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
         }
         //            prompt.text = wordsInTest[questionCounter].components(separatedBy: "::")[0]
         //            prompt.textColor = UIColor(red: 0, green: 0.7, blue: 0, alpha: 1)
+        
+        if LWUserDefaults.standard.pronounceAnswersPreference {
+            LWSpeechSynth.standard.speak(utteranceString: translationInput.attributedText!, language: LWUserDefaults.standard.languageToStudyPreference!)
+        }
     }
     
     
@@ -145,7 +154,9 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
             return
         }
         prompt.attributedText = NSAttributedString(string: wordsInTest[0].pair.components(separatedBy: "::")[1])
-        LWSpeechSynth.standard.speak(utteranceString: prompt.attributedText!, language: LWUserDefaults.standard.nativeLanguagePreference!)
+        if LWUserDefaults.standard.pronounceQuestionsPreference {
+            LWSpeechSynth.standard.speak(utteranceString: prompt.attributedText!, language: LWUserDefaults.standard.nativeLanguagePreference!)
+        }
         translationInput.isUserInteractionEnabled = true
         translationInput.attributedPlaceholder = NSAttributedString(
             string: NSLocalizedString("type in translation", comment: "Placeholder promt"),
