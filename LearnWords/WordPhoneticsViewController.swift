@@ -12,7 +12,7 @@ import Speech
 class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate {
 
     // MARK: - Properties
-    @IBOutlet weak var wordDefinition: UILabel! //?
+
     @IBOutlet weak var stackView: UIStackView!
     @IBOutlet weak var prompt: UILabel!
 
@@ -24,6 +24,12 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
     }
     
     @IBAction func listenAction(_ sender: Any) {
+        if audioEngine.isRunning {
+            recordButtonTapped()
+        }
+        // try? audioSession.setCategory(.playback, mode: .measurement, options: [])
+        try? audioSession.setCategory(.playback, mode: .default, policy: .default, options: [])
+        try? audioSession.setActive(true, options: .notifyOthersOnDeactivation)
         LWSpeechSynth.standard.speak(utteranceString: NSAttributedString(string: wordsInTest[0].pair.components(separatedBy: "::")[0]), language: LWUserDefaults.standard.languageToStudyPreference!)
     }
     var wordsInTest = [WordAndStat]()
@@ -37,6 +43,8 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
     private var recognitionTask: SFSpeechRecognitionTask?
     
     private let audioEngine = AVAudioEngine()
+    
+    let audioSession = AVAudioSession.sharedInstance()
     
     @IBOutlet var recognized: UILabel!
     
@@ -63,6 +71,25 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
         navigationController?.hidesBarsOnTap = false
         if wordsInTest.isEmpty { wordsInTest = Storage.wordsAndStat.shuffled() }
         askQuestion()
+        
+            audioSession.requestRecordPermission()
+            { [unowned self] allowed in
+                DispatchQueue.main.async {
+                    if !allowed {
+                        self.recordButton.isEnabled = false
+                        self.recordButton.setTitle(NSLocalizedString("Microphone access denied.", comment: "Button title"), for: .disabled)
+                        let ac = UIAlertController(title: NSLocalizedString("Allow microphone usage", comment: "Alert title"), message: NSLocalizedString("for phonetic exercises", comment: "Alert message"), preferredStyle: .alert)
+                        
+                        // create an "Add Word" button that submits the user's input
+                        let submitAction = UIAlertAction(title: NSLocalizedString("Allow in settings", comment: ""), style: .default) { /* [unowned self] */ (action: UIAlertAction!) in
+                            gotoAppSettings()
+                        }
+                        ac.addAction(submitAction)
+                        ac.addAction(UIAlertAction(title: NSLocalizedString("Got it", comment: "Button title"), style: .default))
+                        self.present(ac, animated: true)
+                    }
+                }
+            }
         
         // Configure the SFSpeechRecognizer object already
         // stored in a local member variable.
@@ -116,8 +143,9 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
         self.recognitionTask = nil
         
         // Configure the audio session for the app.
-        let audioSession = AVAudioSession.sharedInstance()
-        try audioSession.setCategory(.record, mode: .measurement, options: .duckOthers)
+
+        try audioSession.setCategory(.playAndRecord, mode: .default, options: [])
+        // try audioSession.setCategory(.playAndRecord, mode: .measurement, options: [.])
         try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
         let inputNode = audioEngine.inputNode
 
@@ -144,10 +172,9 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
                 // print("Transcriptions \(result.transcriptions.map{ $0.formattedString.lowercased() })")
                 if !(self?.wordsInTest.isEmpty ?? true),  result.bestTranscription.formattedString.lowercased().contains(self?.wordsInTest[0].pair.components(separatedBy: "::")[0] ?? "") /* && isFinal */ {
                     self?.recordButtonTapped() // stop the audio
-                    OperationQueue.main.addOperation {
-                        self?.recognized.text = self?.wordsInTest[0].pair.components(separatedBy: "::")[0]
-                        self?.afterAnswer(isKnown: true)
-                    }
+                    
+                    self?.recognized.text = self?.wordsInTest[0].pair.components(separatedBy: "::")[0]
+                    self?.afterAnswer(isKnown: true)
                 } else {
                    // self.recognized.text = ""
                 }
@@ -206,6 +233,7 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
         if audioEngine.isRunning {
             audioEngine.stop()
             recognitionRequest?.endAudio()
+            
             recordButton.isEnabled = false
             recordButton.setTitle(NSLocalizedString("Stopping", comment: "Button title"), for: .disabled)
             recordButton.tintColor = .black
@@ -272,7 +300,6 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
     
     func afterAnswer(isKnown: Bool) {
         if !wordsInTest.isEmpty {
-            listenAction(self)
             shownWord = wordsInTest.remove(at: 0)
             isKnown ? shownWord.increaseKnown() : shownWord.decreaseKnown()
             Storage.shownWords.append(shownWord)
@@ -280,7 +307,7 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
 //            //prepareForNextQuestion()
             showAnswer(for: shownWord, isKnown: isKnown)
         } else { // this never happens for now
-            navigationController?.tabBarController?.selectedIndex = 0
+            navigationController?.popToRootViewController(animated: true)
         }
     }
     
@@ -327,9 +354,14 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
         }
         //            prompt.text = wordsInTest[questionCounter].components(separatedBy: "::")[0]
         //            prompt.textColor = UIColor(red: 0, green: 0.7, blue: 0, alpha: 1)
-        
+        if audioEngine.isRunning {
+            recordButtonTapped()
+        }
+        // try? audioSession.setCategory(.playback, mode: .measurement, options: [])
+        try? audioSession.setCategory(.playback, mode: .default, policy: .default, options: [])
+        try? audioSession.setActive(true, options: .notifyOthersOnDeactivation)
         if LWUserDefaults.standard.pronounceAnswersPreference {
-            LWSpeechSynth.standard.speak(utteranceString: wordDefinition.attributedText!, language: LWUserDefaults.standard.languageToStudyPreference!)
+            LWSpeechSynth.standard.speak(utteranceString: recognized.attributedText!, language: LWUserDefaults.standard.languageToStudyPreference!)
         }
     }
     

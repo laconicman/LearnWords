@@ -32,16 +32,18 @@
 			<key>Key</key>
 			<string>languageToStudyPreference</string>
 			<key>DefaultValue</key>
-			<string>en-US</string>
+			<string>en-GB</string>
 			<key>Values</key>
 			<array>
+				<string>en-GB</string>
 				<string>en-US</string>
 				<string>ru-RU</string>
 				<string>es-ES</string>
 			</array>
 			<key>Titles</key>
 			<array>
-				<string>English</string>
+				<string>English (GB)</string>
+				<string>English (US)</string>
 				<string>Russian</string>
 				<string>Spanish</string>
 			</array>
@@ -57,13 +59,15 @@
 			<string>ru-RU</string>
 			<key>Values</key>
 			<array>
+				<string>en-GB</string>
 				<string>en-US</string>
 				<string>ru-RU</string>
 				<string>es-ES</string>
 			</array>
 			<key>Titles</key>
 			<array>
-				<string>English</string>
+				<string>English (GB)</string>
+				<string>English (US)</string>
 				<string>Russian</string>
 				<string>Spanish</string>
 			</array>

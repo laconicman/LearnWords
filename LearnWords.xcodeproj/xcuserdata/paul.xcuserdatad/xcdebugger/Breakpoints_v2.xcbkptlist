@@ -494,8 +494,8 @@
             filePath = "LearnWords/WordPhoneticsViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "62"
-            endingLineNumber = "62"
+            startingLineNumber = "70"
+            endingLineNumber = "70"
             landmarkName = "viewDidAppear(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -510,8 +510,8 @@
             filePath = "LearnWords/WordPhoneticsViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "80"
-            endingLineNumber = "80"
+            startingLineNumber = "107"
+            endingLineNumber = "107"
             landmarkName = "viewDidAppear(_:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -564,34 +564,34 @@
             landmarkType = "7">
             <Locations>
                <Location
-                  uuid = "B932903D-5A02-4505-AF1D-DD86CB98721F - f3c8f28892c86cf9"
+                  uuid = "B932903D-5A02-4505-AF1D-DD86CB98721F - 34cd8c03c8f21918"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
                   symbolName = "LearnWords.WordTableViewController.viewDidLoad() -&gt; ()"
                   moduleName = "LearnWords"
                   usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/paul/Library/Mobile%20Documents/com~apple~CloudDocs/Code/Pav/LearnWords/LearnWords/WordTableViewController.swift"
+                  urlString = "file:///Users/paul/Desktop/LearnWords/LearnWords/WordTableViewController.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "94"
                   endingLineNumber = "94"
-                  offsetFromSymbolStart = "2004">
+                  offsetFromSymbolStart = "1492">
                </Location>
                <Location
-                  uuid = "B932903D-5A02-4505-AF1D-DD86CB98721F - 4a262eb275665759"
+                  uuid = "B932903D-5A02-4505-AF1D-DD86CB98721F - 8d2350392f5c227a"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
                   symbolName = "closure #2 (LearnWords.WordAndStat) -&gt; Swift.Bool in LearnWords.WordTableViewController.viewDidLoad() -&gt; ()"
                   moduleName = "LearnWords"
                   usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/paul/Library/Mobile%20Documents/com~apple~CloudDocs/Code/Pav/LearnWords/LearnWords/WordTableViewController.swift"
+                  urlString = "file:///Users/paul/Desktop/LearnWords/LearnWords/WordTableViewController.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
                   startingLineNumber = "95"
                   endingLineNumber = "95"
-                  offsetFromSymbolStart = "138">
+                  offsetFromSymbolStart = "140">
                </Location>
             </Locations>
          </BreakpointContent>
@@ -674,6 +674,22 @@
             endingLineNumber = "81"
             landmarkName = "knowButtonAction(_:)"
             landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "33E6E10D-6614-4A9D-85F2-88E3E3806D50"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "LearnWords/WordPhoneticsViewController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "363"
+            endingLineNumber = "363"
+            landmarkName = "WordPhoneticsViewController"
+            landmarkType = "3">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

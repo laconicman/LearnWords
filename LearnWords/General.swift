@@ -57,3 +57,10 @@ func split(_ str: String, by oneOfTheCharacters: String) -> [String] {
     let separatorSet = CharacterSet(charactersIn: oneOfTheCharacters) // consider .union(.newlines)
     return str.components(separatedBy: separatorSet).map({ $0.trimmingCharacters(in: .whitespaces)}).filter( { !$0.isEmpty })
 }
+
+ func pluralizedWordCount(_ count: Int) -> String
+{
+    let format = NSLocalizedString("WordCount", comment: "Count of words available")
+    let wordCount = String.localizedStringWithFormat(format, count)
+    return wordCount
+}

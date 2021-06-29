@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		DA160CB1268A3E7C001F6CD2 /* ExersizeChooserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA160CB0268A3E7C001F6CD2 /* ExersizeChooserViewController.swift */; };
 		DA246CB41F8A6E5E00A75ED1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA246CB31F8A6E5E00A75ED1 /* AppDelegate.swift */; };
 		DA246CB61F8A6E5E00A75ED1 /* WordTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA246CB51F8A6E5E00A75ED1 /* WordTableViewController.swift */; };
 		DA246CB91F8A6E5E00A75ED1 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DA246CB71F8A6E5E00A75ED1 /* Main.storyboard */; };
@@ -36,6 +37,8 @@
 		DAA16D7224B60673003C28FD /* ImportAsDictAction.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = DAA16D6624B60673003C28FD /* ImportAsDictAction.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		DAC884BA219C8710005C6588 /* SearchWordViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAC884B9219C8710005C6588 /* SearchWordViewController.swift */; };
 		DAD5E0D6219EF1400084FD1A /* Images.imagecatalog in Resources */ = {isa = PBXBuildFile; fileRef = DAD5E0D5219EF1400084FD1A /* Images.imagecatalog */; };
+		DAEA44F6268A5060004CA6C4 /* Localizable.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = DAEA44F8268A5060004CA6C4 /* Localizable.stringsdict */; };
+		DAEA44FB268A5119004CA6C4 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = DAEA44FD268A5119004CA6C4 /* Localizable.strings */; };
 		DAEC8DCE219DF691009097C2 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAEC8DCD219DF691009097C2 /* Settings.swift */; };
 /* End PBXBuildFile section */
 
@@ -72,6 +75,12 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		DA160CB0268A3E7C001F6CD2 /* ExersizeChooserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExersizeChooserViewController.swift; sourceTree = "<group>"; };
+		DA160CB3268A415B001F6CD2 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Main.strings; sourceTree = "<group>"; };
+		DA160CB4268A42CA001F6CD2 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Main.strings; sourceTree = "<group>"; };
+		DA160CB5268A42CA001F6CD2 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
+		DA160CB6268A42CA001F6CD2 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/MainInterface.strings; sourceTree = "<group>"; };
+		DA160CB7268A42CA001F6CD2 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/MainInterface.strings; sourceTree = "<group>"; };
 		DA246CB01F8A6E5E00A75ED1 /* LearnWords.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LearnWords.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA246CB31F8A6E5E00A75ED1 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		DA246CB51F8A6E5E00A75ED1 /* WordTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordTableViewController.swift; sourceTree = "<group>"; };
@@ -108,6 +117,10 @@
 		DAA16D6F24B60673003C28FD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DAC884B9219C8710005C6588 /* SearchWordViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchWordViewController.swift; sourceTree = "<group>"; };
 		DAD5E0D5219EF1400084FD1A /* Images.imagecatalog */ = {isa = PBXFileReference; lastKnownFileType = folder.imagecatalog; path = Images.imagecatalog; sourceTree = "<group>"; };
+		DAEA44F7268A5060004CA6C4 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = ru; path = ru.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
+		DAEA44FC268A5119004CA6C4 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
+		DAEA44FE268A5164004CA6C4 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		DAEA44FF268A516E004CA6C4 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = en; path = en.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
 		DAEC8DCD219DF691009097C2 /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -175,8 +188,11 @@
 				DA2E2CF4265E9AA200EF285C /* TabBarControllerHome.swift */,
 				DA2E2D0D26612B8A00EF285C /* UserDefaults+Codable.swift */,
 				DA2E2D1726623F0700EF285C /* UnderKeyboardDistrib.swift */,
+				DAEA44FD268A5119004CA6C4 /* Localizable.strings */,
+				DAEA44F8268A5060004CA6C4 /* Localizable.stringsdict */,
 				DA88CB8321A687BF0094D1F8 /* Settings.bundle */,
 				DA246CB71F8A6E5E00A75ED1 /* Main.storyboard */,
+				DA160CB0268A3E7C001F6CD2 /* ExersizeChooserViewController.swift */,
 				DA2E2DA2267CB63E00EF285C /* WordSetsTableViewController.swift */,
 				DA9156272684CBCE00CAEB26 /* WordPhoneticsViewController.swift */,
 				DA246CBA1F8A6E5E00A75ED1 /* Assets.xcassets */,
@@ -320,6 +336,7 @@
 			knownRegions = (
 				en,
 				Base,
+				ru,
 			);
 			mainGroup = DA246CA71F8A6E5E00A75ED1;
 			productRefGroup = DA246CB11F8A6E5E00A75ED1 /* Products */;
@@ -341,8 +358,10 @@
 				DA246CBE1F8A6E5E00A75ED1 /* LaunchScreen.storyboard in Resources */,
 				DAD5E0D6219EF1400084FD1A /* Images.imagecatalog in Resources */,
 				DA88CB8421A687C00094D1F8 /* Settings.bundle in Resources */,
+				DAEA44FB268A5119004CA6C4 /* Localizable.strings in Resources */,
 				DA246CBB1F8A6E5E00A75ED1 /* Assets.xcassets in Resources */,
 				DA246CB91F8A6E5E00A75ED1 /* Main.storyboard in Resources */,
+				DAEA44F6268A5060004CA6C4 /* Localizable.stringsdict in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -385,6 +404,7 @@
 				DA86ADF423489FF7007E3221 /* String+.swift in Sources */,
 				DA9156282684CBCE00CAEB26 /* WordPhoneticsViewController.swift in Sources */,
 				DA2E2D90267A540900EF285C /* LWSpeechSynth.swift in Sources */,
+				DA160CB1268A3E7C001F6CD2 /* ExersizeChooserViewController.swift in Sources */,
 				DA246CB41F8A6E5E00A75ED1 /* AppDelegate.swift in Sources */,
 				DA4162F41F8BE62600165694 /* WordsModel.swift in Sources */,
 			);
@@ -426,6 +446,8 @@
 			isa = PBXVariantGroup;
 			children = (
 				DA246CB81F8A6E5E00A75ED1 /* Base */,
+				DA160CB3268A415B001F6CD2 /* en */,
+				DA160CB4268A42CA001F6CD2 /* ru */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -434,6 +456,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				DA246CBD1F8A6E5E00A75ED1 /* Base */,
+				DA160CB5268A42CA001F6CD2 /* ru */,
 			);
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
@@ -442,6 +465,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				DA246CD11F8AA30E00A75ED1 /* Base */,
+				DA160CB6268A42CA001F6CD2 /* ru */,
 			);
 			name = MainInterface.storyboard;
 			sourceTree = "<group>";
@@ -450,8 +474,27 @@
 			isa = PBXVariantGroup;
 			children = (
 				DAA16D6D24B60673003C28FD /* Base */,
+				DA160CB7268A42CA001F6CD2 /* ru */,
 			);
 			name = MainInterface.storyboard;
+			sourceTree = "<group>";
+		};
+		DAEA44F8268A5060004CA6C4 /* Localizable.stringsdict */ = {
+			isa = PBXVariantGroup;
+			children = (
+				DAEA44F7268A5060004CA6C4 /* ru */,
+				DAEA44FF268A516E004CA6C4 /* en */,
+			);
+			name = Localizable.stringsdict;
+			sourceTree = "<group>";
+		};
+		DAEA44FD268A5119004CA6C4 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				DAEA44FC268A5119004CA6C4 /* ru */,
+				DAEA44FE268A5164004CA6C4 /* en */,
+			);
+			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -461,6 +504,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -514,6 +558,7 @@
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = "";
 			};
 			name = Debug;
 		};
@@ -521,6 +566,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -567,6 +613,7 @@
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = "";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
