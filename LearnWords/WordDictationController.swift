@@ -13,6 +13,9 @@ import AVFoundation
 
 final class WordDictationController: UIViewController, UITextFieldDelegate {
     
+    // MARK: - Properties
+    
+    @IBOutlet weak var roundProgress: UIProgressView!
     @IBOutlet weak var prompt: UILabel!
     @IBOutlet weak var translationInput: UITextField!
     @IBOutlet weak var stackView: UIStackView!
@@ -33,6 +36,8 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
     
     var wordsInTest = [WordAndStat]()
     var shownWord: WordAndStat!
+    
+    private var progressStep: Float = 0.0
     
     var answerMatched: Bool = false {
         didSet {
@@ -72,8 +77,7 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
         underKeyboardLayoutConstraint.setup(stackBottomConstraint, view: view, minMargin: 0)
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .fastForward, target: self, action: #selector(nextTapped))
-        wordsInTest = Storage.wordsAndStat.shuffled()
-        Storage.shownWords = []
+        startRound()
         
         stackView.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
         stackView.alpha = 0
@@ -85,7 +89,9 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         navigationController?.hidesBarsOnTap = false
-        // if wordsInTest.isEmpty { wordsInTest = Storage.wordsAndStat.shuffled() }
+        if wordsInTest.isEmpty {
+            startRound()
+        }
         askQuestion()
     }
     
@@ -95,11 +101,12 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
 
             isKnown ? shownWord.increaseKnown() : shownWord.decreaseKnown()
             Storage.shownWords.append(shownWord)
+            roundProgress.progress = Float(Storage.shownWords.count) * progressStep
 //            //disable buttons and ShowNextButton Instead and autoSkip
 //            //prepareForNextQuestion()
             showAnswer(for: shownWord, isKnown: isKnown)
         } else { // this never happens for now
-            navigationController?.tabBarController?.selectedIndex = 0
+            navigationController?.popToRootViewController(animated: true)
         }
     }
     
@@ -112,12 +119,19 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
         afterAnswer(isKnown: false)
     }
     
+    func startRound() {
+        wordsInTest = Storage.wordsAndStat.shuffled()
+        Storage.shownWords = []
+        progressStep = 1.0 / Float(wordsInTest.count)
+    }
+    
     @objc func nextTapped() {
 //        showingQuestion = true
         if !wordsInTest.isEmpty {
             var knownWord = wordsInTest.remove(at: 0)
             knownWord.skiped += 1
             Storage.shownWords.append(knownWord)
+            roundProgress.progress = Float(Storage.shownWords.count) * progressStep
             askQuestion()
         }
         //prepareForNextQuestion()

@@ -12,7 +12,8 @@ import Speech
 class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate {
 
     // MARK: - Properties
-
+    
+    @IBOutlet weak var roundProgress: UIProgressView!
     @IBOutlet weak var stackView: UIStackView!
     @IBOutlet weak var prompt: UILabel!
 
@@ -35,6 +36,7 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
     var wordsInTest = [WordAndStat]()
     var shownWord: WordAndStat!
     
+    private var progressStep: Float = 0.0
     
     private let speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: LWUserDefaults.standard.languageToStudyPreference!))!
     
@@ -56,8 +58,7 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
         super.viewDidLoad()
 
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .fastForward, target: self, action: #selector(nextTapped))
-        wordsInTest = Storage.wordsAndStat.shuffled()
-        Storage.shownWords = []
+        startRound()
         
         stackView.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
         stackView.alpha = 0
@@ -69,7 +70,9 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
     override public func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         navigationController?.hidesBarsOnTap = false
-        if wordsInTest.isEmpty { wordsInTest = Storage.wordsAndStat.shuffled() }
+        if wordsInTest.isEmpty {
+            startRound()
+        }
         askQuestion()
         
             audioSession.requestRecordPermission()
@@ -303,6 +306,7 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
             shownWord = wordsInTest.remove(at: 0)
             isKnown ? shownWord.increaseKnown() : shownWord.decreaseKnown()
             Storage.shownWords.append(shownWord)
+            roundProgress.progress = Float(Storage.shownWords.count) * progressStep
 //            //disable buttons and ShowNextButton Instead and autoSkip
 //            //prepareForNextQuestion()
             showAnswer(for: shownWord, isKnown: isKnown)
@@ -320,12 +324,19 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
         afterAnswer(isKnown: false)
     }
     
+    func startRound() {
+        wordsInTest = Storage.wordsAndStat.shuffled()
+        Storage.shownWords = []
+        progressStep = 1.0 / Float(wordsInTest.count)
+    }
+    
     @objc func nextTapped() {
 //        showingQuestion = true
         if !wordsInTest.isEmpty {
             var knownWord = wordsInTest.remove(at: 0)
             knownWord.skiped += 1
             Storage.shownWords.append(knownWord)
+            roundProgress.progress = Float(Storage.shownWords.count) * progressStep
             askQuestion()
         }
         //prepareForNextQuestion()

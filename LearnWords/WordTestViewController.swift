@@ -17,6 +17,8 @@ import AVFoundation
 final class WordTestViewController: UIViewController {
     
     // MARK: - Properties
+    
+    @IBOutlet weak var roundProgress: UIProgressView!
     @IBOutlet weak var wordDefinition: UILabel! //?
     @IBOutlet weak var stackView: UIStackView!
     @IBOutlet weak var prompt: UILabel!
@@ -30,19 +32,19 @@ final class WordTestViewController: UIViewController {
     
     var wordsInTest = [WordAndStat]()
     var shownWord: WordAndStat!
-    var questionCounter: Int {
-        return wordsInTest.count
-    }
- //   var showingQuestion = true
- //   var reflibvc: ReferenceLibraryViewController
+
+    private var progressStep: Float = 0.0
+    //   var showingQuestion = true
 
     // MARK: -
     func afterAnswer(isKnown: Bool) {
         if !wordsInTest.isEmpty {
             shownWord = wordsInTest.remove(at: 0)
-
+            
             isKnown ? shownWord.increaseKnown() : shownWord.decreaseKnown()
+            
             Storage.shownWords.append(shownWord)
+            roundProgress.progress = Float(Storage.shownWords.count) * progressStep
 //            //disable buttons and ShowNextButton Instead and autoSkip
 //            //prepareForNextQuestion()
             showAnswer(for: shownWord, isKnown: isKnown)
@@ -104,8 +106,7 @@ final class WordTestViewController: UIViewController {
         super.viewDidLoad()
 
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .fastForward, target: self, action: #selector(nextTapped))
-        wordsInTest = Storage.wordsAndStat.shuffled()
-        Storage.shownWords = []
+        startRound()
         
         stackView.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
         stackView.alpha = 0
@@ -119,8 +120,9 @@ final class WordTestViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         navigationController?.hidesBarsOnTap = false
-        if wordsInTest.isEmpty { wordsInTest = Storage.wordsAndStat.shuffled() }
-        
+        if wordsInTest.isEmpty {
+            startRound()
+        }
         askQuestion()
     }
     
@@ -131,12 +133,21 @@ final class WordTestViewController: UIViewController {
     
     // MARK: - 
     
+    func startRound() {
+        wordsInTest = Storage.wordsAndStat.shuffled()
+        Storage.shownWords = []
+        progressStep = 1.0 / Float(wordsInTest.count)
+    }
+    
     @objc func nextTapped() {
 //        showingQuestion = true
         if !wordsInTest.isEmpty {
             var knownWord = wordsInTest.remove(at: 0)
+            
             knownWord.skiped += 1
+            
             Storage.shownWords.append(knownWord)
+            roundProgress.progress = Float(Storage.shownWords.count) * progressStep
             askQuestion()
         }
         //prepareForNextQuestion()
