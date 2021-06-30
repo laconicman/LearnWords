@@ -54,7 +54,14 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        afterAnswer(isKnown: false)
+        
+        
+        if let answer = textField.text?.lowercased().trimmingCharacters(in: .whitespaces),
+           split(answer, by: " " + ",").contains(wordsInTest[0].pair.components(separatedBy: "::")[0]) {
+            afterAnswer(isKnown: true)
+        } else {
+            afterAnswer(isKnown: false)
+        }
         textField.resignFirstResponder()
         return true
     }

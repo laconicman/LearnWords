@@ -7,13 +7,67 @@
 //
 
 import UIKit
+import MobileCoreServices
 
-class WordSetsTableViewController: UITableViewController {
+class WordSetsTableViewController: UITableViewController, UIDocumentPickerDelegate {
     
     
     // MARK: - IBActions
     
-    @IBAction func addNewWord(_ sender: UIBarButtonItem) {
+    @IBAction func importFromFile(_ sender: UIBarButtonItem) {
+        let types: [String] = [kUTTypeText as String]
+        let documentPicker = UIDocumentPickerViewController(documentTypes: types, in: .import)
+        documentPicker.delegate = self
+        documentPicker.modalPresentationStyle = .formSheet
+        self.present(documentPicker, animated: true, completion: nil)
+    }
+    
+
+
+    func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL])
+    {
+        guard let fileURL = urls.first else { return }
+        print("importing: \(fileURL)")
+        do
+        {
+            var importedWords = [WordAndStat]()
+            var importedWord = ""
+            let importedString = try String(contentsOf: fileURL, encoding: .utf8)
+            if  importedString.aproxWordCount > 1 {
+                let dictionaryEntries = split(importedString, by: "\n" + ";" + "\u{2028}")
+                importedWords = dictionaryEntries.compactMap( {
+                    let e = split($0, by: "|:")
+                    if e.first?.isEmpty ?? true || e.last?.isEmpty ?? true || e.count != 2 { return nil }
+                    let pair = e[0].trimmingCharacters(in: .whitespaces) + "::" + e[1].trimmingCharacters(in: .whitespaces)
+                    return WordAndStat(pair: pair.lowercased(), known: 0, unknown: 0, skiped: 0)
+                })
+                // TODO: Create a screen to verify and select `importedWords`. Check for duplicates
+                importedWords = importedWords.filter({ (impW) -> Bool in
+                    !Storage.wordsAndStat.contains { (storedW) -> Bool in // TODO: make temporary `Set`
+                        impW.pair == storedW.pair
+                    }
+                })
+                Storage.wordsAndStat.append(contentsOf: importedWords)
+                Storage.saveWords(Storage.wordsAndStat)
+            } else { // TODO: it later
+                // import one word
+//                importedWord = lemmas(from: importedString).first ?? ""
+//                performSegue(withIdentifier: "AddWord", sender: self)
+            }
+        }
+        catch
+        {
+            print("Import failed: \(error)")
+            let alert = UIAlertController(
+                title: NSLocalizedString("IMPORT_FAIL_TITLE", comment: "Title for failed import"),
+                message: error.localizedDescription,
+                preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: ""), style: .default, handler: nil))
+            self.present(alert, animated: true, completion: nil)
+        }
+    }
+    
+    @IBAction func addNewWordSet(_ sender: UIBarButtonItem) {
         // create our alert controller
         let ac = UIAlertController(title: NSLocalizedString("Add new word set", comment: "AlertController title"), message: nil, preferredStyle: .alert)
         

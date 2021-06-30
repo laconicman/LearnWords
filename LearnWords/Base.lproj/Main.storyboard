@@ -16,7 +16,7 @@
             <objects>
                 <tableViewController storyboardIdentifier="WordTable" title="LearnWords" id="Jy4-wo-DD5" customClass="WordTableViewController" customModule="LearnWords" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="Gah-Cb-jna">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="647"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <color key="tintColor" systemColor="systemOrangeColor"/>
@@ -232,7 +232,7 @@
             <objects>
                 <tableViewController id="Bgt-6g-kOE" customClass="SearchWordViewController" customModule="LearnWords" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="cZM-IK-3Lk">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="647"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <prototypes>
@@ -270,12 +270,29 @@
             </objects>
             <point key="canvasLocation" x="2448.8000000000002" y="527.58620689655174"/>
         </scene>
+        <!--Item-->
+        <scene sceneID="Eoc-ru-1UW">
+            <objects>
+                <navigationController id="wE2-zt-kta" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" title="Item" id="H9N-Y4-X4Z"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="BrJ-AT-8gB">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="IOT-Jj-vto" kind="relationship" relationship="rootViewController" id="EHL-eg-8EL"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="D4o-Ra-L0w" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1318" y="-514"/>
+        </scene>
         <!--Word Sets-->
         <scene sceneID="oDn-hz-Rcx">
             <objects>
-                <tableViewController hidesBottomBarWhenPushed="YES" id="IOT-Jj-vto" customClass="WordSetsTableViewController" customModule="LearnWords" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController id="IOT-Jj-vto" customClass="WordSetsTableViewController" customModule="LearnWords" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="6Q5-9e-K1K">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="647"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <color key="tintColor" systemColor="systemOrangeColor"/>
@@ -304,12 +321,20 @@
                             <outlet property="delegate" destination="IOT-Jj-vto" id="fFX-GY-Izj"/>
                         </connections>
                     </tableView>
+                    <tabBarItem key="tabBarItem" title="Manage Sets" image="folder" catalog="system" selectedImage="folder.fill" id="EEA-CH-FD5"/>
                     <navigationItem key="navigationItem" title="Word Sets" id="vYV-WR-kC4">
-                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="LDX-PH-WrW">
-                            <connections>
-                                <action selector="addNewWord:" destination="IOT-Jj-vto" id="Icv-XQ-4Na"/>
-                            </connections>
-                        </barButtonItem>
+                        <rightBarButtonItems>
+                            <barButtonItem systemItem="add" id="LDX-PH-WrW">
+                                <connections>
+                                    <action selector="addNewWordSet:" destination="IOT-Jj-vto" id="Icv-XQ-4Na"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem systemItem="organize" id="u2L-Ej-8XW">
+                                <connections>
+                                    <action selector="importFromFile:" destination="IOT-Jj-vto" id="6Uq-QZ-JJu"/>
+                                </connections>
+                            </barButtonItem>
+                        </rightBarButtonItems>
                     </navigationItem>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Cb8-NG-CBm" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -369,6 +394,7 @@
                     </tabBar>
                     <connections>
                         <segue destination="tq9-1q-YoH" kind="relationship" relationship="viewControllers" id="gc3-ug-0So"/>
+                        <segue destination="wE2-zt-kta" kind="relationship" relationship="viewControllers" id="j2I-GY-YPp"/>
                         <segue destination="yWy-gw-Hcv" kind="relationship" relationship="viewControllers" id="1p1-oZ-rvm"/>
                     </connections>
                 </tabBarController>
@@ -536,7 +562,7 @@
                                     <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="UdG-Da-pa4">
                                         <rect key="frame" x="0.0" y="0.0" width="343" height="23"/>
                                         <subviews>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text=" Total in set" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="9" translatesAutoresizingMaskIntoConstraints="NO" id="QVi-no-H8N">
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text=" Total in set" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="8" translatesAutoresizingMaskIntoConstraints="NO" id="QVi-no-H8N">
                                                 <rect key="frame" x="0.0" y="0.0" width="282" height="23"/>
                                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle2"/>
                                                 <nil key="textColor"/>
@@ -852,10 +878,13 @@
         </designable>
     </designables>
     <inferredMetricsTieBreakers>
-        <segue reference="2Ii-3h-c3T"/>
+        <segue reference="EHL-eg-8EL"/>
+        <segue reference="1Cz-UI-kqB"/>
     </inferredMetricsTieBreakers>
     <resources>
+        <image name="folder" catalog="system" width="128" height="97"/>
         <image name="folder.badge.questionmark" catalog="system" width="128" height="91"/>
+        <image name="folder.fill" catalog="system" width="128" height="97"/>
         <image name="graduationcap" catalog="system" width="128" height="106"/>
         <image name="graduationcap.fill" catalog="system" width="128" height="108"/>
         <image name="house" catalog="system" width="128" height="106"/>

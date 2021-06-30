@@ -60,7 +60,7 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         //let currentLang = AVSpeechSynthesisVoice.currentLanguageCode()
         
         //Rebuilt in Storyboard
-        //navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addNewWord))
+        //navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addNewWordSet))
         //let startButton = UIBarButtonItem(barButtonSystemItem: .play, target: self, action: #selector(startTest))
         //let autoPlayButton = UIBarButtonItem(barButtonSystemItem: .reply, target: self, action: #selector(autoPlayTest))
         //navigationItem.rightBarButtonItems = [startButton, autoPlayButton]
@@ -189,7 +189,7 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
 //        vc.wordsInTest = wordsAndStat
 //        navigationController?.pushViewController(vc, animated: true)
 //    }
-    
+    // TODO: delete
     @IBAction func gotoWordSets(_ sender: UIBarButtonItem) {
         // navigationItem.rightBarButtonItems?[1].isEnabled = !(navigationItem.rightBarButtonItems?[1].isEnabled)!
     }
