@@ -12,14 +12,14 @@ extension UserDefaults {
     func decodeAndLoad<T: Codable>(_ forKey: String) -> T? {
         
         guard let data = self.data(forKey: forKey) else {
-            print("No data for key \(forKey) from UserDefaults.")
+            debugLog("No data for key \(forKey) from UserDefaults.")
             return nil
         }
         
         let decoder = JSONDecoder()
         
         guard  let loaded = try? decoder.decode(T.self, from: data) else {
-            print("Failed to decode data for key \(forKey) from UserDefaults.")
+            debugLog("Failed to decode data for key \(forKey) from UserDefaults.")
             self.removeObject(forKey: forKey) // to overwite with new data format later
             return nil
         }
@@ -30,7 +30,7 @@ extension UserDefaults {
         encoder.outputFormatting = .sortedKeys
         if let dataToSave = try? encoder.encode(codableVar) {
             self.set(dataToSave, forKey: forKey) } else {
-                print("Failed to save data for key \(forKey).") }
+                debugLog("Failed to save data for key \(forKey).") }
         
     }
 }

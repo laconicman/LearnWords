@@ -24,7 +24,7 @@ class TodayViewController: UIViewController, NCWidgetProviding, UITableViewDataS
             if let widgetSize = extensionContext?.widgetMaximumSize(for: widgetActiveDisplayMode) {
                 if widgetActiveDisplayMode == .compact {
                     tableView.rowHeight = widgetSize.height / 2 // TODO: Use Mod here and font size
-                    print("Widget size: \(widgetSize)")
+                    debugLog("Widget size: \(widgetSize)")
                 } else if  widgetActiveDisplayMode == .expanded {
                     if widgetSize.height > tableView.contentSize.height {
                         self.preferredContentSize = CGSize(width: 0, height: 80)
@@ -42,11 +42,11 @@ class TodayViewController: UIViewController, NCWidgetProviding, UITableViewDataS
         
         if let userDefaultsGroup = UserDefaults(suiteName: "group.club.laconic.LearnWords") {
             if let savedWords = userDefaultsGroup.stringArray(forKey: "Words") {
-                print("Loaded words: \(savedWords)")
+                debugLog("Loaded words: \(savedWords)")
                 //            if let savedWords = defaults.object(forKey: "Words") as? [String] {
                 words = savedWords
             } else {
-                print("Failed to load user defaults from: group.club.laconic.LearnWords")
+                debugLog("Failed to load user defaults from: group.club.laconic.LearnWords")
             }
         }
         
@@ -105,13 +105,13 @@ class TodayViewController: UIViewController, NCWidgetProviding, UITableViewDataS
         
         if let defaults = UserDefaults(suiteName: "group.club.laconic.LearnWords") {
             if let savedWords = defaults.stringArray(forKey: "Words") {
-                print(savedWords)
+                debugLog(savedWords.description)
                 //            if let savedWords = defaults.object(forKey: "Words") as? [String] {
                 words = savedWords
                 completionHandler(NCUpdateResult.newData)
             }
         } else {
-            print("No user defaults")
+            debugLog("No user defaults")
             completionHandler(NCUpdateResult.failed)
         }
         

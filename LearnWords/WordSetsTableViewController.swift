@@ -27,7 +27,7 @@ class WordSetsTableViewController: UITableViewController, UIDocumentPickerDelega
     func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL])
     {
         guard let fileURL = urls.first else { return }
-        print("importing: \(fileURL)")
+        debugLog("importing: \(fileURL)")
         do
         {
             var importedWords = [WordAndStat]()
@@ -57,7 +57,7 @@ class WordSetsTableViewController: UITableViewController, UIDocumentPickerDelega
         }
         catch
         {
-            print("Import failed: \(error)")
+            debugLog("Import failed: \(error)")
             let alert = UIAlertController(
                 title: NSLocalizedString("IMPORT_FAIL_TITLE", comment: "Title for failed import"),
                 message: error.localizedDescription,
@@ -114,6 +114,13 @@ class WordSetsTableViewController: UITableViewController, UIDocumentPickerDelega
         let cell = tableView.dequeueReusableCell(withIdentifier: "wordSetsCell", for: indexPath)
         cell.textLabel?.text = Storage.wordSets[indexPath.row]
         cell.accessoryType = (cell.textLabel?.text == Storage.currentWordSet) ? .checkmark : .none
+        
+        DispatchQueue.main.async {
+            let wSet = Storage.getWordSet(name: Storage.wordSets[indexPath.row])
+            cell.detailTextLabel?.text = "Total " + pluralizedWordCount(wSet.count) + ". Learned " + pluralizedWordCount(wSet.reduce(0, { result, wAs in
+                if wAs.known == WordAndStat.maxKnownLevel { return result + 1 } else { return result }
+            }))
+        }
         return cell
     }
     

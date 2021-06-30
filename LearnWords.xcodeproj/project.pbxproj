@@ -39,6 +39,8 @@
 		DAD5E0D6219EF1400084FD1A /* Images.imagecatalog in Resources */ = {isa = PBXBuildFile; fileRef = DAD5E0D5219EF1400084FD1A /* Images.imagecatalog */; };
 		DAEA44F6268A5060004CA6C4 /* Localizable.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = DAEA44F8268A5060004CA6C4 /* Localizable.stringsdict */; };
 		DAEA44FB268A5119004CA6C4 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = DAEA44FD268A5119004CA6C4 /* Localizable.strings */; };
+		DAEA4501268CD157004CA6C4 /* Debug.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAEA4500268CD157004CA6C4 /* Debug.swift */; };
+		DAEA4502268CD507004CA6C4 /* Debug.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAEA4500268CD157004CA6C4 /* Debug.swift */; };
 		DAEC8DCE219DF691009097C2 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAEC8DCD219DF691009097C2 /* Settings.swift */; };
 /* End PBXBuildFile section */
 
@@ -121,6 +123,7 @@
 		DAEA44FC268A5119004CA6C4 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
 		DAEA44FE268A5164004CA6C4 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		DAEA44FF268A516E004CA6C4 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = en; path = en.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
+		DAEA4500268CD157004CA6C4 /* Debug.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Debug.swift; sourceTree = "<group>"; };
 		DAEC8DCD219DF691009097C2 /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -195,6 +198,7 @@
 				DA160CB0268A3E7C001F6CD2 /* ExersizeChooserViewController.swift */,
 				DA2E2DA2267CB63E00EF285C /* WordSetsTableViewController.swift */,
 				DA9156272684CBCE00CAEB26 /* WordPhoneticsViewController.swift */,
+				DAEA4500268CD157004CA6C4 /* Debug.swift */,
 				DA246CBA1F8A6E5E00A75ED1 /* Assets.xcassets */,
 				DA246CBC1F8A6E5E00A75ED1 /* LaunchScreen.storyboard */,
 				DA246CBF1F8A6E5E00A75ED1 /* Info.plist */,
@@ -403,6 +407,7 @@
 				DA2E2DA3267CB63E00EF285C /* WordSetsTableViewController.swift in Sources */,
 				DA86ADF423489FF7007E3221 /* String+.swift in Sources */,
 				DA9156282684CBCE00CAEB26 /* WordPhoneticsViewController.swift in Sources */,
+				DAEA4501268CD157004CA6C4 /* Debug.swift in Sources */,
 				DA2E2D90267A540900EF285C /* LWSpeechSynth.swift in Sources */,
 				DA160CB1268A3E7C001F6CD2 /* ExersizeChooserViewController.swift in Sources */,
 				DA246CB41F8A6E5E00A75ED1 /* AppDelegate.swift in Sources */,
@@ -415,6 +420,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DA246CCF1F8AA30E00A75ED1 /* TodayViewController.swift in Sources */,
+				DAEA4502268CD507004CA6C4 /* Debug.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

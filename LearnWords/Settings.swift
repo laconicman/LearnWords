@@ -46,11 +46,11 @@ final class LWUserDefaults {
         
         for preference in preferences {
             guard let key = preference["Key"] as? String else {
-                debugPrint("Key not found in preferences")
+                debugLog("Key not found in preferences")
                 continue
             }
             defaultsToRegister[key] = preference["DefaultValue"]
-            debugPrint(key, " ", preference["DefaultValue"] ?? "Undefined value in preference")
+            debugLog(key, " ", preference["DefaultValue"] ?? "Undefined value in preference")
         }
         //userDefaultsGroup.register(defaults: defaultsToRegister) //This is NOT done automatically for the first launch
         userDefaults.register(defaults: defaultsToRegister)

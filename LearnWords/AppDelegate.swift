@@ -69,7 +69,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // FIXME: This is unused for now, but can be helpfull in future
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
         let urlPath : String = url.absoluteString
-        print(#function, urlPath)
+        // print(#function, urlPath)
+        debugLog(urlPath)
         if urlPath.contains("shareaction"){
             //here go to firstViewController view controller
             self.window = UIWindow(frame: UIScreen.main.bounds)

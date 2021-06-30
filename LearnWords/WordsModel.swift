@@ -12,14 +12,15 @@ struct WordAndStat: Codable {
     private(set) var known: Int
     var unknown: Int
     var skiped: Int
+    static let maxKnownLevel = 5
     
     // MARK: - Setters
-
+    
     /// Increases the level in 1, with a maximum of 5.
     mutating func increaseKnown() {
-        known = min(known + 1, 5)
+        known = min(known + 1, Self.maxKnownLevel)
     }
-
+    
     /// Decreases the level in 1, with a minimum of 0.
     mutating func decreaseKnown() {
         known = max(known - 1, 0)
@@ -53,11 +54,12 @@ struct Storage {
         }
         set {
             userDefaultsGroup.set(newValue, forKey: currentSetKey)
-            if let savedWords: [WordAndStat] = userDefaultsGroup.decodeAndLoad(newValue) {
-                    Storage.wordsAndStat = savedWords
-                } else {
-                    Storage.wordsAndStat = []
-                }
+            Storage.wordsAndStat = getWordSet(name: newValue)
+//            if let savedWords: [WordAndStat] = userDefaultsGroup.decodeAndLoad(newValue) {
+//                Storage.wordsAndStat = savedWords
+//            } else {
+//                Storage.wordsAndStat = []
+//            }
         }
     }
     
@@ -111,6 +113,14 @@ struct Storage {
             currentWordSet = wsf
         }
         userDefaultsGroup.removeObject(forKey: removed)
+    }
+    
+    static func getWordSet(name: String) -> [WordAndStat] {
+        if let savedWords: [WordAndStat] = userDefaultsGroup.decodeAndLoad(name) {
+            return savedWords
+        } else {
+            return []
+        }
     }
 }
 
