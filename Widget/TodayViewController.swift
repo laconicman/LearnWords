@@ -104,7 +104,7 @@ class TodayViewController: UIViewController, NCWidgetProviding, UITableViewDataS
         // Perform any setup necessary in order to update the view.
         
         if let defaults = UserDefaults(suiteName: "group.club.laconic.LearnWords") {
-            if let savedWords = defaults.stringArray(forKey: "Words") {
+            if let savedWords = defaults.stringArray(forKey: "WordsAndStat") {
                 debugLog(savedWords.description)
                 //            if let savedWords = defaults.object(forKey: "Words") as? [String] {
                 words = savedWords

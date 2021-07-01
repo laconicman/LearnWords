@@ -50,7 +50,7 @@ final class LWUserDefaults {
                 continue
             }
             defaultsToRegister[key] = preference["DefaultValue"]
-            debugLog(key, " ", preference["DefaultValue"] ?? "Undefined value in preference")
+            debugLog(key + " " + preference["DefaultValue"].debugDescription)
         }
         //userDefaultsGroup.register(defaults: defaultsToRegister) //This is NOT done automatically for the first launch
         userDefaults.register(defaults: defaultsToRegister)

@@ -241,19 +241,20 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "Word", for: indexPath)
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "Word", for: indexPath) as? WordTableViewCell else { return UITableViewCell() }
         
         let word = wordsInTable[indexPath.row]
         let split = word.pair.components(separatedBy: "::")
 
         
         if #available(iOS 13.0, *) {
-            cell.textLabel?.text = split[0]
-            cell.imageView?.image = UIImage(systemName: "\(word.known).square")
+            cell.leftTextLabel?.text = split[0]
+            // cell.imageView?.image = UIImage(systemName: "\(word.known).square")
+            cell.progressView.angle = (360.0 / Double(WordAndStat.maxKnownLevel)) * Double(word.known)
         } else {
-            cell.textLabel?.text = "\(word.known) \(split[0])"
+            cell.leftTextLabel?.text = "\(word.known) \(split[0])"
         }
-        cell.detailTextLabel?.text = split[1]
+        cell.rightTextLabel?.text = split[1]
         
         return cell
     }
@@ -261,14 +262,14 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
-        if let cell = tableView.cellForRow(at: indexPath) {
-            if cell.detailTextLabel?.text == "" {
+        if let cell = tableView.cellForRow(at: indexPath) as? WordTableViewCell {
+            if cell.rightTextLabel?.text == "" {
                 let word = wordsInTable[indexPath.row]
 
                 let split = word.pair.components(separatedBy: "::")
-                cell.detailTextLabel?.text = split[1]
+                cell.rightTextLabel?.text = split[1]
             } else {
-                cell.detailTextLabel?.text = ""
+                cell.rightTextLabel?.text = ""
             }
         }
     }

@@ -119,7 +119,7 @@ class WordSetsTableViewController: UITableViewController, UIDocumentPickerDelega
             let wSet = Storage.getWordSet(name: Storage.wordSets[indexPath.row])
             cell.detailTextLabel?.text = "Total " + pluralizedWordCount(wSet.count) + ". Learned " + pluralizedWordCount(wSet.reduce(0, { result, wAs in
                 if wAs.known == WordAndStat.maxKnownLevel { return result + 1 } else { return result }
-            }))
+            })) + "."
         }
         return cell
     }

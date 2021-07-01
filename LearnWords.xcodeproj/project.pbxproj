@@ -41,6 +41,8 @@
 		DAEA44FB268A5119004CA6C4 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = DAEA44FD268A5119004CA6C4 /* Localizable.strings */; };
 		DAEA4501268CD157004CA6C4 /* Debug.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAEA4500268CD157004CA6C4 /* Debug.swift */; };
 		DAEA4502268CD507004CA6C4 /* Debug.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAEA4500268CD157004CA6C4 /* Debug.swift */; };
+		DAEA4504268DD835004CA6C4 /* WordTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAEA4503268DD835004CA6C4 /* WordTableViewCell.swift */; };
+		DAEA4506268DDABC004CA6C4 /* KDCircularProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAEA4505268DDABC004CA6C4 /* KDCircularProgress.swift */; };
 		DAEC8DCE219DF691009097C2 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAEC8DCD219DF691009097C2 /* Settings.swift */; };
 /* End PBXBuildFile section */
 
@@ -124,6 +126,8 @@
 		DAEA44FE268A5164004CA6C4 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		DAEA44FF268A516E004CA6C4 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = en; path = en.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
 		DAEA4500268CD157004CA6C4 /* Debug.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Debug.swift; sourceTree = "<group>"; };
+		DAEA4503268DD835004CA6C4 /* WordTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordTableViewCell.swift; sourceTree = "<group>"; };
+		DAEA4505268DDABC004CA6C4 /* KDCircularProgress.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KDCircularProgress.swift; sourceTree = "<group>"; };
 		DAEC8DCD219DF691009097C2 /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -184,6 +188,7 @@
 				DA2E2D9A267B683400EF285C /* General.swift */,
 				DA246CB31F8A6E5E00A75ED1 /* AppDelegate.swift */,
 				DA246CB51F8A6E5E00A75ED1 /* WordTableViewController.swift */,
+				DAEA4503268DD835004CA6C4 /* WordTableViewCell.swift */,
 				DA4162F51F8C219500165694 /* GradientButton.swift */,
 				DA4162F31F8BE62600165694 /* WordsModel.swift */,
 				DA246CDD1F8AE3DA00A75ED1 /* WordTestViewController.swift */,
@@ -198,6 +203,7 @@
 				DA160CB0268A3E7C001F6CD2 /* ExersizeChooserViewController.swift */,
 				DA2E2DA2267CB63E00EF285C /* WordSetsTableViewController.swift */,
 				DA9156272684CBCE00CAEB26 /* WordPhoneticsViewController.swift */,
+				DAEA4505268DDABC004CA6C4 /* KDCircularProgress.swift */,
 				DAEA4500268CD157004CA6C4 /* Debug.swift */,
 				DA246CBA1F8A6E5E00A75ED1 /* Assets.xcassets */,
 				DA246CBC1F8A6E5E00A75ED1 /* LaunchScreen.storyboard */,
@@ -410,6 +416,8 @@
 				DAEA4501268CD157004CA6C4 /* Debug.swift in Sources */,
 				DA2E2D90267A540900EF285C /* LWSpeechSynth.swift in Sources */,
 				DA160CB1268A3E7C001F6CD2 /* ExersizeChooserViewController.swift in Sources */,
+				DAEA4506268DDABC004CA6C4 /* KDCircularProgress.swift in Sources */,
+				DAEA4504268DD835004CA6C4 /* WordTableViewCell.swift in Sources */,
 				DA246CB41F8A6E5E00A75ED1 /* AppDelegate.swift in Sources */,
 				DA4162F41F8BE62600165694 /* WordsModel.swift in Sources */,
 			);

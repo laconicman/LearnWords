@@ -49,10 +49,10 @@ func debugLog(_ message: String = "called", file: String = #file, function: Stri
 #if true
 
 // weed out NSLog usage
-@available(iOS, deprecated: 1.0, message: "Convert to debugLog")
-public func NSLog(_ format: String, _ args: CVarArg...) {}
-
-
-@available(iOS, deprecated: 1.0, message: "Convert to debugLog")
-public func print(_ format: String, _ args: CVarArg...) {}
+//@available(iOS, deprecated: 1.0, message: "Convert to debugLog")
+//public func NSLog(_ format: String, _ args: CVarArg...) {}
+//
+//
+//@available(iOS, deprecated: 1.0, message: "Convert to debugLog")
+//public func print(_ items: Any..., separator: String = " ", terminator: String = "\n") {}
 #endif
