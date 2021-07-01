@@ -10,16 +10,6 @@
 	<array>
 		<dict>
 			<key>Type</key>
-			<string>PSTitleValueSpecifier</string>
-			<key>Title</key>
-			<string>Just a title</string>
-			<key>Key</key>
-			<string>title</string>
-			<key>DefaultValue</key>
-			<string>Just</string>
-		</dict>
-		<dict>
-			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 			<key>Title</key>
 			<string>Languages</string>

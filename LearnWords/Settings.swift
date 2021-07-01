@@ -46,7 +46,7 @@ final class LWUserDefaults {
         
         for preference in preferences {
             guard let key = preference["Key"] as? String else {
-                debugLog("Key not found in preferences")
+                debugLog("Key not found in preferences \(preference)")
                 continue
             }
             defaultsToRegister[key] = preference["DefaultValue"]
