@@ -31,7 +31,7 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
         // try? audioSession.setCategory(.playback, mode: .measurement, options: [])
         try? audioSession.setCategory(.playback, mode: .default, policy: .default, options: [])
         try? audioSession.setActive(true, options: .notifyOthersOnDeactivation)
-        LWSpeechSynth.standard.speak(utteranceString: NSAttributedString(string: wordsInTest[0].pair.components(separatedBy: "::")[0]), language: LWUserDefaults.standard.languageToStudyPreference!)
+        LWSpeechSynth.standard.speak(utteranceString: NSAttributedString(string: wordsInTest[0].firstWord), language: LWUserDefaults.standard.languageToStudyPreference!)
     }
     var wordsInTest = [WordAndStat]()
     var shownWord: WordAndStat!
@@ -173,10 +173,10 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
                 isFinal = result.isFinal
                 // print("Text \(result.bestTranscription.formattedString)")
                 // print("Transcriptions \(result.transcriptions.map{ $0.formattedString.lowercased() })")
-                if !(self?.wordsInTest.isEmpty ?? true),  result.bestTranscription.formattedString.lowercased().contains(self?.wordsInTest[0].pair.components(separatedBy: "::")[0] ?? "") /* && isFinal */ {
+                if !(self?.wordsInTest.isEmpty ?? true),  result.bestTranscription.formattedString.lowercased().contains(self?.wordsInTest[0].firstWord ?? "") /* && isFinal */ {
                     self?.recordButtonTapped() // stop the audio
                     
-                    self?.recognized.text = self?.wordsInTest[0].pair.components(separatedBy: "::")[0]
+                    self?.recognized.text = self?.wordsInTest[0].firstWord
                     self?.afterAnswer(isKnown: true)
                 } else {
                    // self.recognized.text = ""
@@ -263,7 +263,7 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
             navigationController?.popToRootViewController(animated: true)
             return
         }
-        prompt.attributedText = NSAttributedString(string: wordsInTest[0].pair.components(separatedBy: "::")[1])
+        prompt.attributedText = NSAttributedString(string: wordsInTest[0].secondWord)
         if LWUserDefaults.standard.pronounceQuestionsPreference {
             LWSpeechSynth.standard.speak(utteranceString: prompt.attributedText!, language: LWUserDefaults.standard.nativeLanguagePreference!)
         }
@@ -353,7 +353,7 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
                             self?.forgotButton?.isEnabled = false
                             if isKnown { self?.knowButton?.layer.opacity = 0.1 } else { self?.forgotButton?.layer.opacity = 0.1 }
                             self?.recognized.attributedText = NSAttributedString(
-                                string: shownWord.pair.components(separatedBy: "::")[0],
+                                string: shownWord.firstWord,
                                 attributes: [.foregroundColor: isKnown ? UIColor(red: 0, green: 0.7, blue: 0, alpha: 1) : UIColor(red: 0.7, green: 0.0, blue: 0, alpha: 1)])
                             debugLog("begin transition")
                             self?.recognized.textColor = isKnown ? UIColor(red: 0, green: 0.7, blue: 0, alpha: 1) : UIColor(red: 0.7, green: 0.0, blue: 0, alpha: 1)

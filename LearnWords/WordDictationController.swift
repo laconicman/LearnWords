@@ -31,7 +31,7 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
     }
     
     @IBAction func listenAction(_ sender: Any) {
-        LWSpeechSynth.standard.speak(utteranceString: NSAttributedString(string: wordsInTest[0].pair.components(separatedBy: "::")[0]), language: LWUserDefaults.standard.languageToStudyPreference!)
+        LWSpeechSynth.standard.speak(utteranceString: NSAttributedString(string: wordsInTest[0].firstWord), language: LWUserDefaults.standard.languageToStudyPreference!)
     }
     
     var wordsInTest = [WordAndStat]()
@@ -53,7 +53,7 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
     
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         let answer = textField.text?.replacingCharacters(in: Range(range, in: textField.text!)!, with: string).lowercased().trimmingCharacters(in: .whitespaces)
-        answerMatched = answer == wordsInTest[0].pair.components(separatedBy: "::")[0]
+        answerMatched = answer == wordsInTest[0].firstWord
         // print("Answer matched \(answerMatched)", string, textField.text, wordsInTest[0].pair.components(separatedBy: "::")[0])
         return true
     }
@@ -62,7 +62,7 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
         
         
         if let answer = textField.text?.lowercased().trimmingCharacters(in: .whitespaces),
-           split(answer, by: " " + ",").contains(wordsInTest[0].pair.components(separatedBy: "::")[0]) {
+           split(answer, by: " " + ",").contains(wordsInTest[0].firstWord) {
             afterAnswer(isKnown: true)
         } else {
             afterAnswer(isKnown: false)
@@ -148,7 +148,7 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
                             self?.forgotButton?.isEnabled = false
                             if isKnown { self?.knowButton?.layer.opacity = 0.1 } else { self?.forgotButton?.layer.opacity = 0.1 }
                             self?.translationInput.attributedText = NSAttributedString(
-                                string: shownWord.pair.components(separatedBy: "::")[0],
+                                string: shownWord.firstWord,
                                 attributes: [.foregroundColor: isKnown ? UIColor(red: 0, green: 0.7, blue: 0, alpha: 1) : UIColor(red: 0.7, green: 0.0, blue: 0, alpha: 1)])
                             self?.translationInput.textColor = isKnown ? UIColor(red: 0, green: 0.7, blue: 0, alpha: 1) : UIColor(red: 0.7, green: 0.0, blue: 0, alpha: 1)
         }) { [weak self] (ended) in
@@ -174,7 +174,7 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
             navigationController?.popToRootViewController(animated: true)
             return
         }
-        prompt.attributedText = NSAttributedString(string: wordsInTest[0].pair.components(separatedBy: "::")[1])
+        prompt.attributedText = NSAttributedString(string: wordsInTest[0].secondWord)
         if LWUserDefaults.standard.pronounceQuestionsPreference {
             LWSpeechSynth.standard.speak(utteranceString: prompt.attributedText!, language: LWUserDefaults.standard.nativeLanguagePreference!)
         }

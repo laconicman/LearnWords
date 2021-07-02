@@ -38,13 +38,14 @@ class WordSetsTableViewController: UITableViewController, UIDocumentPickerDelega
                 importedWords = dictionaryEntries.compactMap( {
                     let e = split($0, by: "|:")
                     if e.first?.isEmpty ?? true || e.last?.isEmpty ?? true || e.count != 2 { return nil }
-                    let pair = e[0].trimmingCharacters(in: .whitespaces) + "::" + e[1].trimmingCharacters(in: .whitespaces)
-                    return WordAndStat(pair: pair.lowercased(), known: 0, unknown: 0, skiped: 0)
+                    let f = e[0].trimmingCharacters(in: .whitespaces)
+                    let s = e[1].trimmingCharacters(in: .whitespaces)
+                    return WordAndStat(firstWord: f.canonicalise(), secondWord: s.canonicalise(), known: 0, unknown: 0, skiped: 0)
                 })
                 // TODO: Create a screen to verify and select `importedWords`. Check for duplicates
                 importedWords = importedWords.filter({ (impW) -> Bool in
                     !Storage.wordsAndStat.contains { (storedW) -> Bool in // TODO: make temporary `Set`
-                        impW.pair == storedW.pair
+                        impW.firstWord  == storedW.firstWord
                     }
                 })
                 Storage.wordsAndStat.append(contentsOf: importedWords)
@@ -117,7 +118,7 @@ class WordSetsTableViewController: UITableViewController, UIDocumentPickerDelega
         
         DispatchQueue.main.async {
             let wSet = Storage.getWordSet(name: Storage.wordSets[indexPath.row])
-            cell.detailTextLabel?.text = "Total " + pluralizedWordCount(wSet.count) + ". Learned " + pluralizedWordCount(wSet.reduce(0, { result, wAs in
+            cell.detailTextLabel?.text = NSLocalizedString("Total ", comment: "Label total words") + pluralizedWordCount(wSet.count) + ". " + NSLocalizedString("Learned ", comment: "Label learned words") + pluralizedWordCount(wSet.reduce(0, { result, wAs in
                 if wAs.known == WordAndStat.maxKnownLevel { return result + 1 } else { return result }
             })) + "."
         }

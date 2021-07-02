@@ -87,13 +87,14 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
                 importedWords = dictionaryEntries.compactMap( {
                     let e = split($0, by: "|:")
                     if e.first?.isEmpty ?? true || e.last?.isEmpty ?? true || e.count != 2 { return nil }
-                    let pair = e[0].trimmingCharacters(in: .whitespaces) + "::" + e[1].trimmingCharacters(in: .whitespaces)
-                    return WordAndStat(pair: pair.lowercased(), known: 0, unknown: 0, skiped: 0)
+                    let f = e[0].trimmingCharacters(in: .whitespaces)
+                    let s = e[1].trimmingCharacters(in: .whitespaces)
+                    return WordAndStat(firstWord: f, secondWord: s, known: 0, unknown: 0, skiped: 0)
                 })
                 // TODO: Create a screen to verify and select `importedWords`. Check for duplicates
                 importedWords = importedWords.filter({ (impW) -> Bool in
                     !Storage.wordsAndStat.contains { (storedW) -> Bool in // TODO: make temporary `Set`
-                        impW.pair == storedW.pair
+                        impW.firstWord == storedW.firstWord
                     }
                 })
                 Storage.wordsAndStat.append(contentsOf: importedWords)
@@ -189,10 +190,6 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
 //        vc.wordsInTest = wordsAndStat
 //        navigationController?.pushViewController(vc, animated: true)
 //    }
-    // TODO: delete
-    @IBAction func gotoWordSets(_ sender: UIBarButtonItem) {
-        // navigationItem.rightBarButtonItems?[1].isEnabled = !(navigationItem.rightBarButtonItems?[1].isEnabled)!
-    }
 
     private func checkInstalledLocales() {
         /*if let languageListPreferences = userDefaultsGroup?.stringArray(forKey: "LanguageList")  {
@@ -244,17 +241,10 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "Word", for: indexPath) as? WordTableViewCell else { return UITableViewCell() }
         
         let word = wordsInTable[indexPath.row]
-        let split = word.pair.components(separatedBy: "::")
-
-        
-        if #available(iOS 13.0, *) {
-            cell.leftTextLabel?.text = split[0]
-            // cell.imageView?.image = UIImage(systemName: "\(word.known).square")
-            cell.progressView.angle = (360.0 / Double(WordAndStat.maxKnownLevel)) * Double(word.known)
-        } else {
-            cell.leftTextLabel?.text = "\(word.known) \(split[0])"
-        }
-        cell.rightTextLabel?.text = split[1]
+        cell.leftTextLabel?.text = word.firstWord
+        // cell.imageView?.image = UIImage(systemName: "\(word.known).square")
+        cell.progressView.angle = (360.0 / Double(WordAndStat.maxKnownLevel)) * Double(word.known)
+        cell.rightTextLabel?.text = word.secondWord
         
         return cell
     }
@@ -265,9 +255,7 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         if let cell = tableView.cellForRow(at: indexPath) as? WordTableViewCell {
             if cell.rightTextLabel?.text == "" {
                 let word = wordsInTable[indexPath.row]
-
-                let split = word.pair.components(separatedBy: "::")
-                cell.rightTextLabel?.text = split[1]
+                cell.rightTextLabel?.text = word.secondWord
             } else {
                 cell.rightTextLabel?.text = ""
             }
@@ -300,7 +288,10 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
     }
     
     func filterRows(for searchText: String) {
-        filteredWords = Storage.wordsAndStat.filter{$0.pair.lowercased().contains(searchText.lowercased())}
+        filteredWords = Storage.wordsAndStat.filter{
+            $0.firstWord.lowercased().contains(searchText.lowercased()) ||
+                $0.secondWord.lowercased().contains(searchText.lowercased())
+        }
         tableView.reloadData()
     }
     

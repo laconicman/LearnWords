@@ -8,7 +8,8 @@
 
 import Foundation
 struct WordAndStat: Codable {
-    var pair: String
+    var firstWord: String
+    var secondWord: String
     private(set) var known: Int
     var unknown: Int
     var skiped: Int
@@ -64,15 +65,15 @@ struct Storage {
     }
     
     static func saveInitialValues () {
-        wordsAndStat.append(WordAndStat(pair: "bear::медведь",known: 0,unknown: 0,skiped: 0)) // TODO: Change format to somethig like "медведь - bear, bear2"
-        wordsAndStat.append(WordAndStat(pair: "camel::верблюд", known: 0,unknown: 0,skiped: 0))
-        wordsAndStat.append(WordAndStat(pair: "cow::корова", known: 0,unknown: 0,skiped: 0))
-        wordsAndStat.append(WordAndStat(pair: "fox::лиса", known: 0,unknown: 0,skiped: 0))
-        wordsAndStat.append(WordAndStat(pair: "goat::коза", known: 0,unknown: 0,skiped: 0))
-        wordsAndStat.append(WordAndStat(pair: "monkey::обезьяна", known: 0,unknown: 0,skiped: 0))
-        wordsAndStat.append(WordAndStat(pair: "pig::свинья", known: 0,unknown: 0,skiped: 0))
-        wordsAndStat.append(WordAndStat(pair: "rabbit::кролик", known: 0,unknown: 0,skiped: 0))
-        wordsAndStat.append(WordAndStat(pair: "sheep::овца", known: 0,unknown: 0,skiped: 0))
+        wordsAndStat.append(WordAndStat(firstWord: "bear", secondWord: "медведь",known: 0,unknown: 0,skiped: 0)) // TODO: Change format to somethig like "медведь - bear, bear2"
+        wordsAndStat.append(WordAndStat(firstWord: "camel", secondWord: "верблюд", known: 0,unknown: 0,skiped: 0))
+        wordsAndStat.append(WordAndStat(firstWord: "cow", secondWord: "корова", known: 0,unknown: 0,skiped: 0))
+        wordsAndStat.append(WordAndStat(firstWord: "fox", secondWord: "лиса", known: 0,unknown: 0,skiped: 0))
+        wordsAndStat.append(WordAndStat(firstWord: "goat", secondWord: "коза", known: 0,unknown: 0,skiped: 0))
+        wordsAndStat.append(WordAndStat(firstWord: "monkey", secondWord: "обезьяна", known: 0,unknown: 0,skiped: 0))
+        wordsAndStat.append(WordAndStat(firstWord: "pig", secondWord: "свинья", known: 0,unknown: 0,skiped: 0))
+        wordsAndStat.append(WordAndStat(firstWord: "rabbit", secondWord: "кролик", known: 0,unknown: 0,skiped: 0))
+        wordsAndStat.append(WordAndStat(firstWord: "sheep", secondWord: "овца", known: 0,unknown: 0,skiped: 0))
         
         saveWords(wordsAndStat)
         // wordSets = [initialSet] Not sure if its needed
@@ -95,7 +96,7 @@ struct Storage {
         guard foreign.count > 0 && native.count > 0 else { return nil}
         let rowPosition = wordsAndStat.count //TODO: change it - sort somehow
         // wordsAndStat.append(("\(first)::\(second)",0,0,0))
-        wordsAndStat.append(WordAndStat(pair: "\(foreign)::\(native)".lowercased(), known: 0, unknown: 0, skiped: 0))
+        wordsAndStat.append(WordAndStat(firstWord: foreign.canonicalise(), secondWord: native.canonicalise(), known: 0, unknown: 0, skiped: 0))
         saveWords(wordsAndStat)
         return rowPosition
     }

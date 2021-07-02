@@ -137,6 +137,16 @@ final class LWUserDefaults {
         self.userDefaultsGroup.set(true, forKey: dictionaryPromptDisplayed)
     }
     
+    private let includeLearnedWordsKey = "includeLearnedWords"
+    var includeLearnedWords: Bool {
+        get {
+            return self.userDefaults.bool(forKey: includeLearnedWordsKey)
+        }
+        set {
+            self.userDefaults.set(newValue, forKey: includeLearnedWordsKey)
+        }
+    }
+    
 //    private let swapLanguageOrderKey = "swapLanguageOrder"
 //    var swapLanguageOrder: Bool {
 //        get {

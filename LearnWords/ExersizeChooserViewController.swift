@@ -17,6 +17,9 @@ class ExersizeChooserViewController: UIViewController {
     }
     
     @IBOutlet weak var numberOfWordsInSet: UILabel!
+    @IBAction func includeLearnedWordsChanged(_ sender: UISwitch) {
+        LWUserDefaults.standard.includeLearnedWords = sender.isOn
+    }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)

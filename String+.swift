@@ -115,3 +115,10 @@ func isReal(word: String) -> Bool {
     let misspelledRange = checker.rangeOfMisspelledWord(in: word, range: range, startingAt: 0, wrap: false, language: "en")
     return misspelledRange.location == NSNotFound
 }
+
+extension String {
+    func canonicalise() -> String
+    {
+        self.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+}

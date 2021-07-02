@@ -139,12 +139,12 @@ final class WordTestViewController: UIViewController {
         progressStep = 1.0 / Float(wordsInTest.count)
     }
     
-    @objc func nextTapped() {
+    @objc func nextTapped(skipedStat: Int = 1) {
 //        showingQuestion = true
         if !wordsInTest.isEmpty {
             var knownWord = wordsInTest.remove(at: 0)
             
-            knownWord.skiped += 1
+            knownWord.skiped += skipedStat
             
             Storage.shownWords.append(knownWord)
             roundProgress.progress = Float(Storage.shownWords.count) * progressStep
@@ -164,7 +164,7 @@ final class WordTestViewController: UIViewController {
                             if isKnown { self?.knowButton?.layer.opacity = 0.1 } else { self?.forgotButton?.layer.opacity = 0.1 }
                             self?.forgotButton?.isEnabled = false
                             self?.wordDefinition.attributedText = NSAttributedString(
-                                string: shownWord.pair.components(separatedBy: "::")[1],
+                                string: shownWord.secondWord,
                                 attributes: [.foregroundColor: isKnown ? UIColor(red: 0, green: 0.7, blue: 0, alpha: 1) : UIColor(red: 0.7, green: 0.0, blue: 0, alpha: 1)])
                             // prompt.textColor = UIColor(red: 0, green: 0.7, blue: 0, alpha: 1)
         }) { [weak self] (ended) in
@@ -189,7 +189,11 @@ final class WordTestViewController: UIViewController {
             navigationController?.popToRootViewController(animated: true)
             return
         }
-        prompt.attributedText = NSAttributedString(string: wordsInTest[0].pair.components(separatedBy: "::")[0])
+        if  (wordsInTest[0].known >= WordAndStat.maxKnownLevel) && (!LWUserDefaults.standard.includeLearnedWords) {
+            nextTapped(skipedStat: 0)
+            return
+        }
+        prompt.attributedText = NSAttributedString(string: wordsInTest[0].firstWord)
         if LWUserDefaults.standard.pronounceQuestionsPreference {
             LWSpeechSynth.standard.speak(utteranceString: prompt.attributedText!, language: LWUserDefaults.standard.languageToStudyPreference!)
         }
