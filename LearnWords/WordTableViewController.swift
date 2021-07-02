@@ -19,7 +19,7 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
     // MARK: searchController variables
     var filteredWords = [WordAndStat]() //? move to model?
     var wordsInTable : [WordAndStat] { // A subset of word pairs to display in tableView
-        return (searchController.isActive && searchController.searchBar.text != "") ? filteredWords : Storage.wordsAndStat
+        return (searchController.isActive && searchController.searchBar.text != "") ? filteredWords.sorted(by: { $0.firstWord < $1.firstWord }) : Storage.wordsAndStat.sorted(by: { $0.firstWord < $1.firstWord })
     }
     var importedWords = [WordAndStat]()
     var importedWord = ""
@@ -113,6 +113,7 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
 //        if ProcessInfo().isOperatingSystemAtLeast(OperatingSystemVersion(majorVersion: 11, minorVersion: 0, patchVersion: 0)) {
 //            navigationController?.navigationBar.prefersLargeTitles = true
 //        }
+        checkInstalledLocales()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -127,8 +128,8 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         tableView.reloadData() //beter do animated insertion or deletion here
-        checkInstalledLocales()
-        NotificationCenter.default.addObserver(self, selector: #selector(defaultsChanged), name: UserDefaults.didChangeNotification, object: nil)
+        
+        // NotificationCenter.default.addObserver(self, selector: #selector(defaultsChanged), name: UserDefaults.didChangeNotification, object: nil)
         defaultsChanged()
         // Some checks:
 //        print("LWUserDefaults.standard.languageToStudyPreference: " + (LWUserDefaults.standard.languageToStudyPreference ?? "Undefined"))
@@ -140,7 +141,7 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
     
     
     @objc func defaultsChanged(){
-        checkInstalledLocales()
+        // checkInstalledLocales()
         
         // TODO: more checks:
         // checkSpokenLanguages()

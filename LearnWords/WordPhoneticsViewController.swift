@@ -263,6 +263,10 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
             navigationController?.popToRootViewController(animated: true)
             return
         }
+        if  (wordsInTest[0].known >= WordAndStat.maxKnownLevel) && (!LWUserDefaults.standard.includeLearnedWords) {
+            nextTapped(skipedStat: 0)
+            return
+        }
         prompt.attributedText = NSAttributedString(string: wordsInTest[0].secondWord)
         if LWUserDefaults.standard.pronounceQuestionsPreference {
             LWSpeechSynth.standard.speak(utteranceString: prompt.attributedText!, language: LWUserDefaults.standard.nativeLanguagePreference!)
@@ -330,11 +334,11 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
         progressStep = 1.0 / Float(wordsInTest.count)
     }
     
-    @objc func nextTapped() {
+    @objc func nextTapped(skipedStat: Int = 1) {
 //        showingQuestion = true
         if !wordsInTest.isEmpty {
             var knownWord = wordsInTest.remove(at: 0)
-            knownWord.skiped += 1
+            knownWord.skiped += skipedStat
             Storage.shownWords.append(knownWord)
             roundProgress.progress = Float(Storage.shownWords.count) * progressStep
             askQuestion()
