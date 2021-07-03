@@ -126,7 +126,7 @@
             </objects>
             <point key="canvasLocation" x="1317.5999999999999" y="144.3778110944528"/>
         </scene>
-        <!--Classify-->
+        <!--Learning-->
         <scene sceneID="wxh-pH-4nn">
             <objects>
                 <viewController storyboardIdentifier="WordTest" id="hhD-xo-ClW" customClass="WordTestViewController" customModule="LearnWords" customModuleProvider="target" sceneMemberID="viewController">
@@ -234,7 +234,7 @@
                             <constraint firstItem="0M9-Kp-HX4" firstAttribute="trailing" secondItem="be5-a6-mYM" secondAttribute="trailing" constant="20" id="cjz-an-V7b"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" title="Classify" id="fb2-Kp-cfL"/>
+                    <navigationItem key="navigationItem" title="Learning" id="fb2-Kp-cfL"/>
                     <connections>
                         <outlet property="forgotButton" destination="643-wN-0oS" id="Zer-Jd-FkI"/>
                         <outlet property="knowButton" destination="Djr-xr-GdQ" id="KnZ-pd-yFM"/>

@@ -54,10 +54,10 @@
 "IMPORT_SUCCESS_TITLE" = "Import удался";
 
 /* Alert message, langID inside */
-"Keyboard for language to study ((secondaryLanguage)) is not installed now. " = "Клавиатура для изучаемого языка  ((secondaryLanguage)) не установлена.";
+"Keyboard for language to study (%@) is not installed now. " = "Клавиатура для изучаемого языка (%@) не установлена.";
 
 /* Alert message, langID inside */
-"Keyboard for native learner's language ((primaryLanguage)) is not installed now. " = "Клавиатура для родного языка ((primaryLanguage)) не установлена.";
+"Keyboard for native learner's language (%@) is not installed now. " = "Клавиатура для родного языка (%@) не установлена.";
 
 /* Label learned words */
 "Learned " = "Изучено ";
@@ -86,9 +86,6 @@
 /* Button title */
 "Recognition Not Available" = "Распознавание недоступно";
 
-/* Button title */
-"Recording Not Available" = "Запись недоступна";
-
 /* placeholder */
 "Search words in sets" = "Искать слова в наборе";
 
@@ -102,16 +99,16 @@
 "Speech recognition error" = "Ошибка распознавания речи";
 
 /* Button title */
-"Speech recognition permission needed" = "Требуется разрешение на распознавание";
+"Recognition permission needed" = "Нужно разрешение на распознавание";
 
 /* Button title */
-"Start Recording" = "Начать запись";
+"Start recognition" = "Начать распознавание";
 
 /* placeholder in a searchbar */
 "Start typing" = "Начните набирать";
 
 /* Button title */
-"Stop Recording" = "Остановить запись";
+"Stop recognition" = "Остановить распознавание";
 
 /* Button title */
 "Stopping" = "Остановка";
@@ -132,5 +129,5 @@
 "WordCount" = "THINGS WITH LETTERS";
 
 /* No comment provided by engineer. */
-"You may add Keyboards from system General Settings pane." = "Вы можете добавить клавиатуры с  панели \"Основные\" в \"Настройках\".";
+"You may add Keyboards from system General Settings pane." = "Вы можете добавить клавиатуры в панели \"Основные\" в \"Настройках\".";
 

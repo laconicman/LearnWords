@@ -43,8 +43,8 @@
 /* Class = "UITabBarItem"; title = "Manage Sets"; ObjectID = "EEA-CH-FD5"; */
 "EEA-CH-FD5.title" = "Управлять наборами";
 
-/* Class = "UINavigationItem"; title = "Classify"; ObjectID = "fb2-Kp-cfL"; */
-"fb2-Kp-cfL.title" = "Классифицировать";
+/* Class = "UINavigationItem"; title = "Learning"; ObjectID = "fb2-Kp-cfL"; */
+"fb2-Kp-cfL.title" = "Изучение";
 
 /* Class = "UINavigationItem"; title = "Exercises"; ObjectID = "fg3-cG-Mk4"; */
 "fg3-cG-Mk4.title" = "Упражнения";
@@ -61,8 +61,8 @@
 /* Class = "UILabel"; text = "Include learned words"; ObjectID = "JHd-Ju-sT7"; */
 "JHd-Ju-sT7.text" = "Включать выученные слова";
 
-/* Class = "UIButton"; normalTitle = "Recording"; ObjectID = "jVV-UW-vd8"; */
-"jVV-UW-vd8.normalTitle" = "Запись";
+/* Class = "UIButton"; normalTitle = "Start recognition"; ObjectID = "jVV-UW-vd8"; */
+"jVV-UW-vd8.normalTitle" = "Начать распознавание";
 
 /* Class = "UITableViewController"; title = "LearnWords"; ObjectID = "Jy4-wo-DD5"; */
 "Jy4-wo-DD5.title" = "LearnWords";
@@ -124,8 +124,8 @@
 /* Class = "UILabel"; text = "Subtitle"; ObjectID = "Xwv-BA-c3j"; */
 "Xwv-BA-c3j.text" = "Подзаголовок";
 
-/* Class = "UIButton"; normalTitle = "Classify"; ObjectID = "y3Z-Kn-fYD"; */
-"y3Z-Kn-fYD.normalTitle" = "Классифицировать";
+/* Class = "UIButton"; normalTitle = "Learning"; ObjectID = "y3Z-Kn-fYD"; */
+"y3Z-Kn-fYD.normalTitle" = "Изучение";
 
 /* Class = "UILabel"; text = "Word"; ObjectID = "yxM-vR-ero"; */
 "yxM-vR-ero.text" = "Слово";

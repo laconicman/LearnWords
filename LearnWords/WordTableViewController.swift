@@ -306,6 +306,7 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         case "AddWord":
             if let searchWordVC = segue.destination as? SearchWordViewController, let languageToStudy = LWUserDefaults.standard.languageToStudyPreference {
                 searchWordVC.searchedObject = .original(lang: languageToStudy, word: importedWord)
+                searchWordVC.filterRowsForSearchedText(importedWord)
                 searchWordVC.navigationItem.backButtonTitle = NSLocalizedString("Word", comment: "backButtonTitle")
             }
             // TODO: with standart row features

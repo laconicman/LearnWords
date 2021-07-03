@@ -435,13 +435,13 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         debugLog()
         if let term = searchBar.text {
-            addToRecentSearches(term)
-            // check for term to exist
-            if UIReferenceLibraryViewController.dictionaryHasDefinition(forTerm: term) {
-
-            } else {
-                // TODO: put up a faiding alert : Unknown word. Are you sure you typed it right?
-            }
+            // addToRecentSearches(term)
+            // TODO: check for term to exist
+//            if UIReferenceLibraryViewController.dictionaryHasDefinition(forTerm: term) {
+//
+//            } else {
+//                // TODO: put up a faiding alert : Unknown word. Are you sure you typed it right?
+//            }
             switch searchedObject {
             case .original(lang: let lang, word: _):
                 searchedObject = .original(lang: lang, word: term)

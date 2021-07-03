@@ -83,7 +83,6 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
                         self.recordButton.setTitle(NSLocalizedString("Microphone access denied.", comment: "Button title"), for: .disabled)
                         let ac = UIAlertController(title: NSLocalizedString("Allow microphone usage", comment: "Alert title"), message: NSLocalizedString("for phonetic exercises", comment: "Alert message"), preferredStyle: .alert)
                         
-                        // create an "Add Word" button that submits the user's input
                         let submitAction = UIAlertAction(title: NSLocalizedString("Allow in settings", comment: ""), style: .default) { /* [unowned self] */ (action: UIAlertAction!) in
                             gotoAppSettings()
                         }
@@ -116,7 +115,6 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
                     self.recordButton.setTitle(NSLocalizedString("Recognition not allowed", comment: "Button title"), for: .disabled)
                     let ac = UIAlertController(title: NSLocalizedString("Allow speech recognition", comment: "Alert title"), message: NSLocalizedString("for phonetic exercises", comment: "Alert message"), preferredStyle: .alert)
                     
-                    // create an "Add Word" button that submits the user's input
                     let submitAction = UIAlertAction(title: NSLocalizedString("Allow in settings", comment: ""), style: .default) { /* [unowned self] */ (action: UIAlertAction!) in
                         gotoAppSettings()
                     }
@@ -126,7 +124,7 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
                     
                 case .notDetermined:
                     self.recordButton.isEnabled = false
-                    self.recordButton.setTitle(NSLocalizedString("Speech recognition permission needed", comment: "Button title"), for: .disabled)
+                    self.recordButton.setTitle(NSLocalizedString("Recognition permission needed", comment: "Button title"), for: .disabled)
                     let ac = UIAlertController(title: NSLocalizedString("Allow speech recognition", comment: "for phonetic exercises"), message: nil, preferredStyle: .alert)
 
                     ac.addAction(UIAlertAction(title: NSLocalizedString("Got it", comment: "Button title"), style: .default))
@@ -196,7 +194,11 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
                 self?.recordButton.setTitle(NSLocalizedString("Start recognition", comment: "Button title"), for: [])
                 self?.recordButton.tintColor = .black
                 if error != nil, (error! as NSError).code != 203 {
-                    let ac = UIAlertController(title: NSLocalizedString("Speech recognition error", comment: ""), message: error!.localizedDescription + "\n" + (error! as NSError).userInfo.debugDescription, preferredStyle: .alert)
+                    
+                    var ac = UIAlertController(title: NSLocalizedString("Speech recognition error", comment: ""), message: error!.localizedDescription + "\n" + (error! as NSError).userInfo.debugDescription, preferredStyle: .alert)
+                    if (error! as NSError).code == 4 {
+                        ac = UIAlertController(title: NSLocalizedString("Speech recognition error", comment: ""), message: error!.localizedDescription + "\n Probably there is no inernet connection. \n Recognition happens on Apple servers for most of devices. " , preferredStyle: .alert)
+                    }
                     ac.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: ""), style: .default))
                     self?.present(ac, animated: true)
                 }
