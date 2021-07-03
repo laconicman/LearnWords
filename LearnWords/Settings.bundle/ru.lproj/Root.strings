@@ -1,0 +1,23 @@
+/* A single strings file, whose title is specified in your preferences schema. The strings files provide the localized content to display to the user for each of your preferences. */
+"Group" = "Группа";
+
+/* (No Comment) */
+"Name" = "Название";
+
+/* (No Comment) */
+"LearnWords Settings" = "Настройки Learn Words";
+
+"Languages" = "Языки";
+"Language to study" = "Изучаемый язык";
+"Native Language" = "Родной язык";
+"English (GB)" = "Английский (GB)";
+"English (US)" = "Английский (US)";
+"Russian" = "Русский";
+"Spanish" = "Испанский";
+
+"Speech" = "Речь";
+"Pitch" = "Высота тона";
+"Rate" = "Скорость";
+"Pronounce answers" = "Произносить ответы";
+"Pronounce questions" = "Произносить вопросы";
+

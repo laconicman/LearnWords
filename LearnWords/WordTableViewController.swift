@@ -203,10 +203,10 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         
         var checkResultsMessage :String?
         if let secondaryLanguage = LWUserDefaults.standard.languageToStudyPreference, !languageIDs.contains(secondaryLanguage) {
-            checkResultsMessage = NSLocalizedString("Keyboard for language to study (\(secondaryLanguage)) is not installed now. ", comment: "Alert message, langID inside")
+            checkResultsMessage = String(format: NSLocalizedString("Keyboard for language to study (%@) is not installed now. ", comment: "Alert message, langID inside"), secondaryLanguage)
         }
         if let primaryLanguage = LWUserDefaults.standard.nativeLanguagePreference, !languageIDs.contains(primaryLanguage) {
-            checkResultsMessage = (checkResultsMessage ?? "") + NSLocalizedString("Keyboard for native learner's language (\(primaryLanguage)) is not installed now. ", comment: "Alert message, langID inside")
+            checkResultsMessage = (checkResultsMessage ?? "") + String(format: NSLocalizedString("Keyboard for native learner's language (%@) is not installed now. ", comment: "Alert message, langID inside"), primaryLanguage)
         }
         checkResultsMessage?.append(NSLocalizedString("You may add Keyboards from system General Settings pane.", comment: ""))
         

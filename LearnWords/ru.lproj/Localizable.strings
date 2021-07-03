@@ -1,26 +1,136 @@
+/* AlertAction title */
+"Add" = "Добавить";
+
+/* AlertController title */
+"Add new word" = "Добавить новое слово";
+
+/* AlertController title */
+"Add new word set" = "Добавить новый набор слов";
+
+/* AlertAction title */
+"Add Word" = "Добавить слово";
+
+/* No comment provided by engineer. */
+"Allow in settings" = "Разрешить в настройках";
+
+/* Alert title */
+"Allow microphone usage" = "Разрешить использование микрофона";
+
+/* Alert title
+   for phonetic exercises */
+"Allow speech recognition" = "Разрешить распознавание речи";
+
+/* AlertAction title */
+"Cancel" = "Отмена";
+
+/* Alert title */
+"Check installed languages" = "Проверьте установленные языки.";
+
 /* Action for dictionary prompt */
-"DICTIONARY_ACTION" = "Got It";
+"DICTIONARY_ACTION" = "Понятно";
 
 /* Message for dictionary prompt */
-"DICTIONARY_MESSAGE" = "Have you set up your iOS dictionaries?\n\nTap \"Manage\" below to download dictionaries for the languages you want.";
+"DICTIONARY_MESSAGE" = "Вы настроили системные iOS словари?\n\nНажмите кнопку \"Управлять\" внизу чтобы загрузить нужные словари и удалить лишние.";
 
 /* UIViewController+Dictionary */
-"DICTIONARY_TITLE" = "Add Dictionaries";
+"DICTIONARY_TITLE" = "Добавить словари";
 
 /* Count of words to be exported */
-"EXPORT_WORDS_MESSAGE" = "Export %@";
+"EXPORT_WORDS_MESSAGE" = "Экспортировать %@";
+
+/* Alert message */
+"for phonetic exercises" = "для фонетических упражнений";
+
+/* Button title */
+"Got it" = "Понятно";
 
 /* Title for failed import */
-"IMPORT_FAIL_TITLE" = "Import Failed";
+"IMPORT_FAIL_TITLE" = "Импорт не удался";
 
 /* Message for successful import */
-"IMPORT_SUCCESS_MESSAGE" = "%@ found in import source.\n%@ duplicated.\n%@ added.";
+"IMPORT_SUCCESS_MESSAGE" = "%@ найдено в импортируемом источнике.\n%@ дублировано.\n%@ добавлено.";
 
 /* SettingsViewController */
-"IMPORT_SUCCESS_TITLE" = "Import Successful";
+"IMPORT_SUCCESS_TITLE" = "Import удался";
+
+/* Alert message, langID inside */
+"Keyboard for language to study ((secondaryLanguage)) is not installed now. " = "Клавиатура для изучаемого языка  ((secondaryLanguage)) не установлена.";
+
+/* Alert message, langID inside */
+"Keyboard for native learner's language ((primaryLanguage)) is not installed now. " = "Клавиатура для родного языка ((primaryLanguage)) не установлена.";
+
+/* Label learned words */
+"Learned " = "Изучено ";
+
+/* Alert message, langID appended */
+"Looks like you only have those keyboards:" = "У вас сейчас только вот эти клавиатуры:";
+
+/* Button title */
+"Microphone access denied." = "Нет доступа к микрофону.";
+
+/* No comment provided by engineer. */
+"Name of set" = "Название набора";
+
+/* placeholder for adding new word to vocabulary */
+"New word" = "Новое слово";
 
 /* No comment provided by engineer. */
 "OK" = "OK";
 
+/* No comment provided by engineer. */
+"Original " = "Оригинал";
+
+/* Button title */
+"Recognition not allowed" = "Распознавание не разрешено";
+
+/* Button title */
+"Recognition Not Available" = "Распознавание недоступно";
+
+/* Button title */
+"Recording Not Available" = "Запись недоступна";
+
+/* placeholder */
+"Search words in sets" = "Искать слова в наборе";
+
+/* No comment provided by engineer. */
+"Settings" = "Настройки";
+
+/* label prompt */
+"speak the translation" = "произнесите перевод";
+
+/* No comment provided by engineer. */
+"Speech recognition error" = "Ошибка распознавания речи";
+
+/* Button title */
+"Speech recognition permission needed" = "Требуется разрешение на распознавание";
+
+/* Button title */
+"Start Recording" = "Начать запись";
+
+/* placeholder in a searchbar */
+"Start typing" = "Начните набирать";
+
+/* Button title */
+"Stop Recording" = "Остановить запись";
+
+/* Button title */
+"Stopping" = "Остановка";
+
+/* Label total words */
+"Total " = "Всего ";
+
+/* No comment provided by engineer. */
+"Translation " = "Перевод";
+
+/* Placeholder promt */
+"type in translation" = "введите перевод";
+
+/* backButtonTitle */
+"Word" = "Слово";
+
 /* Count of words available */
 "WordCount" = "THINGS WITH LETTERS";
+
+/* No comment provided by engineer. */
+"You may add Keyboards from system General Settings pane." = "Вы можете добавить клавиатуры с  панели \"Основные\" в \"Настройках\".";
+

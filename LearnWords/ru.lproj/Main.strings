@@ -1,111 +1,132 @@
-
-/* Class = "UILabel"; text = "Title"; ObjectID = "39l-aE-DmA"; */
-"39l-aE-DmA.text" = "Title";
-
-/* Class = "UINavigationItem"; title = "Перевод"; ObjectID = "4AK-rv-ykj"; */
+/* Class = "UINavigationItem"; title = "Translation"; ObjectID = "4AK-rv-ykj"; */
 "4AK-rv-ykj.title" = "Перевод";
 
 /* Class = "UINavigationItem"; title = "Add word to study"; ObjectID = "5bW-fz-PeB"; */
-"5bW-fz-PeB.title" = "Add word to study";
-
-/* Class = "UITabBarItem"; title = "Exercises"; ObjectID = "61X-u6-MJk"; */
-"61X-u6-MJk.title" = "Exercises";
-
-/* Class = "UIButton"; normalTitle = "Forgot"; ObjectID = "643-wN-0oS"; */
-"643-wN-0oS.normalTitle" = "Forgot";
+"5bW-fz-PeB.title" = "Добавить слово для изучения";
 
 /* Class = "UILabel"; text = "Word"; ObjectID = "8WT-Dx-fov"; */
-"8WT-Dx-fov.text" = "Word";
+"8WT-Dx-fov.text" = "Слово";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "39l-aE-DmA"; */
+"39l-aE-DmA.text" = "Заголовок";
+
+/* Class = "UITabBarItem"; title = "Exercises"; ObjectID = "61X-u6-MJk"; */
+"61X-u6-MJk.title" = "Упражнения";
+
+/* Class = "UIButton"; normalTitle = "Forgot"; ObjectID = "643-wN-0oS"; */
+"643-wN-0oS.normalTitle" = "Забыл";
+
+/* Class = "UITabBarItem"; title = "Word Set"; ObjectID = "a8m-gm-wVa"; */
+"a8m-gm-wVa.title" = "Набор слов";
+
+/* Class = "UIButton"; normalTitle = "Know"; ObjectID = "bDd-aK-Z4N"; */
+"bDd-aK-Z4N.normalTitle" = "Знаю";
 
 /* Class = "UIButton"; normalTitle = "Forgot"; ObjectID = "Bf1-2B-pAQ"; */
-"Bf1-2B-pAQ.normalTitle" = "Forgot";
+"Bf1-2B-pAQ.normalTitle" = "Забыл";
 
-/* Class = "UIBarButtonItem"; title = "⊕"; ObjectID = "D43-dR-dXq"; */
-"D43-dR-dXq.title" = "⊕";
+/* Class = "UINavigationItem"; title = "Phonetic"; ObjectID = "bIe-cz-JDG"; */
+"bIe-cz-JDG.title" = "Фонетика";
+
+/* Class = "UINavigationItem"; title = "Dictation"; ObjectID = "BpE-Jx-lIv"; */
+"BpE-Jx-lIv.title" = "Диктант";
 
 /* Class = "UIButton"; normalTitle = "Know"; ObjectID = "Djr-xr-GdQ"; */
-"Djr-xr-GdQ.normalTitle" = "Know";
+"Djr-xr-GdQ.normalTitle" = "Знаю";
+
+/* Class = "UILabel"; text = "Right Text Label"; ObjectID = "dnO-iH-vCy"; */
+"dnO-iH-vCy.text" = "Правый текстовый ярлык";
+
+/* Class = "UISwitch"; title = "Include learned"; ObjectID = "dWV-NJ-r41"; */
+"dWV-NJ-r41.title" = "Включать изученные";
+
+/* Class = "UITabBarItem"; title = "Manage Sets"; ObjectID = "EEA-CH-FD5"; */
+"EEA-CH-FD5.title" = "Управлять наборами";
+
+/* Class = "UINavigationItem"; title = "Classify"; ObjectID = "fb2-Kp-cfL"; */
+"fb2-Kp-cfL.title" = "Классифицировать";
+
+/* Class = "UINavigationItem"; title = "Exercises"; ObjectID = "fg3-cG-Mk4"; */
+"fg3-cG-Mk4.title" = "Упражнения";
 
 /* Class = "UIButton"; normalTitle = "Listen"; ObjectID = "Fh8-vi-hwf"; */
-"Fh8-vi-hwf.normalTitle" = "Listen";
+"Fh8-vi-hwf.normalTitle" = "Слушать";
+
+/* Class = "UITabBarItem"; title = "Item"; ObjectID = "H9N-Y4-X4Z"; */
+"H9N-Y4-X4Z.title" = "Элемент";
 
 /* Class = "UIBarButtonItem"; title = "Settings"; ObjectID = "Ieh-AL-JGj"; */
-"Ieh-AL-JGj.title" = "Settings";
+"Ieh-AL-JGj.title" = "Настройки";
 
-/* Class = "UILabel"; text = "Title"; ObjectID = "JWc-3w-23K"; */
-"JWc-3w-23K.text" = "Title";
+/* Class = "UILabel"; text = "Include learned words"; ObjectID = "JHd-Ju-sT7"; */
+"JHd-Ju-sT7.text" = "Включать выученные слова";
+
+/* Class = "UIButton"; normalTitle = "Recording"; ObjectID = "jVV-UW-vd8"; */
+"jVV-UW-vd8.normalTitle" = "Запись";
 
 /* Class = "UITableViewController"; title = "LearnWords"; ObjectID = "Jy4-wo-DD5"; */
 "Jy4-wo-DD5.title" = "LearnWords";
 
+/* Class = "UIButton"; normalTitle = "Look Up"; ObjectID = "keD-qV-ddK"; */
+"keD-qV-ddK.normalTitle" = "В словаре";
+
 /* Class = "UILabel"; text = "Title"; ObjectID = "KI6-K0-Yeq"; */
-"KI6-K0-Yeq.text" = "Title";
+"KI6-K0-Yeq.text" = "Заголовок";
 
 /* Class = "UIButton"; normalTitle = "Listen"; ObjectID = "Liq-qX-vPh"; */
-"Liq-qX-vPh.normalTitle" = "Listen";
-
-/* Class = "UILabel"; text = "Word"; ObjectID = "P1B-tp-yvT"; */
-"P1B-tp-yvT.text" = "Word";
-
-/* Class = "UIButton"; normalTitle = "Forgot"; ObjectID = "Q8X-kw-NHO"; */
-"Q8X-kw-NHO.normalTitle" = "Forgot";
-
-/* Class = "UILabel"; text = " Total in set"; ObjectID = "QVi-no-H8N"; */
-"QVi-no-H8N.text" = " Total in set";
-
-/* Class = "UIButton"; normalTitle = "Phonetic"; ObjectID = "Vmu-2y-Ili"; */
-"Vmu-2y-Ili.normalTitle" = "Phonetic";
-
-/* Class = "UITextField"; text = "type in translation"; ObjectID = "VvQ-x8-gCl"; */
-"VvQ-x8-gCl.text" = "type in translation";
-
-/* Class = "UILabel"; text = "0 words"; ObjectID = "WxG-u0-GkQ"; */
-"WxG-u0-GkQ.text" = "0 words";
-
-/* Class = "UITabBarItem"; title = "Word Set"; ObjectID = "a8m-gm-wVa"; */
-"a8m-gm-wVa.title" = "Word Set";
-
-/* Class = "UIButton"; normalTitle = "Know"; ObjectID = "bDd-aK-Z4N"; */
-"bDd-aK-Z4N.normalTitle" = "Know";
-
-/* Class = "UILabel"; text = "Detail"; ObjectID = "c9s-D1-W13"; */
-"c9s-D1-W13.text" = "Detail";
-
-/* Class = "UIButton"; normalTitle = "Recording"; ObjectID = "jVV-UW-vd8"; */
-"jVV-UW-vd8.normalTitle" = "Recording";
-
-/* Class = "UIButton"; normalTitle = "Look Up"; ObjectID = "keD-qV-ddK"; */
-"keD-qV-ddK.normalTitle" = "Look Up";
+"Liq-qX-vPh.normalTitle" = "Слушать";
 
 /* Class = "UILabel"; text = "Title"; ObjectID = "m9z-JK-XdY"; */
-"m9z-JK-XdY.text" = "Title";
+"m9z-JK-XdY.text" = "Заголовок";
 
-/* Class = "UIBarButtonItem"; title = "Current set"; ObjectID = "nGA-b0-mC0"; */
-"nGA-b0-mC0.title" = "Current set";
+/* Class = "UILabel"; text = "Title"; ObjectID = "NCU-o0-xGZ"; */
+"NCU-o0-xGZ.text" = "Заголовок";
+
+/* Class = "UILabel"; text = "Word"; ObjectID = "P1B-tp-yvT"; */
+"P1B-tp-yvT.text" = "Слово";
 
 /* Class = "UIButton"; normalTitle = "Look Up"; ObjectID = "ph3-GE-3p7"; */
-"ph3-GE-3p7.normalTitle" = "Look Up";
+"ph3-GE-3p7.normalTitle" = "В словаре";
+
+/* Class = "UIButton"; normalTitle = "Forgot"; ObjectID = "Q8X-kw-NHO"; */
+"Q8X-kw-NHO.normalTitle" = "Забыл";
 
 /* Class = "UIButton"; normalTitle = "Look Up"; ObjectID = "qaf-Gn-jV1"; */
-"qaf-Gn-jV1.normalTitle" = "Look Up";
+"qaf-Gn-jV1.normalTitle" = "В словаре";
 
 /* Class = "UILabel"; text = "Word"; ObjectID = "s4E-Gx-k1b"; */
-"s4E-Gx-k1b.text" = "Word";
+"s4E-Gx-k1b.text" = "Слово";
+
+/* Class = "UIBarButtonItem"; title = "Import"; ObjectID = "u2L-Ej-8XW"; */
+"u2L-Ej-8XW.title" = "Импорт";
 
 /* Class = "UIButton"; normalTitle = "Dictation"; ObjectID = "uBK-Se-mT6"; */
-"uBK-Se-mT6.normalTitle" = "Dictation";
+"uBK-Se-mT6.normalTitle" = "Диктант";
 
-/* Class = "UILabel"; text = "Speak the translation"; ObjectID = "uEJ-4s-E9l"; */
-"uEJ-4s-E9l.text" = "Speak the translation";
+/* Class = "UILabel"; text = "speak the translation"; ObjectID = "uEJ-4s-E9l"; */
+"uEJ-4s-E9l.text" = "произнесите перевод";
+
+/* Class = "UIButton"; normalTitle = "Phonetic"; ObjectID = "Vmu-2y-Ili"; */
+"Vmu-2y-Ili.normalTitle" = "Фонетика";
+
+/* Class = "UITextField"; text = "type in translation"; ObjectID = "VvQ-x8-gCl"; */
+"VvQ-x8-gCl.text" = "наберите перевод";
 
 /* Class = "UINavigationItem"; title = "Word Sets"; ObjectID = "vYV-WR-kC4"; */
-"vYV-WR-kC4.title" = "Word Sets";
+"vYV-WR-kC4.title" = "Наборы слов";
+
+/* Class = "UILabel"; text = "0 words"; ObjectID = "WxG-u0-GkQ"; */
+"WxG-u0-GkQ.text" = "0 слов";
 
 /* Class = "UIButton"; normalTitle = "Know"; ObjectID = "x6b-1p-EXm"; */
-"x6b-1p-EXm.normalTitle" = "Know";
+"x6b-1p-EXm.normalTitle" = "Знаю";
+
+/* Class = "UILabel"; text = "Subtitle"; ObjectID = "Xwv-BA-c3j"; */
+"Xwv-BA-c3j.text" = "Подзаголовок";
 
 /* Class = "UIButton"; normalTitle = "Classify"; ObjectID = "y3Z-Kn-fYD"; */
-"y3Z-Kn-fYD.normalTitle" = "Classify";
+"y3Z-Kn-fYD.normalTitle" = "Классифицировать";
 
 /* Class = "UILabel"; text = "Word"; ObjectID = "yxM-vR-ero"; */
-"yxM-vR-ero.text" = "Word";
+"yxM-vR-ero.text" = "Слово";
+

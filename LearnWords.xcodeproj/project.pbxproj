@@ -28,6 +28,8 @@
 		DA4162F61F8C219500165694 /* GradientButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA4162F51F8C219500165694 /* GradientButton.swift */; };
 		DA5454752687C35E007654E0 /* NotificationCenter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA246CCB1F8AA30E00A75ED1 /* NotificationCenter.framework */; };
 		DA86ADF423489FF7007E3221 /* String+.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA86ADF323489FF7007E3221 /* String+.swift */; };
+		DA86CA6C268F7BE100F917F1 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = DA86CA6A268F7BE100F917F1 /* InfoPlist.strings */; };
+		DA86CA6F268F7BE100F917F1 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = DA86CA6D268F7BE100F917F1 /* InfoPlist.strings */; };
 		DA88CB8421A687C00094D1F8 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = DA88CB8321A687BF0094D1F8 /* Settings.bundle */; };
 		DA88CB8521A687C00094D1F8 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = DA88CB8321A687BF0094D1F8 /* Settings.bundle */; };
 		DA9156282684CBCE00CAEB26 /* WordPhoneticsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA9156272684CBCE00CAEB26 /* WordPhoneticsViewController.swift */; };
@@ -111,6 +113,8 @@
 		DA4162F51F8C219500165694 /* GradientButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientButton.swift; sourceTree = "<group>"; };
 		DA554C6826593A1100C67BE0 /* ImportAsDictAction.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ImportAsDictAction.entitlements; sourceTree = "<group>"; };
 		DA86ADF323489FF7007E3221 /* String+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+.swift"; sourceTree = "<group>"; };
+		DA86CA6B268F7BE100F917F1 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		DA86CA6E268F7BE100F917F1 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		DA88CB8321A687BF0094D1F8 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 		DA88CB8621A6A9F40094D1F8 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		DA9156272684CBCE00CAEB26 /* WordPhoneticsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordPhoneticsViewController.swift; sourceTree = "<group>"; };
@@ -208,6 +212,7 @@
 				DA246CBA1F8A6E5E00A75ED1 /* Assets.xcassets */,
 				DA246CBC1F8A6E5E00A75ED1 /* LaunchScreen.storyboard */,
 				DA246CBF1F8A6E5E00A75ED1 /* Info.plist */,
+				DA86CA6D268F7BE100F917F1 /* InfoPlist.strings */,
 				DAD5E0D5219EF1400084FD1A /* Images.imagecatalog */,
 				DA88CB8621A6A9F40094D1F8 /* README.md */,
 			);
@@ -242,6 +247,7 @@
 				DAA16D6A24B60673003C28FD /* ActionViewController.swift */,
 				DAA16D6C24B60673003C28FD /* MainInterface.storyboard */,
 				DAA16D6F24B60673003C28FD /* Info.plist */,
+				DA86CA6A268F7BE100F917F1 /* InfoPlist.strings */,
 			);
 			path = ImportAsDictAction;
 			sourceTree = "<group>";
@@ -366,6 +372,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DA246CBE1F8A6E5E00A75ED1 /* LaunchScreen.storyboard in Resources */,
+				DA86CA6F268F7BE100F917F1 /* InfoPlist.strings in Resources */,
 				DAD5E0D6219EF1400084FD1A /* Images.imagecatalog in Resources */,
 				DA88CB8421A687C00094D1F8 /* Settings.bundle in Resources */,
 				DAEA44FB268A5119004CA6C4 /* Localizable.strings in Resources */,
@@ -389,6 +396,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DAA16D6924B60673003C28FD /* Media.xcassets in Resources */,
+				DA86CA6C268F7BE100F917F1 /* InfoPlist.strings in Resources */,
 				DAA16D6E24B60673003C28FD /* MainInterface.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -482,6 +490,22 @@
 				DA160CB6268A42CA001F6CD2 /* ru */,
 			);
 			name = MainInterface.storyboard;
+			sourceTree = "<group>";
+		};
+		DA86CA6A268F7BE100F917F1 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				DA86CA6B268F7BE100F917F1 /* ru */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		DA86CA6D268F7BE100F917F1 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				DA86CA6E268F7BE100F917F1 /* ru */,
+			);
+			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
 		DAA16D6C24B60673003C28FD /* MainInterface.storyboard */ = {

@@ -193,7 +193,7 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
                 self?.recognitionTask = nil
 
                 self?.recordButton.isEnabled = true
-                self?.recordButton.setTitle(NSLocalizedString("Start Recording", comment: "Button title"), for: [])
+                self?.recordButton.setTitle(NSLocalizedString("Start recognition", comment: "Button title"), for: [])
                 self?.recordButton.tintColor = .black
                 if error != nil, (error! as NSError).code != 203 {
                     let ac = UIAlertController(title: NSLocalizedString("Speech recognition error", comment: ""), message: error!.localizedDescription + "\n" + (error! as NSError).userInfo.debugDescription, preferredStyle: .alert)
@@ -221,7 +221,7 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
     public func speechRecognizer(_ speechRecognizer: SFSpeechRecognizer, availabilityDidChange available: Bool) {
         if available {
             recordButton.isEnabled = true
-            recordButton.setTitle(NSLocalizedString("Start Recording", comment: "Button title"), for: [])
+            recordButton.setTitle(NSLocalizedString("Start recognition", comment: "Button title"), for: [])
         } else {
             recordButton.isEnabled = false
             recordButton.setTitle(NSLocalizedString("Recognition Not Available", comment: "Button title"), for: .disabled)
@@ -243,10 +243,10 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
         } else {
             do {
                 try startRecording()
-                recordButton.setTitle(NSLocalizedString("Stop Recording", comment: "Button title"), for: [])
+                recordButton.setTitle(NSLocalizedString("Stop recognition", comment: "Button title"), for: [])
                 recordButton.tintColor = .red
             } catch {
-                recordButton.setTitle(NSLocalizedString("Recording Not Available", comment: "Button title"), for: [])
+                recordButton.setTitle(NSLocalizedString("Recognition Not Available", comment: "Button title"), for: [])
                 recordButton.tintColor = .black
             }
         }
