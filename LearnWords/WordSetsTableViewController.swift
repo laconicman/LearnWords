@@ -14,6 +14,27 @@ class WordSetsTableViewController: UITableViewController, UIDocumentPickerDelega
     
     // MARK: - IBActions
     
+    @IBAction func exportToFile(_ sender: UIBarButtonItem) {
+        let path = NSTemporaryDirectory() + "\(Storage.currentWordSet).txt"
+        let exportText = Storage.getWordSet(name: Storage.currentWordSet).compactMap({$0.firstWord + " : " + $0.secondWord}).joined(separator: "\n")
+
+        if let data = exportText.data(using: .utf8)
+        {
+            let url = URL(fileURLWithPath: path)
+            try? data.write(to: url)
+
+            let items = [url]
+            let shareSheet = UIActivityViewController(activityItems: items, applicationActivities: nil)
+            shareSheet.completionWithItemsHandler = { (_, _, _, _) in try? FileManager.default.removeItem(at: url) }
+            present(shareSheet, animated: true)
+//            if let popOver = shareSheet.popoverPresentationController
+//            {
+//                popOver.barButtonItem = self.shareButton
+//            }
+        }
+    }
+    
+    
     @IBAction func importFromFile(_ sender: UIBarButtonItem) {
         let types: [String] = [kUTTypeText as String]
         let documentPicker = UIDocumentPickerViewController(documentTypes: types, in: .import)
@@ -38,9 +59,9 @@ class WordSetsTableViewController: UITableViewController, UIDocumentPickerDelega
                 importedWords = dictionaryEntries.compactMap( {
                     let e = split($0, by: "|:")
                     if e.first?.isEmpty ?? true || e.last?.isEmpty ?? true || e.count != 2 { return nil }
-                    let f = e[0].trimmingCharacters(in: .whitespaces)
-                    let s = e[1].trimmingCharacters(in: .whitespaces)
-                    return WordAndStat(firstWord: f.canonicalise(), secondWord: s.canonicalise(), known: 0, unknown: 0, skiped: 0)
+                    let f = e[0].canonicalise()
+                    let s = e[1].canonicalise()
+                    return WordAndStat(firstWord: f, secondWord: s, known: 0, unknown: 0, skiped: 0)
                 })
                 // TODO: Create a screen to verify and select `importedWords`. Check for duplicates
                 importedWords = importedWords.filter({ (impW) -> Bool in
@@ -50,6 +71,7 @@ class WordSetsTableViewController: UITableViewController, UIDocumentPickerDelega
                 })
                 Storage.wordsAndStat.append(contentsOf: importedWords)
                 Storage.saveWords(Storage.wordsAndStat)
+                tableView.reloadData()
             } else { // TODO: it later
                 // import one word
 //                importedWord = lemmas(from: importedString).first ?? ""

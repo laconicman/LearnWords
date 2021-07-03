@@ -46,6 +46,7 @@
 		DAEA4504268DD835004CA6C4 /* WordTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAEA4503268DD835004CA6C4 /* WordTableViewCell.swift */; };
 		DAEA4506268DDABC004CA6C4 /* KDCircularProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAEA4505268DDABC004CA6C4 /* KDCircularProgress.swift */; };
 		DAEC8DCE219DF691009097C2 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAEC8DCD219DF691009097C2 /* Settings.swift */; };
+		DAFE0BFE2690C4E700E21D5C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DAFE0BFD2690C4E700E21D5C /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -133,6 +134,7 @@
 		DAEA4503268DD835004CA6C4 /* WordTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordTableViewCell.swift; sourceTree = "<group>"; };
 		DAEA4505268DDABC004CA6C4 /* KDCircularProgress.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KDCircularProgress.swift; sourceTree = "<group>"; };
 		DAEC8DCD219DF691009097C2 /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
+		DAFE0BFD2690C4E700E21D5C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -243,6 +245,7 @@
 			isa = PBXGroup;
 			children = (
 				DA554C6826593A1100C67BE0 /* ImportAsDictAction.entitlements */,
+				DAFE0BFD2690C4E700E21D5C /* Assets.xcassets */,
 				DAA16D6824B60673003C28FD /* Media.xcassets */,
 				DAA16D6A24B60673003C28FD /* ActionViewController.swift */,
 				DAA16D6C24B60673003C28FD /* MainInterface.storyboard */,
@@ -397,6 +400,7 @@
 			files = (
 				DAA16D6924B60673003C28FD /* Media.xcassets in Resources */,
 				DA86CA6C268F7BE100F917F1 /* InfoPlist.strings in Resources */,
+				DAFE0BFE2690C4E700E21D5C /* Assets.xcassets in Resources */,
 				DAA16D6E24B60673003C28FD /* MainInterface.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -542,6 +546,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "";
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -604,6 +609,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "";
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -740,6 +746,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIconExtension-iOS";
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_ENTITLEMENTS = ImportAsDictAction/ImportAsDictAction.entitlements;
 				CODE_SIGN_STYLE = Automatic;
@@ -765,6 +772,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = "AppIconExtension-iOS";
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_ENTITLEMENTS = ImportAsDictAction/ImportAsDictAction.entitlements;
 				CODE_SIGN_STYLE = Automatic;
