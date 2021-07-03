@@ -114,9 +114,7 @@ class WordSetsTableViewController: UITableViewController, UIDocumentPickerDelega
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
+        self.clearsSelectionOnViewWillAppear = false
 
          //self.navigationItem.rightBarButtonItem = self.editButtonItem
     }
@@ -137,6 +135,11 @@ class WordSetsTableViewController: UITableViewController, UIDocumentPickerDelega
         let cell = tableView.dequeueReusableCell(withIdentifier: "wordSetsCell", for: indexPath)
         cell.textLabel?.text = Storage.wordSets[indexPath.row]
         cell.accessoryType = (cell.textLabel?.text == Storage.currentWordSet) ? .checkmark : .none
+        if cell.accessoryType == .none {
+            tableView.deselectRow(at: indexPath, animated: true)
+        } else {
+            tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
+        }
         
         DispatchQueue.main.async {
             let wSet = Storage.getWordSet(name: Storage.wordSets[indexPath.row])
@@ -183,7 +186,7 @@ class WordSetsTableViewController: UITableViewController, UIDocumentPickerDelega
     */
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
+        // tableView.deselectRow(at: indexPath, animated: true)
         if tableView.cellForRow(at: indexPath) != nil {
             Storage.currentWordSet = Storage.wordSets[indexPath.row]
             tableView.reloadData()
