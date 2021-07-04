@@ -147,6 +147,16 @@ final class LWUserDefaults {
         }
     }
     
+    private let directionOfExersisesKey = "directionOfExersises"
+    var foreignToNative: Bool {
+        get {
+            return self.userDefaults.bool(forKey: directionOfExersisesKey)
+        }
+        set {
+            self.userDefaults.set(newValue, forKey: directionOfExersisesKey)
+        }
+    }
+    
 //    private let swapLanguageOrderKey = "swapLanguageOrder"
 //    var swapLanguageOrder: Bool {
 //        get {

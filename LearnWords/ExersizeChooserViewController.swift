@@ -15,8 +15,24 @@ class ExersizeChooserViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
     }
+ 
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        if let nativeLang = Locale.current.localizedString(forLanguageCode: LWUserDefaults.standard.nativeLanguagePreference!)?.capitalized,
+           let foreignLang = Locale.current.localizedString(forLanguageCode: LWUserDefaults.standard.languageToStudyPreference!)?.capitalized {
+            directionOfExercises.setTitle(nativeLang + ">" + foreignLang, forSegmentAt: 0)
+            directionOfExercises.setTitle(foreignLang + ">" + nativeLang, forSegmentAt: 1)
+        }
+    }
     
     @IBOutlet weak var numberOfWordsInSet: UILabel!
+    
+    @IBOutlet weak var directionOfExercises: UISegmentedControl!
+    
+    @IBAction func directionChanged(_ sender: UISegmentedControl) {
+        LWUserDefaults.standard.foreignToNative = (sender.selectedSegmentIndex == 0) ? false : true
+    }
+    
     @IBAction func includeLearnedWordsChanged(_ sender: UISwitch) {
         LWUserDefaults.standard.includeLearnedWords = sender.isOn
     }

@@ -164,7 +164,7 @@ final class WordTestViewController: UIViewController {
                             if isKnown { self?.knowButton?.layer.opacity = 0.1 } else { self?.forgotButton?.layer.opacity = 0.1 }
                             self?.forgotButton?.isEnabled = false
                             self?.wordDefinition.attributedText = NSAttributedString(
-                                string: shownWord.secondWord,
+                                string: LWUserDefaults.standard.foreignToNative ? shownWord.secondWord : shownWord.firstWord,
                                 attributes: [.foregroundColor: isKnown ? UIColor(red: 0, green: 0.7, blue: 0, alpha: 1) : UIColor(red: 0.7, green: 0.0, blue: 0, alpha: 1)])
                             // prompt.textColor = UIColor(red: 0, green: 0.7, blue: 0, alpha: 1)
         }) { [weak self] (ended) in
@@ -177,7 +177,9 @@ final class WordTestViewController: UIViewController {
         //            prompt.textColor = UIColor(red: 0, green: 0.7, blue: 0, alpha: 1)
         
         if LWUserDefaults.standard.pronounceAnswersPreference {
-            LWSpeechSynth.standard.speak(utteranceString: wordDefinition.attributedText!, language: LWUserDefaults.standard.nativeLanguagePreference!)
+            LWSpeechSynth.standard.speak(utteranceString: wordDefinition.attributedText!, language:
+                                            LWUserDefaults.standard.foreignToNative ?
+                                            LWUserDefaults.standard.nativeLanguagePreference! :  LWUserDefaults.standard.languageToStudyPreference!)
         }
     }
     
@@ -193,9 +195,9 @@ final class WordTestViewController: UIViewController {
             nextTapped(skipedStat: 0)
             return
         }
-        prompt.attributedText = NSAttributedString(string: wordsInTest[0].firstWord)
+        prompt.attributedText = NSAttributedString(string: LWUserDefaults.standard.foreignToNative ? wordsInTest[0].firstWord : wordsInTest[0].secondWord)
         if LWUserDefaults.standard.pronounceQuestionsPreference {
-            LWSpeechSynth.standard.speak(utteranceString: prompt.attributedText!, language: LWUserDefaults.standard.languageToStudyPreference!)
+            LWSpeechSynth.standard.speak(utteranceString: prompt.attributedText!, language: LWUserDefaults.standard.foreignToNative ? LWUserDefaults.standard.languageToStudyPreference! :  LWUserDefaults.standard.nativeLanguagePreference!)
         }
         wordDefinition.attributedText = NSAttributedString(
             string: "?",
