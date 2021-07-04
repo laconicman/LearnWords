@@ -127,3 +127,7 @@ Returns a font descriptor containing the text style and the content size categor
 Передавать словари или слова при помощи action extension FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: "group.com.appcoda.Bookmark"
 Как в проекте Bookmarks   Разобраться с записью в общий для программы её расширения файл или в UserDefaults.
 Упражнение - озвучить слово - фонетика, произношение.
+
+## Известные баги
+На iPad поворачивается
+Не удаляет слово из набора

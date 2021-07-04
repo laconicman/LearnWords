@@ -336,13 +336,13 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         switch searchedObject { //Add emoji flags
         case .original(lang: let originalLanguage, word: _):
-            return NSLocalizedString("Original ", comment: "") + originalLanguage
+            return NSLocalizedString("Word in ", comment: "Language") + Locale.current.localizedString(forLanguageCode: originalLanguage)!.capitalized
         case .translation(orig_lang: let originalLanguage, orig_word: _, dest_lang: let translationLanguage, translations: _):
             switch section {
             case 0:
-                return NSLocalizedString("Original ", comment: "") + originalLanguage
+                return NSLocalizedString("Word in ", comment: "Language") + Locale.current.localizedString(forLanguageCode: originalLanguage)!.capitalized
             case 1:
-                return NSLocalizedString("Translation ", comment: "") + translationLanguage
+                return NSLocalizedString("Meaning in ", comment: "Meaing in native lang") + Locale.current.localizedString(forLanguageCode: translationLanguage)!.capitalized
             default:
                 return ""
             }
@@ -488,27 +488,27 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
     // Add the search term to our list of recent searches, dealing with duplicates
     // and keeping the list trimmed to 10
     //------------------------------------------------------------------------------
-    private func addToRecentSearches(_ aSearch: String)
-    {
-        let foundIndex = recentSearches.firstIndex(of: aSearch)
-        if  foundIndex == nil {
-            // not already in recents, add it
-            recentSearches.insert(aSearch, at: 0)
-        }
-        else {
-            // move found object to index 0
-            let object = recentSearches[foundIndex!]
-            recentSearches.remove(at: foundIndex!)
-            recentSearches.insert(object, at: 0)
-        }
-        
-        // trim recent searches if over 10
-        if recentSearches.count > 10 {
-            recentSearches.removeLast()
-        }
-        userDefaultsGroup.set(recentSearches, forKey: kRecentSearchesKey)
-
-    }
+//    private func addToRecentSearches(_ aSearch: String)
+//    {
+//        let foundIndex = recentSearches.firstIndex(of: aSearch)
+//        if  foundIndex == nil {
+//            // not already in recents, add it
+//            recentSearches.insert(aSearch, at: 0)
+//        }
+//        else {
+//            // move found object to index 0
+//            let object = recentSearches[foundIndex!]
+//            recentSearches.remove(at: foundIndex!)
+//            recentSearches.insert(object, at: 0)
+//        }
+//
+//        // trim recent searches if over 10
+//        if recentSearches.count > 10 {
+//            recentSearches.removeLast()
+//        }
+//        userDefaultsGroup.set(recentSearches, forKey: kRecentSearchesKey)
+//
+//    }
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
 
         if segue.identifier == "Add Translation" { //, searchedObject = .original(lang: termLanguage, word: termToDefine) - underused word

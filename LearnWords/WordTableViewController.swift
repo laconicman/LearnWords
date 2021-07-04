@@ -19,7 +19,7 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
     // MARK: searchController variables
     var filteredWords = [WordAndStat]() //? move to model?
     var wordsInTable : [WordAndStat] { // A subset of word pairs to display in tableView
-        return (searchController.isActive && searchController.searchBar.text != "") ? filteredWords.sorted(by: { $0.firstWord < $1.firstWord }) : Storage.wordsAndStat.sorted(by: { $0.firstWord < $1.firstWord })
+        return (searchController.isActive && searchController.searchBar.text != "") ? filteredWords : Storage.wordsAndStat
     }
     var importedWords = [WordAndStat]()
     var importedWord = ""

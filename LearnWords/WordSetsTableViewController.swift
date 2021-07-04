@@ -118,6 +118,11 @@ class WordSetsTableViewController: UITableViewController, UIDocumentPickerDelega
 
          //self.navigationItem.rightBarButtonItem = self.editButtonItem
     }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        tableView.reloadData()
+    }
 
     // MARK: - Table view data source
 

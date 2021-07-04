@@ -86,7 +86,7 @@ struct Storage {
 //    }
     
     static func saveWords(_ wordsAndStat: [WordAndStat]) {
-        userDefaultsGroup.encodeAndSave(wordsAndStat, currentWordSet)
+        userDefaultsGroup.encodeAndSave(wordsAndStat.sorted(by: { $0.firstWord < $1.firstWord }), currentWordSet)
         //            defaults.set(knownWords, forKey: "knownWords")
         
     }
