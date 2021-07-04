@@ -38,7 +38,7 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
     
     private var progressStep: Float = 0.0
     
-    private let speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: LWUserDefaults.standard.languageToStudyPreference!))!
+    private let speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: LWUserDefaults.standard.foreignToNative ? LWUserDefaults.standard.nativeLanguagePreference! : LWUserDefaults.standard.languageToStudyPreference!))!
     
     private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
     
@@ -171,10 +171,10 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
                 isFinal = result.isFinal
                 // print("Text \(result.bestTranscription.formattedString)")
                 // print("Transcriptions \(result.transcriptions.map{ $0.formattedString.lowercased() })")
-                if !(self?.wordsInTest.isEmpty ?? true),  result.bestTranscription.formattedString.lowercased().contains(self?.wordsInTest[0].firstWord ?? "") /* && isFinal */ {
+                if !(self?.wordsInTest.isEmpty ?? true),  result.bestTranscription.formattedString.lowercased().contains((LWUserDefaults.standard.foreignToNative ? self?.wordsInTest[0].secondWord: self?.wordsInTest[0].firstWord) ?? "") /* && isFinal */ {
                     self?.recordButtonTapped() // stop the audio
                     
-                    self?.recognized.text = self?.wordsInTest[0].firstWord
+                    self?.recognized.text = LWUserDefaults.standard.foreignToNative ? self?.wordsInTest[0].secondWord : self?.wordsInTest[0].firstWord
                     self?.afterAnswer(isKnown: true)
                 } else {
                    // self.recognized.text = ""
@@ -269,9 +269,9 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
             nextTapped(skipedStat: 0)
             return
         }
-        prompt.attributedText = NSAttributedString(string: wordsInTest[0].secondWord)
+        prompt.attributedText = NSAttributedString(string: LWUserDefaults.standard.foreignToNative ? wordsInTest[0].firstWord : wordsInTest[0].secondWord)
         if LWUserDefaults.standard.pronounceQuestionsPreference {
-            LWSpeechSynth.standard.speak(utteranceString: prompt.attributedText!, language: LWUserDefaults.standard.nativeLanguagePreference!)
+            LWSpeechSynth.standard.speak(utteranceString: prompt.attributedText!, language: LWUserDefaults.standard.foreignToNative ? LWUserDefaults.standard.languageToStudyPreference! : LWUserDefaults.standard.nativeLanguagePreference!)
         }
         recognized.attributedText = NSAttributedString(
             string: NSLocalizedString("speak the translation", comment: "label prompt"),
@@ -359,7 +359,7 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
                             self?.forgotButton?.isEnabled = false
                             if isKnown { self?.knowButton?.layer.opacity = 0.1 } else { self?.forgotButton?.layer.opacity = 0.1 }
                             self?.recognized.attributedText = NSAttributedString(
-                                string: shownWord.firstWord,
+                                string: LWUserDefaults.standard.foreignToNative ? shownWord.secondWord : shownWord.firstWord,
                                 attributes: [.foregroundColor: isKnown ? UIColor(red: 0, green: 0.7, blue: 0, alpha: 1) : UIColor(red: 0.7, green: 0.0, blue: 0, alpha: 1)])
                             debugLog("begin transition")
                             self?.recognized.textColor = isKnown ? UIColor(red: 0, green: 0.7, blue: 0, alpha: 1) : UIColor(red: 0.7, green: 0.0, blue: 0, alpha: 1)
@@ -378,7 +378,7 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
         try? audioSession.setCategory(.playback, mode: .default, policy: .default, options: [])
         try? audioSession.setActive(true, options: .notifyOthersOnDeactivation)
         if LWUserDefaults.standard.pronounceAnswersPreference {
-            LWSpeechSynth.standard.speak(utteranceString: recognized.attributedText!, language: LWUserDefaults.standard.languageToStudyPreference!)
+            LWSpeechSynth.standard.speak(utteranceString: recognized.attributedText!, language: LWUserDefaults.standard.foreignToNative ? LWUserDefaults.standard.nativeLanguagePreference! : LWUserDefaults.standard.languageToStudyPreference!)
         }
     }
     
