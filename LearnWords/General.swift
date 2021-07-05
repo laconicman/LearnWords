@@ -64,3 +64,80 @@ func split(_ str: String, by oneOfTheCharacters: String) -> [String] {
     let wordCount = String.localizedStringWithFormat(format, count)
     return wordCount
 }
+
+func match3(pattern: String, answer: String, language: String, delimiters: String = ",;") -> Bool {
+    
+    // let patternComponents = pattern.components(separatedBy: CharacterSet(charactersIn: delimiters)).compactMap({$0.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)})
+    func filterLexicalClasses(phrase: String, lang: String, classes: [String] = ["Determiner", "Particle" /*"Preposition","OtherWord"*/]) -> [String] {
+        var phraseWordsClassified = [String]()
+        
+        phrase.enumerateLinguisticTags(in: phrase.startIndex..<phrase.endIndex,
+                                       scheme: NSLinguisticTagScheme.nameTypeOrLexicalClass.rawValue,
+                                       invoking: { (tag, tokenRange, QRange, stop) in
+            if !classes.contains(tag) {
+                
+                let word = String(phrase[tokenRange])
+                phraseWordsClassified.append(word)}
+            //print("\(String(describing: phraseWordsClassified.last)): \(tag) t2: \(phrase[QRange])")
+        })
+        
+//        taggerLexical.enumerateTags(in: phrase.startIndex..<phrase.endIndex, unit: .word, scheme: .lexicalClass /*, options: [.omitPunctuation, .omitWhitespace]*/) { tag, tokenRange in
+//            if let tag = tag, !classes.contains(tag.rawValue) {
+//                let word = String(phrase[tokenRange])
+//                phraseWordsClassified.append(word)
+//                // print("\(word): \(tag.rawValue)\(word == lemma ? "" : " | Lemma: \(lemma) " )")
+//            }
+//            return true
+//        }
+        return phraseWordsClassified
+    }
+    
+//    taggerLexical.string = answer.lowercased()
+//    taggerLexical.setLanguage(NLLanguage(rawValue: "en"), range: answer.startIndex..<answer.endIndex)
+//    var answerSet = Set<WordAndClass>()
+//    taggerLexical.enumerateTags(in: answer.startIndex..<answer.endIndex, unit: .word, scheme: .lexicalClass, options: [.omitPunctuation, .omitWhitespace]) { tag, tokenRange in
+//        if let tag = tag {
+//            // let lemma = taggerLexical.tag(at: tokenRange.lowerBound, unit: .word, scheme: .lemma).0?.rawValue ?? ""
+//            let word = String(answer[tokenRange])
+//            answerSet.insert(WordAndClass(word: word, lexicalClass: tag.rawValue))
+//            // print("\(word): \(tag.rawValue)\(word == lemma ? "" : " | Lemma: \(lemma) " )")
+//        }
+//        return true
+//    }
+    
+    print(filterLexicalClasses(phrase: answer,  lang: language))
+    print(filterLexicalClasses(phrase: pattern, lang: language))
+    
+    let answerFiltered = filterLexicalClasses(phrase: answer, lang: language)
+    let patternFiltered = filterLexicalClasses(phrase: pattern, lang: language)
+    
+    // let filterSet = CharacterSet.whitespacesAndNewlines.union(.punctuationCharacters).subtracting(CharacterSet(charactersIn: delimiters))
+    let patternFilteredString = patternFiltered.joined().lowercased()
+    //.filter({ filterSet.contains($0.unicodeScalars.first!) == false })
+    //.filter({ ($0.isPunctuation || $0.isWhitespace) == false })
+    print(patternFilteredString)
+    let answerSetString = answerFiltered.joined().lowercased()
+    //.filter({ filterSet.contains($0.unicodeScalars.first!) == false })
+    //.replacingOccurrences(of: " ", with: "")
+    print(answerSetString)
+    //let patternSet = Set(patternFiltered.map({ $0.word }))
+    let patternSet = patternFilteredString.components(separatedBy: CharacterSet(charactersIn: delimiters))
+        .compactMap({$0.filter({ ($0.isPunctuation || $0.isWhitespace) == false })})
+    print(patternSet)
+    let answerSet = answerSetString.components(separatedBy: CharacterSet(charactersIn: delimiters))
+        .compactMap({$0.filter({ ($0.isPunctuation || $0.isWhitespace) == false })})
+    //let intersection = answerSet.intersection(patternSet)
+
+ //   print(Array(intersection))
+//    print(Array(patternSet).map({ $0.word + " - " + $0.lexicalClass}))
+//    let aarr = Array(answerSet).map({ $0.word + " - " + $0.lexicalClass})
+//    print(aarr)
+    
+    //return patternSet.contains(answerSetString)
+    
+    if Set(patternSet).intersection(Set(answerSet)).isEmpty {
+        return false
+    } else {
+        return true
+    }
+}

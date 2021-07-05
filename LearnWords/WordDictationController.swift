@@ -65,14 +65,25 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         
         
-        if let answer = textField.text?.lowercased().trimmingCharacters(in: .whitespaces),
-           split(answer, by: " " + ",").contains(
-            LWUserDefaults.standard.foreignToNative ? wordsInTest[0].secondWord : wordsInTest[0].firstWord) {
-            afterAnswer(isKnown: true)
+//        if let answer = textField.text?.lowercased().trimmingCharacters(in: .whitespaces),
+//           split(answer, by: " " + ",").contains(
+//            LWUserDefaults.standard.foreignToNative ? wordsInTest[0].secondWord : wordsInTest[0].firstWord) {
+//            afterAnswer(isKnown: true)
+//        } else {
+//            afterAnswer(isKnown: false)
+//        }
+        
+        if let answer = textField.text?.trimmingCharacters(in: .whitespaces) {
+            let res = match3(pattern: (LWUserDefaults.standard.foreignToNative ? wordsInTest[0].secondWord : wordsInTest[0].firstWord),
+                            answer: answer,
+                            language: (LWUserDefaults.standard.foreignToNative ? LWUserDefaults.standard.nativeLanguagePreference :
+                                        LWUserDefaults.standard.languageToStudyPreference)!)
+            afterAnswer(isKnown: res)
         } else {
             afterAnswer(isKnown: false)
         }
-        textField.resignFirstResponder()
+            
+        // textField.resignFirstResponder()
         return true
     }
 

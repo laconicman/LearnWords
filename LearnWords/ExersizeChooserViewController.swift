@@ -22,6 +22,7 @@ class ExersizeChooserViewController: UIViewController {
            let foreignLang = Locale.current.localizedString(forLanguageCode: LWUserDefaults.standard.languageToStudyPreference!)?.capitalized {
             directionOfExercises.setTitle(nativeLang + ">" + foreignLang, forSegmentAt: 0)
             directionOfExercises.setTitle(foreignLang + ">" + nativeLang, forSegmentAt: 1)
+            directionOfExercises.selectedSegmentIndex = LWUserDefaults.standard.foreignToNative ? 1 : 0
         }
     }
     

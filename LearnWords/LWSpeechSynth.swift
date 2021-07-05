@@ -41,7 +41,10 @@ final class LWSpeechSynth {
         utterance.preUtteranceDelay = 0.1
         utterance.postUtteranceDelay = 0.1
         
-        sytheiser.stopSpeaking(at: .immediate)
+        while sytheiser.isSpeaking {
+            usleep(250000)
+        }
+        // sytheiser.stopSpeaking(at: .word)
         sytheiser.speak(utterance)
 
     }
