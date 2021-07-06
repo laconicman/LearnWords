@@ -30,7 +30,8 @@ import UIKit
         layer.cornerRadius = cornerRadius
         layer.borderWidth = 1
         layer.borderColor = UIColor.lightGray.cgColor
-
+        titleLabel?.adjustsFontSizeToFitWidth = true
+        titleLabel?.minimumScaleFactor = 0.2
     }
     
 }
