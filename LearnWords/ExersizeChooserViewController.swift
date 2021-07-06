@@ -24,11 +24,13 @@ class ExersizeChooserViewController: UIViewController {
             directionOfExercises.setTitle(foreignLang + ">" + nativeLang, forSegmentAt: 1)
             directionOfExercises.selectedSegmentIndex = LWUserDefaults.standard.foreignToNative ? 1 : 0
         }
+        includeLeanedWords.isOn = LWUserDefaults.standard.includeLearnedWords
     }
     
     @IBOutlet weak var numberOfWordsInSet: UILabel!
     
     @IBOutlet weak var directionOfExercises: UISegmentedControl!
+    @IBOutlet weak var includeLeanedWords: UISwitch!
     
     @IBAction func directionChanged(_ sender: UISegmentedControl) {
         LWUserDefaults.standard.foreignToNative = (sender.selectedSegmentIndex == 0) ? false : true
