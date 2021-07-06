@@ -241,7 +241,7 @@ final class WordTestViewController: UIViewController {
             self.stackView.alpha = 0
         }
         animation.addCompletion { [unowned self] position in
-            self.prompt.textColor = UIColor.black
+            // self.prompt.textColor = UIColor.black
             self.wordDefinition.textColor = UIColor(red: 0, green: 0.7, blue: 0, alpha: 0)
             self.askQuestion()
         }
