@@ -12,7 +12,12 @@ class TabBarControllerHome: UITabBarController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
         // Do any additional setup after loading the view.
+    }
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+//        UINavigationBar.appearance().setBackgroundImage(UIImage(named: "navigationBarBackground"), for: .default)
+//        UITabBar.appearance().backgroundImage = UIImage(named: "navigationBarBackground")
+
     }
 }

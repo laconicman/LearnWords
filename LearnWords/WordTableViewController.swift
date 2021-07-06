@@ -279,7 +279,7 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         definesPresentationContext = true
         // searchController.dimsBackgroundDuringPresentation = false
         searchController.searchResultsUpdater = self
-        searchController.searchBar.barTintColor = UIColor(white: 0.9, alpha: 0.9)
+        searchController.searchBar.barTintColor = UIColor(white: 0.9, alpha: 0.4)
         searchController.searchBar.placeholder = placeholder
         searchController.hidesNavigationBarDuringPresentation = false
         tableView.tableHeaderView = searchController.searchBar

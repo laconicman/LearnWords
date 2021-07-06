@@ -15,11 +15,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
-        UINavigationBar.appearance().setBackgroundImage(UIImage(named: "navigationBarBackground"), for: .default)
-        // Further customization
         UINavigationBar.appearance().tintColor = UIColor.orange
         UITabBar.appearance().tintColor = UIColor.orange
-        UITabBar.appearance().backgroundImage = UIImage(named: "navigationBarBackground")
+        // Does not work well when switching to dark mode
+        // UINavigationBar.appearance().setBackgroundImage(UIImage(named: "navigationBarBackground"), for: .default)
+        // UITabBar.appearance().backgroundImage = UIImage(named: "navigationBarBackground")
+        // UINavigationBar.appearance().setBackgroundImage(UIImage(named: "navigationBarBackground"), for: .default)
+        // UITabBar.appearance().backgroundImage = UIImage(named: "navigationBarBackground")
         // UITabBar.appearance().barTintColor = #colorLiteral(red: 0.4666666687, green: 0.7647058964, blue: 0.2666666806, alpha: 1)
         // UITabBar.appearance().backgroundColor
         // Next lines should do the same, but they don't work for some reasons
