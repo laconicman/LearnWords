@@ -204,7 +204,11 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
             string: NSLocalizedString("type in translation", comment: "Placeholder promt"),
             attributes: [.foregroundColor: UIColor(red: 0, green: 0.7, blue: 0.7, alpha: 1)])
         translationInput.text = ""
-        translationInput.textColor = .black
+        if #available(iOS 13.0, *) {
+            translationInput.textColor = .label
+        } else {
+            translationInput.textColor = .black
+        }
         // prompt.textColor = UIColor(red: 0, green: 0.7, blue: 0, alpha: 1)
 
 
