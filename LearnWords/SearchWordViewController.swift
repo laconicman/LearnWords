@@ -260,7 +260,12 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
                 if let searchTextRangeInSuggestion = suggestion.range(of: searchText) {
                     let searchTextNSRangeInSuggestion = NSRange(searchTextRangeInSuggestion, in: suggestion)
                     let suggestionWithAttributes = NSMutableAttributedString(string: suggestion)
-                    suggestionWithAttributes.addAttribute(.foregroundColor, value: UIColor(red: 0, green: 0.1, blue: 0.7, alpha: 1), range: searchTextNSRangeInSuggestion)
+                    if #available(iOS 13.0, *) {
+                        suggestionWithAttributes.addAttribute(.foregroundColor, value: UIColor.systemIndigo, range: searchTextNSRangeInSuggestion)
+                    } else {
+                        // Fallback on earlier versions
+                        suggestionWithAttributes.addAttribute(.foregroundColor, value:UIColor(red: 0, green: 0.1, blue: 0.7, alpha: 1), range: searchTextNSRangeInSuggestion)
+                    }
                     cell.textLabel?.attributedText = suggestionWithAttributes
                 } else {
                     cell.textLabel?.text = suggestion
@@ -279,7 +284,11 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
                     let suggestion = suggestions[indexPath.row]
                     if let searchTextNSRangeInSuggestion = suggestion.nsRange(of: searchText) {
                         let suggestionWithAttributes = NSMutableAttributedString(string: suggestion)
-                        suggestionWithAttributes.addAttribute(.foregroundColor, value: UIColor(red: 0, green: 0.1, blue: 0.7, alpha: 1), range: searchTextNSRangeInSuggestion)
+                        if #available(iOS 13.0, *) {
+                            suggestionWithAttributes.addAttribute(.foregroundColor, value: UIColor.systemIndigo, range: searchTextNSRangeInSuggestion)
+                        } else {
+                            suggestionWithAttributes.addAttribute(.foregroundColor, value: UIColor(red: 0, green: 0.1, blue: 0.7, alpha: 1), range: searchTextNSRangeInSuggestion)
+                        }
                         cell.textLabel?.attributedText = suggestionWithAttributes
                     } else {
                         cell.textLabel?.text = suggestions[indexPath.row]
