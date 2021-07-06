@@ -17,6 +17,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         UINavigationBar.appearance().tintColor = UIColor.orange
         UITabBar.appearance().tintColor = UIColor.orange
+        self.window?.tintColor = UIColor.orange
         // Does not work well when switching to dark mode
         // UINavigationBar.appearance().setBackgroundImage(UIImage(named: "navigationBarBackground"), for: .default)
         // UITabBar.appearance().backgroundImage = UIImage(named: "navigationBarBackground")
