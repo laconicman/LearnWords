@@ -1,0 +1,26 @@
+/* Action for dictionary prompt */
+"DICTIONARY_ACTION" = "Got It";
+
+/* Message for dictionary prompt */
+"DICTIONARY_MESSAGE" = "Have you set up your iOS dictionaries?\n\nTap \"Manage\" below to download dictionaries for the languages you want.";
+
+/* UIViewController+Dictionary */
+"DICTIONARY_TITLE" = "Add Dictionaries";
+
+/* Count of words to be exported */
+"EXPORT_WORDS_MESSAGE" = "Export %@";
+
+/* Title for failed import */
+"IMPORT_FAIL_TITLE" = "Import Failed";
+
+/* Message for successful import */
+"IMPORT_SUCCESS_MESSAGE" = "%@ found in import source.\n%@ duplicated.\n%@ added.";
+
+/* SettingsViewController */
+"IMPORT_SUCCESS_TITLE" = "Import Successful";
+
+/* No comment provided by engineer. */
+"OK" = "OK";
+
+/* Count of words available */
+"WordCount" = "THINGS WITH LETTERS";

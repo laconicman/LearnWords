@@ -124,6 +124,12 @@
 		DAA16D6A24B60673003C28FD /* ActionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionViewController.swift; sourceTree = "<group>"; };
 		DAA16D6D24B60673003C28FD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
 		DAA16D6F24B60673003C28FD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		DAA926DF2695E088001574B0 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Main.strings; sourceTree = "<group>"; };
+		DAA926E02695E089001574B0 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
+		DAA926E12695E089001574B0 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/MainInterface.strings; sourceTree = "<group>"; };
+		DAA926E22695E089001574B0 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/MainInterface.strings; sourceTree = "<group>"; };
+		DAA926E32695E089001574B0 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
+		DAA926E42695E08A001574B0 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = es; path = es.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
 		DAC884B9219C8710005C6588 /* SearchWordViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchWordViewController.swift; sourceTree = "<group>"; };
 		DAD5E0D5219EF1400084FD1A /* Images.imagecatalog */ = {isa = PBXFileReference; lastKnownFileType = folder.imagecatalog; path = Images.imagecatalog; sourceTree = "<group>"; };
 		DAEA44F7268A5060004CA6C4 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = ru; path = ru.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
@@ -356,6 +362,7 @@
 				en,
 				Base,
 				ru,
+				es,
 			);
 			mainGroup = DA246CA71F8A6E5E00A75ED1;
 			productRefGroup = DA246CB11F8A6E5E00A75ED1 /* Products */;
@@ -474,6 +481,7 @@
 				DA246CB81F8A6E5E00A75ED1 /* Base */,
 				DA160CB3268A415B001F6CD2 /* en */,
 				DA160CB4268A42CA001F6CD2 /* ru */,
+				DAA926DF2695E088001574B0 /* es */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -483,6 +491,7 @@
 			children = (
 				DA246CBD1F8A6E5E00A75ED1 /* Base */,
 				DA160CB5268A42CA001F6CD2 /* ru */,
+				DAA926E02695E089001574B0 /* es */,
 			);
 			name = LaunchScreen.storyboard;
 			sourceTree = "<group>";
@@ -492,6 +501,7 @@
 			children = (
 				DA246CD11F8AA30E00A75ED1 /* Base */,
 				DA160CB6268A42CA001F6CD2 /* ru */,
+				DAA926E12695E089001574B0 /* es */,
 			);
 			name = MainInterface.storyboard;
 			sourceTree = "<group>";
@@ -517,6 +527,7 @@
 			children = (
 				DAA16D6D24B60673003C28FD /* Base */,
 				DA160CB7268A42CA001F6CD2 /* ru */,
+				DAA926E22695E089001574B0 /* es */,
 			);
 			name = MainInterface.storyboard;
 			sourceTree = "<group>";
@@ -526,6 +537,7 @@
 			children = (
 				DAEA44F7268A5060004CA6C4 /* ru */,
 				DAEA44FF268A516E004CA6C4 /* en */,
+				DAA926E42695E08A001574B0 /* es */,
 			);
 			name = Localizable.stringsdict;
 			sourceTree = "<group>";
@@ -535,6 +547,7 @@
 			children = (
 				DAEA44FC268A5119004CA6C4 /* ru */,
 				DAEA44FE268A5164004CA6C4 /* en */,
+				DAA926E32695E089001574B0 /* es */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -546,7 +559,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ASSETCATALOG_COMPILER_APPICON_NAME = "";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -609,7 +622,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ASSETCATALOG_COMPILER_APPICON_NAME = "";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;

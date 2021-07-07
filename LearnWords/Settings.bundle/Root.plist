@@ -22,7 +22,7 @@
 			<key>Key</key>
 			<string>languageToStudyPreference</string>
 			<key>DefaultValue</key>
-			<string>en-GB</string>
+			<string>en-US</string>
 			<key>Values</key>
 			<array>
 				<string>en-GB</string>
