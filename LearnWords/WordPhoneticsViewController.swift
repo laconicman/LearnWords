@@ -171,7 +171,7 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
                 isFinal = result.isFinal
                 // print("Text \(result.bestTranscription.formattedString)")
                 // print("Transcriptions \(result.transcriptions.map{ $0.formattedString.lowercased() })")
-                if !(self?.wordsInTest.isEmpty ?? true),  match3(pattern: (LWUserDefaults.standard.foreignToNative ? self?.wordsInTest[0].secondWord: self?.wordsInTest[0].firstWord) ?? "", answer: result.bestTranscription.formattedString.lowercased(), language: "")    /* && isFinal */ {
+                if !(self?.wordsInTest.isEmpty ?? true),  match3(pattern: (LWUserDefaults.standard.foreignToNative ? self?.wordsInTest[0].secondWord: self?.wordsInTest[0].firstWord) ?? "", answer: result.bestTranscription.formattedString.lowercased(), language: "", delimiters: ",; ")    /* && isFinal */ {
                     self?.recordButtonTapped() // stop the audio
                     
                     self?.recognized.text = LWUserDefaults.standard.foreignToNative ? self?.wordsInTest[0].secondWord : self?.wordsInTest[0].firstWord
