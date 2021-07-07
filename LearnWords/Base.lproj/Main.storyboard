@@ -415,7 +415,7 @@
             <objects>
                 <tableViewController id="3Og-N0-BZi" customClass="SearchWordViewController" customModule="LearnWords" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="nhv-dM-E9i">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="647"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <prototypes>
@@ -632,13 +632,13 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="20" translatesAutoresizingMaskIntoConstraints="NO" id="F0l-2D-eeU">
-                                <rect key="frame" x="16" y="64" width="330" height="434"/>
+                                <rect key="frame" x="16" y="64" width="343" height="434"/>
                                 <subviews>
                                     <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="UdG-Da-pa4">
-                                        <rect key="frame" x="0.0" y="0.0" width="330" height="33.5"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="343" height="33.5"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="252" verticalHuggingPriority="251" text="0 words" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" minimumFontSize="10" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="WxG-u0-GkQ">
-                                                <rect key="frame" x="0.0" y="0.0" width="330" height="33.5"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="343" height="33.5"/>
                                                 <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
@@ -646,10 +646,10 @@
                                         </subviews>
                                     </stackView>
                                     <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Wwv-fH-b6e">
-                                        <rect key="frame" x="0.0" y="53.5" width="330" height="33.5"/>
+                                        <rect key="frame" x="0.0" y="53.5" width="343" height="33.5"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Include learned words" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="10" adjustsFontForContentSizeCategory="YES" preferredMaxLayoutWidth="260" translatesAutoresizingMaskIntoConstraints="NO" id="JHd-Ju-sT7">
-                                                <rect key="frame" x="0.0" y="0.0" width="260" height="33.5"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="273" height="33.5"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" priority="750" constant="260" id="JF5-77-tFk"/>
                                                 </constraints>
@@ -658,7 +658,7 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <switch opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" title="Include learned" translatesAutoresizingMaskIntoConstraints="NO" id="dWV-NJ-r41">
-                                                <rect key="frame" x="260" y="0.0" width="72" height="33.5"/>
+                                                <rect key="frame" x="273" y="0.0" width="72" height="33.5"/>
                                                 <constraints>
                                                     <constraint firstAttribute="width" constant="70" id="lpX-Xm-H4e"/>
                                                 </constraints>
@@ -669,19 +669,19 @@
                                         </subviews>
                                     </stackView>
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="r1y-QB-Ngu">
-                                        <rect key="frame" x="0.0" y="107" width="330" height="64.5"/>
+                                        <rect key="frame" x="0.0" y="107" width="343" height="64.5"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="252" verticalHuggingPriority="251" text="Direction" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="10" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="MTG-Z2-PFM">
-                                                <rect key="frame" x="0.0" y="0.0" width="330" height="33.5"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="343" height="33.5"/>
                                                 <constraints>
-                                                    <constraint firstAttribute="width" relation="lessThanOrEqual" constant="150" id="EF7-dB-EwV"/>
+                                                    <constraint firstAttribute="width" relation="lessThanOrEqual" priority="750" constant="150" id="EF7-dB-EwV"/>
                                                 </constraints>
                                                 <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="K2v-wJ-d9a">
-                                                <rect key="frame" x="0.0" y="33.5" width="330" height="32"/>
+                                                <rect key="frame" x="0.0" y="33.5" width="343" height="32"/>
                                                 <segments>
                                                     <segment title=" Straight"/>
                                                     <segment title="Reversed"/>
@@ -694,7 +694,7 @@
                                         </subviews>
                                     </stackView>
                                     <button opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="249" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="y3Z-Kn-fYD" customClass="GradientButton" customModule="LearnWords" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="191.5" width="330" height="67.5"/>
+                                        <rect key="frame" x="0.0" y="191.5" width="343" height="67.5"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
                                         <color key="tintColor" systemColor="systemOrangeColor"/>
                                         <state key="normal" title="Learning">
@@ -714,7 +714,7 @@
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="249" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="uBK-Se-mT6" customClass="GradientButton" customModule="LearnWords" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="279" width="330" height="67.5"/>
+                                        <rect key="frame" x="0.0" y="279" width="343" height="67.5"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
                                         <color key="tintColor" systemColor="systemOrangeColor"/>
                                         <state key="normal" title="Dictation">
@@ -734,7 +734,7 @@
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="249" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Vmu-2y-Ili" customClass="GradientButton" customModule="LearnWords" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="366.5" width="330" height="67.5"/>
+                                        <rect key="frame" x="0.0" y="366.5" width="343" height="67.5"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
                                         <color key="tintColor" systemColor="systemOrangeColor"/>
                                         <state key="normal" title="Phonetic">
@@ -813,17 +813,17 @@
                                 <rect key="frame" x="20" y="44" width="335" height="554"/>
                                 <subviews>
                                     <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="fWn-lH-Fzm">
-                                        <rect key="frame" x="0.0" y="0.0" width="335" height="6"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="335" height="5"/>
                                         <color key="tintColor" systemColor="systemOrangeColor"/>
                                     </progressView>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="252" text="Word" textAlignment="center" lineBreakMode="wordWrap" baselineAdjustment="none" minimumFontSize="15" translatesAutoresizingMaskIntoConstraints="NO" id="P1B-tp-yvT">
-                                        <rect key="frame" x="0.0" y="14" width="335" height="148.5"/>
+                                        <rect key="frame" x="0.0" y="13" width="335" height="124"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="80"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="speak the translation" textAlignment="center" lineBreakMode="middleTruncation" numberOfLines="0" baselineAdjustment="none" minimumFontSize="15" highlighted="YES" translatesAutoresizingMaskIntoConstraints="NO" id="uEJ-4s-E9l">
-                                        <rect key="frame" x="0.0" y="170.5" width="335" height="112"/>
+                                        <rect key="frame" x="0.0" y="145" width="335" height="150"/>
                                         <constraints>
                                             <constraint firstAttribute="height" relation="lessThanOrEqual" constant="150" id="zzA-ZC-SMf"/>
                                         </constraints>
@@ -832,10 +832,10 @@
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <stackView opaque="NO" contentMode="scaleToFill" spacingType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="CLb-nR-u2j">
-                                        <rect key="frame" x="0.0" y="290.5" width="335" height="82.5"/>
+                                        <rect key="frame" x="0.0" y="303" width="335" height="78"/>
                                         <subviews>
                                             <button opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="251" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qaf-Gn-jV1" customClass="GradientButton" customModule="LearnWords" customModuleProvider="target">
-                                                <rect key="frame" x="0.0" y="0.0" width="163.5" height="82.5"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="163.5" height="78"/>
                                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
                                                 <inset key="contentEdgeInsets" minX="10" minY="10" maxX="10" maxY="10"/>
                                                 <state key="normal" title="Look Up">
@@ -854,7 +854,7 @@
                                                 </connections>
                                             </button>
                                             <button opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="251" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Liq-qX-vPh" customClass="GradientButton" customModule="LearnWords" customModuleProvider="target">
-                                                <rect key="frame" x="171.5" y="0.0" width="163.5" height="82.5"/>
+                                                <rect key="frame" x="171.5" y="0.0" width="163.5" height="78"/>
                                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
                                                 <inset key="contentEdgeInsets" minX="10" minY="10" maxX="10" maxY="10"/>
                                                 <state key="normal" title="Listen">
@@ -878,10 +878,10 @@
                                         </constraints>
                                     </stackView>
                                     <stackView opaque="NO" tag="10" contentMode="scaleToFill" distribution="fillEqually" spacingType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="7ii-cE-rgE">
-                                        <rect key="frame" x="0.0" y="381" width="335" height="82.5"/>
+                                        <rect key="frame" x="0.0" y="389" width="335" height="78.5"/>
                                         <subviews>
                                             <button opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="251" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Bf1-2B-pAQ" userLabel="Forgot" customClass="GradientButton" customModule="LearnWords" customModuleProvider="target">
-                                                <rect key="frame" x="0.0" y="0.0" width="163.5" height="82.5"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="163.5" height="78.5"/>
                                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
                                                 <inset key="contentEdgeInsets" minX="10" minY="10" maxX="10" maxY="10"/>
                                                 <state key="normal" title="Forgot">
@@ -900,7 +900,7 @@
                                                 </connections>
                                             </button>
                                             <button opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="251" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="x6b-1p-EXm" customClass="GradientButton" customModule="LearnWords" customModuleProvider="target">
-                                                <rect key="frame" x="171.5" y="0.0" width="163.5" height="82.5"/>
+                                                <rect key="frame" x="171.5" y="0.0" width="163.5" height="78.5"/>
                                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
                                                 <inset key="contentEdgeInsets" minX="10" minY="10" maxX="10" maxY="10"/>
                                                 <state key="normal" title="Know">
@@ -925,7 +925,7 @@
                                         </constraints>
                                     </stackView>
                                     <button opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="249" verticalCompressionResistancePriority="754" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jVV-UW-vd8" customClass="GradientButton" customModule="LearnWords" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="471.5" width="335" height="82.5"/>
+                                        <rect key="frame" x="0.0" y="475.5" width="335" height="78.5"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleTitle2"/>
                                         <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <state key="normal" title="Start recognition"/>

@@ -31,7 +31,7 @@ struct WordAndStat: Codable {
 struct Storage {
     static var wordsAndStat = [WordAndStat]() // The whole word pair database
     static var shownWords = [WordAndStat]() // Word pair shown during last session
-    private static var initialSet = "WordsAndStat"
+    private static var initialSet = "Initial Sample Set (En->Ru)"
     private static let setsKey = "setsKey"
     static var wordSets: [String] {
         get {
@@ -67,9 +67,9 @@ struct Storage {
     static func saveInitialValues () {
         wordsAndStat.append(WordAndStat(firstWord: "bear", secondWord: "медведь",known: 0,unknown: 0,skiped: 0)) // TODO: Change format to somethig like "медведь - bear, bear2"
         wordsAndStat.append(WordAndStat(firstWord: "camel", secondWord: "верблюд", known: 0,unknown: 0,skiped: 0))
-        wordsAndStat.append(WordAndStat(firstWord: "cow", secondWord: "корова", known: 0,unknown: 0,skiped: 0))
+        wordsAndStat.append(WordAndStat(firstWord: "run", secondWord: "бегать, бежать", known: 0,unknown: 0,skiped: 0))
         wordsAndStat.append(WordAndStat(firstWord: "fox", secondWord: "лиса", known: 0,unknown: 0,skiped: 0))
-        wordsAndStat.append(WordAndStat(firstWord: "goat", secondWord: "коза", known: 0,unknown: 0,skiped: 0))
+        wordsAndStat.append(WordAndStat(firstWord: "polar bear", secondWord: "полярный медведь", known: 0,unknown: 0,skiped: 0))
         wordsAndStat.append(WordAndStat(firstWord: "monkey", secondWord: "обезьяна", known: 0,unknown: 0,skiped: 0))
         wordsAndStat.append(WordAndStat(firstWord: "pig", secondWord: "свинья", known: 0,unknown: 0,skiped: 0))
         wordsAndStat.append(WordAndStat(firstWord: "rabbit", secondWord: "кролик", known: 0,unknown: 0,skiped: 0))
