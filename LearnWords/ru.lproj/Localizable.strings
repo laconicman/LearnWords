@@ -77,14 +77,14 @@
 /* No comment provided by engineer. */
 "OK" = "OK";
 
-/* No comment provided by engineer. */
-"Original " = "Оригинал";
-
 /* Button title */
 "Recognition not allowed" = "Распознавание не разрешено";
 
 /* Button title */
 "Recognition Not Available" = "Распознавание недоступно";
+
+/* Button title */
+"Recognition permission needed" = "Нужно разрешение на распознавание";
 
 /* placeholder */
 "Search words in sets" = "Искать слова в наборе";
@@ -97,9 +97,6 @@
 
 /* No comment provided by engineer. */
 "Speech recognition error" = "Ошибка распознавания речи";
-
-/* Button title */
-"Recognition permission needed" = "Нужно разрешение на распознавание";
 
 /* Button title */
 "Start recognition" = "Начать распознавание";
@@ -116,14 +113,17 @@
 /* Label total words */
 "Total " = "Всего ";
 
-/* No comment provided by engineer. */
-"Translation " = "Перевод";
+/* Label total words in current set */
+"Total in set: " = "Всего в наборе: ";
 
 /* Placeholder promt */
 "type in translation" = "введите перевод";
 
 /* backButtonTitle */
 "Word" = "Слово";
+
+/* Language */
+"Word in " = "Язык: ";
 
 /* Count of words available */
 "WordCount" = "THINGS WITH LETTERS";

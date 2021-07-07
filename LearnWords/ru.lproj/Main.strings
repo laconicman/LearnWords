@@ -14,7 +14,7 @@
 "61X-u6-MJk.title" = "Упражнения";
 
 /* Class = "UIButton"; normalTitle = "Forgot"; ObjectID = "643-wN-0oS"; */
-"643-wN-0oS.normalTitle" = "Забыл";
+"643-wN-0oS.normalTitle" = "Не знаю";
 
 /* Class = "UITabBarItem"; title = "Word Set"; ObjectID = "a8m-gm-wVa"; */
 "a8m-gm-wVa.title" = "Набор слов";
@@ -23,7 +23,7 @@
 "bDd-aK-Z4N.normalTitle" = "Знаю";
 
 /* Class = "UIButton"; normalTitle = "Forgot"; ObjectID = "Bf1-2B-pAQ"; */
-"Bf1-2B-pAQ.normalTitle" = "Забыл";
+"Bf1-2B-pAQ.normalTitle" = "Не знаю";
 
 /* Class = "UINavigationItem"; title = "Phonetic"; ObjectID = "bIe-cz-JDG"; */
 "bIe-cz-JDG.title" = "Фонетика";
@@ -32,7 +32,7 @@
 "BpE-Jx-lIv.title" = "Диктант";
 
 /* Class = "UIButton"; normalTitle = "Know"; ObjectID = "Djr-xr-GdQ"; */
-"Djr-xr-GdQ.normalTitle" = "Знаю";
+"Djr-xr-GdQ.normalTitle" = "Не знаю";
 
 /* Class = "UILabel"; text = "Right Text Label"; ObjectID = "dnO-iH-vCy"; */
 "dnO-iH-vCy.text" = "Правый текстовый ярлык";
@@ -67,6 +67,12 @@
 /* Class = "UITableViewController"; title = "LearnWords"; ObjectID = "Jy4-wo-DD5"; */
 "Jy4-wo-DD5.title" = "LearnWords";
 
+/* Class = "UISegmentedControl"; K2v-wJ-d9a.segmentTitles[0] = " Straight"; ObjectID = "K2v-wJ-d9a"; */
+"K2v-wJ-d9a.segmentTitles[0]" = "Прямой";
+
+/* Class = "UISegmentedControl"; K2v-wJ-d9a.segmentTitles[1] = "Reversed"; ObjectID = "K2v-wJ-d9a"; */
+"K2v-wJ-d9a.segmentTitles[1]" = "Обратный";
+
 /* Class = "UIButton"; normalTitle = "Look Up"; ObjectID = "keD-qV-ddK"; */
 "keD-qV-ddK.normalTitle" = "В словаре";
 
@@ -79,6 +85,9 @@
 /* Class = "UILabel"; text = "Title"; ObjectID = "m9z-JK-XdY"; */
 "m9z-JK-XdY.text" = "Заголовок";
 
+/* Class = "UILabel"; text = "Direction"; ObjectID = "MTG-Z2-PFM"; */
+"MTG-Z2-PFM.text" = "Направление";
+
 /* Class = "UILabel"; text = "Title"; ObjectID = "NCU-o0-xGZ"; */
 "NCU-o0-xGZ.text" = "Заголовок";
 
@@ -89,13 +98,16 @@
 "ph3-GE-3p7.normalTitle" = "В словаре";
 
 /* Class = "UIButton"; normalTitle = "Forgot"; ObjectID = "Q8X-kw-NHO"; */
-"Q8X-kw-NHO.normalTitle" = "Забыл";
+"Q8X-kw-NHO.normalTitle" = "Не знаю";
 
 /* Class = "UIButton"; normalTitle = "Look Up"; ObjectID = "qaf-Gn-jV1"; */
 "qaf-Gn-jV1.normalTitle" = "В словаре";
 
 /* Class = "UILabel"; text = "Word"; ObjectID = "s4E-Gx-k1b"; */
 "s4E-Gx-k1b.text" = "Слово";
+
+/* Class = "UIBarButtonItem"; title = "Export"; ObjectID = "sgg-W9-3fN"; */
+"sgg-W9-3fN.title" = "Экспорт";
 
 /* Class = "UIBarButtonItem"; title = "Import"; ObjectID = "u2L-Ej-8XW"; */
 "u2L-Ej-8XW.title" = "Импорт";

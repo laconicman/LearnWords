@@ -65,7 +65,7 @@ struct Storage {
     }
     
     static func saveInitialValues () {
-        wordsAndStat.append(WordAndStat(firstWord: "bear", secondWord: "медведь",known: 0,unknown: 0,skiped: 0)) // TODO: Change format to somethig like "медведь - bear, bear2"
+        wordsAndStat.append(WordAndStat(firstWord: "bear", secondWord: "медведь",known: 0,unknown: 0,skiped: 0))
         wordsAndStat.append(WordAndStat(firstWord: "camel", secondWord: "верблюд", known: 0,unknown: 0,skiped: 0))
         wordsAndStat.append(WordAndStat(firstWord: "run", secondWord: "бегать, бежать", known: 0,unknown: 0,skiped: 0))
         wordsAndStat.append(WordAndStat(firstWord: "fox", secondWord: "лиса", known: 0,unknown: 0,skiped: 0))
