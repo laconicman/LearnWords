@@ -53,6 +53,51 @@ func lookUp(term: String, sender: UIViewController) {
     // TODO: If it is the first time, then show "The app relies on system dictionries, . They can be used ofline. Make sure you have downloaded the dictionaries you need. To add or remove didctionaries use Manage Dictionaries button on the next screen" "Remind me next time" "Got it"
 }
 
+/*
+func definition(for term: String, index: Int = 0) -> String {
+    var dictionaryMain: String = ""
+    // if UIReferenceLibraryViewController.dictionaryHasDefinition(forTerm: term) {
+        let rlvc = UIReferenceLibraryViewController(term: term)
+        //rlvc.editButtonItem what is this
+        //rlvc.setEditing(true, animated: true)
+        //rlvc.modalPresentationStyle = .popover //no effect on iphone
+        //wordDefinition.text =  rlvc.editButtonItem.title
+        //present(rlvc, animated: true)
+        var definitions = [NSAttributedString]()
+        if let definitionValues = rlvc.value(forKey: "_definitionValues") as? NSArray {
+            
+            
+            let definitionValue = definitionValues[0]
+                if let dvObj = (definitionValue as? NSObject) {
+                    if let def = dvObj.value(forKey: "_definition") as? NSAttributedString {
+                        definitions.append(def)
+                        // print("\(def.string)")
+                        
+                    }
+                }
+            
+            
+            // let terms = definitions[0].string.split(separator: ";")
+            var i=0
+            definitions[0].string.enumerateLines { (line, stop) in
+                //print("\(line) i=\(i) stop=\(stop)")
+                if i<3 {
+                    i += 1
+                } else {
+                    stop = true
+                }
+            }
+            
+            dictionaryMain = split(definitions[index].string, by: "\n" + "\u{2028}")[1]
+            // print(dictionaryMain)
+            
+        }
+        return dictionaryMain.replacingOccurrences(of: "1", with: "")
+//    } else {
+//        return nil
+//    }
+} */
+
 func split(_ str: String, by oneOfTheCharacters: String) -> [String] {
     let separatorSet = CharacterSet(charactersIn: oneOfTheCharacters) // consider .union(.newlines)
     return str.components(separatedBy: separatorSet).map({ $0.trimmingCharacters(in: .whitespaces)}).filter( { !$0.isEmpty })

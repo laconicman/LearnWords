@@ -211,6 +211,7 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
         //navigationItem.titleView = searchBar
         searchBar.sizeToFit()
         tableView.tableHeaderView = searchBar
+        tableView.rowHeight = UITableView.automaticDimension
         //navigationItem.titleView = searchBar
     }
     
@@ -270,7 +271,9 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
                 } else {
                     cell.textLabel?.text = suggestion
                 }
-                
+//                DispatchQueue.main.async {
+//                    cell.detailTextLabel?.text = definition(for: suggestion)
+//                }
             } else {
                 cell.textLabel?.text = recentSearches[indexPath.row]
             }
@@ -358,6 +361,9 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
         }
     }
     
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        46.0
+    }
     
 //    func sectionIndexTitles(for tableView: UITableView) -> [String]? {
 //        Implement this
