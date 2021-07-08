@@ -83,9 +83,10 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
 
         if let importedString = userDefaultsGroup.string(forKey: "ImportedText") {
             if  importedString.aproxWordCount > 1 {
-                let dictionaryEntries = split(importedString, by: "\n" + ";" + "\u{2028}")
+                let dictionaryEntries = split(importedString, by: "\n" + "\u{2028}", union: .newlines)
                 importedWords = dictionaryEntries.compactMap( {
-                    let e = split($0, by: "|:")
+                    // FIXME: remove dash or mind it elsewhere
+                    let e = split($0, by: "|:-–")
                     if e.first?.isEmpty ?? true || e.last?.isEmpty ?? true || e.count != 2 { return nil }
                     let f = e[0].trimmingCharacters(in: .whitespaces)
                     let s = e[1].trimmingCharacters(in: .whitespaces)
@@ -98,10 +99,10 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
                     }
                 })
                 Storage.wordsAndStat.append(contentsOf: importedWords)
-                Storage.saveWords(Storage.wordsAndStat)
+                Storage.saveWords(Storage.wordsAndStat.sorted(by: { $0.firstWord < $1.firstWord }))
             } else {
                 // import one word
-                importedWord = lemmas(from: importedString).first ?? ""
+                importedWord = lemmas(from: importedString).first ?? importedString
                 performSegue(withIdentifier: "AddWord", sender: self)
             }
             userDefaultsGroup.removeObject(forKey: "ImportedText")

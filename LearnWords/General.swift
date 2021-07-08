@@ -98,8 +98,9 @@ func definition(for term: String, index: Int = 0) -> String {
 //    }
 } */
 
-func split(_ str: String, by oneOfTheCharacters: String) -> [String] {
-    let separatorSet = CharacterSet(charactersIn: oneOfTheCharacters) // consider .union(.newlines)
+func split(_ str: String, by oneOfTheCharacters: String, union chSet: CharacterSet? = nil) -> [String] {
+    var separatorSet = CharacterSet(charactersIn: oneOfTheCharacters)
+    if let chSet = chSet { separatorSet = separatorSet.union(chSet) }
     return str.components(separatedBy: separatorSet).map({ $0.trimmingCharacters(in: .whitespaces)}).filter( { !$0.isEmpty })
 }
 
@@ -113,12 +114,14 @@ func split(_ str: String, by oneOfTheCharacters: String) -> [String] {
 func match3(pattern: String, answer: String, language: String, delimiters: String = ",;") -> Bool {
     
     // let patternComponents = pattern.components(separatedBy: CharacterSet(charactersIn: delimiters)).compactMap({$0.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)})
-    func filterLexicalClasses(phrase: String, lang: String, classes: [String] = ["Determiner", "Particle" /*"Preposition","OtherWord"*/]) -> [String] {
+    func filterLexicalClasses(phrase: String, lang: String, classes: [String] = ["Determiner", "Particle",  /* "Other", "Preposition","OtherWord"*/]) -> [String] {
         var phraseWordsClassified = [String]()
         
         phrase.enumerateLinguisticTags(in: phrase.startIndex..<phrase.endIndex,
                                        scheme: NSLinguisticTagScheme.nameTypeOrLexicalClass.rawValue,
+                                       orthography: NSOrthography.defaultOrthography(forLanguage: lang),
                                        invoking: { (tag, tokenRange, QRange, stop) in
+            debugLog("Tag for word \(String(phrase[tokenRange])) is \(tag)")
             if !classes.contains(tag) {
                 
                 let word = String(phrase[tokenRange])
@@ -150,8 +153,8 @@ func match3(pattern: String, answer: String, language: String, delimiters: Strin
 //        return true
 //    }
     
-    print(filterLexicalClasses(phrase: answer,  lang: language))
-    print(filterLexicalClasses(phrase: pattern, lang: language))
+    debugLog(filterLexicalClasses(phrase: answer,  lang: language).debugDescription)
+    debugLog(filterLexicalClasses(phrase: pattern, lang: language).debugDescription)
     
     let answerFiltered = filterLexicalClasses(phrase: answer, lang: language)
     let patternFiltered = filterLexicalClasses(phrase: pattern, lang: language)
