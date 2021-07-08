@@ -55,12 +55,12 @@ class WordSetsTableViewController: UITableViewController, UIDocumentPickerDelega
             var importedWord = ""
             let importedString = try String(contentsOf: fileURL, encoding: .utf8)
             if  importedString.aproxWordCount > 1 {
-                let dictionaryEntries = split(importedString, by: "\n" + ";" + "\u{2028}")
+                let dictionaryEntries = split(importedString, by: "\n"  + "\u{2028}", union: .newlines)
                 importedWords = dictionaryEntries.compactMap( {
-                    let e = split($0, by: "|:")
+                    let e = split($0, by: "|:-–")
                     if e.first?.isEmpty ?? true || e.last?.isEmpty ?? true || e.count != 2 { return nil }
-                    let f = e[0].canonicalise()
-                    let s = e[1].canonicalise()
+                    let f = e[0].trimmingCharacters(in: .whitespaces)
+                    let s = e[1].trimmingCharacters(in: .whitespaces)
                     return WordAndStat(firstWord: f, secondWord: s, known: 0, unknown: 0, skiped: 0)
                 })
                 // TODO: Create a screen to verify and select `importedWords`. Check for duplicates
