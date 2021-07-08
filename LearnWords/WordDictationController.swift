@@ -141,11 +141,11 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
         progressStep = 1.0 / Float(wordsInTest.count)
     }
     
-    @objc func nextTapped(skipedStat: Int = 1) {
+    @objc func nextTapped() {
 //        showingQuestion = true
         if !wordsInTest.isEmpty {
             var knownWord = wordsInTest.remove(at: 0)
-            knownWord.skiped += skipedStat
+            knownWord.skiped += 1
             Storage.shownWords.append(knownWord)
             roundProgress.progress = Float(Storage.shownWords.count) * progressStep
             askQuestion()
@@ -191,7 +191,7 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
             return
         }
         if  (wordsInTest[0].known >= WordAndStat.maxKnownLevel) && (!LWUserDefaults.standard.includeLearnedWords) {
-            nextTapped(skipedStat: 0)
+            nextTapped()
             return
         }
         prompt.attributedText = NSAttributedString(string: LWUserDefaults.standard.foreignToNative ?

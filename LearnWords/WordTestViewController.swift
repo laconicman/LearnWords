@@ -139,12 +139,12 @@ final class WordTestViewController: UIViewController {
         progressStep = 1.0 / Float(wordsInTest.count)
     }
     
-    @objc func nextTapped(skipedStat: Int = 1) {
+    @objc func nextTapped() {
 //        showingQuestion = true
         if !wordsInTest.isEmpty {
             var knownWord = wordsInTest.remove(at: 0)
             
-            knownWord.skiped += skipedStat
+            knownWord.skiped += 1
             
             Storage.shownWords.append(knownWord)
             roundProgress.progress = Float(Storage.shownWords.count) * progressStep
@@ -192,7 +192,7 @@ final class WordTestViewController: UIViewController {
             return
         }
         if  (wordsInTest[0].known >= WordAndStat.maxKnownLevel) && (!LWUserDefaults.standard.includeLearnedWords) {
-            nextTapped(skipedStat: 0)
+            nextTapped()
             return
         }
         prompt.attributedText = NSAttributedString(string: LWUserDefaults.standard.foreignToNative ? wordsInTest[0].firstWord : wordsInTest[0].secondWord)
