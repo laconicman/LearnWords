@@ -365,6 +365,11 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
         46.0
     }
     
+    override func tableView(_ tableView: UITableView , accessoryButtonTappedForRowWith: IndexPath) {
+        debugLog("accessoryButtonTappedForRowWith \(accessoryButtonTappedForRowWith)")
+        lookUp(term: tableView.cellForRow(at: accessoryButtonTappedForRowWith)?.textLabel?.text ?? "", sender: self)
+    }
+    
 //    func sectionIndexTitles(for tableView: UITableView) -> [String]? {
 //        Implement this
 //    }
