@@ -638,8 +638,8 @@
             filePath = "LearnWords/WordPhoneticsViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "380"
-            endingLineNumber = "380"
+            startingLineNumber = "388"
+            endingLineNumber = "388"
             landmarkName = "showAnswer(for:isKnown:)"
             landmarkType = "7">
          </BreakpointContent>

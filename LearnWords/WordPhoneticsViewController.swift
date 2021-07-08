@@ -343,6 +343,14 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
             knownWord.skiped += 1
             Storage.shownWords.append(knownWord)
             roundProgress.progress = Float(Storage.shownWords.count) * progressStep
+            
+            if audioEngine.isRunning {
+                recordButtonTapped()
+            }
+            // try? audioSession.setCategory(.playback, mode: .measurement, options: [])
+            try? audioSession.setCategory(.playback, mode: .default, policy: .default, options: [])
+            try? audioSession.setActive(true, options: .notifyOthersOnDeactivation)
+            
             askQuestion()
         }
         //prepareForNextQuestion()
