@@ -32,7 +32,7 @@
 "BpE-Jx-lIv.title" = "Диктант";
 
 /* Class = "UIButton"; normalTitle = "Know"; ObjectID = "Djr-xr-GdQ"; */
-"Djr-xr-GdQ.normalTitle" = "Не знаю";
+"Djr-xr-GdQ.normalTitle" = "Знаю";
 
 /* Class = "UILabel"; text = "Right Text Label"; ObjectID = "dnO-iH-vCy"; */
 "dnO-iH-vCy.text" = "Правый текстовый ярлык";

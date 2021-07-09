@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 struct WordAndStat: Codable {
     var firstWord: String
     var secondWord: String
@@ -85,8 +86,8 @@ struct Storage {
 //
 //    }
     
-    static func saveWords(_ wordsAndStat: [WordAndStat]) {
-        userDefaultsGroup.encodeAndSave(wordsAndStat.sorted(by: { $0.firstWord < $1.firstWord }), currentWordSet)
+    static func saveWords(_ wordsAndStat: [WordAndStat], for wordset: String = currentWordSet) {
+        userDefaultsGroup.encodeAndSave(wordsAndStat.sorted(by: { $0.firstWord < $1.firstWord }), wordset)
         //            defaults.set(knownWords, forKey: "knownWords")
         
     }
@@ -106,6 +107,7 @@ struct Storage {
         wsa.append(name)
         let wsaSet = Set(wsa)
         wordSets = Array(wsaSet).sorted()
+        Storage.saveWords([], for: name)
         return wordSets.firstIndex(of: name)
     }
     static func removeWordSet(at index: Int) {
