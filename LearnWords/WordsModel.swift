@@ -33,7 +33,7 @@ struct Storage {
     static var wordsAndStat = [WordAndStat]() // The whole word pair database
     static var shownWords = [WordAndStat]() // Word pair shown during last session
     private static var initialSet = "Initial Sample Set (En->Ru)"
-    private static let setsKey = "setsKey"
+    private static let setsKey = "setsKeyForWordsIdentifier"
     static var wordSets: [String] {
         get {
             return userDefaultsGroup.stringArray(forKey: setsKey) ?? [initialSet]
@@ -49,7 +49,7 @@ struct Storage {
         }
     }
     
-    private static let currentSetKey = "currentSetKey"
+    private static let currentSetKey = "currentSetKeyForWordsIdentifier"
     static var currentWordSet: String {
         get {
             return userDefaultsGroup.string(forKey: currentSetKey) ?? initialSet
