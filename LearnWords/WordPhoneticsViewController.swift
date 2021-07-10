@@ -182,7 +182,7 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
                     self?.recognized.text = LWUserDefaults.standard.foreignToNative ? self?.wordsInTest[0].secondWord : self?.wordsInTest[0].firstWord
                     self?.afterAnswer(isKnown: true)
                 } else {
-                   // self.recognized.text = ""
+                   // self.correct.text = ""
                 }
             }
             
@@ -220,7 +220,7 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
         try audioEngine.start()
         
         // Let the user know to start talking.
-        // recognized.text = "Speak the translation"
+        // correct.text = "Speak the translation"
     }
     
     // MARK: SFSpeechRecognizerDelegate
@@ -315,7 +315,7 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
     func afterAnswer(isKnown: Bool) {
         if !wordsInTest.isEmpty {
             shownWord = wordsInTest.remove(at: 0)
-            isKnown ? shownWord.increaseKnown() : shownWord.decreaseKnown()
+            isKnown ? shownWord.increaseCorrect(exercize: "P") : shownWord.decreaseCorrect(exercize: "P")
             Storage.shownWords.append(shownWord)
             roundProgress.progress = Float(Storage.shownWords.count) * progressStep
 //            //disable buttons and ShowNextButton Instead and autoSkip

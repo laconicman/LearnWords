@@ -90,7 +90,7 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
                     if e.first?.isEmpty ?? true || e.last?.isEmpty ?? true || e.count != 2 { return nil }
                     let f = e[0].trimmingCharacters(in: .whitespaces)
                     let s = e[1].trimmingCharacters(in: .whitespaces)
-                    return WordAndStat(firstWord: f, secondWord: s, known: 0, unknown: 0, skiped: 0)
+                    return WordAndStat(firstWord: f, secondWord: s, correct: [:], incorrect: [:], skiped: 0)
                 })
                 // TODO: Create a screen to verify and select `importedWords`. Check for duplicates
                 importedWords = importedWords.filter({ (impW) -> Bool in

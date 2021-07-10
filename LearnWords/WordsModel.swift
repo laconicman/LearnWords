@@ -11,21 +11,27 @@ import UIKit
 struct WordAndStat: Codable {
     var firstWord: String
     var secondWord: String
-    private(set) var known: Int
-    var unknown: Int
-    var skiped: Int
+    var known : Int {
+        min(correct.values.reduce(0, +) + 1, Self.maxKnownLevel)
+    }
+    private(set) var correct: [String : Int] = [:]
+    private(set) var incorrect: [String : Int] = [:]
+    var skiped: Int = 0
+    // var lastShown: Date?
     static let maxKnownLevel = 5
     
     // MARK: - Setters
     
     /// Increases the level in 1, with a maximum of 5.
-    mutating func increaseKnown() {
-        known = min(known + 1, Self.maxKnownLevel)
+    mutating func increaseCorrect(exercize: String) {
+        let currVal = correct[exercize] ?? 0
+        correct[exercize] = min(currVal + 1, Self.maxKnownLevel)
     }
     
     /// Decreases the level in 1, with a minimum of 0.
-    mutating func decreaseKnown() {
-        known = max(known - 1, 0)
+    mutating func decreaseCorrect(exercize: String) {
+        let currValCorr = correct[exercize] ?? 0
+        correct[exercize] = max(currValCorr - 1, 0)
     }
 }
 // TODO: Make codable to become capable of storing sets of words in files (Another option - move to CoreData)
@@ -66,15 +72,15 @@ struct Storage {
     }
     
     static func saveInitialValues () {
-        wordsAndStat.append(WordAndStat(firstWord: "bear", secondWord: "медведь",known: 0,unknown: 0,skiped: 0))
-        wordsAndStat.append(WordAndStat(firstWord: "camel", secondWord: "верблюд", known: 0,unknown: 0,skiped: 0))
-        wordsAndStat.append(WordAndStat(firstWord: "run", secondWord: "бегать, бежать", known: 0,unknown: 0,skiped: 0))
-        wordsAndStat.append(WordAndStat(firstWord: "fox", secondWord: "лиса", known: 0,unknown: 0,skiped: 0))
-        wordsAndStat.append(WordAndStat(firstWord: "polar bear", secondWord: "полярный медведь", known: 0,unknown: 0,skiped: 0))
-        wordsAndStat.append(WordAndStat(firstWord: "monkey", secondWord: "обезьяна", known: 0,unknown: 0,skiped: 0))
-        wordsAndStat.append(WordAndStat(firstWord: "pig", secondWord: "свинья", known: 0,unknown: 0,skiped: 0))
-        wordsAndStat.append(WordAndStat(firstWord: "rabbit", secondWord: "кролик", known: 0,unknown: 0,skiped: 0))
-        wordsAndStat.append(WordAndStat(firstWord: "sheep", secondWord: "овца", known: 0,unknown: 0,skiped: 0))
+        wordsAndStat.append(WordAndStat(firstWord: "bear", secondWord: "медведь", correct: [:],incorrect: [:],skiped: 0))
+        wordsAndStat.append(WordAndStat(firstWord: "camel", secondWord: "верблюд", correct: [:], incorrect: [:],skiped: 0))
+        wordsAndStat.append(WordAndStat(firstWord: "run", secondWord: "бегать, бежать", correct: [:], incorrect: [:], skiped: 0))
+        wordsAndStat.append(WordAndStat(firstWord: "fox", secondWord: "лиса", correct: [:], incorrect: [:], skiped: 0))
+        wordsAndStat.append(WordAndStat(firstWord: "polar bear", secondWord: "полярный медведь", correct: [:], incorrect: [:], skiped: 0))
+        wordsAndStat.append(WordAndStat(firstWord: "monkey", secondWord: "обезьяна", correct: [:], incorrect: [:], skiped: 0))
+        wordsAndStat.append(WordAndStat(firstWord: "pig", secondWord: "свинья", correct: [:], incorrect: [:], skiped: 0))
+        wordsAndStat.append(WordAndStat(firstWord: "rabbit", secondWord: "кролик", correct: [:], incorrect: [:], skiped: 0))
+        wordsAndStat.append(WordAndStat(firstWord: "sheep", secondWord: "овца", correct: [:], incorrect: [:], skiped: 0))
         
         saveWords(wordsAndStat)
         // wordSets = [initialSet] Not sure if its needed
@@ -97,7 +103,7 @@ struct Storage {
         guard foreign.count > 0 && native.count > 0 else { return nil}
         let rowPosition = wordsAndStat.count //TODO: change it - sort somehow
         // wordsAndStat.append(("\(first)::\(second)",0,0,0))
-        wordsAndStat.append(WordAndStat(firstWord: foreign.canonicalise(), secondWord: native.canonicalise(), known: 0, unknown: 0, skiped: 0))
+        wordsAndStat.append(WordAndStat(firstWord: foreign.canonicalise(), secondWord: native.canonicalise(), correct: [:], incorrect: [:], skiped: 0))
         saveWords(wordsAndStat)
         return rowPosition
     }

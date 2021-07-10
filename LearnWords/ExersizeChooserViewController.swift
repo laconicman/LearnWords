@@ -54,7 +54,7 @@ class ExersizeChooserViewController: UIViewController {
             if includeLeanedWords.isOn {
                 countOfWordsToShow = Storage.wordsAndStat.count
             } else {
-                countOfWordsToShow = Storage.wordsAndStat.filter({ $0.known >= WordAndStat.maxKnownLevel}).count
+                countOfWordsToShow = Storage.wordsAndStat.filter({ $0.known < WordAndStat.maxKnownLevel}).count
                 if Storage.wordsAndStat.count > 0 {
                     alertMessage = NSLocalizedString("You may opt to include learned words if you'd like to continue exercises.", comment: "Message for alert for empty set to display")
                 }

@@ -41,7 +41,7 @@ final class WordTestViewController: UIViewController {
         if !wordsInTest.isEmpty {
             shownWord = wordsInTest.remove(at: 0)
             
-            isKnown ? shownWord.increaseKnown() : shownWord.decreaseKnown()
+            isKnown ? shownWord.increaseCorrect(exercize: "L") : shownWord.decreaseCorrect(exercize: "L")
             
             Storage.shownWords.append(shownWord)
             roundProgress.progress = Float(Storage.shownWords.count) * progressStep

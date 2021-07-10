@@ -115,7 +115,7 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
         if !wordsInTest.isEmpty {
             shownWord = wordsInTest.remove(at: 0)
 
-            isKnown ? shownWord.increaseKnown() : shownWord.decreaseKnown()
+            isKnown ? shownWord.increaseCorrect(exercize: "D") : shownWord.decreaseCorrect(exercize: "D")
             Storage.shownWords.append(shownWord)
             roundProgress.progress = Float(Storage.shownWords.count) * progressStep
 //            //disable buttons and ShowNextButton Instead and autoSkip
