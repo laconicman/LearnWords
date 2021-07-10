@@ -108,6 +108,8 @@ struct Storage {
         let wsaSet = Set(wsa)
         wordSets = Array(wsaSet).sorted()
         Storage.saveWords([], for: name)
+        // TODO:
+        Storage.currentWordSet = name
         return wordSets.firstIndex(of: name)
     }
     static func removeWordSet(at index: Int) {

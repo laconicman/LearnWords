@@ -47,6 +47,30 @@ class ExersizeChooserViewController: UIViewController {
         })) + "."
     }
 
-
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if  ["Learning Exercise", "Dictation Exercise", "Phonetic Exercise"].contains(segue.identifier) {
+            let countOfWordsToShow: Int
+            var alertMessage: String = NSLocalizedString("Current set is empty. Add some words to learn.", comment: "Message for alert for empty set to display")
+            if includeLeanedWords.isOn {
+                countOfWordsToShow = Storage.wordsAndStat.count
+            } else {
+                countOfWordsToShow = Storage.wordsAndStat.filter({ $0.known >= WordAndStat.maxKnownLevel}).count
+                if Storage.wordsAndStat.count > 0 {
+                    alertMessage = NSLocalizedString("You may opt to include learned words if you'd like to continue exercises.", comment: "Message for alert for empty set to display")
+                }
+            }
+            if countOfWordsToShow == 0 {
+                let alert = UIAlertController(
+                    title: NSLocalizedString("No words to study", comment: "Title for alert"),
+                    message: alertMessage,
+                    preferredStyle: .alert)
+                alert.addAction(UIAlertAction(
+                    title: NSLocalizedString("OK", comment: "Action for alert for empty set"),
+                    style: .default,
+                    handler: nil))
+                present(alert, animated: true, completion: nil)
+            }
+        }
+    }
 
 }

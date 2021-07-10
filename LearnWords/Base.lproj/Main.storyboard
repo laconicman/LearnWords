@@ -710,7 +710,7 @@
                                             </userDefinedRuntimeAttribute>
                                         </userDefinedRuntimeAttributes>
                                         <connections>
-                                            <segue destination="hhD-xo-ClW" kind="show" id="iAo-DO-Xu5"/>
+                                            <segue destination="hhD-xo-ClW" kind="show" identifier="Learning Exercise" id="iAo-DO-Xu5"/>
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="249" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="uBK-Se-mT6" customClass="GradientButton" customModule="LearnWords" customModuleProvider="target">
@@ -730,7 +730,7 @@
                                             </userDefinedRuntimeAttribute>
                                         </userDefinedRuntimeAttributes>
                                         <connections>
-                                            <segue destination="29i-mr-9oh" kind="show" id="Zrf-bW-q6e"/>
+                                            <segue destination="29i-mr-9oh" kind="show" identifier="Dictation Exercise" id="Zrf-bW-q6e"/>
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="249" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Vmu-2y-Ili" customClass="GradientButton" customModule="LearnWords" customModuleProvider="target">
@@ -750,7 +750,7 @@
                                             </userDefinedRuntimeAttribute>
                                         </userDefinedRuntimeAttributes>
                                         <connections>
-                                            <segue destination="4os-y6-JWd" kind="show" id="Uvc-vz-Z2B"/>
+                                            <segue destination="4os-y6-JWd" kind="show" identifier="Phonetic Exercise" id="Uvc-vz-Z2B"/>
                                         </connections>
                                     </button>
                                 </subviews>
