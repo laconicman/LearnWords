@@ -26,6 +26,9 @@
 /* Alert title */
 "Check installed languages" = "Проверьте установленные языки.";
 
+/* Message for alert for empty set to display */
+"Current set is empty. Add some words to learn." = "Текущий набор пуст. Добавьте слова для изучения.";
+
 /* Action for dictionary prompt */
 "DICTIONARY_ACTION" = "Понятно";
 
@@ -62,8 +65,14 @@
 /* Label learned words */
 "Learned " = "Изучено ";
 
+/* Label learned words */
+"Learned: " = "Изучено: ";
+
 /* Alert message, langID appended */
 "Looks like you only have those keyboards:" = "У вас сейчас только вот эти клавиатуры:";
+
+/* Meaing in native lang */
+"Meaning in " = "Язык: ";
 
 /* Button title */
 "Microphone access denied." = "Нет доступа к микрофону.";
@@ -74,8 +83,14 @@
 /* placeholder for adding new word to vocabulary */
 "New word" = "Новое слово";
 
-/* No comment provided by engineer. */
+/* Title for alert */
+"No words to study" = "Нет слов для изучения";
+
+/* Action for alert for empty set */
 "OK" = "OK";
+
+/* label prompt */
+"pronounce the translation" = "произнесите перевод";
 
 /* Button title */
 "Recognition not allowed" = "Распознавание не разрешено";
@@ -91,9 +106,6 @@
 
 /* No comment provided by engineer. */
 "Settings" = "Настройки";
-
-/* label prompt */
-"speak the translation" = "произнесите перевод";
 
 /* No comment provided by engineer. */
 "Speech recognition error" = "Ошибка распознавания речи";
@@ -117,7 +129,7 @@
 "Total in set: " = "Всего в наборе: ";
 
 /* Placeholder promt */
-"type in translation" = "введите перевод";
+"type in the translation" = "наберите перевод";
 
 /* backButtonTitle */
 "Word" = "Слово";
@@ -130,4 +142,7 @@
 
 /* No comment provided by engineer. */
 "You may add Keyboards from system General Settings pane." = "Вы можете добавить клавиатуры в панели \"Основные\" в \"Настройках\".";
+
+/* Message for alert for empty set to display */
+"You may opt to include learned words if you'd like to continue exercises." = "Вы можете включить в упражнения изученные слова и продолжить закреплять их.";
 

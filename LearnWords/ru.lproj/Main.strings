@@ -115,13 +115,13 @@
 /* Class = "UIButton"; normalTitle = "Dictation"; ObjectID = "uBK-Se-mT6"; */
 "uBK-Se-mT6.normalTitle" = "Диктант";
 
-/* Class = "UILabel"; text = "speak the translation"; ObjectID = "uEJ-4s-E9l"; */
+/* Class = "UILabel"; text = "pronounce the translation"; ObjectID = "uEJ-4s-E9l"; */
 "uEJ-4s-E9l.text" = "произнесите перевод";
 
-/* Class = "UIButton"; normalTitle = "Phonetic"; ObjectID = "Vmu-2y-Ili"; */
+/* Class = "UIButton"; normalTitle = "Phonetics"; ObjectID = "Vmu-2y-Ili"; */
 "Vmu-2y-Ili.normalTitle" = "Фонетика";
 
-/* Class = "UITextField"; text = "type in translation"; ObjectID = "VvQ-x8-gCl"; */
+/* Class = "UITextField"; text = "type in the translation"; ObjectID = "VvQ-x8-gCl"; */
 "VvQ-x8-gCl.text" = "наберите перевод";
 
 /* Class = "UINavigationItem"; title = "Word Sets"; ObjectID = "vYV-WR-kC4"; */
