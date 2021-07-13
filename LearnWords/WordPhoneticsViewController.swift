@@ -220,7 +220,7 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
         try audioEngine.start()
         
         // Let the user know to start talking.
-        // correct.text = "Speak the translation"
+        // correct.text = "pronounce the translation"
     }
     
     // MARK: SFSpeechRecognizerDelegate
@@ -279,7 +279,7 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
             LWSpeechSynth.standard.speak(utteranceString: prompt.attributedText!, language: LWUserDefaults.standard.foreignToNative ? LWUserDefaults.standard.languageToStudyPreference! : LWUserDefaults.standard.nativeLanguagePreference!)
         }
         recognized.attributedText = NSAttributedString(
-            string: NSLocalizedString("speak the translation", comment: "label prompt"),
+            string: NSLocalizedString("pronounce the translation", comment: "label prompt"),
             attributes: [.foregroundColor: UIColor(red: 0, green: 0.7, blue: 0.7, alpha: 1)])
         // prompt.textColor = UIColor(red: 0, green: 0.7, blue: 0, alpha: 1)
 

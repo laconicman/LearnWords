@@ -487,13 +487,13 @@
                                         <color key="tintColor" systemColor="systemOrangeColor"/>
                                     </progressView>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Word" textAlignment="center" lineBreakMode="wordWrap" baselineAdjustment="none" minimumFontSize="15" translatesAutoresizingMaskIntoConstraints="NO" id="8WT-Dx-fov">
-                                        <rect key="frame" x="0.0" y="16" width="335" height="167.5"/>
+                                        <rect key="frame" x="0.0" y="16" width="335" height="168.5"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="70"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="type in translation" borderStyle="roundedRect" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="VvQ-x8-gCl">
-                                        <rect key="frame" x="0.0" y="191.5" width="335" height="146.5"/>
+                                    <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="type in the translation" borderStyle="roundedRect" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="VvQ-x8-gCl">
+                                        <rect key="frame" x="0.0" y="192.5" width="335" height="145.5"/>
                                         <constraints>
                                             <constraint firstAttribute="height" relation="lessThanOrEqual" constant="200" id="R1H-kk-GEW"/>
                                         </constraints>
@@ -737,7 +737,7 @@
                                         <rect key="frame" x="0.0" y="366.5" width="343" height="67.5"/>
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
                                         <color key="tintColor" systemColor="systemOrangeColor"/>
-                                        <state key="normal" title="Phonetic">
+                                        <state key="normal" title="Phonetics">
                                             <color key="titleColor" systemColor="labelColor"/>
                                             <imageReference key="image" image="mic" catalog="system" symbolScale="large"/>
                                         </state>
@@ -822,7 +822,7 @@
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="speak the translation" textAlignment="center" lineBreakMode="middleTruncation" numberOfLines="0" baselineAdjustment="none" minimumFontSize="15" highlighted="YES" translatesAutoresizingMaskIntoConstraints="NO" id="uEJ-4s-E9l">
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="pronounce the translation" textAlignment="center" lineBreakMode="middleTruncation" numberOfLines="0" baselineAdjustment="none" minimumFontSize="15" highlighted="YES" translatesAutoresizingMaskIntoConstraints="NO" id="uEJ-4s-E9l">
                                         <rect key="frame" x="0.0" y="170.5" width="335" height="112"/>
                                         <constraints>
                                             <constraint firstAttribute="height" relation="lessThanOrEqual" constant="150" id="zzA-ZC-SMf"/>
@@ -990,7 +990,7 @@
             <size key="intrinsicContentSize" width="125" height="66"/>
         </designable>
         <designable name="Vmu-2y-Ili">
-            <size key="intrinsicContentSize" width="186" height="53"/>
+            <size key="intrinsicContentSize" width="207" height="53"/>
         </designable>
         <designable name="bDd-aK-Z4N">
             <size key="intrinsicContentSize" width="112" height="66"/>

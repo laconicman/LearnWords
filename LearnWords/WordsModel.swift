@@ -12,7 +12,7 @@ struct WordAndStat: Codable {
     var firstWord: String
     var secondWord: String
     var known : Int {
-        min(correct.values.reduce(0, +) + 1, Self.maxKnownLevel)
+        min(correct.values.reduce(0, +), Self.maxKnownLevel)
     }
     private(set) var correct: [String : Int] = [:]
     private(set) var incorrect: [String : Int] = [:]

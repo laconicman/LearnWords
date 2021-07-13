@@ -42,7 +42,7 @@ class ExersizeChooserViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        numberOfWordsInSet.text = NSLocalizedString("Total in set: ", comment: "Label total words in current set") + pluralizedWordCount(Storage.wordsAndStat.count) + ". " + NSLocalizedString("Learned ", comment: "Label learned words") + pluralizedWordCount(Storage.wordsAndStat.reduce(0, { result, wAs in
+        numberOfWordsInSet.text = NSLocalizedString("Total in set: ", comment: "Label total words in current set") + pluralizedWordCount(Storage.wordsAndStat.count) + ". " + NSLocalizedString("Learned: ", comment: "Label learned words") + pluralizedWordCount(Storage.wordsAndStat.reduce(0, { result, wAs in
             if wAs.known == WordAndStat.maxKnownLevel { return result + 1 } else { return result }
         })) + "."
     }

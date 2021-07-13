@@ -201,7 +201,7 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
         }
         translationInput.isUserInteractionEnabled = true
         translationInput.attributedPlaceholder = NSAttributedString(
-            string: NSLocalizedString("type in translation", comment: "Placeholder promt"),
+            string: NSLocalizedString("type in the translation", comment: "Placeholder promt"),
             attributes: [.foregroundColor: UIColor(red: 0, green: 0.7, blue: 0.7, alpha: 1)])
         translationInput.text = ""
         if #available(iOS 13.0, *) {
