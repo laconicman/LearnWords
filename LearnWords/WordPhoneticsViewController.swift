@@ -374,6 +374,7 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
                             self?.recognized.attributedText = NSAttributedString(
                                 string: LWUserDefaults.standard.foreignToNative ? shownWord.secondWord : shownWord.firstWord,
                                 attributes: [.foregroundColor: isKnown ? UIColor(red: 0, green: 0.7, blue: 0, alpha: 1) : UIColor(red: 0.7, green: 0.0, blue: 0, alpha: 1)])
+                            self?.view.layoutIfNeeded()
                             debugLog("begin transition")
                             self?.recognized.textColor = isKnown ? UIColor(red: 0, green: 0.7, blue: 0, alpha: 1) : UIColor(red: 0.7, green: 0.0, blue: 0, alpha: 1)
         }) { [weak self] (ended) in

@@ -156,36 +156,36 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
 //        }
     }
     
-    @IBAction func addNewWord(_ sender: UIBarButtonItem) {
-        // create our alert controller
-        let ac = UIAlertController(title: NSLocalizedString("Add new word", comment: "AlertController title"), message: nil, preferredStyle: .alert)
-        
-        // add two text fields, one for English and one for French
-        ac.addTextField { textField in
-            textField.placeholder = NSLocalizedString(LWUserDefaults.standard.languageToStudyPreference!, comment: "Foreing language")
-        }
-        
-        ac.addTextField { (textField) in
-            textField.placeholder = NSLocalizedString(LWUserDefaults.standard.nativeLanguagePreference!, comment: "Native language")
-        }
-        
-        // create an "Add Word" button that submits the user's input
-        let submitAction = UIAlertAction(title: NSLocalizedString("Add Word", comment: "AlertAction title"), style: .default) { [unowned self, ac] (action: UIAlertAction!) in
-            // pull out the English and French words, or an empty string if there was a problem
-            let firstWord = ac.textFields?[0].text ?? ""
-            let secondWord = ac.textFields?[1].text ?? ""
-            
-            // submit the English and French word to the insertFlashcard() method
-            if let indexOfInsertedRow = Storage.insertFlashcard(foreign: firstWord, native: secondWord) {
-                //TODO: Check for duplicates and alphabetically sort
-                let newIndexPath = IndexPath(row: indexOfInsertedRow, section: 0)
-                self.tableView.insertRows(at: [newIndexPath], with: .automatic)
-            }
-        }
-        ac.addAction(submitAction)
-        ac.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: "AlertAction title"), style: .cancel))
-        present(ac, animated: true)
-    }
+//    @IBAction func addNewWord(_ sender: UIBarButtonItem) {
+//        // create our alert controller
+//        let ac = UIAlertController(title: NSLocalizedString("Add new word", comment: "AlertController title"), message: nil, preferredStyle: .alert)
+//
+//        // add two text fields, one for English and one for French
+//        ac.addTextField { textField in
+//            textField.placeholder = NSLocalizedString(LWUserDefaults.standard.languageToStudyPreference!, comment: "Foreing language")
+//        }
+//
+//        ac.addTextField { (textField) in
+//            textField.placeholder = NSLocalizedString(LWUserDefaults.standard.nativeLanguagePreference!, comment: "Native language")
+//        }
+//
+//        // create an "Add Word" button that submits the user's input
+//        let submitAction = UIAlertAction(title: NSLocalizedString("Add Word", comment: "AlertAction title"), style: .default) { [unowned self, ac] (action: UIAlertAction!) in
+//            // pull out the English and French words, or an empty string if there was a problem
+//            let firstWord = ac.textFields?[0].text ?? ""
+//            let secondWord = ac.textFields?[1].text ?? ""
+//
+//            // submit the English and French word to the insertFlashcard() method
+//            if let indexOfInsertedRow = Storage.insertFlashcard(foreign: firstWord, native: secondWord) {
+//                //TODO: Check for duplicates and alphabetically sort
+//                let newIndexPath = IndexPath(row: indexOfInsertedRow, section: 0)
+//                self.tableView.insertRows(at: [newIndexPath], with: .automatic)
+//            }
+//        }
+//        ac.addAction(submitAction)
+//        ac.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: "AlertAction title"), style: .cancel))
+//        present(ac, animated: true)
+//    }
     
 //    @objc func startTest() {
 //        guard let vc = storyboard?.instantiateViewController(withIdentifier: "WordTest") as? WordTestViewController else { return }
@@ -264,17 +264,65 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         }
     }
     
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        guard !(searchController.isActive && searchController.searchBar.text != "") else {return}
-        if editingStyle == .delete {
+//    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+//        guard !(searchController.isActive && searchController.searchBar.text != "") else {return}
+//        if editingStyle == .delete {
+//            //TODO: Move operating functions to model
+//            Storage.wordsAndStat.remove(at: indexPath.row)
+//            tableView.deleteRows(at: [indexPath], with: .automatic)
+//            // TODO: Replace with saveCurrentWordSet
+//            Storage.saveWords(Storage.wordsAndStat)
+//
+//        }
+//    }
+    
+    override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        guard !(searchController.isActive && searchController.searchBar.text != "") else { return UISwipeActionsConfiguration(actions: []) }
+        
+        let delete = UIContextualAction(style: .destructive, title: NSLocalizedString("Delete", comment: "swipe action")) { (_, _, _) in
             //TODO: Move operating functions to model
             Storage.wordsAndStat.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .automatic)
             // TODO: Replace with saveCurrentWordSet
             Storage.saveWords(Storage.wordsAndStat)
-
         }
+        
+        let edit = UIContextualAction(style: .normal, title: NSLocalizedString("Edit", comment: "swipe action")) { (action, _, _) in
+            // create our alert controller
+            let ac = UIAlertController(title: NSLocalizedString("Edit word", comment: "AlertController title"), message: nil, preferredStyle: .alert)
+            
+            // add two text fields, one for English and one for French
+            ac.addTextField { textField in
+                textField.text = Storage.wordsAndStat[indexPath.row].firstWord
+            }
+            
+            ac.addTextField { (textField) in
+                textField.text = Storage.wordsAndStat[indexPath.row].secondWord
+            }
+            
+            // create an "Add Word" button that submits the user's input
+            let submitAction = UIAlertAction(title: NSLocalizedString("Save", comment: "AlertAction title"), style: .default) { (action: UIAlertAction!) in
+                // pull out the English and French words, or an empty string if there was a problem
+                Storage.wordsAndStat[indexPath.row].firstWord = ac.textFields?[0].text ?? ""
+                Storage.wordsAndStat[indexPath.row].secondWord = ac.textFields?[1].text ?? ""
+                Storage.wordsAndStat.sort(by: { $0.firstWord < $1.firstWord })
+                Storage.saveWords(Storage.wordsAndStat)
+                tableView.reloadRows(at: tableView.indexPathsForVisibleRows ?? [indexPath], with: .automatic)
+            }
+            ac.addAction(submitAction)
+            ac.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: "AlertAction title"), style: .cancel))
+            self.present(ac, animated: true)
+        }
+        edit.backgroundColor = .systemTeal
+        if #available(iOS 13, *) {
+        edit.image = UIImage(systemName: "pencil")
+        delete.image = UIImage(systemName: "trash")
+        }
+        let config = UISwipeActionsConfiguration(actions: [delete, edit])
+        config.performsFirstActionWithFullSwipe = true
+        return config
     }
+    
     // MARK: SearchController for filtering WordTableView
     private func setupSearchController(placeholder: String = "", hideWhenAppear: Bool = true) { //Unify with searchViewControllers
         definesPresentationContext = true

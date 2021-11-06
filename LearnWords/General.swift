@@ -16,6 +16,7 @@ func haptic(feedback: UINotificationFeedbackGenerator.FeedbackType) {
 
 func lookUp(term: String, sender: UIViewController) {
     guard !term.isEmpty else { return }
+    guard let term = split(term, by: ",;").first?.trimmingCharacters(in: .whitespacesAndNewlines) else { return }
     // self.searchingIndicator.startAnimating()
     let dictionaryViewController = UIReferenceLibraryViewController(term: term)
     sender.present(dictionaryViewController, animated: true)

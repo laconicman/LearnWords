@@ -271,7 +271,7 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
                 } else {
                     cell.textLabel?.text = suggestion
                 }
-//                DispatchQueue.main.async {
+//                DispatchQueue.global(qos: .userInitiated).async {
 //                    cell.detailTextLabel?.text = definition(for: suggestion)
 //                }
             } else {
