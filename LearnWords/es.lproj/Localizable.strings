@@ -1,26 +1,139 @@
-/* Action for dictionary prompt */
-"DICTIONARY_ACTION" = "Got It";
+/* AlertController title */
+"Add new word" = "Agregar una palabra nueva";
 
-/* Message for dictionary prompt */
-"DICTIONARY_MESSAGE" = "Have you set up your iOS dictionaries?\n\nTap \"Manage\" below to download dictionaries for the languages you want.";
+/* AlertController title */
+"Add new word set" = "Agregar un conjunto de palabras";
 
-/* UIViewController+Dictionary */
-"DICTIONARY_TITLE" = "Add Dictionaries";
-
-/* Count of words to be exported */
-"EXPORT_WORDS_MESSAGE" = "Export %@";
-
-/* Title for failed import */
-"IMPORT_FAIL_TITLE" = "Import Failed";
-
-/* Message for successful import */
-"IMPORT_SUCCESS_MESSAGE" = "%@ found in import source.\n%@ duplicated.\n%@ added.";
-
-/* SettingsViewController */
-"IMPORT_SUCCESS_TITLE" = "Import Successful";
+/* AlertAction title */
+"Add Word" = "Agregar una palabra";
 
 /* No comment provided by engineer. */
+"Allow in settings" = "Permitir en los ajustes";
+
+/* Alert title */
+"Allow microphone usage" = "Permitir el uso del micrófono";
+
+/* Alert title
+   for phonetic exercises */
+"Allow speech recognition" = "Permitir el reconocimiento del habla ";
+
+/* AlertAction title */
+"Cancel" = "Cancelar";
+
+/* Alert title */
+"Check installed languages" = "Comprobar los idiomas instalados";
+
+/* Message for alert for empty set to display */
+"Current set is empty. Add some words to learn." = "El conjunto actual está vacío";
+
+/* Action for dictionary prompt */
+"DICTIONARY_ACTION" = "Claro";
+
+/* Message for dictionary prompt */
+"DICTIONARY_MESSAGE" = "¿Has configurado tu iOS diccionario?\n\nToca \"Administrar\" debajo para descargar los diccionarios de idiomas preferidos";
+
+/* UIViewController+Dictionary */
+"DICTIONARY_TITLE" = " Agregar diccionarios";
+
+/* Count of words to be exported */
+"EXPORT_WORDS_MESSAGE" = "Exportar %@";
+
+/* Alert message */
+"for phonetic exercises" = "para los ejercicios fonéticos";
+
+/* Button title */
+"Got it" = "Claro";
+
+/* Title for failed import */
+"IMPORT_FAIL_TITLE" = "Importación falló";
+
+/* Message for successful import */
+"IMPORT_SUCCESS_MESSAGE" = "%@ es encontrado en la fuente de la importación.\n%@ es duplicado.\n%@ es agregado.";
+
+/* SettingsViewController */
+"IMPORT_SUCCESS_TITLE" = "Importación se realiza correctamente";
+
+/* Alert message, langID inside */
+"Keyboard for language to study (%@) is not installed now. " = "El teclado para el idioma aprendido (%@) no está instalado.";
+
+/* Alert message, langID inside */
+"Keyboard for native learner's language (%@) is not installed now. " = "El teclado para el idioma nativo del alumno (%@) no está instalado.";
+
+/* Label learned words */
+"Learned " = "Es aprendido";
+
+/* Label learned words */
+"Learned: " = "Es aprendido: ";
+
+/* Alert message, langID appended */
+"Looks like you only have those keyboards:" = "Parece que solo tienes estos teclados:  ";
+
+/* Meaing in native lang */
+"Meaning in " = "Idioma: ";
+
+/* Button title */
+"Microphone access denied." = "Acceso denegado al micrófono.";
+
+/* No comment provided by engineer. */
+"Name of set" = "Nombre del conjunto";
+
+/* placeholder for adding new word to vocabulary */
+"New word" = "Palabra nueva";
+
+/* Title for alert */
+"No words to study" = "No palabras para aprender";
+
+/* Action for alert for empty set */
 "OK" = "OK";
+
+/* label prompt */
+"pronounce the translation" = "Pronuncia la traducción";
+
+/* Button title */
+"Recognition not allowed" = "Reconocimiento no está permitido";
+
+/* Button title */
+"Recognition Not Available" = "Reconocimiento no está disponible";
+
+/* Button title */
+"Recognition permission needed" = "Se necesita ermiso de reconocimiento ";
+
+/* placeholder */
+"Search words in sets" = "Buscar palabras en conjuntos";
+
+/* No comment provided by engineer. */
+"Settings" = "Ajustes";
+
+/* No comment provided by engineer. */
+"Speech recognition error" = "Error de reconocimiento de habla";
+
+/* Button title */
+"Start recognition" = "Empezar reconocimiento";
+
+/* placeholder in a searchbar */
+"Start typing" = "Empezar a teclear";
+
+/* Button title */
+"Stop recognition" = "Dejar reconocimiento";
+
+/* Button title */
+"Stopping" = "Está parando";
+
+/* Label total words */
+"Total " = "Total";
+
+/* Label total words in current set */
+"Total in set: " = "Total en conjunto: ";
+
+/* Placeholder promt */
+"type in the translation" = "teclea la traducción";
+
+/* backButtonTitle */
+"Word" = "Palabra";
+
+/* Language */
+"Word in " = "Palabra en";
 
 /* Count of words available */
 "WordCount" = "THINGS WITH LETTERS";
+

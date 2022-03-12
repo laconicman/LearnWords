@@ -1,0 +1,9 @@
+/* Bundle name */
+"CFBundleName" = "LearnWords";
+
+/* Privacy - Microphone Usage Description */
+"NSMicrophoneUsageDescription" = "Tu micrófono será usado para escuchar tu habla y para reconocerla";
+
+/* Privacy - Speech Recognition Usage Description */
+"NSSpeechRecognitionUsageDescription" = "Reconocimiento será usado para probar tu pronunciación";
+

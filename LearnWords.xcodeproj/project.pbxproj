@@ -82,6 +82,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		DA15BDEF27DC69BE008F5AEE /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		DA15BDF027DC69BE008F5AEE /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		DA160CB0268A3E7C001F6CD2 /* ExersizeChooserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExersizeChooserViewController.swift; sourceTree = "<group>"; };
 		DA160CB3268A415B001F6CD2 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Main.strings; sourceTree = "<group>"; };
 		DA160CB4268A42CA001F6CD2 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Main.strings; sourceTree = "<group>"; };
@@ -509,6 +511,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				DA86CA6B268F7BE100F917F1 /* ru */,
+				DA15BDEF27DC69BE008F5AEE /* es */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";
@@ -517,6 +520,7 @@
 			isa = PBXVariantGroup;
 			children = (
 				DA86CA6E268F7BE100F917F1 /* ru */,
+				DA15BDF027DC69BE008F5AEE /* es */,
 			);
 			name = InfoPlist.strings;
 			sourceTree = "<group>";

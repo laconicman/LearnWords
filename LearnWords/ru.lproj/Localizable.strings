@@ -29,6 +29,9 @@
 /* Message for alert for empty set to display */
 "Current set is empty. Add some words to learn." = "Текущий набор пуст. Добавьте слова для изучения.";
 
+/* swipe action */
+"Delete" = "Удалить";
+
 /* Action for dictionary prompt */
 "DICTIONARY_ACTION" = "Понятно";
 
@@ -37,6 +40,12 @@
 
 /* UIViewController+Dictionary */
 "DICTIONARY_TITLE" = "Добавить словари";
+
+/* swipe action */
+"Edit" = "Редактировать";
+
+/* AlertController title */
+"Edit word" = "Редактировать слово";
 
 /* Count of words to be exported */
 "EXPORT_WORDS_MESSAGE" = "Экспортировать %@";
@@ -100,6 +109,9 @@
 
 /* Button title */
 "Recognition permission needed" = "Нужно разрешение на распознавание";
+
+/* AlertAction title */
+"Save" = "Сохранить";
 
 /* placeholder */
 "Search words in sets" = "Искать слова в наборе";

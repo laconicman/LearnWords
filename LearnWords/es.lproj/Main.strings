@@ -1,12 +1,14 @@
-
-/* Class = "UILabel"; text = "Title"; ObjectID = "39l-aE-DmA"; */
-"39l-aE-DmA.text" = "Title";
-
 /* Class = "UINavigationItem"; title = "Translation"; ObjectID = "4AK-rv-ykj"; */
 "4AK-rv-ykj.title" = "Translation";
 
 /* Class = "UINavigationItem"; title = "Add word to study"; ObjectID = "5bW-fz-PeB"; */
 "5bW-fz-PeB.title" = "Add word to study";
+
+/* Class = "UILabel"; text = "Word"; ObjectID = "8WT-Dx-fov"; */
+"8WT-Dx-fov.text" = "Word";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "39l-aE-DmA"; */
+"39l-aE-DmA.text" = "Title";
 
 /* Class = "UITabBarItem"; title = "Exercises"; ObjectID = "61X-u6-MJk"; */
 "61X-u6-MJk.title" = "Exercises";
@@ -14,11 +16,17 @@
 /* Class = "UIButton"; normalTitle = "Forgot"; ObjectID = "643-wN-0oS"; */
 "643-wN-0oS.normalTitle" = "Forgot";
 
-/* Class = "UILabel"; text = "Word"; ObjectID = "8WT-Dx-fov"; */
-"8WT-Dx-fov.text" = "Word";
+/* Class = "UITabBarItem"; title = "Word Set"; ObjectID = "a8m-gm-wVa"; */
+"a8m-gm-wVa.title" = "Word Set";
+
+/* Class = "UIButton"; normalTitle = "Know"; ObjectID = "bDd-aK-Z4N"; */
+"bDd-aK-Z4N.normalTitle" = "Know";
 
 /* Class = "UIButton"; normalTitle = "Forgot"; ObjectID = "Bf1-2B-pAQ"; */
 "Bf1-2B-pAQ.normalTitle" = "Forgot";
+
+/* Class = "UINavigationItem"; title = "Phonetic"; ObjectID = "bIe-cz-JDG"; */
+"bIe-cz-JDG.title" = "Phonetic";
 
 /* Class = "UINavigationItem"; title = "Dictation"; ObjectID = "BpE-Jx-lIv"; */
 "BpE-Jx-lIv.title" = "Dictation";
@@ -26,8 +34,20 @@
 /* Class = "UIButton"; normalTitle = "Know"; ObjectID = "Djr-xr-GdQ"; */
 "Djr-xr-GdQ.normalTitle" = "Know";
 
+/* Class = "UILabel"; text = "Right Text Label"; ObjectID = "dnO-iH-vCy"; */
+"dnO-iH-vCy.text" = "Right Text Label";
+
+/* Class = "UISwitch"; title = "Include learned"; ObjectID = "dWV-NJ-r41"; */
+"dWV-NJ-r41.title" = "Include learned";
+
 /* Class = "UITabBarItem"; title = "Manage Sets"; ObjectID = "EEA-CH-FD5"; */
 "EEA-CH-FD5.title" = "Manage Sets";
+
+/* Class = "UINavigationItem"; title = "Learning"; ObjectID = "fb2-Kp-cfL"; */
+"fb2-Kp-cfL.title" = "Learning";
+
+/* Class = "UINavigationItem"; title = "Exercises"; ObjectID = "fg3-cG-Mk4"; */
+"fg3-cG-Mk4.title" = "Exercises";
 
 /* Class = "UIButton"; normalTitle = "Listen"; ObjectID = "Fh8-vi-hwf"; */
 "Fh8-vi-hwf.normalTitle" = "Listen";
@@ -41,6 +61,9 @@
 /* Class = "UILabel"; text = "Include learned words"; ObjectID = "JHd-Ju-sT7"; */
 "JHd-Ju-sT7.text" = "Include learned words";
 
+/* Class = "UIButton"; normalTitle = "Start recognition"; ObjectID = "jVV-UW-vd8"; */
+"jVV-UW-vd8.normalTitle" = "Start recognition";
+
 /* Class = "UITableViewController"; title = "LearnWords"; ObjectID = "Jy4-wo-DD5"; */
 "Jy4-wo-DD5.title" = "LearnWords";
 
@@ -50,11 +73,17 @@
 /* Class = "UISegmentedControl"; K2v-wJ-d9a.segmentTitles[1] = "Reversed"; ObjectID = "K2v-wJ-d9a"; */
 "K2v-wJ-d9a.segmentTitles[1]" = "Reversed";
 
+/* Class = "UIButton"; normalTitle = "Look Up"; ObjectID = "keD-qV-ddK"; */
+"keD-qV-ddK.normalTitle" = "Look Up";
+
 /* Class = "UILabel"; text = "Title"; ObjectID = "KI6-K0-Yeq"; */
 "KI6-K0-Yeq.text" = "Title";
 
 /* Class = "UIButton"; normalTitle = "Listen"; ObjectID = "Liq-qX-vPh"; */
 "Liq-qX-vPh.normalTitle" = "Listen";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "m9z-JK-XdY"; */
+"m9z-JK-XdY.text" = "Title";
 
 /* Class = "UILabel"; text = "Direction"; ObjectID = "MTG-Z2-PFM"; */
 "MTG-Z2-PFM.text" = "Direction";
@@ -65,53 +94,11 @@
 /* Class = "UILabel"; text = "Word"; ObjectID = "P1B-tp-yvT"; */
 "P1B-tp-yvT.text" = "Word";
 
-/* Class = "UIButton"; normalTitle = "Forgot"; ObjectID = "Q8X-kw-NHO"; */
-"Q8X-kw-NHO.normalTitle" = "Forgot";
-
-/* Class = "UIButton"; normalTitle = "Phonetic"; ObjectID = "Vmu-2y-Ili"; */
-"Vmu-2y-Ili.normalTitle" = "Phonetic";
-
-/* Class = "UITextField"; text = "type in translation"; ObjectID = "VvQ-x8-gCl"; */
-"VvQ-x8-gCl.text" = "type in translation";
-
-/* Class = "UILabel"; text = "0 words"; ObjectID = "WxG-u0-GkQ"; */
-"WxG-u0-GkQ.text" = "0 words";
-
-/* Class = "UILabel"; text = "Subtitle"; ObjectID = "Xwv-BA-c3j"; */
-"Xwv-BA-c3j.text" = "Subtitle";
-
-/* Class = "UITabBarItem"; title = "Word Set"; ObjectID = "a8m-gm-wVa"; */
-"a8m-gm-wVa.title" = "Word Set";
-
-/* Class = "UIButton"; normalTitle = "Know"; ObjectID = "bDd-aK-Z4N"; */
-"bDd-aK-Z4N.normalTitle" = "Know";
-
-/* Class = "UINavigationItem"; title = "Phonetic"; ObjectID = "bIe-cz-JDG"; */
-"bIe-cz-JDG.title" = "Phonetic";
-
-/* Class = "UISwitch"; title = "Include learned"; ObjectID = "dWV-NJ-r41"; */
-"dWV-NJ-r41.title" = "Include learned";
-
-/* Class = "UILabel"; text = "Right Text Label"; ObjectID = "dnO-iH-vCy"; */
-"dnO-iH-vCy.text" = "Right Text Label";
-
-/* Class = "UINavigationItem"; title = "Learning"; ObjectID = "fb2-Kp-cfL"; */
-"fb2-Kp-cfL.title" = "Learning";
-
-/* Class = "UINavigationItem"; title = "Exercises"; ObjectID = "fg3-cG-Mk4"; */
-"fg3-cG-Mk4.title" = "Exercises";
-
-/* Class = "UIButton"; normalTitle = "Start recognition"; ObjectID = "jVV-UW-vd8"; */
-"jVV-UW-vd8.normalTitle" = "Start recognition";
-
-/* Class = "UIButton"; normalTitle = "Look Up"; ObjectID = "keD-qV-ddK"; */
-"keD-qV-ddK.normalTitle" = "Look Up";
-
-/* Class = "UILabel"; text = "Title"; ObjectID = "m9z-JK-XdY"; */
-"m9z-JK-XdY.text" = "Title";
-
 /* Class = "UIButton"; normalTitle = "Look Up"; ObjectID = "ph3-GE-3p7"; */
 "ph3-GE-3p7.normalTitle" = "Look Up";
+
+/* Class = "UIButton"; normalTitle = "Forgot"; ObjectID = "Q8X-kw-NHO"; */
+"Q8X-kw-NHO.normalTitle" = "Forgot";
 
 /* Class = "UIButton"; normalTitle = "Look Up"; ObjectID = "qaf-Gn-jV1"; */
 "qaf-Gn-jV1.normalTitle" = "Look Up";
@@ -128,17 +115,30 @@
 /* Class = "UIButton"; normalTitle = "Dictation"; ObjectID = "uBK-Se-mT6"; */
 "uBK-Se-mT6.normalTitle" = "Dictation";
 
-/* Class = "UILabel"; text = "speak the translation"; ObjectID = "uEJ-4s-E9l"; */
+/* Class = "UILabel"; text = "pronounce the translation"; ObjectID = "uEJ-4s-E9l"; */
 "uEJ-4s-E9l.text" = "speak the translation";
+
+/* Class = "UIButton"; normalTitle = "Phonetics"; ObjectID = "Vmu-2y-Ili"; */
+"Vmu-2y-Ili.normalTitle" = "Phonetic";
+
+/* Class = "UITextField"; text = "type in the translation"; ObjectID = "VvQ-x8-gCl"; */
+"VvQ-x8-gCl.text" = "type in translation";
 
 /* Class = "UINavigationItem"; title = "Word Sets"; ObjectID = "vYV-WR-kC4"; */
 "vYV-WR-kC4.title" = "Word Sets";
 
+/* Class = "UILabel"; text = "0 words"; ObjectID = "WxG-u0-GkQ"; */
+"WxG-u0-GkQ.text" = "0 words";
+
 /* Class = "UIButton"; normalTitle = "Know"; ObjectID = "x6b-1p-EXm"; */
 "x6b-1p-EXm.normalTitle" = "Know";
+
+/* Class = "UILabel"; text = "Subtitle"; ObjectID = "Xwv-BA-c3j"; */
+"Xwv-BA-c3j.text" = "Subtitle";
 
 /* Class = "UIButton"; normalTitle = "Learning"; ObjectID = "y3Z-Kn-fYD"; */
 "y3Z-Kn-fYD.normalTitle" = "Learning";
 
 /* Class = "UILabel"; text = "Word"; ObjectID = "yxM-vR-ero"; */
 "yxM-vR-ero.text" = "Word";
+

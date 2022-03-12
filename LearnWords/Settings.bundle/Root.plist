@@ -29,6 +29,9 @@
 				<string>en-US</string>
 				<string>ru-RU</string>
 				<string>es-ES</string>
+				<string>de-DE</string>
+				<string>fr-FR</string>
+				<string>it-IT</string>
 			</array>
 			<key>Titles</key>
 			<array>
@@ -36,6 +39,9 @@
 				<string>English (US)</string>
 				<string>Russian</string>
 				<string>Spanish</string>
+				<string>German</string>
+				<string>French</string>
+				<string>Italian</string>
 			</array>
 		</dict>
 		<dict>
@@ -53,6 +59,9 @@
 				<string>en-US</string>
 				<string>ru-RU</string>
 				<string>es-ES</string>
+				<string>de-DE</string>
+				<string>fr-FR</string>
+				<string>it-IT</string>
 			</array>
 			<key>Titles</key>
 			<array>
@@ -60,6 +69,9 @@
 				<string>English (US)</string>
 				<string>Russian</string>
 				<string>Spanish</string>
+				<string>German</string>
+				<string>French</string>
+				<string>Italian</string>
 			</array>
 		</dict>
 		<dict>
@@ -106,7 +118,7 @@
 			<key>Key</key>
 			<string>utteranceRatePreference</string>
 			<key>DefaultValue</key>
-			<real>0.35</real>
+			<real>0.4</real>
 			<key>MinimumValue</key>
 			<real>0.2</real>
 			<key>MaximumValue</key>
