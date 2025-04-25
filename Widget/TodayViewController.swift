@@ -40,13 +40,13 @@ class TodayViewController: UIViewController, NCWidgetProviding, UITableViewDataS
     
     func widgetActiveDisplayModeDidChange(_ activeDisplayMode: NCWidgetDisplayMode, withMaximumSize maxSize: CGSize) {
         
-        if let userDefaultsGroup = UserDefaults(suiteName: "group.club.laconic.LearnWords") {
+        if let userDefaultsGroup = UserDefaults(suiteName: AppConstants.appGroup) {
             if let savedWords = userDefaultsGroup.stringArray(forKey: "Words") {
                 debugLog("Loaded words: \(savedWords)")
                 //            if let savedWords = defaults.object(forKey: "Words") as? [String] {
                 words = savedWords
             } else {
-                debugLog("Failed to load user defaults from: group.club.laconic.LearnWords")
+                debugLog("Failed to load user defaults from: \(AppConstants.appGroup)")
             }
         }
         
@@ -103,7 +103,7 @@ class TodayViewController: UIViewController, NCWidgetProviding, UITableViewDataS
     func widgetPerformUpdate(completionHandler: (@escaping (NCUpdateResult) -> Void)) {
         // Perform any setup necessary in order to update the view.
         
-        if let defaults = UserDefaults(suiteName: "group.club.laconic.LearnWords") {
+        if let defaults = UserDefaults(suiteName: AppConstants.appGroup) {
             if let savedWords = defaults.stringArray(forKey: "WordsAndStat") {
                 debugLog(savedWords.description)
                 //            if let savedWords = defaults.object(forKey: "Words") as? [String] {

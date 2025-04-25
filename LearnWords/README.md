@@ -1,5 +1,12 @@
 #  Заметки
 ## Идеи
+
+### Озвучиваение слов в списке
+
+### Autoplay в режиме изучения.
+
+### В share action, если слово одно сразу автоматически переходить в основную программу
+
 ### Добавить описание 
 Learn words makes use of system voices. The  standart quality is good enough, but there are rich options to choose from.
 You can install adiditonal voices of higher quality and choose on your taste. 

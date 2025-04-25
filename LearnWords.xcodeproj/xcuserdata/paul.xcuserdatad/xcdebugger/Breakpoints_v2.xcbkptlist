@@ -175,56 +175,6 @@
             endingLineNumber = "256"
             landmarkName = "tableView(_:cellForRowAt:)"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "FEA7A28E-864A-45E4-9B1E-8E2F23204B69 - 589ccbff4cf3c540"
-                  shouldBeEnabled = "No"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "LearnWords.SearchWordViewController.tableView(_: __C.UITableView, cellForRowAt: Foundation.IndexPath) -&gt; __C.UITableViewCell"
-                  moduleName = "LearnWords"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/paul/Documents/Code/Pav/LearnWords/LearnWords/SearchWordViewController.swift"
-                  timestampString = "564873213.123083"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "249"
-                  endingLineNumber = "249"
-                  offsetFromSymbolStart = "300">
-               </Location>
-               <Location
-                  uuid = "FEA7A28E-864A-45E4-9B1E-8E2F23204B69 - 589ccbff4cf3c540"
-                  shouldBeEnabled = "No"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "LearnWords.SearchWordViewController.tableView(_: __C.UITableView, cellForRowAt: Foundation.IndexPath) -&gt; __C.UITableViewCell"
-                  moduleName = "LearnWords"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/paul/Documents/Code/Pav/LearnWords/LearnWords/SearchWordViewController.swift"
-                  timestampString = "564873213.126802"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "249"
-                  endingLineNumber = "249"
-                  offsetFromSymbolStart = "605">
-               </Location>
-               <Location
-                  uuid = "FEA7A28E-864A-45E4-9B1E-8E2F23204B69 - 589ccbff4cf3c540"
-                  shouldBeEnabled = "No"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "LearnWords.SearchWordViewController.tableView(_: __C.UITableView, cellForRowAt: Foundation.IndexPath) -&gt; __C.UITableViewCell"
-                  moduleName = "LearnWords"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/paul/Documents/Code/Pav/LearnWords/LearnWords/SearchWordViewController.swift"
-                  timestampString = "564873213.1304621"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "249"
-                  endingLineNumber = "249"
-                  offsetFromSymbolStart = "1798">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -562,38 +512,6 @@
             endingLineNumber = "97"
             landmarkName = "viewDidLoad()"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "D9476A10-1951-4291-95E6-9B3ED582D72F - 7c65cbe266710958"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #3 (LearnWords.WordAndStat) -&gt; Swift.Bool in LearnWords.WordTableViewController.viewDidLoad() -&gt; ()"
-                  moduleName = "LearnWords"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/paul/Library/Mobile%20Documents/com~apple~CloudDocs/Code/Pav/LearnWords/LearnWords/WordTableViewController.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "95"
-                  endingLineNumber = "95"
-                  offsetFromSymbolStart = "138">
-               </Location>
-               <Location
-                  uuid = "D9476A10-1951-4291-95E6-9B3ED582D72F - d7b9059e38d13b7c"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #1 (LearnWords.WordAndStat) -&gt; Swift.Bool in closure #3 (LearnWords.WordAndStat) -&gt; Swift.Bool in LearnWords.WordTableViewController.viewDidLoad() -&gt; ()"
-                  moduleName = "LearnWords"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/paul/Library/Mobile%20Documents/com~apple~CloudDocs/Code/Pav/LearnWords/LearnWords/WordTableViewController.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "96"
-                  endingLineNumber = "96"
-                  offsetFromSymbolStart = "32">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -758,8 +676,7 @@
                   continueAfterRunningActions = "No"
                   symbolName = "UICollectionViewFlowLayoutBreakForInvalidSizes"
                   moduleName = "UIKitCore"
-                  usesParentBreakpointCondition = "Yes"
-                  offsetFromSymbolStart = "0">
+                  usesParentBreakpointCondition = "Yes">
                </Location>
             </Locations>
          </BreakpointContent>
@@ -906,38 +823,6 @@
             endingLineNumber = "41"
             landmarkName = "WordPhoneticsViewController"
             landmarkType = "3">
-            <Locations>
-               <Location
-                  uuid = "8EC944C0-D4CE-406A-85E8-81AF84CFB65A - a12f0fe24317db0c"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "LearnWords.WordPhoneticsViewController.init(nibName: Swift.Optional&lt;Swift.String&gt;, bundle: Swift.Optional&lt;__C.NSBundle&gt;) -&gt; LearnWords.WordPhoneticsViewController"
-                  moduleName = "LearnWords"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/paul/Desktop/LearnWords/LearnWords/WordPhoneticsViewController.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "41"
-                  endingLineNumber = "41"
-                  offsetFromSymbolStart = "759">
-               </Location>
-               <Location
-                  uuid = "8EC944C0-D4CE-406A-85E8-81AF84CFB65A - eb64fbc7eda6cf8"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "LearnWords.WordPhoneticsViewController.init(coder: __C.NSCoder) -&gt; Swift.Optional&lt;LearnWords.WordPhoneticsViewController&gt;"
-                  moduleName = "LearnWords"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/paul/Desktop/LearnWords/LearnWords/WordPhoneticsViewController.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "41"
-                  endingLineNumber = "41"
-                  offsetFromSymbolStart = "716">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy

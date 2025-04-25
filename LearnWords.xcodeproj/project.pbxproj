@@ -27,6 +27,9 @@
 		DA4162F41F8BE62600165694 /* WordsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA4162F31F8BE62600165694 /* WordsModel.swift */; };
 		DA4162F61F8C219500165694 /* GradientButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA4162F51F8C219500165694 /* GradientButton.swift */; };
 		DA5454752687C35E007654E0 /* NotificationCenter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA246CCB1F8AA30E00A75ED1 /* NotificationCenter.framework */; };
+		DA7607702DBC0C3B0081CECD /* AppConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA76076F2DBC0C3B0081CECD /* AppConstants.swift */; };
+		DA7607712DBC0CF80081CECD /* AppConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA76076F2DBC0C3B0081CECD /* AppConstants.swift */; };
+		DA7607722DBC0D530081CECD /* AppConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA76076F2DBC0C3B0081CECD /* AppConstants.swift */; };
 		DA86ADF423489FF7007E3221 /* String+.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA86ADF323489FF7007E3221 /* String+.swift */; };
 		DA86CA6C268F7BE100F917F1 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = DA86CA6A268F7BE100F917F1 /* InfoPlist.strings */; };
 		DA86CA6F268F7BE100F917F1 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = DA86CA6D268F7BE100F917F1 /* InfoPlist.strings */; };
@@ -115,6 +118,7 @@
 		DA4162F31F8BE62600165694 /* WordsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordsModel.swift; sourceTree = "<group>"; };
 		DA4162F51F8C219500165694 /* GradientButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientButton.swift; sourceTree = "<group>"; };
 		DA554C6826593A1100C67BE0 /* ImportAsDictAction.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ImportAsDictAction.entitlements; sourceTree = "<group>"; };
+		DA76076F2DBC0C3B0081CECD /* AppConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConstants.swift; sourceTree = "<group>"; };
 		DA86ADF323489FF7007E3221 /* String+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+.swift"; sourceTree = "<group>"; };
 		DA86CA6B268F7BE100F917F1 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		DA86CA6E268F7BE100F917F1 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -195,6 +199,7 @@
 		DA246CB21F8A6E5E00A75ED1 /* LearnWords */ = {
 			isa = PBXGroup;
 			children = (
+				DA76076F2DBC0C3B0081CECD /* AppConstants.swift */,
 				DA246CDB1F8AB75900A75ED1 /* LearnWords.entitlements */,
 				DAC884B9219C8710005C6588 /* SearchWordViewController.swift */,
 				DAEC8DCD219DF691009097C2 /* Settings.swift */,
@@ -424,6 +429,7 @@
 				DA2E2D9B267B683400EF285C /* General.swift in Sources */,
 				DA4162F61F8C219500165694 /* GradientButton.swift in Sources */,
 				DAEC8DCE219DF691009097C2 /* Settings.swift in Sources */,
+				DA7607702DBC0C3B0081CECD /* AppConstants.swift in Sources */,
 				DA246CDE1F8AE3DA00A75ED1 /* WordTestViewController.swift in Sources */,
 				DA2E2CF5265E9AA200EF285C /* TabBarControllerHome.swift in Sources */,
 				DA2E2D1826623F0700EF285C /* UnderKeyboardDistrib.swift in Sources */,
@@ -448,6 +454,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DA246CCF1F8AA30E00A75ED1 /* TodayViewController.swift in Sources */,
+				DA7607712DBC0CF80081CECD /* AppConstants.swift in Sources */,
 				DAEA4502268CD507004CA6C4 /* Debug.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -457,6 +464,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DAA16D6B24B60673003C28FD /* ActionViewController.swift in Sources */,
+				DA7607722DBC0D530081CECD /* AppConstants.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -687,13 +695,14 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 5;
-				DEVELOPMENT_TEAM = WEJF495R4D;
+				DEVELOPMENT_TEAM = MW2YXY2465;
 				INFOPLIST_FILE = LearnWords/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = club.laconic.LearnWords;
+				PRODUCT_BUNDLE_IDENTIFIER = club.linguist.LearnWords;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
@@ -710,13 +719,14 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 5;
-				DEVELOPMENT_TEAM = WEJF495R4D;
+				DEVELOPMENT_TEAM = MW2YXY2465;
 				INFOPLIST_FILE = LearnWords/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = club.laconic.LearnWords;
+				PRODUCT_BUNDLE_IDENTIFIER = club.linguist.LearnWords;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
@@ -730,14 +740,14 @@
 				CODE_SIGN_ENTITLEMENTS = Widget/Widget.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 5;
-				DEVELOPMENT_TEAM = WEJF495R4D;
+				DEVELOPMENT_TEAM = MW2YXY2465;
 				INFOPLIST_FILE = Widget/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = club.laconic.LearnWords.Widget;
+				PRODUCT_BUNDLE_IDENTIFIER = club.linguist.LearnWords.Widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
@@ -751,14 +761,14 @@
 				CODE_SIGN_ENTITLEMENTS = Widget/Widget.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 5;
-				DEVELOPMENT_TEAM = WEJF495R4D;
+				DEVELOPMENT_TEAM = MW2YXY2465;
 				INFOPLIST_FILE = Widget/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = club.laconic.LearnWords.Widget;
+				PRODUCT_BUNDLE_IDENTIFIER = club.linguist.LearnWords.Widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
@@ -775,7 +785,7 @@
 				CODE_SIGN_ENTITLEMENTS = ImportAsDictAction/ImportAsDictAction.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = WEJF495R4D;
+				DEVELOPMENT_TEAM = MW2YXY2465;
 				INFOPLIST_FILE = ImportAsDictAction/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -786,7 +796,7 @@
 				MARKETING_VERSION = 1.0.1;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = club.laconic.LearnWords.ImportAsDictAction;
+				PRODUCT_BUNDLE_IDENTIFIER = club.linguist.LearnWords.ImportAsDictAction;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
@@ -803,7 +813,7 @@
 				CODE_SIGN_ENTITLEMENTS = ImportAsDictAction/ImportAsDictAction.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = WEJF495R4D;
+				DEVELOPMENT_TEAM = MW2YXY2465;
 				INFOPLIST_FILE = ImportAsDictAction/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -813,7 +823,7 @@
 				);
 				MARKETING_VERSION = 1.0.1;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = club.laconic.LearnWords.ImportAsDictAction;
+				PRODUCT_BUNDLE_IDENTIFIER = club.linguist.LearnWords.ImportAsDictAction;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;

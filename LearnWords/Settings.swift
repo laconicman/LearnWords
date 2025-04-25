@@ -14,16 +14,15 @@ private let kLastSearchKey = "LastSearch"
 private let dictionaryPromptDisplayed = "firstUseDictionaryPromptDisplayed"
 
 // TODO: make common settings for app and extensions
-// let userDefaultsGroup = UserDefaults(suiteName: "group.club.laconic.LearnWords")
 let userDefaultsGroup = LWUserDefaults.standard.userDefaultsGroup
 let userDefaults = LWUserDefaults.standard.userDefaults
 
-// Usefull links
-// parsing the whole settings bundle stucture:
+// Useful links
+// parsing the whole settings bundle structure:
 // https://stackoverflow.com/questions/46453789/swift-4-settings-bundle-get-defaults
 // with Decodable:
 // https://stackoverflow.com/questions/24045570/how-do-i-get-a-plist-as-a-dictionary-in-swift
-// Unfortunatery it is not recommended to write root.plist directly
+// Unfortunately it is not recommended to write root.plist directly
 // register while init, easy get/set wrapper:
 // https://forums.developer.apple.com/thread/73266
 
@@ -31,10 +30,9 @@ let userDefaults = LWUserDefaults.standard.userDefaults
 
 final class LWUserDefaults {
     
-    static var standard = LWUserDefaults()
+    static let standard = LWUserDefaults()
     
-    func registerDefaultsFromSettingsBundle()
-    {
+    func registerDefaultsFromSettingsBundle() {
         // This seems to do the same thing as user defaults
 //        CFPreferencesSetAppValue("languageToStudyPreference" as CFString, ["a", "b", "c"] as CFArray, kCFPreferencesCurrentApplication)
 //        CFPreferencesAppSynchronize(kCFPreferencesCurrentApplication)
@@ -69,7 +67,7 @@ final class LWUserDefaults {
         // languageToStudyPreference.UITextInputMode.activeInputModes.filter{ $0.contains("emoji") }.last?.primaryLanguage
     }
     
-    let userDefaultsGroup = UserDefaults(suiteName: "group.club.laconic.LearnWords") ?? UserDefaults.standard
+    let userDefaultsGroup = UserDefaults(suiteName: AppConstants.appGroup) ?? UserDefaults.standard
     let userDefaults = UserDefaults.standard
     
     var utteranceRatePreference: Double {
