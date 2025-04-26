@@ -124,6 +124,15 @@ final class LWUserDefaults {
         }
     }
     
+    var maxKnownLevelPreference: Int {
+        get {
+            return Int(self.userDefaults.double(forKey: "maxKnownLevelPreference").rounded())
+        }
+        set {
+            self.userDefaults.set(Double(newValue), forKey: "maxKnownLevelPreference")
+        }
+    }
+    
     var shouldDisplayFirstUseDictionaryPrompt: Bool {
         get {
             !self.userDefaultsGroup.bool(forKey: dictionaryPromptDisplayed)

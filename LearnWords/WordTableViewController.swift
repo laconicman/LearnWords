@@ -142,6 +142,7 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
 //        print("UserDefaults.standard.string(forKey: 'languageToStudyPreference'): " + (UserDefaults.standard.string(forKey: "languageToStudyPreference") ?? "Undefined"))
 //        print("UserDefaults.standard.string(forKey: 'nativeLanguagePreference'): " + (UserDefaults.standard.string(forKey: "nativeLanguagePreference") ?? "Undefined"))
         // tableView.reloadData() //inefficient
+        _ = SpeechManager.shared // Init this complex object when the screen is already displayed. Thus there will be no delay in first attempt tts.
     }
     
     

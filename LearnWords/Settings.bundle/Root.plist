@@ -144,6 +144,28 @@
 			<key>DefaultValue</key>
 			<true/>
 		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSTitleValueSpecifier</string>
+			<key>Title</key>
+			<string>Study</string>
+			<key>Key</key>
+			<string>studyTitlePreference</string>
+			<key>DefaultValue</key>
+			<string></string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSSliderSpecifier</string>
+			<key>Key</key>
+			<string>maxKnownLevelPreference</string>
+			<key>DefaultValue</key>
+			<integer>20</integer>
+			<key>MinimumValue</key>
+			<real>1</real>
+			<key>MaximumValue</key>
+			<real>100</real>
+		</dict>
 	</array>
 </dict>
 </plist>

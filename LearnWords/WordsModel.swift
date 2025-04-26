@@ -18,7 +18,10 @@ struct WordAndStat: Codable {
     private(set) var incorrect: [String : Int] = [:]
     var skiped: Int = 0
     // var lastShown: Date?
-    static let maxKnownLevel = 5
+    static var maxKnownLevel: Int {
+        print(LWUserDefaults.standard.maxKnownLevelPreference)
+        return LWUserDefaults.standard.maxKnownLevelPreference
+    }
     
     // MARK: - Setters
     // TODO: Refactor naming to `increaseCorrect(for exercise: String)` for example.
