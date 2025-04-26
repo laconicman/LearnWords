@@ -114,7 +114,7 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         navigationItem.rightBarButtonItems?.insert(editButtonItem, at: 0)
             //  print("$\(PRODUCT_BUNDLE_IDENTIFIER)")
 
-        // For features avalible after iOS 11 In is coomented out because it is ugly
+        // For features available after iOS 11 In is commented out because it is ugly
 //        if ProcessInfo().isOperatingSystemAtLeast(OperatingSystemVersion(majorVersion: 11, minorVersion: 0, patchVersion: 0)) {
 //            navigationController?.navigationBar.prefersLargeTitles = true
 //        }
@@ -254,7 +254,43 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         // cell.progressView.angle = (360.0 / Double(WordAndStat.maxKnownLevel)) * Double(word.known)
         cell.rightTextLabel?.text = word.secondWord
         
+        
+        // Remove any existing gesture recognizers to avoid duplicates when cells are reused
+        if let gestureRecognizers = cell.gestureRecognizers {
+            for recognizer in gestureRecognizers {
+                if recognizer is UILongPressGestureRecognizer {
+                    cell.removeGestureRecognizer(recognizer)
+                }
+            }
+        }
+        
+        // Create and add long press gesture recognizer
+        let longPressRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress(_:)))
+        longPressRecognizer.minimumPressDuration = 0.5 // Set duration in seconds
+        cell.addGestureRecognizer(longPressRecognizer)
+        cell.isUserInteractionEnabled = true
+        
         return cell
+    }
+    
+    @objc private func handleLongPress(_ gestureRecognizer: UILongPressGestureRecognizer) {
+        if gestureRecognizer.state == .began {
+            // Get the touch point in the table view
+            let touchPoint = gestureRecognizer.location(in: tableView)
+            
+            // Get the index path of the cell at the touch point
+            if let indexPath = tableView.indexPathForRow(at: touchPoint) {
+                // Do something with the selected cell
+                print("Long press detected on cell at index path: \(indexPath)")
+                
+                // Example: show a context menu
+                //showContextMenu(for: indexPath, at: touchPoint)
+                if let cell = tableView.cellForRow(at: indexPath) as? WordTableViewCell,
+                   let wordToLookUp = cell.leftTextLabel?.text {
+                    lookUp(term: wordToLookUp, sender: self, location: touchPoint)
+                }
+            }
+        }
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -299,22 +335,22 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         
         let edit = UIContextualAction(style: .normal, title: NSLocalizedString("Edit", comment: "swipe action")) { [weak self] (_, _, completionHandler) in
 
-            let ac = UIAlertController(title: NSLocalizedString("Edit word", comment: "AlertController title"), message: nil, preferredStyle: .alert)
+            let alertController = UIAlertController(title: NSLocalizedString("Edit word", comment: "AlertController title"), message: nil, preferredStyle: .alert)
             
             // add two text fields, one for English and one for French
-            ac.addTextField { textField in
+            alertController.addTextField { textField in
                 textField.text = Storage.wordsAndStat[indexPath.row].firstWord
             }
             
-            ac.addTextField { textField in
+            alertController.addTextField { textField in
                 textField.text = Storage.wordsAndStat[indexPath.row].secondWord
             }
             
             // create an "Add Word" button that submits the user's input
             let submitAction = UIAlertAction(title: NSLocalizedString("Save", comment: "AlertAction title"), style: .default) { _ in
                 // pull out the English and French words, or an empty string if there was a problem
-                Storage.wordsAndStat[indexPath.row].firstWord = ac.textFields?[0].text ?? ""
-                Storage.wordsAndStat[indexPath.row].secondWord = ac.textFields?[1].text ?? ""
+                Storage.wordsAndStat[indexPath.row].firstWord = alertController.textFields?[0].text ?? ""
+                Storage.wordsAndStat[indexPath.row].secondWord = alertController.textFields?[1].text ?? ""
                 Storage.wordsAndStat.sort(by: { $0.firstWord < $1.firstWord })
                 Storage.saveWords()
                 completionHandler(true)
@@ -323,11 +359,18 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
             let cancelAction = UIAlertAction(title: NSLocalizedString("Cancel", comment: "AlertAction title"), style: .cancel) { _ in
                 completionHandler(true)
             }
-            ac.addAction(submitAction)
-            ac.addAction(cancelAction)
-            tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
-            self?.present(ac, animated: true) {
-                tableView.deselectRow(at: indexPath, animated: true)
+            alertController.addAction(submitAction)
+            alertController.addAction(cancelAction)
+            
+            // For iPad support (required for action sheets)
+            if let popoverController = alertController.popoverPresentationController {
+                popoverController.sourceView = tableView
+                // popoverController.sourceRect = CGRect(origin: point, size: CGSize(width: 1, height: 1))
+            }
+            // tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
+            self?.present(alertController, animated: true) {
+                tableView.selectRow(at: indexPath, animated: true, scrollPosition: .middle)
+                // tableView.deselectRow(at: indexPath, animated: true)
             }
             // completionHandler(false) // Even when passing false the row hides swipe actions which is not what we want.
         }
