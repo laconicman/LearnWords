@@ -37,6 +37,10 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
     @IBAction func unwindSegue(segue: UIStoryboardSegue) {
         
     }
+    // TODO: refactor to a factory func `uiImage(systemName: String)`
+    private let resetProgressActionImage = UIImage.systemImage(["memories.badge.xmark", "memories"])
+    private let editImage = UIImage.systemImage("pencil")
+    private let deleteImage = UIImage.systemImage("trash")
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -264,9 +268,8 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
             }
         }
         
-        // Create and add long press gesture recognizer
         let longPressRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress(_:)))
-        longPressRecognizer.minimumPressDuration = 0.5 // Set duration in seconds
+        longPressRecognizer.minimumPressDuration = 0.3
         cell.addGestureRecognizer(longPressRecognizer)
         cell.isUserInteractionEnabled = true
         
@@ -275,16 +278,12 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
     
     @objc private func handleLongPress(_ gestureRecognizer: UILongPressGestureRecognizer) {
         if gestureRecognizer.state == .began {
-            // Get the touch point in the table view
             let touchPoint = gestureRecognizer.location(in: tableView)
             
-            // Get the index path of the cell at the touch point
             if let indexPath = tableView.indexPathForRow(at: touchPoint) {
-                // Do something with the selected cell
-                print("Long press detected on cell at index path: \(indexPath)")
                 
-                // Example: show a context menu
-                //showContextMenu(for: indexPath, at: touchPoint)
+                // We could show a context menu instead.
+                // showContextMenu(for: indexPath, at: touchPoint)
                 if let cell = tableView.cellForRow(at: indexPath) as? WordTableViewCell,
                    let wordToLookUp = cell.leftTextLabel?.text {
                     lookUp(term: wordToLookUp, sender: self, location: touchPoint)
@@ -354,7 +353,12 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
                 Storage.wordsAndStat.sort(by: { $0.firstWord < $1.firstWord })
                 Storage.saveWords()
                 completionHandler(true)
-                tableView.reloadRows(at: tableView.indexPathsForVisibleRows ?? [indexPath], with: .automatic)
+                let indexPaths = tableView.indexPathsForVisibleRows ?? [indexPath]
+                if #available(iOS 15.0, *) {
+                    self?.tableView.reconfigureRows(at: indexPaths)
+                } else {
+                    self?.tableView.reloadRows(at: indexPaths, with: .automatic)
+                }
             }
             let cancelAction = UIAlertAction(title: NSLocalizedString("Cancel", comment: "AlertAction title"), style: .cancel) { _ in
                 completionHandler(true)
@@ -375,10 +379,9 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
             // completionHandler(false) // Even when passing false the row hides swipe actions which is not what we want.
         }
         edit.backgroundColor = .systemTeal
-        if #available(iOS 13, *) {
-        edit.image = UIImage(systemName: "pencil")
-        delete.image = UIImage(systemName: "trash")
-        }
+        edit.image = editImage
+        delete.image = deleteImage
+
         let config = UISwipeActionsConfiguration(actions: [delete, edit])
         config.performsFirstActionWithFullSwipe = true
         return config
@@ -387,7 +390,6 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
     override func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         guard !isSearching else { return nil }
         
-        let resetProgressActionImage: UIImage? = if #available(iOS 13, *) { UIImage(systemName: "pencil") } else { nil }
         let resetProgressAction = UIContextualAction(style: .normal, title: "Reset", backgroundColor: .systemOrange, image: resetProgressActionImage) { [weak self] (_, _, completionHandler) in
             guard let self else { return }
             Storage.resetAnswerStat(at: indexPath.row)

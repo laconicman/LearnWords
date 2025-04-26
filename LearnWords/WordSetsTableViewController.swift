@@ -194,8 +194,11 @@ class WordSetsTableViewController: UITableViewController, UIDocumentPickerDelega
         // tableView.deselectRow(at: indexPath, animated: true)
         if tableView.cellForRow(at: indexPath) != nil {
             Storage.currentWordSet = Storage.wordSets[indexPath.row]
-            tableView.reloadRows(at: [indexPath], with: .automatic)
-            // tableView.reloadData()
+            if #available(iOS 15.0, *) {
+                self.tableView.reconfigureRows(at: [indexPath])
+            } else {
+                self.tableView.reloadRows(at: [indexPath], with: .automatic)
+            }
             self.tabBarController?.selectedIndex = 0
         }
     }

@@ -19,8 +19,7 @@ struct WordAndStat: Codable {
     var skiped: Int = 0
     // var lastShown: Date?
     static var maxKnownLevel: Int {
-        print(LWUserDefaults.standard.maxKnownLevelPreference)
-        return LWUserDefaults.standard.maxKnownLevelPreference
+        LWUserDefaults.standard.maxKnownLevelPreference
     }
     
     // MARK: - Setters
