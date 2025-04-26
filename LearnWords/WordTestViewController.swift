@@ -177,7 +177,7 @@ final class WordTestViewController: UIViewController {
         //            prompt.textColor = UIColor(red: 0, green: 0.7, blue: 0, alpha: 1)
         
         if LWUserDefaults.standard.pronounceAnswersPreference {
-            LWSpeechSynth.standard.speak(utteranceString: wordDefinition.attributedText!, language:
+            SpeechManager.shared.speak(wordDefinition.attributedText!, language:
                                             LWUserDefaults.standard.foreignToNative ?
                                             LWUserDefaults.standard.nativeLanguagePreference! :  LWUserDefaults.standard.languageToStudyPreference!)
         }
@@ -197,7 +197,7 @@ final class WordTestViewController: UIViewController {
         }
         prompt.attributedText = NSAttributedString(string: LWUserDefaults.standard.foreignToNative ? wordsInTest[0].firstWord : wordsInTest[0].secondWord)
         if LWUserDefaults.standard.pronounceQuestionsPreference {
-            LWSpeechSynth.standard.speak(utteranceString: prompt.attributedText!, language: LWUserDefaults.standard.foreignToNative ? LWUserDefaults.standard.languageToStudyPreference! :  LWUserDefaults.standard.nativeLanguagePreference!)
+            SpeechManager.shared.speak(prompt.attributedText!, language: LWUserDefaults.standard.foreignToNative ? LWUserDefaults.standard.languageToStudyPreference! :  LWUserDefaults.standard.nativeLanguagePreference!)
         }
         wordDefinition.attributedText = NSAttributedString(
             string: "?",

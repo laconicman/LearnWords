@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		DA160CB1268A3E7C001F6CD2 /* ExersizeChooserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA160CB0268A3E7C001F6CD2 /* ExersizeChooserViewController.swift */; };
 		DA1636B72DBCF80D00578C95 /* UIContextualAction+ConvenienceInit.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA1636B62DBCF80D00578C95 /* UIContextualAction+ConvenienceInit.swift */; };
+		DA1636B92DBD39F100578C95 /* SpeechManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA1636B82DBD39F100578C95 /* SpeechManager.swift */; };
 		DA246CB41F8A6E5E00A75ED1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA246CB31F8A6E5E00A75ED1 /* AppDelegate.swift */; };
 		DA246CB61F8A6E5E00A75ED1 /* WordTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA246CB51F8A6E5E00A75ED1 /* WordTableViewController.swift */; };
 		DA246CB91F8A6E5E00A75ED1 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DA246CB71F8A6E5E00A75ED1 /* Main.storyboard */; };
@@ -22,7 +23,6 @@
 		DA2E2CF5265E9AA200EF285C /* TabBarControllerHome.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA2E2CF4265E9AA200EF285C /* TabBarControllerHome.swift */; };
 		DA2E2D0E26612B8B00EF285C /* UserDefaults+Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA2E2D0D26612B8A00EF285C /* UserDefaults+Codable.swift */; };
 		DA2E2D1826623F0700EF285C /* UnderKeyboardDistrib.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA2E2D1726623F0700EF285C /* UnderKeyboardDistrib.swift */; };
-		DA2E2D90267A540900EF285C /* LWSpeechSynth.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA2E2D8F267A540900EF285C /* LWSpeechSynth.swift */; };
 		DA2E2D9B267B683400EF285C /* General.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA2E2D9A267B683400EF285C /* General.swift */; };
 		DA2E2DA3267CB63E00EF285C /* WordSetsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA2E2DA2267CB63E00EF285C /* WordSetsTableViewController.swift */; };
 		DA4162F41F8BE62600165694 /* WordsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA4162F31F8BE62600165694 /* WordsModel.swift */; };
@@ -95,6 +95,7 @@
 		DA160CB6268A42CA001F6CD2 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/MainInterface.strings; sourceTree = "<group>"; };
 		DA160CB7268A42CA001F6CD2 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/MainInterface.strings; sourceTree = "<group>"; };
 		DA1636B62DBCF80D00578C95 /* UIContextualAction+ConvenienceInit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIContextualAction+ConvenienceInit.swift"; sourceTree = "<group>"; };
+		DA1636B82DBD39F100578C95 /* SpeechManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechManager.swift; sourceTree = "<group>"; };
 		DA246CB01F8A6E5E00A75ED1 /* LearnWords.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LearnWords.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA246CB31F8A6E5E00A75ED1 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		DA246CB51F8A6E5E00A75ED1 /* WordTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordTableViewController.swift; sourceTree = "<group>"; };
@@ -114,7 +115,6 @@
 		DA2E2CF4265E9AA200EF285C /* TabBarControllerHome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarControllerHome.swift; sourceTree = "<group>"; };
 		DA2E2D0D26612B8A00EF285C /* UserDefaults+Codable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDefaults+Codable.swift"; sourceTree = "<group>"; };
 		DA2E2D1726623F0700EF285C /* UnderKeyboardDistrib.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UnderKeyboardDistrib.swift; sourceTree = "<group>"; };
-		DA2E2D8F267A540900EF285C /* LWSpeechSynth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LWSpeechSynth.swift; sourceTree = "<group>"; };
 		DA2E2D9A267B683400EF285C /* General.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = General.swift; sourceTree = "<group>"; };
 		DA2E2DA2267CB63E00EF285C /* WordSetsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordSetsTableViewController.swift; sourceTree = "<group>"; };
 		DA4162F31F8BE62600165694 /* WordsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordsModel.swift; sourceTree = "<group>"; };
@@ -201,12 +201,12 @@
 		DA246CB21F8A6E5E00A75ED1 /* LearnWords */ = {
 			isa = PBXGroup;
 			children = (
+				DA1636B82DBD39F100578C95 /* SpeechManager.swift */,
 				DA1636B62DBCF80D00578C95 /* UIContextualAction+ConvenienceInit.swift */,
 				DA76076F2DBC0C3B0081CECD /* AppConstants.swift */,
 				DA246CDB1F8AB75900A75ED1 /* LearnWords.entitlements */,
 				DAC884B9219C8710005C6588 /* SearchWordViewController.swift */,
 				DAEC8DCD219DF691009097C2 /* Settings.swift */,
-				DA2E2D8F267A540900EF285C /* LWSpeechSynth.swift */,
 				DA2E2D9A267B683400EF285C /* General.swift */,
 				DA246CB31F8A6E5E00A75ED1 /* AppDelegate.swift */,
 				DA246CB51F8A6E5E00A75ED1 /* WordTableViewController.swift */,
@@ -440,11 +440,11 @@
 				DA2E2D0E26612B8B00EF285C /* UserDefaults+Codable.swift in Sources */,
 				DA246CB61F8A6E5E00A75ED1 /* WordTableViewController.swift in Sources */,
 				DA2E2CE7265E865A00EF285C /* WordDictationController.swift in Sources */,
+				DA1636B92DBD39F100578C95 /* SpeechManager.swift in Sources */,
 				DA2E2DA3267CB63E00EF285C /* WordSetsTableViewController.swift in Sources */,
 				DA86ADF423489FF7007E3221 /* String+.swift in Sources */,
 				DA9156282684CBCE00CAEB26 /* WordPhoneticsViewController.swift in Sources */,
 				DAEA4501268CD157004CA6C4 /* Debug.swift in Sources */,
-				DA2E2D90267A540900EF285C /* LWSpeechSynth.swift in Sources */,
 				DA160CB1268A3E7C001F6CD2 /* ExersizeChooserViewController.swift in Sources */,
 				DAEA4506268DDABC004CA6C4 /* KDCircularProgress.swift in Sources */,
 				DAEA4504268DD835004CA6C4 /* WordTableViewCell.swift in Sources */,

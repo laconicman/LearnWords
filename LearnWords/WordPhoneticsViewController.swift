@@ -31,7 +31,7 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
         // try? audioSession.setCategory(.playback, mode: .measurement, options: [])
         try? audioSession.setCategory(.playback, mode: .default, policy: .default, options: [])
         try? audioSession.setActive(true, options: .notifyOthersOnDeactivation)
-        LWSpeechSynth.standard.speak(utteranceString: NSAttributedString(string: wordsInTest[0].firstWord), language: LWUserDefaults.standard.languageToStudyPreference!)
+        SpeechManager.shared.speak(NSAttributedString(string: wordsInTest[0].firstWord), language: LWUserDefaults.standard.languageToStudyPreference!)
     }
     var wordsInTest = [WordAndStat]()
     var shownWord: WordAndStat!
@@ -276,7 +276,7 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
         }
         prompt.attributedText = NSAttributedString(string: LWUserDefaults.standard.foreignToNative ? wordsInTest[0].firstWord : wordsInTest[0].secondWord)
         if LWUserDefaults.standard.pronounceQuestionsPreference {
-            LWSpeechSynth.standard.speak(utteranceString: prompt.attributedText!, language: LWUserDefaults.standard.foreignToNative ? LWUserDefaults.standard.languageToStudyPreference! : LWUserDefaults.standard.nativeLanguagePreference!)
+            SpeechManager.shared.speak(prompt.attributedText!, language: LWUserDefaults.standard.foreignToNative ? LWUserDefaults.standard.languageToStudyPreference! : LWUserDefaults.standard.nativeLanguagePreference!)
         }
         recognized.attributedText = NSAttributedString(
             string: NSLocalizedString("pronounce the translation", comment: "label prompt"),
@@ -392,7 +392,7 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
         try? audioSession.setCategory(.playback, mode: .default, policy: .default, options: [])
         try? audioSession.setActive(true, options: .notifyOthersOnDeactivation)
         if LWUserDefaults.standard.pronounceAnswersPreference {
-            LWSpeechSynth.standard.speak(utteranceString: recognized.attributedText!, language: LWUserDefaults.standard.foreignToNative ? LWUserDefaults.standard.nativeLanguagePreference! : LWUserDefaults.standard.languageToStudyPreference!)
+            SpeechManager.shared.speak(recognized.attributedText!, language: LWUserDefaults.standard.foreignToNative ? LWUserDefaults.standard.nativeLanguagePreference! : LWUserDefaults.standard.languageToStudyPreference!)
         }
     }
     

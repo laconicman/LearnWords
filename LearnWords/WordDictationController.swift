@@ -31,7 +31,7 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
     }
     
     @IBAction func listenAction(_ sender: Any) {
-        LWSpeechSynth.standard.speak(utteranceString: NSAttributedString(string: wordsInTest[0].firstWord), language: LWUserDefaults.standard.languageToStudyPreference!)
+        SpeechManager.shared.speak(NSAttributedString(string: wordsInTest[0].firstWord), language: LWUserDefaults.standard.languageToStudyPreference!)
     }
     
     var wordsInTest = [WordAndStat]()
@@ -177,7 +177,7 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
         //            prompt.textColor = UIColor(red: 0, green: 0.7, blue: 0, alpha: 1)
         
         if LWUserDefaults.standard.pronounceAnswersPreference {
-            LWSpeechSynth.standard.speak(utteranceString: translationInput.attributedText!, language: LWUserDefaults.standard.foreignToNative ? LWUserDefaults.standard.nativeLanguagePreference! : LWUserDefaults.standard.languageToStudyPreference!)
+            SpeechManager.shared.speak(translationInput.attributedText!, language: LWUserDefaults.standard.foreignToNative ? LWUserDefaults.standard.nativeLanguagePreference! : LWUserDefaults.standard.languageToStudyPreference!)
         }
     }
     
@@ -197,7 +197,7 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
         prompt.attributedText = NSAttributedString(string: LWUserDefaults.standard.foreignToNative ?
                                                    wordsInTest[0].firstWord : wordsInTest[0].secondWord)
         if LWUserDefaults.standard.pronounceQuestionsPreference {
-            LWSpeechSynth.standard.speak(utteranceString: prompt.attributedText!, language: LWUserDefaults.standard.foreignToNative ? LWUserDefaults.standard.languageToStudyPreference!: LWUserDefaults.standard.nativeLanguagePreference!)
+            SpeechManager.shared.speak(prompt.attributedText!, language: LWUserDefaults.standard.foreignToNative ? LWUserDefaults.standard.languageToStudyPreference!: LWUserDefaults.standard.nativeLanguagePreference!)
         }
         translationInput.isUserInteractionEnabled = true
         translationInput.attributedPlaceholder = NSAttributedString(

@@ -257,9 +257,12 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
+        defer { tableView.deselectRow(at: indexPath, animated: true) }
         
         if let cell = tableView.cellForRow(at: indexPath) as? WordTableViewCell {
+            if let wordToSpeak = cell.leftTextLabel?.text {
+                SpeechManager.shared.speak(NSAttributedString(string: wordToSpeak), language: LWUserDefaults.standard.languageToStudyPreference!)
+            }
             if cell.rightTextLabel?.text == "" {
                 let word = wordsInTable[indexPath.row]
                 cell.rightTextLabel?.text = word.secondWord
