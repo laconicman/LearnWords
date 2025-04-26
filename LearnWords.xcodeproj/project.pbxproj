@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 60;
+	objectVersion = 90;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -72,15 +72,13 @@
 /* Begin PBXCopyFilesBuildPhase section */
 		DA246CDA1F8AA30E00A75ED1 /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
 			dstPath = "";
-			dstSubfolderSpec = 13;
+			dstSubfolder = PlugIns;
 			files = (
 				DA246CD61F8AA30E00A75ED1 /* Widget.appex in Embed Foundation Extensions */,
 				DAA16D7224B60673003C28FD /* ImportAsDictAction.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
@@ -141,25 +139,19 @@
 /* Begin PBXFrameworksBuildPhase section */
 		DA246CAD1F8A6E5E00A75ED1 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 		DA246CC61F8AA30E00A75ED1 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 				DA5454752687C35E007654E0 /* NotificationCenter.framework in Frameworks */,
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 		DAA16D6324B60673003C28FD /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
@@ -290,8 +282,6 @@
 			);
 			buildRules = (
 			);
-			dependencies = (
-			);
 			name = Widget;
 			productName = Widget;
 			productReference = DA246CC91F8AA30E00A75ED1 /* Widget.appex */;
@@ -306,8 +296,6 @@
 				DAA16D6424B60673003C28FD /* Resources */,
 			);
 			buildRules = (
-			);
-			dependencies = (
 			);
 			name = ImportAsDictAction;
 			productName = ImportAsDictAction;
@@ -351,7 +339,6 @@
 				};
 			};
 			buildConfigurationList = DA246CAB1F8A6E5E00A75ED1 /* Build configuration list for PBXProject "LearnWords" */;
-			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -361,6 +348,7 @@
 				es,
 			);
 			mainGroup = DA246CA71F8A6E5E00A75ED1;
+			preferredProjectObjectVersion = 90;
 			productRefGroup = DA246CB11F8A6E5E00A75ED1 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -375,7 +363,6 @@
 /* Begin PBXResourcesBuildPhase section */
 		DA246CAE1F8A6E5E00A75ED1 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 				DA246CBE1F8A6E5E00A75ED1 /* LaunchScreen.storyboard in Resources */,
 				DAD5E0D6219EF1400084FD1A /* Images.imagecatalog in Resources */,
@@ -385,34 +372,28 @@
 				DA246CBB1F8A6E5E00A75ED1 /* Assets.xcassets in Resources */,
 				DA246CB91F8A6E5E00A75ED1 /* Main.storyboard in Resources */,
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 		DA246CC71F8AA30E00A75ED1 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 				DA88CB8521A687C00094D1F8 /* Settings.bundle in Resources */,
 				DA246CD21F8AA30E00A75ED1 /* MainInterface.storyboard in Resources */,
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 		DAA16D6424B60673003C28FD /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 				DAA16D6924B60673003C28FD /* Media.xcassets in Resources */,
 				DA1636BD2DBD4C8800578C95 /* InfoPlist.xcstrings in Resources */,
 				DAFE0BFE2690C4E700E21D5C /* Assets.xcassets in Resources */,
 				DAA16D6E24B60673003C28FD /* MainInterface.storyboard in Resources */,
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		DA246CAC1F8A6E5E00A75ED1 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 				DAC884BA219C8710005C6588 /* SearchWordViewController.swift in Sources */,
 				DA2E2D9B267B683400EF285C /* General.swift in Sources */,
@@ -437,26 +418,21 @@
 				DA4162F41F8BE62600165694 /* WordsModel.swift in Sources */,
 				DA1636B72DBCF80D00578C95 /* UIContextualAction+ConvenienceInit.swift in Sources */,
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 		DA246CC51F8AA30E00A75ED1 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 				DA246CCF1F8AA30E00A75ED1 /* TodayViewController.swift in Sources */,
 				DA7607712DBC0CF80081CECD /* AppConstants.swift in Sources */,
 				DAEA4502268CD507004CA6C4 /* Debug.swift in Sources */,
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 		DAA16D6224B60673003C28FD /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
 			files = (
 				DAA16D6B24B60673003C28FD /* ActionViewController.swift in Sources */,
 				DA7607722DBC0D530081CECD /* AppConstants.swift in Sources */,
 			);
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
@@ -513,7 +489,7 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		DA246CC01F8A6E5E00A75ED1 /* Debug */ = {
+		DA246CC01F8A6E5E00A75ED1 /* Debug configuration for PBXProject "LearnWords" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -582,7 +558,7 @@
 			};
 			name = Debug;
 		};
-		DA246CC11F8A6E5E00A75ED1 /* Release */ = {
+		DA246CC11F8A6E5E00A75ED1 /* Release configuration for PBXProject "LearnWords" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -645,7 +621,7 @@
 			};
 			name = Release;
 		};
-		DA246CC31F8A6E5E00A75ED1 /* Debug */ = {
+		DA246CC31F8A6E5E00A75ED1 /* Debug configuration for PBXNativeTarget "LearnWords" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -667,7 +643,7 @@
 			};
 			name = Debug;
 		};
-		DA246CC41F8A6E5E00A75ED1 /* Release */ = {
+		DA246CC41F8A6E5E00A75ED1 /* Release configuration for PBXNativeTarget "LearnWords" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -689,7 +665,7 @@
 			};
 			name = Release;
 		};
-		DA246CD81F8AA30E00A75ED1 /* Debug */ = {
+		DA246CD81F8AA30E00A75ED1 /* Debug configuration for PBXNativeTarget "Widget" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = Widget/Widget.entitlements;
@@ -709,7 +685,7 @@
 			};
 			name = Debug;
 		};
-		DA246CD91F8AA30E00A75ED1 /* Release */ = {
+		DA246CD91F8AA30E00A75ED1 /* Release configuration for PBXNativeTarget "Widget" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = Widget/Widget.entitlements;
@@ -729,7 +705,7 @@
 			};
 			name = Release;
 		};
-		DAA16D7424B60673003C28FD /* Debug */ = {
+		DAA16D7424B60673003C28FD /* Debug configuration for PBXNativeTarget "ImportAsDictAction" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
@@ -756,7 +732,7 @@
 			};
 			name = Debug;
 		};
-		DAA16D7524B60673003C28FD /* Release */ = {
+		DAA16D7524B60673003C28FD /* Release configuration for PBXNativeTarget "ImportAsDictAction" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
@@ -788,37 +764,33 @@
 		DA246CAB1F8A6E5E00A75ED1 /* Build configuration list for PBXProject "LearnWords" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				DA246CC01F8A6E5E00A75ED1 /* Debug */,
-				DA246CC11F8A6E5E00A75ED1 /* Release */,
+				DA246CC01F8A6E5E00A75ED1 /* Debug configuration for PBXProject "LearnWords" */,
+				DA246CC11F8A6E5E00A75ED1 /* Release configuration for PBXProject "LearnWords" */,
 			);
-			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 		DA246CC21F8A6E5E00A75ED1 /* Build configuration list for PBXNativeTarget "LearnWords" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				DA246CC31F8A6E5E00A75ED1 /* Debug */,
-				DA246CC41F8A6E5E00A75ED1 /* Release */,
+				DA246CC31F8A6E5E00A75ED1 /* Debug configuration for PBXNativeTarget "LearnWords" */,
+				DA246CC41F8A6E5E00A75ED1 /* Release configuration for PBXNativeTarget "LearnWords" */,
 			);
-			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 		DA246CD71F8AA30E00A75ED1 /* Build configuration list for PBXNativeTarget "Widget" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				DA246CD81F8AA30E00A75ED1 /* Debug */,
-				DA246CD91F8AA30E00A75ED1 /* Release */,
+				DA246CD81F8AA30E00A75ED1 /* Debug configuration for PBXNativeTarget "Widget" */,
+				DA246CD91F8AA30E00A75ED1 /* Release configuration for PBXNativeTarget "Widget" */,
 			);
-			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 		DAA16D7324B60673003C28FD /* Build configuration list for PBXNativeTarget "ImportAsDictAction" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				DAA16D7424B60673003C28FD /* Debug */,
-				DAA16D7524B60673003C28FD /* Release */,
+				DAA16D7424B60673003C28FD /* Debug configuration for PBXNativeTarget "ImportAsDictAction" */,
+				DAA16D7524B60673003C28FD /* Release configuration for PBXNativeTarget "ImportAsDictAction" */,
 			);
-			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
