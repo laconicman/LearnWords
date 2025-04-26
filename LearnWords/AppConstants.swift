@@ -16,7 +16,7 @@ enum AppConstants {
         // Find the main app bundle ID by removing extension suffixes
         // This handles any extension naming pattern (widget, extension, share, etc.)
         let components = bundleID.components(separatedBy: ".")
-//        if components.count > 2 && (
+        if components.count > 3 { // && (
 //            components.last == "widget" ||
 //            components.last == "extension" ||
 //            components.last == "share" ||
@@ -26,9 +26,9 @@ enum AppConstants {
             let baseID = components.dropLast().joined(separator: ".")
             print("baseID: \(baseID)")
             return "group.\(baseID)"
-//        }
+        }
 
         // If no extension suffix found, use the bundle ID as is
-//        return "group.\(bundleID)"
+        return "group.\(bundleID)"
     }()
 }

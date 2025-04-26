@@ -3,11 +3,12 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		DA160CB1268A3E7C001F6CD2 /* ExersizeChooserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA160CB0268A3E7C001F6CD2 /* ExersizeChooserViewController.swift */; };
+		DA1636B72DBCF80D00578C95 /* UIContextualAction+ConvenienceInit.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA1636B62DBCF80D00578C95 /* UIContextualAction+ConvenienceInit.swift */; };
 		DA246CB41F8A6E5E00A75ED1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA246CB31F8A6E5E00A75ED1 /* AppDelegate.swift */; };
 		DA246CB61F8A6E5E00A75ED1 /* WordTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA246CB51F8A6E5E00A75ED1 /* WordTableViewController.swift */; };
 		DA246CB91F8A6E5E00A75ED1 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DA246CB71F8A6E5E00A75ED1 /* Main.storyboard */; };
@@ -15,7 +16,7 @@
 		DA246CBE1F8A6E5E00A75ED1 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DA246CBC1F8A6E5E00A75ED1 /* LaunchScreen.storyboard */; };
 		DA246CCF1F8AA30E00A75ED1 /* TodayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA246CCE1F8AA30E00A75ED1 /* TodayViewController.swift */; };
 		DA246CD21F8AA30E00A75ED1 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DA246CD01F8AA30E00A75ED1 /* MainInterface.storyboard */; };
-		DA246CD61F8AA30E00A75ED1 /* Widget.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = DA246CC91F8AA30E00A75ED1 /* Widget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		DA246CD61F8AA30E00A75ED1 /* Widget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = DA246CC91F8AA30E00A75ED1 /* Widget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		DA246CDE1F8AE3DA00A75ED1 /* WordTestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA246CDD1F8AE3DA00A75ED1 /* WordTestViewController.swift */; };
 		DA2E2CE7265E865A00EF285C /* WordDictationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA2E2CE6265E865900EF285C /* WordDictationController.swift */; };
 		DA2E2CF5265E9AA200EF285C /* TabBarControllerHome.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA2E2CF4265E9AA200EF285C /* TabBarControllerHome.swift */; };
@@ -39,7 +40,7 @@
 		DAA16D6924B60673003C28FD /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DAA16D6824B60673003C28FD /* Media.xcassets */; };
 		DAA16D6B24B60673003C28FD /* ActionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAA16D6A24B60673003C28FD /* ActionViewController.swift */; };
 		DAA16D6E24B60673003C28FD /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DAA16D6C24B60673003C28FD /* MainInterface.storyboard */; };
-		DAA16D7224B60673003C28FD /* ImportAsDictAction.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = DAA16D6624B60673003C28FD /* ImportAsDictAction.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		DAA16D7224B60673003C28FD /* ImportAsDictAction.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = DAA16D6624B60673003C28FD /* ImportAsDictAction.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		DAC884BA219C8710005C6588 /* SearchWordViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAC884B9219C8710005C6588 /* SearchWordViewController.swift */; };
 		DAD5E0D6219EF1400084FD1A /* Images.imagecatalog in Resources */ = {isa = PBXBuildFile; fileRef = DAD5E0D5219EF1400084FD1A /* Images.imagecatalog */; };
 		DAEA44F6268A5060004CA6C4 /* Localizable.stringsdict in Resources */ = {isa = PBXBuildFile; fileRef = DAEA44F8268A5060004CA6C4 /* Localizable.stringsdict */; };
@@ -70,16 +71,16 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		DA246CDA1F8AA30E00A75ED1 /* Embed App Extensions */ = {
+		DA246CDA1F8AA30E00A75ED1 /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				DA246CD61F8AA30E00A75ED1 /* Widget.appex in Embed App Extensions */,
-				DAA16D7224B60673003C28FD /* ImportAsDictAction.appex in Embed App Extensions */,
+				DA246CD61F8AA30E00A75ED1 /* Widget.appex in Embed Foundation Extensions */,
+				DAA16D7224B60673003C28FD /* ImportAsDictAction.appex in Embed Foundation Extensions */,
 			);
-			name = "Embed App Extensions";
+			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -93,6 +94,7 @@
 		DA160CB5268A42CA001F6CD2 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		DA160CB6268A42CA001F6CD2 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/MainInterface.strings; sourceTree = "<group>"; };
 		DA160CB7268A42CA001F6CD2 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/MainInterface.strings; sourceTree = "<group>"; };
+		DA1636B62DBCF80D00578C95 /* UIContextualAction+ConvenienceInit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIContextualAction+ConvenienceInit.swift"; sourceTree = "<group>"; };
 		DA246CB01F8A6E5E00A75ED1 /* LearnWords.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LearnWords.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA246CB31F8A6E5E00A75ED1 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		DA246CB51F8A6E5E00A75ED1 /* WordTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordTableViewController.swift; sourceTree = "<group>"; };
@@ -199,6 +201,7 @@
 		DA246CB21F8A6E5E00A75ED1 /* LearnWords */ = {
 			isa = PBXGroup;
 			children = (
+				DA1636B62DBCF80D00578C95 /* UIContextualAction+ConvenienceInit.swift */,
 				DA76076F2DBC0C3B0081CECD /* AppConstants.swift */,
 				DA246CDB1F8AB75900A75ED1 /* LearnWords.entitlements */,
 				DAC884B9219C8710005C6588 /* SearchWordViewController.swift */,
@@ -278,7 +281,7 @@
 				DA246CAC1F8A6E5E00A75ED1 /* Sources */,
 				DA246CAD1F8A6E5E00A75ED1 /* Frameworks */,
 				DA246CAE1F8A6E5E00A75ED1 /* Resources */,
-				DA246CDA1F8AA30E00A75ED1 /* Embed App Extensions */,
+				DA246CDA1F8AA30E00A75ED1 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
@@ -331,8 +334,9 @@
 		DA246CA81F8A6E5E00A75ED1 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				BuildIndependentTargetsInParallel = YES;
 				LastSwiftUpdateCheck = 1150;
-				LastUpgradeCheck = 1240;
+				LastUpgradeCheck = 1630;
 				ORGANIZATIONNAME = Paul;
 				TargetAttributes = {
 					DA246CAF1F8A6E5E00A75ED1 = {
@@ -446,6 +450,7 @@
 				DAEA4504268DD835004CA6C4 /* WordTableViewCell.swift in Sources */,
 				DA246CB41F8A6E5E00A75ED1 /* AppDelegate.swift in Sources */,
 				DA4162F41F8BE62600165694 /* WordsModel.swift in Sources */,
+				DA1636B72DBCF80D00578C95 /* UIContextualAction+ConvenienceInit.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -571,6 +576,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -602,9 +608,12 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = "";
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = MW2YXY2465;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -634,6 +643,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -665,9 +675,12 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = "";
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = MW2YXY2465;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -689,13 +702,11 @@
 		DA246CC31F8A6E5E00A75ED1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = LearnWords/LearnWords.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
-				DEVELOPMENT_TEAM = MW2YXY2465;
+				CURRENT_PROJECT_VERSION = 6;
 				INFOPLIST_FILE = LearnWords/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -713,13 +724,11 @@
 		DA246CC41F8A6E5E00A75ED1 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = LearnWords/LearnWords.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
-				DEVELOPMENT_TEAM = MW2YXY2465;
+				CURRENT_PROJECT_VERSION = 6;
 				INFOPLIST_FILE = LearnWords/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.education";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -739,8 +748,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = Widget/Widget.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
-				DEVELOPMENT_TEAM = MW2YXY2465;
+				CURRENT_PROJECT_VERSION = 6;
 				INFOPLIST_FILE = Widget/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -760,8 +768,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = Widget/Widget.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 5;
-				DEVELOPMENT_TEAM = MW2YXY2465;
+				CURRENT_PROJECT_VERSION = 6;
 				INFOPLIST_FILE = Widget/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -784,8 +791,7 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_ENTITLEMENTS = ImportAsDictAction/ImportAsDictAction.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = MW2YXY2465;
+				CURRENT_PROJECT_VERSION = 6;
 				INFOPLIST_FILE = ImportAsDictAction/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -793,7 +799,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = "";
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = club.linguist.LearnWords.ImportAsDictAction;
@@ -812,8 +818,7 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CODE_SIGN_ENTITLEMENTS = ImportAsDictAction/ImportAsDictAction.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = MW2YXY2465;
+				CURRENT_PROJECT_VERSION = 6;
 				INFOPLIST_FILE = ImportAsDictAction/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -821,7 +826,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = "";
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = club.linguist.LearnWords.ImportAsDictAction;
 				PRODUCT_NAME = "$(TARGET_NAME)";

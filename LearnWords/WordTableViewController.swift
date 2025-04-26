@@ -19,12 +19,16 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
     // MARK: searchController variables
     var filteredWords = [WordAndStat]() //? move to model?
     var wordsInTable : [WordAndStat] { // A subset of word pairs to display in tableView
-        return (searchController.isActive && searchController.searchBar.text != "") ? filteredWords : Storage.wordsAndStat
+        return isSearching ? filteredWords : Storage.wordsAndStat
     }
     var importedWords = [WordAndStat]()
     var importedWord = ""
 
     let searchController = UISearchController(searchResultsController: nil)
+    
+    private var isSearching: Bool {
+        searchController.isActive && (searchController.searchBar.text?.isEmpty != true)
+    }
 
     @IBAction func goToSettings(_ sender: UIBarButtonItem) {
         gotoAppSettings()
@@ -245,7 +249,8 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         let word = wordsInTable[indexPath.row]
         cell.leftTextLabel?.text = word.firstWord
         // cell.imageView?.image = UIImage(systemName: "\(word.known).square")
-        cell.progressView.angle = (360.0 / Double(WordAndStat.maxKnownLevel)) * Double(word.known)
+        cell.progressView.animate(toAngle: (360.0 / Double(WordAndStat.maxKnownLevel)) * Double(word.known), duration: 0.4, completion: nil)
+        // cell.progressView.angle = (360.0 / Double(WordAndStat.maxKnownLevel)) * Double(word.known)
         cell.rightTextLabel?.text = word.secondWord
         
         return cell
@@ -277,18 +282,19 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
 //    }
     
     override func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        guard !(searchController.isActive && searchController.searchBar.text != "") else { return UISwipeActionsConfiguration(actions: []) }
+        guard !isSearching else { return nil }
         
-        let delete = UIContextualAction(style: .destructive, title: NSLocalizedString("Delete", comment: "swipe action")) { (_, _, _) in
+        let delete = UIContextualAction(style: .destructive, title: NSLocalizedString("Delete", comment: "swipe action")) { (_, _, completionHandler) in
             //TODO: Move operating functions to model
             Storage.wordsAndStat.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .automatic)
             // TODO: Replace with saveCurrentWordSet
             Storage.saveWords(Storage.wordsAndStat)
+            completionHandler(true)
         }
         
-        let edit = UIContextualAction(style: .normal, title: NSLocalizedString("Edit", comment: "swipe action")) { (action, _, _) in
-            // create our alert controller
+        let edit = UIContextualAction(style: .normal, title: NSLocalizedString("Edit", comment: "swipe action")) { [weak self] (_, _, completionHandler) in
+
             let ac = UIAlertController(title: NSLocalizedString("Edit word", comment: "AlertController title"), message: nil, preferredStyle: .alert)
             
             // add two text fields, one for English and one for French
@@ -296,22 +302,30 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
                 textField.text = Storage.wordsAndStat[indexPath.row].firstWord
             }
             
-            ac.addTextField { (textField) in
+            ac.addTextField { textField in
                 textField.text = Storage.wordsAndStat[indexPath.row].secondWord
             }
             
             // create an "Add Word" button that submits the user's input
-            let submitAction = UIAlertAction(title: NSLocalizedString("Save", comment: "AlertAction title"), style: .default) { (action: UIAlertAction!) in
+            let submitAction = UIAlertAction(title: NSLocalizedString("Save", comment: "AlertAction title"), style: .default) { _ in
                 // pull out the English and French words, or an empty string if there was a problem
                 Storage.wordsAndStat[indexPath.row].firstWord = ac.textFields?[0].text ?? ""
                 Storage.wordsAndStat[indexPath.row].secondWord = ac.textFields?[1].text ?? ""
                 Storage.wordsAndStat.sort(by: { $0.firstWord < $1.firstWord })
-                Storage.saveWords(Storage.wordsAndStat)
+                Storage.saveWords()
+                completionHandler(true)
                 tableView.reloadRows(at: tableView.indexPathsForVisibleRows ?? [indexPath], with: .automatic)
             }
+            let cancelAction = UIAlertAction(title: NSLocalizedString("Cancel", comment: "AlertAction title"), style: .cancel) { _ in
+                completionHandler(true)
+            }
             ac.addAction(submitAction)
-            ac.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: "AlertAction title"), style: .cancel))
-            self.present(ac, animated: true)
+            ac.addAction(cancelAction)
+            tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
+            self?.present(ac, animated: true) {
+                tableView.deselectRow(at: indexPath, animated: true)
+            }
+            // completionHandler(false) // Even when passing false the row hides swipe actions which is not what we want.
         }
         edit.backgroundColor = .systemTeal
         if #available(iOS 13, *) {
@@ -320,6 +334,28 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         }
         let config = UISwipeActionsConfiguration(actions: [delete, edit])
         config.performsFirstActionWithFullSwipe = true
+        return config
+    }
+    
+    override func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        guard !isSearching else { return nil }
+        
+        let resetProgressActionImage: UIImage? = if #available(iOS 13, *) { UIImage(systemName: "pencil") } else { nil }
+        let resetProgressAction = UIContextualAction(style: .normal, title: "Reset", backgroundColor: .systemOrange, image: resetProgressActionImage) { [weak self] (_, _, completionHandler) in
+            guard let self else { return }
+            Storage.resetAnswerStat(at: indexPath.row)
+            Storage.saveWords(Storage.wordsAndStat)
+            // Self?? // Do we need reloadRows?
+            if #available(iOS 15.0, *) {
+                self.tableView.reconfigureRows(at: [indexPath])
+            } else {
+                self.tableView.reloadRows(at: [indexPath], with: .automatic)
+            }
+            completionHandler(true)
+        }
+
+        let config = UISwipeActionsConfiguration(actions: [resetProgressAction])
+        // config.performsFirstActionWithFullSwipe = true
         return config
     }
     

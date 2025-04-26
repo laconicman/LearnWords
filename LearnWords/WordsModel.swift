@@ -21,7 +21,7 @@ struct WordAndStat: Codable {
     static let maxKnownLevel = 5
     
     // MARK: - Setters
-    
+    // TODO: Refactor naming to `increaseCorrect(for exercise: String)` for example.
     /// Increases the level in 1, with a maximum of 5.
     mutating func increaseCorrect(exercize: String) {
         let currVal = correct[exercize] ?? 0
@@ -33,6 +33,12 @@ struct WordAndStat: Codable {
         let currValCorr = correct[exercize] ?? 0
         correct[exercize] = max(currValCorr - 1, 0)
     }
+    
+    mutating func resetAnswerStat() {
+        correct.removeAll(keepingCapacity: true)
+        incorrect.removeAll(keepingCapacity: true)
+    }
+
 }
 // TODO: Make codable to become capable of storing sets of words in files (Another option - move to CoreData)
 struct Storage {
@@ -92,10 +98,11 @@ struct Storage {
 //
 //    }
     
-    static func saveWords(_ wordsAndStat: [WordAndStat], for wordset: String = currentWordSet) {
-        userDefaultsGroup.encodeAndSave(wordsAndStat.sorted(by: { $0.firstWord < $1.firstWord }), wordset)
-        //            defaults.set(knownWords, forKey: "knownWords")
-        
+    static func saveWords(_ wordsAndStat: [WordAndStat] = Self.wordsAndStat, for wordSet: String = currentWordSet) {
+        backgroundSaveQueue.async {
+            userDefaultsGroup.encodeAndSave(wordsAndStat.sorted(by: { $0.firstWord < $1.firstWord }), wordSet)
+            //            defaults.set(knownWords, forKey: "knownWords")
+        }
     }
     
     static func insertFlashcard(foreign: String, native: String) ->  Int? {
@@ -118,6 +125,7 @@ struct Storage {
         Storage.currentWordSet = name
         return wordSets.firstIndex(of: name)
     }
+    
     static func removeWordSet(at index: Int) {
         let removed = wordSets.remove(at: index)
         if currentWordSet == removed, let wsf = wordSets.first {
@@ -133,6 +141,12 @@ struct Storage {
             return []
         }
     }
+    
+    static func resetAnswerStat(at index: Int) {
+        wordsAndStat[index].resetAnswerStat()
+    }
+    
+    static private let backgroundSaveQueue = DispatchQueue(label: "com.storage.backgroundSaveQueue", qos: .background)
 }
 
 
