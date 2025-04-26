@@ -1,0 +1,42 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "HJI-Or-vgS.text" : {
+      "comment" : "Class = \"UILabel\"; text = \"Detail\"; ObjectID = \"HJI-Or-vgS\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Detail"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Detail"
+          }
+        }
+      }
+    },
+    "Nqx-ku-ZlU.text" : {
+      "comment" : "Class = \"UILabel\"; text = \"Title\"; ObjectID = \"Nqx-ku-ZlU\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Title"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Title"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

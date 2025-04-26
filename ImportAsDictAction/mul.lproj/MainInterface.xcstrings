@@ -1,0 +1,24 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "ObA-dk-sSI.title" : {
+      "comment" : "Class = \"UIViewController\"; title = \"Image\"; ObjectID = \"ObA-dk-sSI\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imagen"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Изображение"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

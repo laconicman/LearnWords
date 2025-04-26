@@ -1,0 +1,870 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "4AK-rv-ykj.title" : {
+      "comment" : "Class = \"UINavigationItem\"; title = \"Translation\"; ObjectID = \"4AK-rv-ykj\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Translation"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Перевод"
+          }
+        }
+      }
+    },
+    "5bW-fz-PeB.title" : {
+      "comment" : "Class = \"UINavigationItem\"; title = \"Add word to study\"; ObjectID = \"5bW-fz-PeB\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Add word to study"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить слово для изучения"
+          }
+        }
+      }
+    },
+    "8WT-Dx-fov.text" : {
+      "comment" : "Class = \"UILabel\"; text = \"Word\"; ObjectID = \"8WT-Dx-fov\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Word"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Слово"
+          }
+        }
+      }
+    },
+    "39l-aE-DmA.text" : {
+      "comment" : "Class = \"UILabel\"; text = \"Title\"; ObjectID = \"39l-aE-DmA\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Title"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Заголовок"
+          }
+        }
+      }
+    },
+    "61X-u6-MJk.title" : {
+      "comment" : "Class = \"UITabBarItem\"; title = \"Exercises\"; ObjectID = \"61X-u6-MJk\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exercises"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Упражнения"
+          }
+        }
+      }
+    },
+    "643-wN-0oS.normalTitle" : {
+      "comment" : "Class = \"UIButton\"; normalTitle = \"Forgot\"; ObjectID = \"643-wN-0oS\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Forgot"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не знаю"
+          }
+        }
+      }
+    },
+    "a8m-gm-wVa.title" : {
+      "comment" : "Class = \"UITabBarItem\"; title = \"Word Set\"; ObjectID = \"a8m-gm-wVa\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Word Set"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Набор слов"
+          }
+        }
+      }
+    },
+    "bDd-aK-Z4N.normalTitle" : {
+      "comment" : "Class = \"UIButton\"; normalTitle = \"Know\"; ObjectID = \"bDd-aK-Z4N\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Know"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Знаю"
+          }
+        }
+      }
+    },
+    "Bf1-2B-pAQ.normalTitle" : {
+      "comment" : "Class = \"UIButton\"; normalTitle = \"Forgot\"; ObjectID = \"Bf1-2B-pAQ\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Forgot"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не знаю"
+          }
+        }
+      }
+    },
+    "bIe-cz-JDG.title" : {
+      "comment" : "Class = \"UINavigationItem\"; title = \"Phonetic\"; ObjectID = \"bIe-cz-JDG\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phonetic"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Фонетика"
+          }
+        }
+      }
+    },
+    "BpE-Jx-lIv.title" : {
+      "comment" : "Class = \"UINavigationItem\"; title = \"Dictation\"; ObjectID = \"BpE-Jx-lIv\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dictation"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Диктант"
+          }
+        }
+      }
+    },
+    "Djr-xr-GdQ.normalTitle" : {
+      "comment" : "Class = \"UIButton\"; normalTitle = \"Know\"; ObjectID = \"Djr-xr-GdQ\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Know"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Знаю"
+          }
+        }
+      }
+    },
+    "dnO-iH-vCy.text" : {
+      "comment" : "Class = \"UILabel\"; text = \"Right Text Label\"; ObjectID = \"dnO-iH-vCy\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Right Text Label"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Правый текстовый ярлык"
+          }
+        }
+      }
+    },
+    "dWV-NJ-r41.title" : {
+      "comment" : "Class = \"UISwitch\"; title = \"Include learned\"; ObjectID = \"dWV-NJ-r41\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Include learned"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Включать изученные"
+          }
+        }
+      }
+    },
+    "EEA-CH-FD5.title" : {
+      "comment" : "Class = \"UITabBarItem\"; title = \"Manage Sets\"; ObjectID = \"EEA-CH-FD5\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manage Sets"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Управлять наборами"
+          }
+        }
+      }
+    },
+    "fb2-Kp-cfL.title" : {
+      "comment" : "Class = \"UINavigationItem\"; title = \"Learning\"; ObjectID = \"fb2-Kp-cfL\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Learning"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Изучение"
+          }
+        }
+      }
+    },
+    "fg3-cG-Mk4.title" : {
+      "comment" : "Class = \"UINavigationItem\"; title = \"Exercises\"; ObjectID = \"fg3-cG-Mk4\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exercises"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Упражнения"
+          }
+        }
+      }
+    },
+    "Fh8-vi-hwf.normalTitle" : {
+      "comment" : "Class = \"UIButton\"; normalTitle = \"Listen\"; ObjectID = \"Fh8-vi-hwf\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Listen"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Слушать"
+          }
+        }
+      }
+    },
+    "H9N-Y4-X4Z.title" : {
+      "comment" : "Class = \"UITabBarItem\"; title = \"Item\"; ObjectID = \"H9N-Y4-X4Z\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Item"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Элемент"
+          }
+        }
+      }
+    },
+    "Ieh-AL-JGj.title" : {
+      "comment" : "Class = \"UIBarButtonItem\"; title = \"Settings\"; ObjectID = \"Ieh-AL-JGj\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Настройки"
+          }
+        }
+      }
+    },
+    "JHd-Ju-sT7.text" : {
+      "comment" : "Class = \"UILabel\"; text = \"Include learned words\"; ObjectID = \"JHd-Ju-sT7\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Include learned words"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Включать выученные слова"
+          }
+        }
+      }
+    },
+    "jVV-UW-vd8.normalTitle" : {
+      "comment" : "Class = \"UIButton\"; normalTitle = \"Start recognition\"; ObjectID = \"jVV-UW-vd8\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start recognition"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Начать распознавание"
+          }
+        }
+      }
+    },
+    "Jy4-wo-DD5.title" : {
+      "comment" : "Class = \"UITableViewController\"; title = \"LearnWords\"; ObjectID = \"Jy4-wo-DD5\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LearnWords"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LearnWords"
+          }
+        }
+      }
+    },
+    "K2v-wJ-d9a.segmentTitles[0]" : {
+      "comment" : "Class = \"UISegmentedControl\"; K2v-wJ-d9a.segmentTitles[0] = \" Straight\"; ObjectID = \"K2v-wJ-d9a\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " Straight"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Прямой"
+          }
+        }
+      }
+    },
+    "K2v-wJ-d9a.segmentTitles[1]" : {
+      "comment" : "Class = \"UISegmentedControl\"; K2v-wJ-d9a.segmentTitles[1] = \"Reversed\"; ObjectID = \"K2v-wJ-d9a\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reversed"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Обратный"
+          }
+        }
+      }
+    },
+    "keD-qV-ddK.normalTitle" : {
+      "comment" : "Class = \"UIButton\"; normalTitle = \"Look Up\"; ObjectID = \"keD-qV-ddK\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Look Up"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "В словаре"
+          }
+        }
+      }
+    },
+    "KI6-K0-Yeq.text" : {
+      "comment" : "Class = \"UILabel\"; text = \"Title\"; ObjectID = \"KI6-K0-Yeq\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Title"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Заголовок"
+          }
+        }
+      }
+    },
+    "Liq-qX-vPh.normalTitle" : {
+      "comment" : "Class = \"UIButton\"; normalTitle = \"Listen\"; ObjectID = \"Liq-qX-vPh\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Listen"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Слушать"
+          }
+        }
+      }
+    },
+    "m9z-JK-XdY.text" : {
+      "comment" : "Class = \"UILabel\"; text = \"Title\"; ObjectID = \"m9z-JK-XdY\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Title"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Заголовок"
+          }
+        }
+      }
+    },
+    "MTG-Z2-PFM.text" : {
+      "comment" : "Class = \"UILabel\"; text = \"Direction\"; ObjectID = \"MTG-Z2-PFM\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Direction"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Направление"
+          }
+        }
+      }
+    },
+    "NCU-o0-xGZ.text" : {
+      "comment" : "Class = \"UILabel\"; text = \"Title\"; ObjectID = \"NCU-o0-xGZ\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Title"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Заголовок"
+          }
+        }
+      }
+    },
+    "P1B-tp-yvT.text" : {
+      "comment" : "Class = \"UILabel\"; text = \"Word\"; ObjectID = \"P1B-tp-yvT\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Word"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Слово"
+          }
+        }
+      }
+    },
+    "ph3-GE-3p7.normalTitle" : {
+      "comment" : "Class = \"UIButton\"; normalTitle = \"Look Up\"; ObjectID = \"ph3-GE-3p7\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Look Up"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "В словаре"
+          }
+        }
+      }
+    },
+    "Q8X-kw-NHO.normalTitle" : {
+      "comment" : "Class = \"UIButton\"; normalTitle = \"Forgot\"; ObjectID = \"Q8X-kw-NHO\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Forgot"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не знаю"
+          }
+        }
+      }
+    },
+    "qaf-Gn-jV1.normalTitle" : {
+      "comment" : "Class = \"UIButton\"; normalTitle = \"Look Up\"; ObjectID = \"qaf-Gn-jV1\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Look Up"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "В словаре"
+          }
+        }
+      }
+    },
+    "s4E-Gx-k1b.text" : {
+      "comment" : "Class = \"UILabel\"; text = \"Word\"; ObjectID = \"s4E-Gx-k1b\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Word"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Слово"
+          }
+        }
+      }
+    },
+    "sgg-W9-3fN.title" : {
+      "comment" : "Class = \"UIBarButtonItem\"; title = \"Export\"; ObjectID = \"sgg-W9-3fN\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Экспорт"
+          }
+        }
+      }
+    },
+    "u2L-Ej-8XW.title" : {
+      "comment" : "Class = \"UIBarButtonItem\"; title = \"Import\"; ObjectID = \"u2L-Ej-8XW\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Импорт"
+          }
+        }
+      }
+    },
+    "uBK-Se-mT6.normalTitle" : {
+      "comment" : "Class = \"UIButton\"; normalTitle = \"Dictation\"; ObjectID = \"uBK-Se-mT6\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dictation"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Диктант"
+          }
+        }
+      }
+    },
+    "uEJ-4s-E9l.text" : {
+      "comment" : "Class = \"UILabel\"; text = \"pronounce the translation\"; ObjectID = \"uEJ-4s-E9l\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "speak the translation"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "произнесите перевод"
+          }
+        }
+      }
+    },
+    "Vmu-2y-Ili.normalTitle" : {
+      "comment" : "Class = \"UIButton\"; normalTitle = \"Phonetics\"; ObjectID = \"Vmu-2y-Ili\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phonetic"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Фонетика"
+          }
+        }
+      }
+    },
+    "VvQ-x8-gCl.text" : {
+      "comment" : "Class = \"UITextField\"; text = \"type in the translation\"; ObjectID = \"VvQ-x8-gCl\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "type in translation"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "наберите перевод"
+          }
+        }
+      }
+    },
+    "vYV-WR-kC4.title" : {
+      "comment" : "Class = \"UINavigationItem\"; title = \"Word Sets\"; ObjectID = \"vYV-WR-kC4\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Word Sets"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Наборы слов"
+          }
+        }
+      }
+    },
+    "WxG-u0-GkQ.text" : {
+      "comment" : "Class = \"UILabel\"; text = \"0 words\"; ObjectID = \"WxG-u0-GkQ\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "0 words"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "0 слов"
+          }
+        }
+      }
+    },
+    "x6b-1p-EXm.normalTitle" : {
+      "comment" : "Class = \"UIButton\"; normalTitle = \"Know\"; ObjectID = \"x6b-1p-EXm\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Know"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Знаю"
+          }
+        }
+      }
+    },
+    "Xwv-BA-c3j.text" : {
+      "comment" : "Class = \"UILabel\"; text = \"Subtitle\"; ObjectID = \"Xwv-BA-c3j\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Subtitle"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подзаголовок"
+          }
+        }
+      }
+    },
+    "y3Z-Kn-fYD.normalTitle" : {
+      "comment" : "Class = \"UIButton\"; normalTitle = \"Learning\"; ObjectID = \"y3Z-Kn-fYD\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Learning"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Изучение"
+          }
+        }
+      }
+    },
+    "yxM-vR-ero.text" : {
+      "comment" : "Class = \"UILabel\"; text = \"Word\"; ObjectID = \"yxM-vR-ero\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Word"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Слово"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

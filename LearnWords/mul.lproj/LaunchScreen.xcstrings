@@ -1,0 +1,18 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "ZOG-JG-jcM.text" : {
+      "comment" : "Class = \"UILabel\"; text = \"Learn Words\"; ObjectID = \"ZOG-JG-jcM\";",
+      "extractionState" : "migrated",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Learn Words"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}
