@@ -1,6 +1,0 @@
-/* Privacy - Microphone Usage Description */
-"NSMicrophoneUsageDescription" = "Микрофон будет использован для распознавания вашей речи.";
-
-/* Privacy - Speech Recognition Usage Description */
-"NSSpeechRecognitionUsageDescription" = "Распознавание речи будет использоваться для проверки произношения.";
-

@@ -3,8 +3,14 @@
   "strings" : {
     "HJI-Or-vgS.text" : {
       "comment" : "Class = \"UILabel\"; text = \"Detail\"; ObjectID = \"HJI-Or-vgS\";",
-      "extractionState" : "migrated",
+      "extractionState" : "extracted_with_value",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Detail"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -21,8 +27,14 @@
     },
     "Nqx-ku-ZlU.text" : {
       "comment" : "Class = \"UILabel\"; text = \"Title\"; ObjectID = \"Nqx-ku-ZlU\";",
-      "extractionState" : "migrated",
+      "extractionState" : "extracted_with_value",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Title"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",

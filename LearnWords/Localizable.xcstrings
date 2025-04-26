@@ -3,7 +3,6 @@
   "strings" : {
     "Add" : {
       "comment" : "AlertAction title",
-      "extractionState" : "migrated",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -15,7 +14,6 @@
     },
     "Add new word" : {
       "comment" : "AlertController title",
-      "extractionState" : "migrated",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -33,7 +31,6 @@
     },
     "Add new word set" : {
       "comment" : "AlertController title",
-      "extractionState" : "migrated",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -51,7 +48,6 @@
     },
     "Add Word" : {
       "comment" : "AlertAction title",
-      "extractionState" : "migrated",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -68,7 +64,6 @@
       }
     },
     "Allow in settings" : {
-      "extractionState" : "migrated",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -86,7 +81,6 @@
     },
     "Allow microphone usage" : {
       "comment" : "Alert title",
-      "extractionState" : "migrated",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -103,8 +97,7 @@
       }
     },
     "Allow speech recognition" : {
-      "comment" : "Alert title\n   for phonetic exercises",
-      "extractionState" : "migrated",
+      "comment" : "Alert title\nfor phonetic exercises",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -122,7 +115,6 @@
     },
     "Cancel" : {
       "comment" : "AlertAction title",
-      "extractionState" : "migrated",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -140,7 +132,6 @@
     },
     "Check installed languages" : {
       "comment" : "Alert title",
-      "extractionState" : "migrated",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -158,7 +149,6 @@
     },
     "Current set is empty. Add some words to learn." : {
       "comment" : "Message for alert for empty set to display",
-      "extractionState" : "migrated",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -176,7 +166,6 @@
     },
     "Delete" : {
       "comment" : "swipe action",
-      "extractionState" : "migrated",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -188,7 +177,6 @@
     },
     "DICTIONARY_ACTION" : {
       "comment" : "Action for dictionary prompt",
-      "extractionState" : "migrated",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -212,7 +200,6 @@
     },
     "DICTIONARY_MESSAGE" : {
       "comment" : "Message for dictionary prompt",
-      "extractionState" : "migrated",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -235,8 +222,7 @@
       }
     },
     "DICTIONARY_TITLE" : {
-      "comment" : "UIViewController+Dictionary",
-      "extractionState" : "migrated",
+      "comment" : "Title for dictionary prompt",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -260,7 +246,6 @@
     },
     "Edit" : {
       "comment" : "swipe action",
-      "extractionState" : "migrated",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -272,7 +257,6 @@
     },
     "Edit word" : {
       "comment" : "AlertController title",
-      "extractionState" : "migrated",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -284,7 +268,7 @@
     },
     "EXPORT_WORDS_MESSAGE" : {
       "comment" : "Count of words to be exported",
-      "extractionState" : "migrated",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -308,7 +292,6 @@
     },
     "for phonetic exercises" : {
       "comment" : "Alert message",
-      "extractionState" : "migrated",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -326,7 +309,6 @@
     },
     "Got it" : {
       "comment" : "Button title",
-      "extractionState" : "migrated",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -344,7 +326,6 @@
     },
     "IMPORT_FAIL_TITLE" : {
       "comment" : "Title for failed import",
-      "extractionState" : "migrated",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -368,7 +349,7 @@
     },
     "IMPORT_SUCCESS_MESSAGE" : {
       "comment" : "Message for successful import",
-      "extractionState" : "migrated",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -392,7 +373,7 @@
     },
     "IMPORT_SUCCESS_TITLE" : {
       "comment" : "SettingsViewController",
-      "extractionState" : "migrated",
+      "extractionState" : "manual",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -416,7 +397,6 @@
     },
     "Keyboard for language to study (%@) is not installed now. " : {
       "comment" : "Alert message, langID inside",
-      "extractionState" : "migrated",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -434,7 +414,6 @@
     },
     "Keyboard for native learner's language (%@) is not installed now. " : {
       "comment" : "Alert message, langID inside",
-      "extractionState" : "migrated",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -452,7 +431,6 @@
     },
     "Learned " : {
       "comment" : "Label learned words",
-      "extractionState" : "migrated",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -470,7 +448,6 @@
     },
     "Learned: " : {
       "comment" : "Label learned words",
-      "extractionState" : "migrated",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -488,7 +465,6 @@
     },
     "Looks like you only have those keyboards:" : {
       "comment" : "Alert message, langID appended",
-      "extractionState" : "migrated",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -506,7 +482,6 @@
     },
     "Meaning in " : {
       "comment" : "Meaing in native lang",
-      "extractionState" : "migrated",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -524,7 +499,6 @@
     },
     "Microphone access denied." : {
       "comment" : "Button title",
-      "extractionState" : "migrated",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -541,7 +515,6 @@
       }
     },
     "Name of set" : {
-      "extractionState" : "migrated",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -559,7 +532,6 @@
     },
     "New word" : {
       "comment" : "placeholder for adding new word to vocabulary",
-      "extractionState" : "migrated",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -577,7 +549,6 @@
     },
     "No words to study" : {
       "comment" : "Title for alert",
-      "extractionState" : "migrated",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -594,14 +565,8 @@
       }
     },
     "OK" : {
-      "extractionState" : "migrated",
+      "comment" : "Action for alert for empty set",
       "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "OK"
-          }
-        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -618,7 +583,6 @@
     },
     "pronounce the translation" : {
       "comment" : "label prompt",
-      "extractionState" : "migrated",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -636,7 +600,6 @@
     },
     "Recognition not allowed" : {
       "comment" : "Button title",
-      "extractionState" : "migrated",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -654,7 +617,6 @@
     },
     "Recognition Not Available" : {
       "comment" : "Button title",
-      "extractionState" : "migrated",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -672,7 +634,6 @@
     },
     "Recognition permission needed" : {
       "comment" : "Button title",
-      "extractionState" : "migrated",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -690,7 +651,6 @@
     },
     "Save" : {
       "comment" : "AlertAction title",
-      "extractionState" : "migrated",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -702,7 +662,6 @@
     },
     "Search words in sets" : {
       "comment" : "placeholder",
-      "extractionState" : "migrated",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -719,7 +678,6 @@
       }
     },
     "Settings" : {
-      "extractionState" : "migrated",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -736,7 +694,6 @@
       }
     },
     "Speech recognition error" : {
-      "extractionState" : "migrated",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -754,7 +711,6 @@
     },
     "Start recognition" : {
       "comment" : "Button title",
-      "extractionState" : "migrated",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -772,7 +728,6 @@
     },
     "Start typing" : {
       "comment" : "placeholder in a searchbar",
-      "extractionState" : "migrated",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -790,7 +745,6 @@
     },
     "Stop recognition" : {
       "comment" : "Button title",
-      "extractionState" : "migrated",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -808,7 +762,6 @@
     },
     "Stopping" : {
       "comment" : "Button title",
-      "extractionState" : "migrated",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -826,7 +779,6 @@
     },
     "Total " : {
       "comment" : "Label total words",
-      "extractionState" : "migrated",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -844,7 +796,6 @@
     },
     "Total in set: " : {
       "comment" : "Label total words in current set",
-      "extractionState" : "migrated",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -862,7 +813,6 @@
     },
     "type in the translation" : {
       "comment" : "Placeholder promt",
-      "extractionState" : "migrated",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -880,7 +830,6 @@
     },
     "Word" : {
       "comment" : "backButtonTitle",
-      "extractionState" : "migrated",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -898,7 +847,6 @@
     },
     "Word in " : {
       "comment" : "Language",
-      "extractionState" : "migrated",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -916,7 +864,6 @@
     },
     "WordCount" : {
       "comment" : "Count of words available",
-      "extractionState" : "migrated",
       "localizations" : {
         "en" : {
           "variations" : {
@@ -1005,7 +952,6 @@
       }
     },
     "You may add Keyboards from system General Settings pane." : {
-      "extractionState" : "migrated",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -1017,7 +963,6 @@
     },
     "You may opt to include learned words if you'd like to continue exercises." : {
       "comment" : "Message for alert for empty set to display",
-      "extractionState" : "migrated",
       "localizations" : {
         "ru" : {
           "stringUnit" : {

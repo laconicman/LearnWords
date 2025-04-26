@@ -3,8 +3,14 @@
   "strings" : {
     "CFBundleName" : {
       "comment" : "Bundle name",
-      "extractionState" : "migrated",
+      "extractionState" : "extracted_with_value",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "LearnWords"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -15,8 +21,14 @@
     },
     "NSMicrophoneUsageDescription" : {
       "comment" : "Privacy - Microphone Usage Description",
-      "extractionState" : "migrated",
+      "extractionState" : "extracted_with_value",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Your microphone will be used to listen to your speech and to recognize it."
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -33,8 +45,14 @@
     },
     "NSSpeechRecognitionUsageDescription" : {
       "comment" : "Privacy - Speech Recognition Usage Description",
-      "extractionState" : "migrated",
+      "extractionState" : "extracted_with_value",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Speech recognition will be used to test your pronunciation"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",

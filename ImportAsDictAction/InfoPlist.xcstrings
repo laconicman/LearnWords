@@ -3,8 +3,14 @@
   "strings" : {
     "CFBundleDisplayName" : {
       "comment" : "Bundle display name",
-      "extractionState" : "migrated",
+      "extractionState" : "extracted_with_value",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Import as Dictionay"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
@@ -15,6 +21,18 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Импортировать как словарь"
+          }
+        }
+      }
+    },
+    "CFBundleName" : {
+      "comment" : "Bundle name",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "ImportAsDictAction"
           }
         }
       }

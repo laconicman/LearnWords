@@ -3,8 +3,14 @@
   "strings" : {
     "ZOG-JG-jcM.text" : {
       "comment" : "Class = \"UILabel\"; text = \"Learn Words\"; ObjectID = \"ZOG-JG-jcM\";",
-      "extractionState" : "migrated",
+      "extractionState" : "extracted_with_value",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Learn Words"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",

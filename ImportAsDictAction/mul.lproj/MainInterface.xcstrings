@@ -3,8 +3,14 @@
   "strings" : {
     "ObA-dk-sSI.title" : {
       "comment" : "Class = \"UIViewController\"; title = \"Image\"; ObjectID = \"ObA-dk-sSI\";",
-      "extractionState" : "migrated",
+      "extractionState" : "extracted_with_value",
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Image"
+          }
+        },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
