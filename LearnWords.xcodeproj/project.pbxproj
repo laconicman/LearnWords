@@ -31,6 +31,8 @@
 		DA4162F41F8BE62600165694 /* WordsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA4162F31F8BE62600165694 /* WordsModel.swift */; };
 		DA4162F61F8C219500165694 /* GradientButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA4162F51F8C219500165694 /* GradientButton.swift */; };
 		DA4C541B2DBD80E600C5D686 /* UIImage+backport.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA4C541A2DBD80D500C5D686 /* UIImage+backport.swift */; };
+		DA4C54212DBD8F5F00C5D686 /* TranslationV.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA4C541E2DBD8F5F00C5D686 /* TranslationV.swift */; };
+		DA4C54222DBD8F5F00C5D686 /* AvailableLanguage.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA4C541F2DBD8F5F00C5D686 /* AvailableLanguage.swift */; };
 		DA5454752687C35E007654E0 /* NotificationCenter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA246CCB1F8AA30E00A75ED1 /* NotificationCenter.framework */; };
 		DA7607702DBC0C3B0081CECD /* AppConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA76076F2DBC0C3B0081CECD /* AppConstants.swift */; };
 		DA7607712DBC0CF80081CECD /* AppConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA76076F2DBC0C3B0081CECD /* AppConstants.swift */; };
@@ -118,6 +120,8 @@
 		DA4162F31F8BE62600165694 /* WordsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordsModel.swift; sourceTree = "<group>"; };
 		DA4162F51F8C219500165694 /* GradientButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientButton.swift; sourceTree = "<group>"; };
 		DA4C541A2DBD80D500C5D686 /* UIImage+backport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+backport.swift"; sourceTree = "<group>"; };
+		DA4C541E2DBD8F5F00C5D686 /* TranslationV.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslationV.swift; sourceTree = "<group>"; };
+		DA4C541F2DBD8F5F00C5D686 /* AvailableLanguage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvailableLanguage.swift; sourceTree = "<group>"; };
 		DA554C6826593A1100C67BE0 /* ImportAsDictAction.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ImportAsDictAction.entitlements; sourceTree = "<group>"; };
 		DA76076F2DBC0C3B0081CECD /* AppConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConstants.swift; sourceTree = "<group>"; };
 		DA86ADF323489FF7007E3221 /* String+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+.swift"; sourceTree = "<group>"; };
@@ -182,6 +186,7 @@
 		DA246CB21F8A6E5E00A75ED1 /* LearnWords */ = {
 			isa = PBXGroup;
 			children = (
+				DA4C54202DBD8F5F00C5D686 /* Translation */,
 				DA4C541A2DBD80D500C5D686 /* UIImage+backport.swift */,
 				DA1636B82DBD39F100578C95 /* SpeechManager.swift */,
 				DA1636B62DBCF80D00578C95 /* UIContextualAction+ConvenienceInit.swift */,
@@ -236,6 +241,15 @@
 				DA246CD31F8AA30E00A75ED1 /* Info.plist */,
 			);
 			path = Widget;
+			sourceTree = "<group>";
+		};
+		DA4C54202DBD8F5F00C5D686 /* Translation */ = {
+			isa = PBXGroup;
+			children = (
+				DA4C541E2DBD8F5F00C5D686 /* TranslationV.swift */,
+				DA4C541F2DBD8F5F00C5D686 /* AvailableLanguage.swift */,
+			);
+			path = Translation;
 			sourceTree = "<group>";
 		};
 		DAA16D6724B60673003C28FD /* ImportAsDictAction */ = {
@@ -406,6 +420,8 @@
 				DA246CDE1F8AE3DA00A75ED1 /* WordTestViewController.swift in Sources */,
 				DA2E2CF5265E9AA200EF285C /* TabBarControllerHome.swift in Sources */,
 				DA2E2D1826623F0700EF285C /* UnderKeyboardDistrib.swift in Sources */,
+				DA4C54212DBD8F5F00C5D686 /* TranslationV.swift in Sources */,
+				DA4C54222DBD8F5F00C5D686 /* AvailableLanguage.swift in Sources */,
 				DA2E2D0E26612B8B00EF285C /* UserDefaults+Codable.swift in Sources */,
 				DA246CB61F8A6E5E00A75ED1 /* WordTableViewController.swift in Sources */,
 				DA2E2CE7265E865A00EF285C /* WordDictationController.swift in Sources */,

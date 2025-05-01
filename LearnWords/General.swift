@@ -67,7 +67,7 @@ func lookUp(term: String, sender: UIViewController, location: CGPoint? = nil) {
         DispatchQueue.main.async
         {
             //debugLog("checking definition")
-            if UIReferenceLibraryViewController.dictionaryHasDefinition(forTerm: term) || !(isReal(word: term)) { return }
+            if UIReferenceLibraryViewController.dictionaryHasDefinition(forTerm: term) || !isReal(word: term) { return }
             //debugLog("hasDefinition = \(hasDefinition)")
             // Prompt the user to set up their iOS dictionaries, the first time they use this only
             //if LWUserDefaults.standard.shouldDisplayFirstUseDictionaryPrompt

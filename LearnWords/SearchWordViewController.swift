@@ -274,6 +274,10 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
 //                DispatchQueue.global(qos: .userInitiated).async {
 //                    cell.detailTextLabel?.text = definition(for: suggestion)
 //                }
+// Could not use it without swift UI
+//                if #available(iOS 18.0, *) {
+//                    TranslationViewModel.shared.translate(text: suggestion, using: ???)
+//                }
             } else {
                 cell.textLabel?.text = recentSearches[indexPath.row]
             }
