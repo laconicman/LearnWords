@@ -147,7 +147,7 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
 
         try audioSession.setCategory(.playAndRecord, mode: .default, options: [])
         // try audioSession.setCategory(.playAndRecord, mode: .measurement, options: [.])
-        try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
+        try audioSession.setActive(true) // options: .notifyOthersOnDeactivation) - this option can be passed only only when passing `false` to `setActive()`.
         let inputNode = audioEngine.inputNode
 
         // Create and configure the speech recognition request.
@@ -155,11 +155,11 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
         guard let recognitionRequest = recognitionRequest else { fatalError("Unable to create a SFSpeechAudioBufferRecognitionRequest object") }
         recognitionRequest.shouldReportPartialResults = true
         
-        // Keep speech recognition data on device
         if #available(iOS 13, *) {
             recognitionRequest.requiresOnDeviceRecognition = false
         }
-        
+        // TODO: Check if recognition is avaliable
+        // guard speechRecognizer.isAvailable else { showAlert(); return }
         // Create a recognition task for the speech recognition session.
         // Keep a reference to the task so that it can be canceled.
         recognitionTask = speechRecognizer.recognitionTask(with: recognitionRequest) { [weak self] result, error in
@@ -198,11 +198,11 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
                 self?.recordButton.isEnabled = true
                 self?.recordButton.setTitle(NSLocalizedString("Start recognition", comment: "Button title"), for: [])
                 self?.recordButton.tintColor = .black
-                if error != nil, (error! as NSError).code != 203 {
+                if let error, (error as NSError).code != 203 {
                     
-                    var ac = UIAlertController(title: NSLocalizedString("Speech recognition error", comment: ""), message: error!.localizedDescription + "\n" + (error! as NSError).userInfo.debugDescription, preferredStyle: .alert)
-                    if (error! as NSError).code == 4 {
-                        ac = UIAlertController(title: NSLocalizedString("Speech recognition error", comment: ""), message: error!.localizedDescription + "\n Probably there is no inernet connection. \n Recognition happens on Apple servers for most of devices. " , preferredStyle: .alert)
+                    var ac = UIAlertController(title: NSLocalizedString("Speech recognition error", comment: ""), message: error.localizedDescription + "\n" + (error as NSError).userInfo.debugDescription, preferredStyle: .alert)
+                    if (error as NSError).code == 4 {
+                        ac = UIAlertController(title: NSLocalizedString("Speech recognition error", comment: ""), message: error.localizedDescription + "\n Probably there is no internet connection. \n Recognition happens on Apple servers for most of devices. " , preferredStyle: .alert)
                     }
                     ac.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: ""), style: .default))
                     self?.present(ac, animated: true)
