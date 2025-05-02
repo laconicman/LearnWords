@@ -67,7 +67,7 @@ final class LWUserDefaults {
         // languageToStudyPreference.UITextInputMode.activeInputModes.filter{ $0.contains("emoji") }.last?.primaryLanguage
     }
     
-    let userDefaultsGroup = UserDefaults(suiteName: AppConstants.appGroup) ?? UserDefaults.standard
+    let userDefaultsGroup = AppGroup.userDefaults ?? UserDefaults.standard
     let userDefaults = UserDefaults.standard
     
     var utteranceRatePreference: Double {

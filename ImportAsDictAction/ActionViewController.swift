@@ -30,7 +30,8 @@ class ActionViewController: UIViewController {
                                 if let gotText = textItem as? String {
                                     strongTextView.text = gotText
                                     // parse as dict later, for now - just save
-                                    UserDefaults(suiteName: AppConstants.appGroup)?.set(gotText, forKey: "ImportedText")
+                                    // TODO: refactor to 
+                                    AppGroup.userDefaults?.set(.importedText(gotText))
                                 }
                             }
                         }
