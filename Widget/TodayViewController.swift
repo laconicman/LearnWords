@@ -38,18 +38,30 @@ class TodayViewController: UIViewController, NCWidgetProviding, UITableViewDataS
     
     
     
-    func widgetActiveDisplayModeDidChange(_ activeDisplayMode: NCWidgetDisplayMode, withMaximumSize maxSize: CGSize) {
+    fileprivate func loadCurrentWordSet() {
+        /*
+         if let userDefaultsGroup = AppGroup.userDefaults {
+         if let savedWords = userDefaultsGroup.stringArray(forKey: "Words") {
+         debugLog("Loaded words: \(savedWords)")
+         //            if let savedWords = defaults.object(forKey: "Words") as? [String] {
+         words = savedWords
+         } else {
+         debugLog("Failed to load user defaults from: \(AppGroup.identifier)")
+         }
+         }
+         */
         
-        if let userDefaultsGroup = AppGroup.userDefaults {
-            if let savedWords = userDefaultsGroup.stringArray(forKey: "Words") {
-                debugLog("Loaded words: \(savedWords)")
-                //            if let savedWords = defaults.object(forKey: "Words") as? [String] {
-                words = savedWords
-            } else {
-                debugLog("Failed to load user defaults from: \(AppGroup.identifier)")
-            }
+        if let savedWords: [WordAndStat] = userDefaultsGroup.decodeAndLoad(Storage.currentWordSet) {
+            words = savedWords.map{ $0.firstWord + "::" + $0.secondWord }
+        } else {
+            Storage.saveInitialValues()
+            words = Storage.wordsAndStat.map{ $0.firstWord + "::" + $0.secondWord }
         }
-        
+    }
+    
+    func widgetActiveDisplayModeDidChange(_ activeDisplayMode: NCWidgetDisplayMode, withMaximumSize maxSize: CGSize) {
+        loadCurrentWordSet()
+        tableView.reloadData()
         if activeDisplayMode == .compact {
             preferredContentSize = CGSize(width: 0, height: 110)
         } else {
@@ -102,7 +114,7 @@ class TodayViewController: UIViewController, NCWidgetProviding, UITableViewDataS
     
     func widgetPerformUpdate(completionHandler: (@escaping (NCUpdateResult) -> Void)) {
         // Perform any setup necessary in order to update the view.
-        
+        /*
         if let defaults = AppGroup.userDefaults {
             if let savedWords = defaults.stringArray(forKey: "WordsAndStat") {
                 debugLog(savedWords.description)
@@ -114,7 +126,11 @@ class TodayViewController: UIViewController, NCWidgetProviding, UITableViewDataS
             debugLog("No user defaults")
             completionHandler(NCUpdateResult.failed)
         }
-        
+        */
+        loadCurrentWordSet()
+        completionHandler(NCUpdateResult.newData)
+        tableView.reloadData()
+
         // If an error is encountered, use NCUpdateResult.Failed
         // If there's no update required, use NCUpdateResult.NoData
         // If there's an update, use NCUpdateResult.NewData

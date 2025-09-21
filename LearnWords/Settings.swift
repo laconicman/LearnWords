@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  Settings.swift
 //  LearnWords
 //
 //  Created by Paul on 15.11.2018.
@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import UIKit
 
 private let kRecentSearchesKey = "RecentSearches"
 private let kLastSearchKey = "LastSearch"
@@ -186,10 +185,3 @@ final class LWUserDefaults {
     
 }
 
-func gotoAppSettings() {
-    if let url = URL(string: UIApplication.openSettingsURLString) { //+ "root=General&path=Network"
-        if UIApplication.shared.canOpenURL(url) {
-            UIApplication.shared.open(url)
-        }
-    }
-}

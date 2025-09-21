@@ -64,6 +64,8 @@ public enum AppGroup {
         /// Common extension suffixes known in iOS/macOS ecosystem
         static let knownExtensionSuffixes = [
             // Standard extensions
+            ".Widget",
+            ".ImportAsDictAction",
             ".widget",
             ".extension",
             ".share",
