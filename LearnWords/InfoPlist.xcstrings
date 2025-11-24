@@ -8,13 +8,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "LearnWords"
+            "value" : "LearnWordsLegacy"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "LearnWords"
+            "value" : "LearnWordsLegacy"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LearnWordsLegacy"
           }
         }
       }
