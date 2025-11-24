@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <defs>
+    <style>
+      .bubble      { fill: #FFFFFF; stroke: #D0D0D0; stroke-width: 20; stroke-linejoin: round; }
+      .bubble-tail { fill: #FFFFFF; stroke: #D0D0D0; stroke-width: 20; stroke-linejoin: round; }
+      .bubble-line { stroke: #E0E0E0; stroke-width: 14; stroke-linecap: round; }
+    </style>
+  </defs>
+
+  <!-- Large main bubble (top-right) -->
+  <rect x="520" y="220" width="280" height="190" rx="40" class="bubble"/>
+  <!-- Tail for main bubble -->
+  <path class="bubble-tail"
+        d="M 640 410
+           l 40 70
+           l -90 -60
+           z" />
+
+  <!-- Text lines inside main bubble -->
+  <line x1="550" y1="270" x2="780" y2="270" class="bubble-line"/>
+  <line x1="550" y1="315" x2="740" y2="315" class="bubble-line"/>
+  <line x1="550" y1="360" x2="700" y2="360" class="bubble-line"/>
+
+  <!-- Reply bubble (lower-right) -->
+  <rect x="560" y="520" width="240" height="150" rx="36" class="bubble"/>
+  <!-- Tail for reply bubble -->
+  <path class="bubble-tail"
+        d="M 720 670
+           l -35 65
+           l 80 -55
+           z" />
+
+  <!-- Text lines inside reply bubble -->
+  <line x1="585" y1="560" x2="770" y2="560" class="bubble-line"/>
+  <line x1="585" y1="605" x2="735" y2="605" class="bubble-line"/>
+</svg>

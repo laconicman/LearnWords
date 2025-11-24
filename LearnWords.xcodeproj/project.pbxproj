@@ -34,6 +34,7 @@
 		DA4C54212DBD8F5F00C5D686 /* TranslationV.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA4C541E2DBD8F5F00C5D686 /* TranslationV.swift */; };
 		DA4C54222DBD8F5F00C5D686 /* AvailableLanguage.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA4C541F2DBD8F5F00C5D686 /* AvailableLanguage.swift */; };
 		DA5454752687C35E007654E0 /* NotificationCenter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA246CCB1F8AA30E00A75ED1 /* NotificationCenter.framework */; };
+		DA58C03C2ED481E000B4A733 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = DA58C03B2ED481E000B4A733 /* AppIcon.icon */; };
 		DA7607702DBC0C3B0081CECD /* AppConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA76076F2DBC0C3B0081CECD /* AppConstants.swift */; };
 		DA7607712DBC0CF80081CECD /* AppConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA76076F2DBC0C3B0081CECD /* AppConstants.swift */; };
 		DA7607722DBC0D530081CECD /* AppConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA76076F2DBC0C3B0081CECD /* AppConstants.swift */; };
@@ -130,6 +131,7 @@
 		DA4C541E2DBD8F5F00C5D686 /* TranslationV.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslationV.swift; sourceTree = "<group>"; };
 		DA4C541F2DBD8F5F00C5D686 /* AvailableLanguage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvailableLanguage.swift; sourceTree = "<group>"; };
 		DA554C6826593A1100C67BE0 /* ImportAsDictAction.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ImportAsDictAction.entitlements; sourceTree = "<group>"; };
+		DA58C03B2ED481E000B4A733 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIcon.icon; sourceTree = "<group>"; };
 		DA76076F2DBC0C3B0081CECD /* AppConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConstants.swift; sourceTree = "<group>"; };
 		DA86ADF323489FF7007E3221 /* String+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+.swift"; sourceTree = "<group>"; };
 		DA88CB8321A687BF0094D1F8 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
@@ -174,6 +176,7 @@
 		DA246CA71F8A6E5E00A75ED1 = {
 			isa = PBXGroup;
 			children = (
+				DA58C03B2ED481E000B4A733 /* AppIcon.icon */,
 				DA246CB21F8A6E5E00A75ED1 /* LearnWords */,
 				DA246CCD1F8AA30E00A75ED1 /* Widget */,
 				DAA16D6724B60673003C28FD /* ImportAsDictAction */,
@@ -392,6 +395,7 @@
 			files = (
 				DA246CBE1F8A6E5E00A75ED1 /* LaunchScreen.storyboard in Resources */,
 				DAD5E0D6219EF1400084FD1A /* Images.imagecatalog in Resources */,
+				DA58C03C2ED481E000B4A733 /* AppIcon.icon in Resources */,
 				DA1636BF2DBD4C8800578C95 /* InfoPlist.xcstrings in Resources */,
 				DA88CB8421A687C00094D1F8 /* Settings.bundle in Resources */,
 				DA1636C12DBD4C8800578C95 /* Localizable.xcstrings in Resources */,

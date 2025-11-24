@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <defs>
+    <style>
+      .book-cover-light { fill: #FF9500; } /* UIColor.orange */
+      .book-edge-light  { fill: #F78A00; }
+      .book-page-light  { fill: #FFFFFF; }
+      .book-outline     { fill: none; stroke: #C26A00; stroke-width: 28; stroke-linejoin: round; }
+      .book-line        { stroke: #E3E3E3; stroke-width: 14; stroke-linecap: round; }
+      .bookmark         { fill: #FFFFFF; }
+    </style>
+  </defs>
+
+  <!-- Back "pages" block -->
+  <rect x="214" y="190" width="360" height="644" rx="56" class="book-page-light"/>
+
+  <!-- Main cover -->
+  <rect x="190" y="160" width="380" height="704" rx="64" class="book-cover-light"/>
+
+  <!-- Right edge strip of the cover -->
+  <rect x="520" y="190" width="40" height="644" rx="20" class="book-edge-light"/>
+
+  <!-- Outline of the cover -->
+  <rect x="190" y="160" width="380" height="704" rx="64" class="book-outline"/>
+
+  <!-- Horizontal "copybook" lines -->
+  <line x1="240" y1="320" x2="520" y2="320" class="book-line"/>
+  <line x1="240" y1="380" x2="520" y2="380" class="book-line"/>
+  <line x1="240" y1="440" x2="520" y2="440" class="book-line"/>
+  <line x1="240" y1="500" x2="520" y2="500" class="book-line"/>
+
+  <!-- Bookmark on top -->
+  <path class="bookmark"
+        d="M 420 160
+           h 70
+           a 20 20 0 0 1 20 20
+           v 180
+           l -55 -40
+           l -55 40
+           v -180
+           a 20 20 0 0 1 20 -20
+           z" />
+</svg>

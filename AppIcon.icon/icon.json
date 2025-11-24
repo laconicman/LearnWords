@@ -1,0 +1,74 @@
+{
+  "fill" : {
+    "linear-gradient" : [
+      "display-p3:0.63363,1.00000,0.64588,1.00000",
+      "display-p3:0.53548,0.76943,0.26089,1.00000"
+    ],
+    "orientation" : {
+      "start" : {
+        "x" : 0.5,
+        "y" : 0
+      },
+      "stop" : {
+        "x" : 0.5,
+        "y" : 0.7
+      }
+    }
+  },
+  "groups" : [
+    {
+      "layers" : [
+        {
+          "image-name" : "copybook.svg",
+          "name" : "copybook",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              -62,
+              -9.9921875
+            ]
+          }
+        }
+      ],
+      "name" : "CopyBook",
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    },
+    {
+      "layers" : [
+        {
+          "image-name" : "bubbles 2.svg",
+          "name" : "bubbles 2",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              100.140625,
+              24.5078125
+            ]
+          }
+        }
+      ],
+      "name" : "Bubbles",
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "circles" : [
+      "watchOS"
+    ],
+    "squares" : "shared"
+  }
+}
