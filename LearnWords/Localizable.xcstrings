@@ -14,6 +14,7 @@
     },
     "Add new word" : {
       "comment" : "AlertController title",
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -48,6 +49,7 @@
     },
     "Add Word" : {
       "comment" : "AlertAction title",
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -532,6 +534,7 @@
     },
     "New word" : {
       "comment" : "placeholder for adding new word to vocabulary",
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
