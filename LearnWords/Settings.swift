@@ -71,115 +71,115 @@ final class LWUserDefaults {
     
     var utteranceRatePreference: Double {
         get {
-            return self.userDefaults.double(forKey: "utteranceRatePreference")
+            userDefaults.double(forKey: "utteranceRatePreference")
         }
         set {
-            self.userDefaults.set(newValue, forKey: "utteranceRatePreference")
+            userDefaults.set(newValue, forKey: "utteranceRatePreference")
         }
     }
     
     var pitchMultiplierPreference: Double {
         get {
-            return self.userDefaults.double(forKey: "pitchMultiplierPreference")
+            userDefaults.double(forKey: "pitchMultiplierPreference")
         }
         set {
-            self.userDefaults.set(newValue, forKey: "pitchMultiplierPreference")
+            userDefaults.set(newValue, forKey: "pitchMultiplierPreference")
         }
     }
     
     var pronounceAnswersPreference: Bool {
         get {
-            return self.userDefaults.bool(forKey: "pronounceAnswersPreference")
+            userDefaults.bool(forKey: "pronounceAnswersPreference")
         }
         set {
-            self.userDefaults.set(newValue, forKey: "pronounceAnswersPreference")
+            userDefaults.set(newValue, forKey: "pronounceAnswersPreference")
         }
     }
     
     var pronounceQuestionsPreference: Bool {
         get {
-            return self.userDefaults.bool(forKey: "pronounceQuestionsPreference")
+            userDefaults.bool(forKey: "pronounceQuestionsPreference")
         }
         set {
-            self.userDefaults.set(newValue, forKey: "pronounceQuestionsPreference")
+userDefaults.set(newValue, forKey: "pronounceQuestionsPreference")
         }
     }
     
     var languageToStudyPreference: String? {
         get {
-            return self.userDefaults.string(forKey: "languageToStudyPreference")
+            userDefaults.string(forKey: "languageToStudyPreference")
         }
         set {
-            self.userDefaults.set(newValue, forKey: "languageToStudyPreference")
+            userDefaults.set(newValue, forKey: "languageToStudyPreference")
         }
     }
     
     var nativeLanguagePreference: String? {
         get {
-            return self.userDefaults.string(forKey: "nativeLanguagePreference")
+            userDefaults.string(forKey: "nativeLanguagePreference")
         }
         set {
-            self.userDefaults.set(newValue, forKey: "nativeLanguagePreference")
+            userDefaults.set(newValue, forKey: "nativeLanguagePreference")
         }
     }
     
     var maxKnownLevelPreference: Int {
         get {
-            return Int(self.userDefaults.double(forKey: "maxKnownLevelPreference").rounded())
+            Int(userDefaults.double(forKey: "maxKnownLevelPreference").rounded())
         }
         set {
-            self.userDefaults.set(Double(newValue), forKey: "maxKnownLevelPreference")
+            userDefaults.set(Double(newValue), forKey: "maxKnownLevelPreference")
         }
     }
     
     var shouldDisplayFirstUseDictionaryPrompt: Bool {
         get {
-            !self.userDefaultsGroup.bool(forKey: dictionaryPromptDisplayed)
+            !userDefaultsGroup.bool(forKey: dictionaryPromptDisplayed)
         }
     }
 
     func didDisplayFirstUseDictionaryPrompt()
     {
-        self.userDefaultsGroup.set(true, forKey: dictionaryPromptDisplayed)
+        userDefaultsGroup.set(true, forKey: dictionaryPromptDisplayed)
     }
     
     private let includeLearnedWordsKey = "includeLearnedWords"
     var includeLearnedWords: Bool {
         get {
-            return self.userDefaults.bool(forKey: includeLearnedWordsKey)
+            userDefaults.bool(forKey: includeLearnedWordsKey)
         }
         set {
-            self.userDefaults.set(newValue, forKey: includeLearnedWordsKey)
+            userDefaults.set(newValue, forKey: includeLearnedWordsKey)
         }
     }
     
     private let directionOfExersisesKey = "directionOfExersises"
     var foreignToNative: Bool {
         get {
-            return self.userDefaults.bool(forKey: directionOfExersisesKey)
+            userDefaults.bool(forKey: directionOfExersisesKey)
         }
         set {
-            self.userDefaults.set(newValue, forKey: directionOfExersisesKey)
+            userDefaults.set(newValue, forKey: directionOfExersisesKey)
         }
     }
     
 //    private let swapLanguageOrderKey = "swapLanguageOrder"
 //    var swapLanguageOrder: Bool {
 //        get {
-//            return self.userDefaults.bool(forKey: swapLanguageOrderKey)
+//            userDefaults.bool(forKey: swapLanguageOrderKey)
 //        }
 //        set {
-//            self.userDefaults.set(newValue, forKey: swapLanguageOrderKey)
+//            userDefaults.set(newValue, forKey: swapLanguageOrderKey)
 //        }
 //    }
     
 //    private let currentSetKey = "currentSetKey"
 //    var currentWordSet: String? {
 //        get {
-//            return self.userDefaultsGroup.string(forKey: currentSetKey)
+//            return userDefaultsGroup.string(forKey: currentSetKey)
 //        }
 //        set {
-//            self.userDefaultsGroup.set(newValue, forKey: currentSetKey)
+//            userDefaultsGroup.set(newValue, forKey: currentSetKey)
 //        }
 //    }
     

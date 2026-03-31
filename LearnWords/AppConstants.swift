@@ -54,7 +54,7 @@ public enum AppGroup {
     
     /// Returns a UserDefaults instance configured with the app group
     public static var userDefaults: UserDefaults? {
-        return UserDefaults(suiteName: identifier)
+        UserDefaults(suiteName: identifier)
     }
     
     // MARK: - Private Helpers
