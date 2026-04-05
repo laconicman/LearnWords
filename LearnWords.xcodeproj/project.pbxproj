@@ -49,6 +49,7 @@
 		DABAC90A2F7C260D00F6A1D4 /* PermissionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DABAC9092F7C260D00F6A1D4 /* PermissionManager.swift */; };
 		DAC884BA219C8710005C6588 /* SearchWordViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAC884B9219C8710005C6588 /* SearchWordViewController.swift */; };
 		DAD5E0D6219EF1400084FD1A /* Images.imagecatalog in Resources */ = {isa = PBXBuildFile; fileRef = DAD5E0D5219EF1400084FD1A /* Images.imagecatalog */; };
+		DADCA5FA2F82AF7B00AC0C2A /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = DADCA5F92F82AF7B00AC0C2A /* PrivacyInfo.xcprivacy */; };
 		DAE7482D2E8070E7004D96BC /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAE7482C2E8070E7004D96BC /* Storage.swift */; };
 		DAE7482E2E8070F1004D96BC /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAE7482C2E8070E7004D96BC /* Storage.swift */; };
 		DAE7482F2E80719D004D96BC /* WordsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA4162F31F8BE62600165694 /* WordsModel.swift */; };
@@ -146,6 +147,7 @@
 		DABAC9092F7C260D00F6A1D4 /* PermissionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionManager.swift; sourceTree = "<group>"; };
 		DAC884B9219C8710005C6588 /* SearchWordViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchWordViewController.swift; sourceTree = "<group>"; };
 		DAD5E0D5219EF1400084FD1A /* Images.imagecatalog */ = {isa = PBXFileReference; lastKnownFileType = folder.imagecatalog; path = Images.imagecatalog; sourceTree = "<group>"; };
+		DADCA5F92F82AF7B00AC0C2A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		DAE7482C2E8070E7004D96BC /* Storage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Storage.swift; sourceTree = "<group>"; };
 		DAE748302E8071C6004D96BC /* gotoAppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = gotoAppSettings.swift; sourceTree = "<group>"; };
 		DAEA4500268CD157004CA6C4 /* Debug.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Debug.swift; sourceTree = "<group>"; };
@@ -179,6 +181,7 @@
 			isa = PBXGroup;
 			children = (
 				DA58C03B2ED481E000B4A733 /* AppIcon.icon */,
+				DADCA5F92F82AF7B00AC0C2A /* PrivacyInfo.xcprivacy */,
 				DA246CB21F8A6E5E00A75ED1 /* LearnWords */,
 				DA246CCD1F8AA30E00A75ED1 /* Widget */,
 				DAA16D6724B60673003C28FD /* ImportAsDictAction */,
@@ -399,6 +402,7 @@
 				DA246CBE1F8A6E5E00A75ED1 /* LaunchScreen.storyboard in Resources */,
 				DAD5E0D6219EF1400084FD1A /* Images.imagecatalog in Resources */,
 				DA58C03C2ED481E000B4A733 /* AppIcon.icon in Resources */,
+				DADCA5FA2F82AF7B00AC0C2A /* PrivacyInfo.xcprivacy in Resources */,
 				DA1636BF2DBD4C8800578C95 /* InfoPlist.xcstrings in Resources */,
 				DA88CB8421A687C00094D1F8 /* Settings.bundle in Resources */,
 				DA1636C12DBD4C8800578C95 /* Localizable.xcstrings in Resources */,
