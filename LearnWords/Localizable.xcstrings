@@ -516,6 +516,9 @@
         }
       }
     },
+    "Microphone Access Required" : {
+      "comment" : "PermissionManager - `onDenied`"
+    },
     "Name of set" : {
       "localizations" : {
         "es" : {
@@ -583,6 +586,12 @@
           }
         }
       }
+    },
+    "Please enable Microphone access in Settings to use voice features." : {
+      "comment" : "PermissionManager - `onDenied`"
+    },
+    "Please enable Speech Recognition in Settings to use voice features." : {
+      "comment" : "PermissionManager - `onDenied`"
     },
     "pronounce the translation" : {
       "comment" : "label prompt",
@@ -711,6 +720,9 @@
           }
         }
       }
+    },
+    "Speech Recognition Required" : {
+      "comment" : "PermissionManager - `onDenied`"
     },
     "Start recognition" : {
       "comment" : "Button title",
