@@ -62,6 +62,7 @@
 		DAEA4504268DD835004CA6C4 /* WordTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAEA4503268DD835004CA6C4 /* WordTableViewCell.swift */; };
 		DAEA4506268DDABC004CA6C4 /* KDCircularProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAEA4505268DDABC004CA6C4 /* KDCircularProgress.swift */; };
 		DAEC8DCE219DF691009097C2 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAEC8DCD219DF691009097C2 /* Settings.swift */; };
+		DAF774FD2FF142ED00CAD7EC /* Documentation.docc in Sources */ = {isa = PBXBuildFile; fileRef = DAF774FC2FF142ED00CAD7EC /* Documentation.docc */; };
 		DAFE0BFE2690C4E700E21D5C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DAFE0BFD2690C4E700E21D5C /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -154,6 +155,7 @@
 		DAEA4503268DD835004CA6C4 /* WordTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordTableViewCell.swift; sourceTree = "<group>"; };
 		DAEA4505268DDABC004CA6C4 /* KDCircularProgress.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KDCircularProgress.swift; sourceTree = "<group>"; };
 		DAEC8DCD219DF691009097C2 /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
+		DAF774FC2FF142ED00CAD7EC /* Documentation.docc */ = {isa = PBXFileReference; lastKnownFileType = folder.documentationcatalog; path = Documentation.docc; sourceTree = "<group>"; };
 		DAFE0BFD2690C4E700E21D5C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -239,6 +241,7 @@
 				DA1636BE2DBD4C8800578C95 /* InfoPlist.xcstrings */,
 				DAD5E0D5219EF1400084FD1A /* Images.imagecatalog */,
 				DA88CB8621A6A9F40094D1F8 /* README.md */,
+				DAF774FC2FF142ED00CAD7EC /* Documentation.docc */,
 			);
 			path = LearnWords;
 			sourceTree = "<group>";
@@ -446,6 +449,7 @@
 				DA246CB61F8A6E5E00A75ED1 /* WordTableViewController.swift in Sources */,
 				DA2E2CE7265E865A00EF285C /* WordDictationController.swift in Sources */,
 				DA1636B92DBD39F100578C95 /* SpeechManager.swift in Sources */,
+				DAF774FD2FF142ED00CAD7EC /* Documentation.docc in Sources */,
 				DA2E2DA3267CB63E00EF285C /* WordSetsTableViewController.swift in Sources */,
 				DA86ADF423489FF7007E3221 /* String+.swift in Sources */,
 				DAE748312E8071C6004D96BC /* gotoAppSettings.swift in Sources */,
