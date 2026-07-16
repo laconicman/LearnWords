@@ -7,63 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		DA160CB1268A3E7C001F6CD2 /* ExersizeChooserViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA160CB0268A3E7C001F6CD2 /* ExersizeChooserViewController.swift */; };
-		DA1636B72DBCF80D00578C95 /* UIContextualAction+ConvenienceInit.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA1636B62DBCF80D00578C95 /* UIContextualAction+ConvenienceInit.swift */; };
-		DA1636B92DBD39F100578C95 /* SpeechManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA1636B82DBD39F100578C95 /* SpeechManager.swift */; };
-		DA1636BD2DBD4C8800578C95 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = DA1636BC2DBD4C8800578C95 /* InfoPlist.xcstrings */; };
-		DA1636BF2DBD4C8800578C95 /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = DA1636BE2DBD4C8800578C95 /* InfoPlist.xcstrings */; };
-		DA1636C12DBD4C8800578C95 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = DA1636C02DBD4C8800578C95 /* Localizable.xcstrings */; };
-		DA246CB41F8A6E5E00A75ED1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA246CB31F8A6E5E00A75ED1 /* AppDelegate.swift */; };
-		DA246CB61F8A6E5E00A75ED1 /* WordTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA246CB51F8A6E5E00A75ED1 /* WordTableViewController.swift */; };
-		DA246CB91F8A6E5E00A75ED1 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DA246CB71F8A6E5E00A75ED1 /* Main.storyboard */; };
-		DA246CBB1F8A6E5E00A75ED1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DA246CBA1F8A6E5E00A75ED1 /* Assets.xcassets */; };
-		DA246CBE1F8A6E5E00A75ED1 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DA246CBC1F8A6E5E00A75ED1 /* LaunchScreen.storyboard */; };
-		DA246CCF1F8AA30E00A75ED1 /* TodayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA246CCE1F8AA30E00A75ED1 /* TodayViewController.swift */; };
-		DA246CD21F8AA30E00A75ED1 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DA246CD01F8AA30E00A75ED1 /* MainInterface.storyboard */; };
 		DA246CD61F8AA30E00A75ED1 /* Widget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = DA246CC91F8AA30E00A75ED1 /* Widget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		DA246CDE1F8AE3DA00A75ED1 /* WordTestViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA246CDD1F8AE3DA00A75ED1 /* WordTestViewController.swift */; };
-		DA2E2CE7265E865A00EF285C /* WordDictationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA2E2CE6265E865900EF285C /* WordDictationController.swift */; };
-		DA2E2CF5265E9AA200EF285C /* TabBarControllerHome.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA2E2CF4265E9AA200EF285C /* TabBarControllerHome.swift */; };
-		DA2E2D0E26612B8B00EF285C /* UserDefaults+Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA2E2D0D26612B8A00EF285C /* UserDefaults+Codable.swift */; };
-		DA2E2D1826623F0700EF285C /* UnderKeyboardDistrib.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA2E2D1726623F0700EF285C /* UnderKeyboardDistrib.swift */; };
-		DA2E2D9B267B683400EF285C /* General.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA2E2D9A267B683400EF285C /* General.swift */; };
-		DA2E2DA3267CB63E00EF285C /* WordSetsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA2E2DA2267CB63E00EF285C /* WordSetsTableViewController.swift */; };
-		DA4162F41F8BE62600165694 /* WordsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA4162F31F8BE62600165694 /* WordsModel.swift */; };
-		DA4162F61F8C219500165694 /* GradientButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA4162F51F8C219500165694 /* GradientButton.swift */; };
-		DA4C541B2DBD80E600C5D686 /* UIImage+backport.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA4C541A2DBD80D500C5D686 /* UIImage+backport.swift */; };
-		DA4C54212DBD8F5F00C5D686 /* TranslationV.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA4C541E2DBD8F5F00C5D686 /* TranslationV.swift */; };
-		DA4C54222DBD8F5F00C5D686 /* AvailableLanguage.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA4C541F2DBD8F5F00C5D686 /* AvailableLanguage.swift */; };
-		DA5454752687C35E007654E0 /* NotificationCenter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA246CCB1F8AA30E00A75ED1 /* NotificationCenter.framework */; };
 		DA58C03C2ED481E000B4A733 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = DA58C03B2ED481E000B4A733 /* AppIcon.icon */; };
-		DA7607702DBC0C3B0081CECD /* AppConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA76076F2DBC0C3B0081CECD /* AppConstants.swift */; };
-		DA7607712DBC0CF80081CECD /* AppConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA76076F2DBC0C3B0081CECD /* AppConstants.swift */; };
-		DA7607722DBC0D530081CECD /* AppConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA76076F2DBC0C3B0081CECD /* AppConstants.swift */; };
-		DA86ADF423489FF7007E3221 /* String+.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA86ADF323489FF7007E3221 /* String+.swift */; };
-		DA88CB8421A687C00094D1F8 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = DA88CB8321A687BF0094D1F8 /* Settings.bundle */; };
-		DA88CB8521A687C00094D1F8 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = DA88CB8321A687BF0094D1F8 /* Settings.bundle */; };
-		DA9156282684CBCE00CAEB26 /* WordPhoneticsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA9156272684CBCE00CAEB26 /* WordPhoneticsViewController.swift */; };
-		DAA16D6924B60673003C28FD /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DAA16D6824B60673003C28FD /* Media.xcassets */; };
-		DAA16D6B24B60673003C28FD /* ActionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAA16D6A24B60673003C28FD /* ActionViewController.swift */; };
-		DAA16D6E24B60673003C28FD /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DAA16D6C24B60673003C28FD /* MainInterface.storyboard */; };
 		DAA16D7224B60673003C28FD /* ImportAsDictAction.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = DAA16D6624B60673003C28FD /* ImportAsDictAction.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		DABAC90A2F7C260D00F6A1D4 /* PermissionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DABAC9092F7C260D00F6A1D4 /* PermissionManager.swift */; };
-		DAC884BA219C8710005C6588 /* SearchWordViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAC884B9219C8710005C6588 /* SearchWordViewController.swift */; };
-		DAD5E0D6219EF1400084FD1A /* Images.imagecatalog in Resources */ = {isa = PBXBuildFile; fileRef = DAD5E0D5219EF1400084FD1A /* Images.imagecatalog */; };
 		DADCA5FA2F82AF7B00AC0C2A /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = DADCA5F92F82AF7B00AC0C2A /* PrivacyInfo.xcprivacy */; };
-		DAE7482D2E8070E7004D96BC /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAE7482C2E8070E7004D96BC /* Storage.swift */; };
-		DAE7482E2E8070F1004D96BC /* Storage.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAE7482C2E8070E7004D96BC /* Storage.swift */; };
-		DAE7482F2E80719D004D96BC /* WordsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA4162F31F8BE62600165694 /* WordsModel.swift */; };
-		DAE748312E8071C6004D96BC /* gotoAppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAE748302E8071C6004D96BC /* gotoAppSettings.swift */; };
-		DAE748322E807226004D96BC /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAEC8DCD219DF691009097C2 /* Settings.swift */; };
-		DAE748332E807268004D96BC /* UserDefaults+Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA2E2D0D26612B8A00EF285C /* UserDefaults+Codable.swift */; };
-		DAE748342E80727E004D96BC /* String+.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA86ADF323489FF7007E3221 /* String+.swift */; };
-		DAEA4501268CD157004CA6C4 /* Debug.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAEA4500268CD157004CA6C4 /* Debug.swift */; };
-		DAEA4502268CD507004CA6C4 /* Debug.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAEA4500268CD157004CA6C4 /* Debug.swift */; };
-		DAEA4504268DD835004CA6C4 /* WordTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAEA4503268DD835004CA6C4 /* WordTableViewCell.swift */; };
-		DAEA4506268DDABC004CA6C4 /* KDCircularProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAEA4505268DDABC004CA6C4 /* KDCircularProgress.swift */; };
-		DAEC8DCE219DF691009097C2 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAEC8DCD219DF691009097C2 /* Settings.swift */; };
-		DAF774FD2FF142ED00CAD7EC /* Documentation.docc in Sources */ = {isa = PBXBuildFile; fileRef = DAF774FC2FF142ED00CAD7EC /* Documentation.docc */; };
-		DAFE0BFE2690C4E700E21D5C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DAFE0BFD2690C4E700E21D5C /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -97,67 +44,88 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		DA160CB0268A3E7C001F6CD2 /* ExersizeChooserViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExersizeChooserViewController.swift; sourceTree = "<group>"; };
-		DA1636B62DBCF80D00578C95 /* UIContextualAction+ConvenienceInit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIContextualAction+ConvenienceInit.swift"; sourceTree = "<group>"; };
-		DA1636B82DBD39F100578C95 /* SpeechManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechManager.swift; sourceTree = "<group>"; };
-		DA1636BA2DBD4C8800578C95 /* mul */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; name = mul; path = mul.lproj/Main.xcstrings; sourceTree = "<group>"; };
-		DA1636BB2DBD4C8800578C95 /* mul */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; name = mul; path = mul.lproj/MainInterface.xcstrings; sourceTree = "<group>"; };
-		DA1636BC2DBD4C8800578C95 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
-		DA1636BE2DBD4C8800578C95 /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
-		DA1636C02DBD4C8800578C95 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
-		DA1636C22DBD4C8800578C95 /* mul */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; name = mul; path = mul.lproj/MainInterface.xcstrings; sourceTree = "<group>"; };
-		DA1636C32DBD4C8800578C95 /* mul */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; name = mul; path = mul.lproj/LaunchScreen.xcstrings; sourceTree = "<group>"; };
 		DA246CB01F8A6E5E00A75ED1 /* LearnWords.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LearnWords.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		DA246CB31F8A6E5E00A75ED1 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		DA246CB51F8A6E5E00A75ED1 /* WordTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordTableViewController.swift; sourceTree = "<group>"; };
-		DA246CB81F8A6E5E00A75ED1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		DA246CBA1F8A6E5E00A75ED1 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		DA246CBD1F8A6E5E00A75ED1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		DA246CBF1F8A6E5E00A75ED1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DA246CC91F8AA30E00A75ED1 /* Widget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = Widget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
-		DA246CCB1F8AA30E00A75ED1 /* NotificationCenter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NotificationCenter.framework; path = System/Library/Frameworks/NotificationCenter.framework; sourceTree = SDKROOT; };
-		DA246CCE1F8AA30E00A75ED1 /* TodayViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayViewController.swift; sourceTree = "<group>"; };
-		DA246CD11F8AA30E00A75ED1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
-		DA246CD31F8AA30E00A75ED1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		DA246CDB1F8AB75900A75ED1 /* LearnWords.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LearnWords.entitlements; sourceTree = "<group>"; };
-		DA246CDC1F8AD1C200A75ED1 /* Widget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Widget.entitlements; sourceTree = "<group>"; };
-		DA246CDD1F8AE3DA00A75ED1 /* WordTestViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordTestViewController.swift; sourceTree = "<group>"; };
-		DA2E2CE6265E865900EF285C /* WordDictationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordDictationController.swift; sourceTree = "<group>"; };
-		DA2E2CF4265E9AA200EF285C /* TabBarControllerHome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarControllerHome.swift; sourceTree = "<group>"; };
-		DA2E2D0D26612B8A00EF285C /* UserDefaults+Codable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDefaults+Codable.swift"; sourceTree = "<group>"; };
-		DA2E2D1726623F0700EF285C /* UnderKeyboardDistrib.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UnderKeyboardDistrib.swift; sourceTree = "<group>"; };
-		DA2E2D9A267B683400EF285C /* General.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = General.swift; sourceTree = "<group>"; };
-		DA2E2DA2267CB63E00EF285C /* WordSetsTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordSetsTableViewController.swift; sourceTree = "<group>"; };
-		DA4162F31F8BE62600165694 /* WordsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordsModel.swift; sourceTree = "<group>"; };
-		DA4162F51F8C219500165694 /* GradientButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientButton.swift; sourceTree = "<group>"; };
-		DA4C541A2DBD80D500C5D686 /* UIImage+backport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImage+backport.swift"; sourceTree = "<group>"; };
-		DA4C541E2DBD8F5F00C5D686 /* TranslationV.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslationV.swift; sourceTree = "<group>"; };
-		DA4C541F2DBD8F5F00C5D686 /* AvailableLanguage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AvailableLanguage.swift; sourceTree = "<group>"; };
-		DA554C6826593A1100C67BE0 /* ImportAsDictAction.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ImportAsDictAction.entitlements; sourceTree = "<group>"; };
 		DA58C03B2ED481E000B4A733 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIcon.icon; sourceTree = "<group>"; };
-		DA76076F2DBC0C3B0081CECD /* AppConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConstants.swift; sourceTree = "<group>"; };
-		DA86ADF323489FF7007E3221 /* String+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+.swift"; sourceTree = "<group>"; };
-		DA88CB8321A687BF0094D1F8 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
-		DA88CB8621A6A9F40094D1F8 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		DA9156272684CBCE00CAEB26 /* WordPhoneticsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordPhoneticsViewController.swift; sourceTree = "<group>"; };
 		DAA16D6624B60673003C28FD /* ImportAsDictAction.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ImportAsDictAction.appex; sourceTree = BUILT_PRODUCTS_DIR; };
-		DAA16D6824B60673003C28FD /* Media.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Media.xcassets; sourceTree = "<group>"; };
-		DAA16D6A24B60673003C28FD /* ActionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActionViewController.swift; sourceTree = "<group>"; };
-		DAA16D6D24B60673003C28FD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
-		DAA16D6F24B60673003C28FD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		DABAC9092F7C260D00F6A1D4 /* PermissionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionManager.swift; sourceTree = "<group>"; };
-		DAC884B9219C8710005C6588 /* SearchWordViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchWordViewController.swift; sourceTree = "<group>"; };
-		DAD5E0D5219EF1400084FD1A /* Images.imagecatalog */ = {isa = PBXFileReference; lastKnownFileType = folder.imagecatalog; path = Images.imagecatalog; sourceTree = "<group>"; };
 		DADCA5F92F82AF7B00AC0C2A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		DAE7482C2E8070E7004D96BC /* Storage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Storage.swift; sourceTree = "<group>"; };
-		DAE748302E8071C6004D96BC /* gotoAppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = gotoAppSettings.swift; sourceTree = "<group>"; };
-		DAEA4500268CD157004CA6C4 /* Debug.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Debug.swift; sourceTree = "<group>"; };
-		DAEA4503268DD835004CA6C4 /* WordTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordTableViewCell.swift; sourceTree = "<group>"; };
-		DAEA4505268DDABC004CA6C4 /* KDCircularProgress.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KDCircularProgress.swift; sourceTree = "<group>"; };
-		DAEC8DCD219DF691009097C2 /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
-		DAF774FC2FF142ED00CAD7EC /* Documentation.docc */ = {isa = PBXFileReference; lastKnownFileType = folder.documentationcatalog; path = Documentation.docc; sourceTree = "<group>"; };
-		DAFE0BFD2690C4E700E21D5C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		DADB609230083110002A71A8 /* Exceptions for "LearnWords" folder in "LearnWords" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+				README.md,
+			);
+			target = DA246CAF1F8A6E5E00A75ED1 /* LearnWords */;
+		};
+		DADB609330083110002A71A8 /* Exceptions for "LearnWords" folder in "Widget" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				AppConstants.swift,
+				Debug.swift,
+				Settings.bundle,
+				Settings.swift,
+				Storage.swift,
+				"String+.swift",
+				"UserDefaults+Codable.swift",
+				WordsModel.swift,
+			);
+			target = DA246CC81F8AA30E00A75ED1 /* Widget */;
+		};
+		DADB609430083110002A71A8 /* Exceptions for "LearnWords" folder in "ImportAsDictAction" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				AppConstants.swift,
+			);
+			target = DAA16D6524B60673003C28FD /* ImportAsDictAction */;
+		};
+		DADB609E3008312C002A71A8 /* Exceptions for "Widget" folder in "Widget" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"/Localized: MainInterface.storyboard",
+				TodayViewController.swift,
+			);
+			target = DA246CC81F8AA30E00A75ED1 /* Widget */;
+		};
+		DADB60AF3008312E002A71A8 /* Exceptions for "ImportAsDictAction" folder in "ImportAsDictAction" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = DAA16D6524B60673003C28FD /* ImportAsDictAction */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		DADB60643008310F002A71A8 /* LearnWords */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				DADB609230083110002A71A8 /* Exceptions for "LearnWords" folder in "LearnWords" target */,
+				DADB609330083110002A71A8 /* Exceptions for "LearnWords" folder in "Widget" target */,
+				DADB609430083110002A71A8 /* Exceptions for "LearnWords" folder in "ImportAsDictAction" target */,
+			);
+			path = LearnWords;
+			sourceTree = "<group>";
+		};
+		DADB609B3008312B002A71A8 /* Widget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				DADB609E3008312C002A71A8 /* Exceptions for "Widget" folder in "Widget" target */,
+			);
+			path = Widget;
+			sourceTree = "<group>";
+		};
+		DADB60A83008312D002A71A8 /* ImportAsDictAction */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				DADB60AF3008312E002A71A8 /* Exceptions for "ImportAsDictAction" folder in "ImportAsDictAction" target */,
+			);
+			path = ImportAsDictAction;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		DA246CAD1F8A6E5E00A75ED1 /* Frameworks */ = {
@@ -168,7 +136,6 @@
 		DA246CC61F8AA30E00A75ED1 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
-				DA5454752687C35E007654E0 /* NotificationCenter.framework in Frameworks */,
 			);
 		};
 		DAA16D6324B60673003C28FD /* Frameworks */ = {
@@ -184,10 +151,9 @@
 			children = (
 				DA58C03B2ED481E000B4A733 /* AppIcon.icon */,
 				DADCA5F92F82AF7B00AC0C2A /* PrivacyInfo.xcprivacy */,
-				DA246CB21F8A6E5E00A75ED1 /* LearnWords */,
-				DA246CCD1F8AA30E00A75ED1 /* Widget */,
-				DAA16D6724B60673003C28FD /* ImportAsDictAction */,
-				DA246CCA1F8AA30E00A75ED1 /* Frameworks */,
+				DADB60643008310F002A71A8 /* LearnWords */,
+				DADB609B3008312B002A71A8 /* Widget */,
+				DADB60A83008312D002A71A8 /* ImportAsDictAction */,
 				DA246CB11F8A6E5E00A75ED1 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -200,93 +166,6 @@
 				DAA16D6624B60673003C28FD /* ImportAsDictAction.appex */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		DA246CB21F8A6E5E00A75ED1 /* LearnWords */ = {
-			isa = PBXGroup;
-			children = (
-				DABAC9092F7C260D00F6A1D4 /* PermissionManager.swift */,
-				DAE748302E8071C6004D96BC /* gotoAppSettings.swift */,
-				DAE7482C2E8070E7004D96BC /* Storage.swift */,
-				DA4C54202DBD8F5F00C5D686 /* Translation */,
-				DA4C541A2DBD80D500C5D686 /* UIImage+backport.swift */,
-				DA1636B82DBD39F100578C95 /* SpeechManager.swift */,
-				DA1636B62DBCF80D00578C95 /* UIContextualAction+ConvenienceInit.swift */,
-				DA76076F2DBC0C3B0081CECD /* AppConstants.swift */,
-				DA246CDB1F8AB75900A75ED1 /* LearnWords.entitlements */,
-				DAC884B9219C8710005C6588 /* SearchWordViewController.swift */,
-				DAEC8DCD219DF691009097C2 /* Settings.swift */,
-				DA2E2D9A267B683400EF285C /* General.swift */,
-				DA246CB31F8A6E5E00A75ED1 /* AppDelegate.swift */,
-				DA246CB51F8A6E5E00A75ED1 /* WordTableViewController.swift */,
-				DAEA4503268DD835004CA6C4 /* WordTableViewCell.swift */,
-				DA4162F51F8C219500165694 /* GradientButton.swift */,
-				DA4162F31F8BE62600165694 /* WordsModel.swift */,
-				DA246CDD1F8AE3DA00A75ED1 /* WordTestViewController.swift */,
-				DA2E2CE6265E865900EF285C /* WordDictationController.swift */,
-				DA2E2CF4265E9AA200EF285C /* TabBarControllerHome.swift */,
-				DA2E2D0D26612B8A00EF285C /* UserDefaults+Codable.swift */,
-				DA2E2D1726623F0700EF285C /* UnderKeyboardDistrib.swift */,
-				DA1636C02DBD4C8800578C95 /* Localizable.xcstrings */,
-				DA88CB8321A687BF0094D1F8 /* Settings.bundle */,
-				DA246CB71F8A6E5E00A75ED1 /* Main.storyboard */,
-				DA160CB0268A3E7C001F6CD2 /* ExersizeChooserViewController.swift */,
-				DA2E2DA2267CB63E00EF285C /* WordSetsTableViewController.swift */,
-				DA9156272684CBCE00CAEB26 /* WordPhoneticsViewController.swift */,
-				DAEA4505268DDABC004CA6C4 /* KDCircularProgress.swift */,
-				DAEA4500268CD157004CA6C4 /* Debug.swift */,
-				DA246CBA1F8A6E5E00A75ED1 /* Assets.xcassets */,
-				DA246CBC1F8A6E5E00A75ED1 /* LaunchScreen.storyboard */,
-				DA246CBF1F8A6E5E00A75ED1 /* Info.plist */,
-				DA1636BE2DBD4C8800578C95 /* InfoPlist.xcstrings */,
-				DAD5E0D5219EF1400084FD1A /* Images.imagecatalog */,
-				DA88CB8621A6A9F40094D1F8 /* README.md */,
-				DAF774FC2FF142ED00CAD7EC /* Documentation.docc */,
-			);
-			path = LearnWords;
-			sourceTree = "<group>";
-		};
-		DA246CCA1F8AA30E00A75ED1 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				DA86ADF323489FF7007E3221 /* String+.swift */,
-				DA246CCB1F8AA30E00A75ED1 /* NotificationCenter.framework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		DA246CCD1F8AA30E00A75ED1 /* Widget */ = {
-			isa = PBXGroup;
-			children = (
-				DA246CDC1F8AD1C200A75ED1 /* Widget.entitlements */,
-				DA246CCE1F8AA30E00A75ED1 /* TodayViewController.swift */,
-				DA246CD01F8AA30E00A75ED1 /* MainInterface.storyboard */,
-				DA246CD31F8AA30E00A75ED1 /* Info.plist */,
-			);
-			path = Widget;
-			sourceTree = "<group>";
-		};
-		DA4C54202DBD8F5F00C5D686 /* Translation */ = {
-			isa = PBXGroup;
-			children = (
-				DA4C541E2DBD8F5F00C5D686 /* TranslationV.swift */,
-				DA4C541F2DBD8F5F00C5D686 /* AvailableLanguage.swift */,
-			);
-			path = Translation;
-			sourceTree = "<group>";
-		};
-		DAA16D6724B60673003C28FD /* ImportAsDictAction */ = {
-			isa = PBXGroup;
-			children = (
-				DA554C6826593A1100C67BE0 /* ImportAsDictAction.entitlements */,
-				DAFE0BFD2690C4E700E21D5C /* Assets.xcassets */,
-				DAA16D6824B60673003C28FD /* Media.xcassets */,
-				DAA16D6A24B60673003C28FD /* ActionViewController.swift */,
-				DAA16D6C24B60673003C28FD /* MainInterface.storyboard */,
-				DAA16D6F24B60673003C28FD /* Info.plist */,
-				DA1636BC2DBD4C8800578C95 /* InfoPlist.xcstrings */,
-			);
-			path = ImportAsDictAction;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -306,6 +185,9 @@
 			dependencies = (
 				DA246CD51F8AA30E00A75ED1 /* PBXTargetDependency */,
 				DAA16D7124B60673003C28FD /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				DADB60643008310F002A71A8 /* LearnWords */,
 			);
 			name = LearnWords;
 			productName = LearnWords;
@@ -336,6 +218,9 @@
 				DAA16D6424B60673003C28FD /* Resources */,
 			);
 			buildRules = (
+			);
+			fileSystemSynchronizedGroups = (
+				DADB60A83008312D002A71A8 /* ImportAsDictAction */,
 			);
 			name = ImportAsDictAction;
 			productName = ImportAsDictAction;
@@ -402,31 +287,18 @@
 		DA246CAE1F8A6E5E00A75ED1 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
-				DA246CBE1F8A6E5E00A75ED1 /* LaunchScreen.storyboard in Resources */,
-				DAD5E0D6219EF1400084FD1A /* Images.imagecatalog in Resources */,
 				DA58C03C2ED481E000B4A733 /* AppIcon.icon in Resources */,
 				DADCA5FA2F82AF7B00AC0C2A /* PrivacyInfo.xcprivacy in Resources */,
-				DA1636BF2DBD4C8800578C95 /* InfoPlist.xcstrings in Resources */,
-				DA88CB8421A687C00094D1F8 /* Settings.bundle in Resources */,
-				DA1636C12DBD4C8800578C95 /* Localizable.xcstrings in Resources */,
-				DA246CBB1F8A6E5E00A75ED1 /* Assets.xcassets in Resources */,
-				DA246CB91F8A6E5E00A75ED1 /* Main.storyboard in Resources */,
 			);
 		};
 		DA246CC71F8AA30E00A75ED1 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
-				DA88CB8521A687C00094D1F8 /* Settings.bundle in Resources */,
-				DA246CD21F8AA30E00A75ED1 /* MainInterface.storyboard in Resources */,
 			);
 		};
 		DAA16D6424B60673003C28FD /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
-				DAA16D6924B60673003C28FD /* Media.xcassets in Resources */,
-				DA1636BD2DBD4C8800578C95 /* InfoPlist.xcstrings in Resources */,
-				DAFE0BFE2690C4E700E21D5C /* Assets.xcassets in Resources */,
-				DAA16D6E24B60673003C28FD /* MainInterface.storyboard in Resources */,
 			);
 		};
 /* End PBXResourcesBuildPhase section */
@@ -435,55 +307,16 @@
 		DA246CAC1F8A6E5E00A75ED1 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
-				DAC884BA219C8710005C6588 /* SearchWordViewController.swift in Sources */,
-				DA2E2D9B267B683400EF285C /* General.swift in Sources */,
-				DA4162F61F8C219500165694 /* GradientButton.swift in Sources */,
-				DAEC8DCE219DF691009097C2 /* Settings.swift in Sources */,
-				DA7607702DBC0C3B0081CECD /* AppConstants.swift in Sources */,
-				DA246CDE1F8AE3DA00A75ED1 /* WordTestViewController.swift in Sources */,
-				DA2E2CF5265E9AA200EF285C /* TabBarControllerHome.swift in Sources */,
-				DA2E2D1826623F0700EF285C /* UnderKeyboardDistrib.swift in Sources */,
-				DA4C54212DBD8F5F00C5D686 /* TranslationV.swift in Sources */,
-				DA4C54222DBD8F5F00C5D686 /* AvailableLanguage.swift in Sources */,
-				DA2E2D0E26612B8B00EF285C /* UserDefaults+Codable.swift in Sources */,
-				DA246CB61F8A6E5E00A75ED1 /* WordTableViewController.swift in Sources */,
-				DA2E2CE7265E865A00EF285C /* WordDictationController.swift in Sources */,
-				DA1636B92DBD39F100578C95 /* SpeechManager.swift in Sources */,
-				DAF774FD2FF142ED00CAD7EC /* Documentation.docc in Sources */,
-				DA2E2DA3267CB63E00EF285C /* WordSetsTableViewController.swift in Sources */,
-				DA86ADF423489FF7007E3221 /* String+.swift in Sources */,
-				DAE748312E8071C6004D96BC /* gotoAppSettings.swift in Sources */,
-				DA9156282684CBCE00CAEB26 /* WordPhoneticsViewController.swift in Sources */,
-				DABAC90A2F7C260D00F6A1D4 /* PermissionManager.swift in Sources */,
-				DAEA4501268CD157004CA6C4 /* Debug.swift in Sources */,
-				DA160CB1268A3E7C001F6CD2 /* ExersizeChooserViewController.swift in Sources */,
-				DAEA4506268DDABC004CA6C4 /* KDCircularProgress.swift in Sources */,
-				DA4C541B2DBD80E600C5D686 /* UIImage+backport.swift in Sources */,
-				DAEA4504268DD835004CA6C4 /* WordTableViewCell.swift in Sources */,
-				DA246CB41F8A6E5E00A75ED1 /* AppDelegate.swift in Sources */,
-				DA4162F41F8BE62600165694 /* WordsModel.swift in Sources */,
-				DA1636B72DBCF80D00578C95 /* UIContextualAction+ConvenienceInit.swift in Sources */,
-				DAE7482D2E8070E7004D96BC /* Storage.swift in Sources */,
 			);
 		};
 		DA246CC51F8AA30E00A75ED1 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
-				DAE748322E807226004D96BC /* Settings.swift in Sources */,
-				DAE7482F2E80719D004D96BC /* WordsModel.swift in Sources */,
-				DAE748342E80727E004D96BC /* String+.swift in Sources */,
-				DAE748332E807268004D96BC /* UserDefaults+Codable.swift in Sources */,
-				DA246CCF1F8AA30E00A75ED1 /* TodayViewController.swift in Sources */,
-				DAE7482E2E8070F1004D96BC /* Storage.swift in Sources */,
-				DA7607712DBC0CF80081CECD /* AppConstants.swift in Sources */,
-				DAEA4502268CD507004CA6C4 /* Debug.swift in Sources */,
 			);
 		};
 		DAA16D6224B60673003C28FD /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
-				DAA16D6B24B60673003C28FD /* ActionViewController.swift in Sources */,
-				DA7607722DBC0D530081CECD /* AppConstants.swift in Sources */,
 			);
 		};
 /* End PBXSourcesBuildPhase section */
@@ -500,45 +333,6 @@
 			targetProxy = DAA16D7024B60673003C28FD /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
-
-/* Begin PBXVariantGroup section */
-		DA246CB71F8A6E5E00A75ED1 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				DA246CB81F8A6E5E00A75ED1 /* Base */,
-				DA1636BA2DBD4C8800578C95 /* mul */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-		DA246CBC1F8A6E5E00A75ED1 /* LaunchScreen.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				DA246CBD1F8A6E5E00A75ED1 /* Base */,
-				DA1636C32DBD4C8800578C95 /* mul */,
-			);
-			name = LaunchScreen.storyboard;
-			sourceTree = "<group>";
-		};
-		DA246CD01F8AA30E00A75ED1 /* MainInterface.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				DA246CD11F8AA30E00A75ED1 /* Base */,
-				DA1636BB2DBD4C8800578C95 /* mul */,
-			);
-			name = MainInterface.storyboard;
-			sourceTree = "<group>";
-		};
-		DAA16D6C24B60673003C28FD /* MainInterface.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				DAA16D6D24B60673003C28FD /* Base */,
-				DA1636C22DBD4C8800578C95 /* mul */,
-			);
-			name = MainInterface.storyboard;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		DA246CC01F8A6E5E00A75ED1 /* Debug configuration for PBXProject "LearnWords" */ = {
@@ -579,7 +373,6 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 7;
-				MARKETING_VERSION = 1.2.0;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = MW2YXY2465;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -601,6 +394,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.2.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -650,7 +444,6 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 7;
-				MARKETING_VERSION = 1.2.0;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = MW2YXY2465;
 				ENABLE_NS_ASSERTIONS = NO;
@@ -666,6 +459,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.2.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
