@@ -50,11 +50,31 @@ A single `Main.storyboard` drives navigation. **Cost:** merge conflicts, slow lo
 clean dependency injection into view controllers. **Discharge:** split per feature or go
 programmatic; inject via `UIStoryboard.instantiateViewController(identifier:creator:)`.
 
-## TD-6 — No automated tests
+## TD-6 — Automated tests — **seeded (2026-07-17)**
 
-No unit or UI test target. **Cost:** refactors (including the reorg above) can't be
-verified; regressions ship silently. **Discharge:** add a test target; start with `Model`
-(`WordsModel`, `Storage`) and a launch smoke test.
+Was: no test target. Owner added a hosted Swift Testing "Unit Testing Bundle"
+(`@testable import LearnWords`); it now holds **13 passing cases**:
+- `WordAndStatTests` — the model's pure logic (increase caps at `maxKnownLevel`, decrease
+  floors at 0, `known` sums-and-caps, reset clears, Codable round-trip). The
+  `maxKnownLevel`-dependent cases run in a `@Suite(.serialized)` because that value is read
+  from a global `UserDefaults`.
+- `StringCanonicaliseTests` — parameterized cases for `String.canonicalise()`.
+- `AppRootTests` — launch smoke test: `AppRoot.makeRoot()` builds the home tab bar from
+  `Main.storyboard`.
+
+**Remaining:** `Storage` is uncovered (TD-12). **Note:** the test target's deployment target
+is iOS 26.5 (Xcode default), so tests need a 26.x simulator; lower it if you want them
+runnable on older sims/CI.
+
+## TD-12 — `Storage` is not unit-testable (all-static + global UserDefaults)
+
+`Storage` is an all-`static` type that reads/writes the App-Group `UserDefaults`
+(`userDefaultsGroup`) directly and saves asynchronously on a background queue. **Cost:** its
+logic (word-set add/remove, current-set switching, insert guards, dedup) can't be tested
+without mutating shared global state, so it stays uncovered by TD-6. **Discharge:** inject
+the store as a dependency (e.g. a `StorageController` holding an injected `UserDefaults`, per
+uikit-app-structure's "inject, don't reach for singletons"), then test against an ephemeral
+`UserDefaults(suiteName:)`. Pairs with the DI direction in [Design](Design.md).
 
 ## TD-7 — iOS 12 availability audit
 

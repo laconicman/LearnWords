@@ -4,36 +4,40 @@ Priority-ordered. Rationale lives in [Design](Design.md); debt items in [TechDeb
 
 ## Now
 
-- **UIScene *dual* lifecycle — done (this change).** iOS 13+ via `SceneDelegate`, iOS 12
-  via `AppDelegate`, both through `AppRoot`; floor reverted to 12.1. Reverses the earlier
-  iOS-15 decision — this Legacy app stays on old hardware (see [Design](Design.md)).
-- **Verify green on a modern simulator (Xcode 26):** compiles at the 12.1 floor and the
-  scene path launches + the `learnWords://shareaction` deep link works (TD-7).
-- **Verify the iOS 12 path on Xcode 15** (TD-8): launch + deep link on an iOS 12 sim/device —
-  the only way to exercise the `AppDelegate` branch. Do before any lifecycle-touching release.
+- **iOS 12 on-device verification (TD-8) — deferred by owner.** Lifecycle + colors are
+  unverified on real iOS 12 until checked on an owner device (visual side-load path in TD-8)
+  or Xcode 15. Do before any lifecycle/UI-touching release.
 
 ## Done (2026-07-17)
 
-- **Feature-first reorg of source** (TD-1) — all 30 `.swift` files moved into
-  `App/ Model/ Controllers/ Shared/… Features/*`; shared-file `membershipExceptions`
-  updated (TD-2); clean build of all three targets green; app launches. Resources deferred.
+- **UIScene dual lifecycle** — iOS 13+ `SceneDelegate`, iOS 12 `AppDelegate`, both through
+  `AppRoot`; floor 12.1 (reverses the earlier iOS-15 decision — see [Design](Design.md)).
+  Built + launched (light/dark) on a modern sim; TD-7 audit clean.
+- **Feature-first reorg of source** (TD-1) — all 30 `.swift` files into
+  `App/ Model/ Controllers/ Shared/… Features/*`; `membershipExceptions` updated (TD-2);
+  all three targets build; app launches. Resources deferred.
 - **Doc consolidation** (TD-9) — obsolete `Documentation.docc` scaffold deleted; `docs/` is
   the single source.
+- **iOS 12 storyboard colors** (TD-11) — semantic colors → named asset colors; verified
+  light/dark on a modern sim. Icons deferred (text-only on iOS 12).
+- **Test seed** (TD-6) — Swift Testing bundle, 13 passing cases (`WordAndStat` logic,
+  `canonicalise`, launch smoke test).
 
 ## Next
 
-- **iOS 12 availability audit** (TD-7) — grep for unguarded iOS 13+ symbols now that the floor
-  is 12.1 again; guard or backport.
-- **Split `Main.storyboard` / reduce storyboard centralization** (TD-5), then move resources
-  beside their features (finishes TD-1).
-- **Verify the ported deep link** (TD-3) against the ImportAsDictAction extension — note the
-  extension targets iOS 14, so the deep link can't fire below that yet (TD-10).
+- **Verify / clean the deep link** (TD-3) — the `learnWords://shareaction` handler; note
+  ImportAsDictAction targets iOS 14 (TD-10), so it can't fire below that yet.
+- **Make `Storage` injectable** (TD-12) — unlocks `Storage` unit tests; DI per
+  uikit-app-structure.
+- **Today extension** (TD-4) — decide: migrate to WidgetKit vs remove.
+- Storyboard split (TD-5) is **likely YAGNI** at this size — prefer creator-injection on the
+  existing storyboard where a screen needs a dependency; revisit only if the one storyboard
+  actually hurts.
 
 ## Later
 
-- **Replace the deprecated Today extension** (`NCWidgetProviding`) with WidgetKit (TD-4).
-- **Add tests** — unit tests for `Model` (`WordsModel`, `Storage`), a launch smoke test (TD-6).
-- **Naming pass** — `…Manager` → `…Controller` for shared controllers, once tests exist.
+- **Naming pass** — `…Manager` → `…Controller` for shared controllers, now that tests exist.
+- Move resources beside features (finishes TD-1), once the storyboard direction settles.
 - Promote these docs to a rendered DocC catalog (`repo-init`).
 
 ## Someday — the modern rewrite (separate app)

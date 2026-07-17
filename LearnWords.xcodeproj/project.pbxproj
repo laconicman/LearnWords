@@ -21,6 +21,13 @@
 			remoteGlobalIDString = DA246CC81F8AA30E00A75ED1;
 			remoteInfo = Widget;
 		};
+		DA329630300AA1B200A0413A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DA246CA81F8A6E5E00A75ED1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DA246CAF1F8A6E5E00A75ED1;
+			remoteInfo = LearnWords;
+		};
 		DAA16D7024B60673003C28FD /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = DA246CA81F8A6E5E00A75ED1 /* Project object */;
@@ -46,6 +53,7 @@
 /* Begin PBXFileReference section */
 		DA246CB01F8A6E5E00A75ED1 /* LearnWords.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LearnWords.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA246CC91F8AA30E00A75ED1 /* Widget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = Widget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		DA32962C300AA1B200A0413A /* Unit Testing Bundle.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Unit Testing Bundle.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA58C03B2ED481E000B4A733 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIcon.icon; sourceTree = "<group>"; };
 		DAA16D6624B60673003C28FD /* ImportAsDictAction.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ImportAsDictAction.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		DADCA5F92F82AF7B00AC0C2A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
@@ -63,14 +71,14 @@
 		DADB609330083110002A71A8 /* Exceptions for "LearnWords" folder in "Widget" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Shared/AppConstants.swift,
-				Shared/Debug.swift,
-				Settings.bundle,
 				Model/Settings.swift,
 				Model/Storage.swift,
+				Model/WordsModel.swift,
+				Settings.bundle,
+				Shared/AppConstants.swift,
+				Shared/Debug.swift,
 				"Shared/Extensions/String+.swift",
 				"Shared/Extensions/UserDefaults+Codable.swift",
-				Model/WordsModel.swift,
 			);
 			target = DA246CC81F8AA30E00A75ED1 /* Widget */;
 		};
@@ -99,6 +107,11 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		DA32962D300AA1B200A0413A /* Unit Testing Bundle */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "Unit Testing Bundle";
+			sourceTree = "<group>";
+		};
 		DADB60643008310F002A71A8 /* LearnWords */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -138,6 +151,11 @@
 			files = (
 			);
 		};
+		DA329629300AA1B200A0413A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
 		DAA16D6324B60673003C28FD /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
@@ -154,6 +172,7 @@
 				DADB60643008310F002A71A8 /* LearnWords */,
 				DADB609B3008312B002A71A8 /* Widget */,
 				DADB60A83008312D002A71A8 /* ImportAsDictAction */,
+				DA32962D300AA1B200A0413A /* Unit Testing Bundle */,
 				DA246CB11F8A6E5E00A75ED1 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -164,6 +183,7 @@
 				DA246CB01F8A6E5E00A75ED1 /* LearnWords.app */,
 				DA246CC91F8AA30E00A75ED1 /* Widget.appex */,
 				DAA16D6624B60673003C28FD /* ImportAsDictAction.appex */,
+				DA32962C300AA1B200A0413A /* Unit Testing Bundle.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -209,6 +229,27 @@
 			productReference = DA246CC91F8AA30E00A75ED1 /* Widget.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		DA32962B300AA1B200A0413A /* Unit Testing Bundle */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DA329634300AA1B200A0413A /* Build configuration list for PBXNativeTarget "Unit Testing Bundle" */;
+			buildPhases = (
+				DA329628300AA1B200A0413A /* Sources */,
+				DA329629300AA1B200A0413A /* Frameworks */,
+				DA32962A300AA1B200A0413A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DA329631300AA1B200A0413A /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				DA32962D300AA1B200A0413A /* Unit Testing Bundle */,
+			);
+			name = "Unit Testing Bundle";
+			productName = "Unit Testing Bundle";
+			productReference = DA32962C300AA1B200A0413A /* Unit Testing Bundle.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		DAA16D6524B60673003C28FD /* ImportAsDictAction */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = DAA16D7324B60673003C28FD /* Build configuration list for PBXNativeTarget "ImportAsDictAction" */;
@@ -234,7 +275,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastSwiftUpdateCheck = 1150;
+				LastSwiftUpdateCheck = 2660;
 				LastUpgradeCheck = 2660;
 				ORGANIZATIONNAME = Paul;
 				TargetAttributes = {
@@ -255,6 +296,10 @@
 								enabled = 1;
 							};
 						};
+					};
+					DA32962B300AA1B200A0413A = {
+						CreatedOnToolsVersion = 26.6;
+						TestTargetID = DA246CAF1F8A6E5E00A75ED1;
 					};
 					DAA16D6524B60673003C28FD = {
 						CreatedOnToolsVersion = 11.5;
@@ -279,6 +324,7 @@
 				DA246CAF1F8A6E5E00A75ED1 /* LearnWords */,
 				DA246CC81F8AA30E00A75ED1 /* Widget */,
 				DAA16D6524B60673003C28FD /* ImportAsDictAction */,
+				DA32962B300AA1B200A0413A /* Unit Testing Bundle */,
 			);
 		};
 /* End PBXProject section */
@@ -292,6 +338,11 @@
 			);
 		};
 		DA246CC71F8AA30E00A75ED1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
+		DA32962A300AA1B200A0413A /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
 			);
@@ -314,6 +365,11 @@
 			files = (
 			);
 		};
+		DA329628300AA1B200A0413A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
 		DAA16D6224B60673003C28FD /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
@@ -326,6 +382,11 @@
 			isa = PBXTargetDependency;
 			target = DA246CC81F8AA30E00A75ED1 /* Widget */;
 			targetProxy = DA246CD41F8AA30E00A75ED1 /* PBXContainerItemProxy */;
+		};
+		DA329631300AA1B200A0413A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DA246CAF1F8A6E5E00A75ED1 /* LearnWords */;
+			targetProxy = DA329630300AA1B200A0413A /* PBXContainerItemProxy */;
 		};
 		DAA16D7124B60673003C28FD /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -561,6 +622,60 @@
 			};
 			name = Release;
 		};
+		DA329632300AA1B200A0413A /* Debug configuration for PBXNativeTarget "Unit Testing Bundle" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = MW2YXY2465;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.learnable.Unit-Testing-Bundle";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LearnWords.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/LearnWords";
+			};
+			name = Debug;
+		};
+		DA329633300AA1B200A0413A /* Release configuration for PBXNativeTarget "Unit Testing Bundle" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = MW2YXY2465;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.learnable.Unit-Testing-Bundle";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LearnWords.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/LearnWords";
+			};
+			name = Release;
+		};
 		DAA16D7424B60673003C28FD /* Debug configuration for PBXNativeTarget "ImportAsDictAction" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -640,6 +755,14 @@
 			buildConfigurations = (
 				DA246CD81F8AA30E00A75ED1 /* Debug configuration for PBXNativeTarget "Widget" */,
 				DA246CD91F8AA30E00A75ED1 /* Release configuration for PBXNativeTarget "Widget" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		DA329634300AA1B200A0413A /* Build configuration list for PBXNativeTarget "Unit Testing Bundle" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DA329632300AA1B200A0413A /* Debug configuration for PBXNativeTarget "Unit Testing Bundle" */,
+				DA329633300AA1B200A0413A /* Release configuration for PBXNativeTarget "Unit Testing Bundle" */,
 			);
 			defaultConfigurationName = Release;
 		};
