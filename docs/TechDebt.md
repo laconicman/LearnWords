@@ -58,13 +58,41 @@ verified; regressions ship silently. **Discharge:** add a test target; start wit
 
 ## TD-7 — iOS 12 availability audit
 
-The floor is back at **12.1** (dual lifecycle — see [Design](Design.md)). Any API newer
-than 12.1 used **without** an `@available`/`#available` guard is a compile error at this
-floor, or a crash if mis-guarded. The code is already heavily guarded (it predates the
-brief 15.0 bump), and HEAD compiled at 12.1, so risk is low — but anything added during
-the 15.0 window must be re-checked. **Cost:** build breakage / iOS 12 runtime crashes.
-**Discharge:** build at 12.1; grep for unguarded iOS 13+ symbols (e.g. `.systemOrange`,
-`.label`, `UIImage(systemName:)` outside `UIImage+backport`); guard or backport each.
+**Swift code: clean.** A clean build at the 12.1 floor succeeds, and Swift treats any
+unguarded newer API as a hard *error* — so a green build proves there are no unguarded
+iOS 13+ API uses. (Spot-checked: `.label`, `systemIndigo`, `UIImage(systemName:)` are all
+inside `#available`; `systemOrange` is iOS 7+.) No action needed here.
+
+## TD-11 — Storyboard has iOS 13+ UI dependencies that break on iOS 12
+
+The compiler can't see inside `Main.storyboard`, and it hard-codes iOS 13+ features with
+**no fallbacks**, so the app *launches* on iOS 12 (dual lifecycle works) but its UI is
+broken there:
+
+- **Semantic colors without fallback** — ~40 refs to `labelColor`, `secondaryLabelColor`,
+  `systemBackgroundColor` as `systemColor="…"` with **no `cocoaTouchSystemColor`** sibling.
+  On iOS 12 these **crash or render transparent** (confirmed: noahgilmore.com, xamarin-macios
+  #7086) — e.g. invisible text on a broken background.
+- **SF Symbols** — tab-bar/cell images via `catalog="system"` (`house`, `folder`,
+  `graduationcap`, `mic`, `keyboard.badge.ellipsis`, …). SF Symbols don't exist on iOS 12, so
+  they render **blank**. `UIImage+backport.systemImage(_:)` already returns `nil` on iOS 12
+  with a `// TODO: look up in assets` — no fallback assets exist yet.
+
+**Cost:** the app's *reason to exist* (working on iOS 12) is unmet at the UI layer; crash
+risk. **Cannot be fully verified on Xcode 26** (no iOS 12 sim — TD-8).
+
+**Colors — resolved (2026-07-17).** All 32 semantic-color refs in `Main.storyboard`
+(`labelColor`, `secondaryLabelColor`, `systemBackgroundColor`, `systemGray4Color`) migrated
+to named asset-catalog colors — `TextPrimary`, `TextSecondary`, `Background`, `Gray4` (in
+`Assets.xcassets`, each with Any + Dark appearances). Named colors are iOS 11+, so no iOS 12
+crash; dark mode preserved on iOS 13+. Verified on a modern sim in **both** light and dark;
+iOS 12 itself still needs an Xcode-15 pass (TD-8). `LaunchScreen` used only `systemOrange`
+(iOS 7+) — untouched. These four are the seed of a real design system (see `axiom-design`).
+
+**Icons — deferred (owner's call, 2026-07-17).** SF Symbols stay `catalog="system"`; they
+render on iOS 13+ and degrade to **text-only tabs on iOS 12**. Adding PNG fallback art +
+programmatic tab images (completing `UIImage+backport`) is future work if iOS-12 icon
+fidelity is wanted.
 
 ## TD-8 — iOS 12 path is unverifiable on Xcode 26
 

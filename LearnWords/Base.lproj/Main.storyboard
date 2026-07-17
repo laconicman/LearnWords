@@ -21,7 +21,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <color key="tintColor" systemColor="systemOrangeColor"/>
-                        <color key="sectionIndexBackgroundColor" systemColor="systemBackgroundColor"/>
+                        <color key="sectionIndexBackgroundColor" name="Background"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="Word" id="6Q4-9O-5gu" customClass="WordTableViewCell" customModule="LearnWords" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="50" width="375" height="52.5"/>
@@ -35,7 +35,7 @@
                                             <subviews>
                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="01J-fN-Z6r" userLabel="ProgressView" customClass="KDCircularProgress" customModule="LearnWords" customModuleProvider="target">
                                                     <rect key="frame" x="0.0" y="0.0" width="44" height="44.5"/>
-                                                    <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                                    <color key="backgroundColor" name="Background"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="44" id="cAv-4i-Dw8"/>
                                                         <constraint firstAttribute="width" secondItem="01J-fN-Z6r" secondAttribute="height" multiplier="1:1" id="wkE-bX-xzX"/>
@@ -60,7 +60,7 @@
                                                             <real key="value" value="14"/>
                                                         </userDefinedRuntimeAttribute>
                                                         <userDefinedRuntimeAttribute type="color" keyPath="trackColor">
-                                                            <color key="value" systemColor="systemGray4Color"/>
+                                                            <color key="value" name="Gray4"/>
                                                         </userDefinedRuntimeAttribute>
                                                         <userDefinedRuntimeAttribute type="color" keyPath="IBColor2">
                                                             <color key="value" systemColor="systemOrangeColor"/>
@@ -81,7 +81,7 @@
                                                             <rect key="frame" x="154.5" y="0.0" width="151.5" height="44.5"/>
                                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                             <fontDescription key="fontDescription" style="UICTFontTextStyleTitle2"/>
-                                                            <color key="textColor" systemColor="secondaryLabelColor"/>
+                                                            <color key="textColor" name="TextSecondary"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
                                                     </subviews>
@@ -163,14 +163,14 @@
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
                                         <inset key="contentEdgeInsets" minX="10" minY="10" maxX="10" maxY="10"/>
                                         <state key="normal" title="Look Up">
-                                            <color key="titleColor" systemColor="labelColor"/>
+                                            <color key="titleColor" name="TextPrimary"/>
                                         </state>
                                         <userDefinedRuntimeAttributes>
                                             <userDefinedRuntimeAttribute type="color" keyPath="startColor">
                                                 <color key="value" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             </userDefinedRuntimeAttribute>
                                             <userDefinedRuntimeAttribute type="color" keyPath="endColor">
-                                                <color key="value" systemColor="systemGray4Color"/>
+                                                <color key="value" name="Gray4"/>
                                             </userDefinedRuntimeAttribute>
                                         </userDefinedRuntimeAttributes>
                                         <connections>
@@ -185,7 +185,7 @@
                                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
                                                 <inset key="contentEdgeInsets" minX="10" minY="10" maxX="10" maxY="10"/>
                                                 <state key="normal" title="Forgot">
-                                                    <color key="titleColor" systemColor="labelColor"/>
+                                                    <color key="titleColor" name="TextPrimary"/>
                                                 </state>
                                                 <userDefinedRuntimeAttributes>
                                                     <userDefinedRuntimeAttribute type="color" keyPath="startColor">
@@ -204,7 +204,7 @@
                                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
                                                 <inset key="contentEdgeInsets" minX="10" minY="10" maxX="10" maxY="10"/>
                                                 <state key="normal" title="Know">
-                                                    <color key="titleColor" systemColor="labelColor"/>
+                                                    <color key="titleColor" name="TextPrimary"/>
                                                 </state>
                                                 <userDefinedRuntimeAttributes>
                                                     <userDefinedRuntimeAttribute type="color" keyPath="startColor">
@@ -231,7 +231,7 @@
                             </stackView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="0M9-Kp-HX4"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <color key="backgroundColor" name="Background"/>
                         <constraints>
                             <constraint firstItem="0M9-Kp-HX4" firstAttribute="bottom" secondItem="be5-a6-mYM" secondAttribute="bottom" constant="20" id="4JU-PH-Jr6"/>
                             <constraint firstItem="be5-a6-mYM" firstAttribute="top" secondItem="0M9-Kp-HX4" secondAttribute="top" id="HJF-vt-uX9"/>
@@ -351,7 +351,7 @@
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" allowsSelectionDuringEditing="YES" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="6Q5-9e-K1K">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <color key="backgroundColor" name="Background"/>
                         <color key="tintColor" systemColor="systemOrangeColor"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="wordSetsCell" textLabel="39l-aE-DmA" detailTextLabel="Xwv-BA-c3j" style="IBUITableViewCellStyleSubtitle" id="UT5-Il-mip">
@@ -509,14 +509,14 @@
                                                 <inset key="contentEdgeInsets" minX="10" minY="10" maxX="10" maxY="10"/>
                                                 <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                                 <state key="normal" title="Look Up">
-                                                    <color key="titleColor" systemColor="labelColor"/>
+                                                    <color key="titleColor" name="TextPrimary"/>
                                                 </state>
                                                 <userDefinedRuntimeAttributes>
                                                     <userDefinedRuntimeAttribute type="color" keyPath="startColor">
                                                         <color key="value" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     </userDefinedRuntimeAttribute>
                                                     <userDefinedRuntimeAttribute type="color" keyPath="endColor">
-                                                        <color key="value" systemColor="systemGray4Color"/>
+                                                        <color key="value" name="Gray4"/>
                                                     </userDefinedRuntimeAttribute>
                                                 </userDefinedRuntimeAttributes>
                                                 <connections>
@@ -528,14 +528,14 @@
                                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
                                                 <inset key="contentEdgeInsets" minX="10" minY="10" maxX="10" maxY="10"/>
                                                 <state key="normal" title="Listen">
-                                                    <color key="titleColor" systemColor="labelColor"/>
+                                                    <color key="titleColor" name="TextPrimary"/>
                                                 </state>
                                                 <userDefinedRuntimeAttributes>
                                                     <userDefinedRuntimeAttribute type="color" keyPath="startColor">
                                                         <color key="value" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     </userDefinedRuntimeAttribute>
                                                     <userDefinedRuntimeAttribute type="color" keyPath="endColor">
-                                                        <color key="value" systemColor="systemGray4Color"/>
+                                                        <color key="value" name="Gray4"/>
                                                     </userDefinedRuntimeAttribute>
                                                 </userDefinedRuntimeAttributes>
                                                 <connections>
@@ -555,7 +555,7 @@
                                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
                                                 <inset key="contentEdgeInsets" minX="10" minY="10" maxX="10" maxY="10"/>
                                                 <state key="normal" title="Forgot">
-                                                    <color key="titleColor" systemColor="labelColor"/>
+                                                    <color key="titleColor" name="TextPrimary"/>
                                                 </state>
                                                 <userDefinedRuntimeAttributes>
                                                     <userDefinedRuntimeAttribute type="color" keyPath="startColor">
@@ -574,7 +574,7 @@
                                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
                                                 <inset key="contentEdgeInsets" minX="10" minY="10" maxX="10" maxY="10"/>
                                                 <state key="normal" title="Know">
-                                                    <color key="titleColor" systemColor="labelColor"/>
+                                                    <color key="titleColor" name="TextPrimary"/>
                                                 </state>
                                                 <userDefinedRuntimeAttributes>
                                                     <userDefinedRuntimeAttribute type="color" keyPath="startColor">
@@ -600,7 +600,7 @@
                             </stackView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="Ftf-Jx-RTh"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <color key="backgroundColor" name="Background"/>
                         <constraints>
                             <constraint firstItem="Ftf-Jx-RTh" firstAttribute="trailing" secondItem="DrO-BH-om0" secondAttribute="trailing" constant="20" id="HqG-Pm-weM"/>
                             <constraint firstItem="DrO-BH-om0" firstAttribute="top" secondItem="Ftf-Jx-RTh" secondAttribute="top" id="IIp-vy-dCe"/>
@@ -698,12 +698,12 @@
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
                                         <color key="tintColor" systemColor="systemOrangeColor"/>
                                         <state key="normal" title="Learning">
-                                            <color key="titleColor" systemColor="labelColor"/>
+                                            <color key="titleColor" name="TextPrimary"/>
                                             <imageReference key="image" image="folder.badge.questionmark" catalog="system" symbolScale="large"/>
                                         </state>
                                         <userDefinedRuntimeAttributes>
                                             <userDefinedRuntimeAttribute type="color" keyPath="endColor">
-                                                <color key="value" systemColor="systemGray4Color"/>
+                                                <color key="value" name="Gray4"/>
                                             </userDefinedRuntimeAttribute>
                                             <userDefinedRuntimeAttribute type="color" keyPath="startColor">
                                                 <color key="value" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -718,12 +718,12 @@
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
                                         <color key="tintColor" systemColor="systemOrangeColor"/>
                                         <state key="normal" title="Dictation">
-                                            <color key="titleColor" systemColor="labelColor"/>
+                                            <color key="titleColor" name="TextPrimary"/>
                                             <imageReference key="image" image="keyboard.badge.ellipsis" catalog="system" symbolScale="large"/>
                                         </state>
                                         <userDefinedRuntimeAttributes>
                                             <userDefinedRuntimeAttribute type="color" keyPath="endColor">
-                                                <color key="value" systemColor="systemGray4Color"/>
+                                                <color key="value" name="Gray4"/>
                                             </userDefinedRuntimeAttribute>
                                             <userDefinedRuntimeAttribute type="color" keyPath="startColor">
                                                 <color key="value" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -738,12 +738,12 @@
                                         <fontDescription key="fontDescription" style="UICTFontTextStyleTitle0"/>
                                         <color key="tintColor" systemColor="systemOrangeColor"/>
                                         <state key="normal" title="Phonetics">
-                                            <color key="titleColor" systemColor="labelColor"/>
+                                            <color key="titleColor" name="TextPrimary"/>
                                             <imageReference key="image" image="mic" catalog="system" symbolScale="large"/>
                                         </state>
                                         <userDefinedRuntimeAttributes>
                                             <userDefinedRuntimeAttribute type="color" keyPath="endColor">
-                                                <color key="value" systemColor="systemGray4Color"/>
+                                                <color key="value" name="Gray4"/>
                                             </userDefinedRuntimeAttribute>
                                             <userDefinedRuntimeAttribute type="color" keyPath="startColor">
                                                 <color key="value" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -763,7 +763,7 @@
                             </stackView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="7KC-bb-Y5P"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <color key="backgroundColor" name="Background"/>
                         <constraints>
                             <constraint firstItem="F0l-2D-eeU" firstAttribute="bottom" secondItem="7KC-bb-Y5P" secondAttribute="bottom" priority="250" constant="-120" id="OIw-LZ-fN4"/>
                             <constraint firstItem="7KC-bb-Y5P" firstAttribute="trailing" secondItem="F0l-2D-eeU" secondAttribute="trailing" constant="16" id="bSW-cA-luq"/>
@@ -839,14 +839,14 @@
                                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
                                                 <inset key="contentEdgeInsets" minX="10" minY="10" maxX="10" maxY="10"/>
                                                 <state key="normal" title="Look Up">
-                                                    <color key="titleColor" systemColor="labelColor"/>
+                                                    <color key="titleColor" name="TextPrimary"/>
                                                 </state>
                                                 <userDefinedRuntimeAttributes>
                                                     <userDefinedRuntimeAttribute type="color" keyPath="startColor">
                                                         <color key="value" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     </userDefinedRuntimeAttribute>
                                                     <userDefinedRuntimeAttribute type="color" keyPath="endColor">
-                                                        <color key="value" systemColor="systemGray4Color"/>
+                                                        <color key="value" name="Gray4"/>
                                                     </userDefinedRuntimeAttribute>
                                                 </userDefinedRuntimeAttributes>
                                                 <connections>
@@ -858,14 +858,14 @@
                                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
                                                 <inset key="contentEdgeInsets" minX="10" minY="10" maxX="10" maxY="10"/>
                                                 <state key="normal" title="Listen">
-                                                    <color key="titleColor" systemColor="labelColor"/>
+                                                    <color key="titleColor" name="TextPrimary"/>
                                                 </state>
                                                 <userDefinedRuntimeAttributes>
                                                     <userDefinedRuntimeAttribute type="color" keyPath="startColor">
                                                         <color key="value" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     </userDefinedRuntimeAttribute>
                                                     <userDefinedRuntimeAttribute type="color" keyPath="endColor">
-                                                        <color key="value" systemColor="systemGray4Color"/>
+                                                        <color key="value" name="Gray4"/>
                                                     </userDefinedRuntimeAttribute>
                                                 </userDefinedRuntimeAttributes>
                                                 <connections>
@@ -885,7 +885,7 @@
                                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
                                                 <inset key="contentEdgeInsets" minX="10" minY="10" maxX="10" maxY="10"/>
                                                 <state key="normal" title="Forgot">
-                                                    <color key="titleColor" systemColor="labelColor"/>
+                                                    <color key="titleColor" name="TextPrimary"/>
                                                 </state>
                                                 <userDefinedRuntimeAttributes>
                                                     <userDefinedRuntimeAttribute type="color" keyPath="startColor">
@@ -904,7 +904,7 @@
                                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
                                                 <inset key="contentEdgeInsets" minX="10" minY="10" maxX="10" maxY="10"/>
                                                 <state key="normal" title="Know">
-                                                    <color key="titleColor" systemColor="labelColor"/>
+                                                    <color key="titleColor" name="TextPrimary"/>
                                                 </state>
                                                 <userDefinedRuntimeAttributes>
                                                     <userDefinedRuntimeAttribute type="color" keyPath="startColor">
@@ -931,7 +931,7 @@
                                         <state key="normal" title="Start recognition"/>
                                         <userDefinedRuntimeAttributes>
                                             <userDefinedRuntimeAttribute type="color" keyPath="endColor">
-                                                <color key="value" systemColor="systemGray4Color"/>
+                                                <color key="value" name="Gray4"/>
                                             </userDefinedRuntimeAttribute>
                                         </userDefinedRuntimeAttributes>
                                         <connections>
@@ -946,7 +946,7 @@
                             </stackView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="a6P-qz-BA2"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <color key="backgroundColor" name="Background"/>
                         <constraints>
                             <constraint firstItem="IGc-Ns-fqb" firstAttribute="top" secondItem="a6P-qz-BA2" secondAttribute="top" id="29S-cO-Pnv"/>
                             <constraint firstItem="a6P-qz-BA2" firstAttribute="bottom" secondItem="IGc-Ns-fqb" secondAttribute="bottom" constant="20" id="4wY-w9-HlC"/>
@@ -1030,18 +1030,18 @@
         <image name="house.fill" catalog="system" width="128" height="106"/>
         <image name="keyboard.badge.ellipsis" catalog="system" width="128" height="80"/>
         <image name="mic" catalog="system" width="108" height="128"/>
-        <systemColor name="labelColor">
-            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
-        <systemColor name="secondaryLabelColor">
-            <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
-        </systemColor>
-        <systemColor name="systemBackgroundColor">
+        <namedColor name="Background">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
-        <systemColor name="systemGray4Color">
+        </namedColor>
+        <namedColor name="Gray4">
             <color red="0.81960784313725488" green="0.81960784313725488" blue="0.83921568627450982" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </systemColor>
+        </namedColor>
+        <namedColor name="TextPrimary">
+            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </namedColor>
+        <namedColor name="TextSecondary">
+            <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
         <systemColor name="systemOrangeColor">
             <color red="1" green="0.58431372549019611" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
