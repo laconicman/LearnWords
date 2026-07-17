@@ -63,21 +63,21 @@
 		DADB609330083110002A71A8 /* Exceptions for "LearnWords" folder in "Widget" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				AppConstants.swift,
-				Debug.swift,
+				Shared/AppConstants.swift,
+				Shared/Debug.swift,
 				Settings.bundle,
-				Settings.swift,
-				Storage.swift,
-				"String+.swift",
-				"UserDefaults+Codable.swift",
-				WordsModel.swift,
+				Model/Settings.swift,
+				Model/Storage.swift,
+				"Shared/Extensions/String+.swift",
+				"Shared/Extensions/UserDefaults+Codable.swift",
+				Model/WordsModel.swift,
 			);
 			target = DA246CC81F8AA30E00A75ED1 /* Widget */;
 		};
 		DADB609430083110002A71A8 /* Exceptions for "LearnWords" folder in "ImportAsDictAction" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				AppConstants.swift,
+				Shared/AppConstants.swift,
 			);
 			target = DAA16D6524B60673003C28FD /* ImportAsDictAction */;
 		};
