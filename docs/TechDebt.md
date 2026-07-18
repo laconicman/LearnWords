@@ -38,7 +38,36 @@ bar as root, mirroring the old behavior. **Cost:** may be dead code, or may need
 select a specific tab index the old code left commented out. **Discharge:** exercise the
 share flow from ImportAsDictAction; confirm the intended landing screen; delete if unused.
 
-## TD-4 — Deprecated Today extension (`Widget/`)
+## TD-4 — Widgets: WidgetKit (iOS 14+) + legacy Today (iOS 12–13) — **implemented (2026-07-18)**
+
+Decision (owner): migrate to WidgetKit **and** keep a working Today extension for the iOS
+versions WidgetKit doesn't reach. The version math: WidgetKit is iOS 14+; Today extensions
+(`NCWidgetProviding`, pre-14) still *display* on iOS 12–17 but **iOS 18 removed** legacy
+Today-view widgets entirely. So the split is exact and permanent:
+
+| iOS | Widget shown |
+|---|---|
+| 12–13 | Today extension (`Widget` target — deployment 12.1, inherited) |
+| 14–17 | WidgetKit (`WordWidgetExtension`); the Today one also still appears (harmless) |
+| 18+ | WidgetKit only (system dropped Today widgets) |
+
+Implemented: `WordWidgetExtension` (owner-created target; floor lowered 26.5 → **14.0**) with
+a `TimelineProvider` reading the current word set through the shared `Storage`/`WordStore`
+stack and App-Group defaults (`group.club.laconic.LearnWords` — entitlements added; the
+`AppGroup` helper derives the group from the extension bundle id via its `NSExtension` key).
+Small + medium families; iOS 17 `containerBackground` gated with `#available`; template's
+Control-widget scaffolding (iOS 18) removed; shared files wired via a new
+`membershipExceptions` set (mirrors the Widget target's list — `Settings.bundle` included
+because `Settings.swift` force-unwraps it at init). Builds green; `.appex` embeds.
+
+**Remaining:** (a) visual check — add the widget from the simulator/device home screen;
+(b) the app never calls `WidgetCenter.shared.reloadAllTimelines()` after saves, so the
+widget lags edits by up to its 30-min refresh — add an availability-gated nudge app-side
+when convenient; (c) the old Today extension stays deprecated-but-working for 12–13
+(verification only possible per TD-8); App Store still accepts Today extensions — recheck
+at submission.
+
+## TD-4 (historical) — Deprecated Today extension (`Widget/`)
 
 `TodayViewController` uses `NCWidgetProviding`, deprecated since iOS 14 and unsupported
 on modern iOS. **Cost:** dead/again-un-shippable extension; App Store review risk.
@@ -66,15 +95,30 @@ Was: no test target. Owner added a hosted Swift Testing "Unit Testing Bundle"
 is iOS 26.5 (Xcode default), so tests need a 26.x simulator; lower it if you want them
 runnable on older sims/CI.
 
-## TD-12 — `Storage` is not unit-testable (all-static + global UserDefaults)
+## TD-12 — `Storage` testability / persistence seam — **resolved (2026-07-17)**
 
-`Storage` is an all-`static` type that reads/writes the App-Group `UserDefaults`
-(`userDefaultsGroup`) directly and saves asynchronously on a background queue. **Cost:** its
-logic (word-set add/remove, current-set switching, insert guards, dedup) can't be tested
-without mutating shared global state, so it stays uncovered by TD-6. **Discharge:** inject
-the store as a dependency (e.g. a `StorageController` holding an injected `UserDefaults`, per
-uikit-app-structure's "inject, don't reach for singletons"), then test against an ephemeral
-`UserDefaults(suiteName:)`. Pairs with the DI direction in [Design](Design.md).
+Was: `Storage` was all-`static` over the global App-Group `UserDefaults`, untestable. Now:
+- **`WordStore`** (`Model/WordStore.swift`) — the persistence-seam protocol.
+- **`UserDefaultsWordStore`** (`Model/UserDefaultsWordStore.swift`) — today's logic with an
+  injected `UserDefaults` + save executor → **8 unit tests** against an ephemeral suite.
+- **`Storage`** — now a thin static facade forwarding to a swappable `backend: WordStore`;
+  all 73 call sites unchanged. (Both new files added to the Widget target's membership.)
+- Verified: all targets build; 21 tests pass; app launches and the word list still loads.
+
+**Interim:** `Storage.backend` remains a global swap-point (service-locator smell), *not*
+per-VC injection — deliberately, because Core Data (TD-13) will replace this layer, making
+per-VC injection of the UserDefaults store throwaway. Full injection lands with that migration.
+
+## TD-13 — Core Data + CloudKit migration (planned direction)
+
+Owner intends to move persistence to Core Data with `NSPersistentCloudKitContainer` so word
+sets and learning progress sync across a user's devices. The `WordStore` seam (TD-12) is built
+for exactly this: write `CoreDataWordStore: WordStore`, swap `Storage.backend`, and inject the
+store/context at the composition root (finishing the DI that TD-12 deferred). Use the
+`core-data-expert` / `axiom-data` skills. Open considerations: the object model (Word, WordSet,
+per-exercise stats), CloudKit schema + entitlements and App-Group sharing with the extensions,
+migrating existing `UserDefaults` data, and whether the `WordStore` API should go async (CloudKit
+sync is background).
 
 ## TD-7 — iOS 12 availability audit
 
@@ -131,15 +175,17 @@ TEMPLATE scaffold from 1880e5d) had diverged. The obsolete `Documentation.docc` 
 was deleted; **`docs/*.md` is the single source of truth.** If a rendered DocC catalog is
 wanted later, regenerate it from `docs/` (per `repo-init`) rather than hand-maintaining two.
 
-## TD-10 — Extensions still target iOS 14, not 12
+## TD-10 — ImportAsDictAction targets iOS 14, not 12
 
-The Widget and ImportAsDictAction targets set `IPHONEOS_DEPLOYMENT_TARGET = 14`, so on
-iOS 12–13 the app runs but its extensions are unavailable — including the share-import
-flow that the ported `learnWords://shareaction` deep link (TD-3) exists to serve, making
-that deep link effectively dead below iOS 14. **Cost:** partial/inconsistent iOS 12 support;
-the legacy deep link can't actually fire on the oldest devices. **Discharge:** decide
-per-extension — lower ImportAsDictAction to 12.1 (after its own availability audit) if the
-import feature must work on iOS 12, and resolve the Widget via TD-4 (WidgetKit or removal).
+*(Corrected 2026-07-18: an earlier version claimed the Widget target was also at 14 — wrong.
+The Widget (Today) target sets no explicit deployment target and inherits the project-level
+**12.1**; only **ImportAsDictAction** pins `IPHONEOS_DEPLOYMENT_TARGET = 14`.)*
+
+ImportAsDictAction was set to iOS 14 as a deliberate quick fix (owner: no workaround found in
+reasonable time), so on iOS 12–13 the share-import flow is unavailable — and with it the
+`learnWords://shareaction` deep link (TD-3) below iOS 14. **Cost:** the import feature is
+missing on the oldest devices. **Discharge (deferred by owner):** revisit once structure
+settles — either find the workaround and lower to 12.1, raise consciously, or accept as-is.
 
 ---
 

@@ -10,6 +10,9 @@
 		DA246CD61F8AA30E00A75ED1 /* Widget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = DA246CC91F8AA30E00A75ED1 /* Widget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		DA58C03C2ED481E000B4A733 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = DA58C03B2ED481E000B4A733 /* AppIcon.icon */; };
 		DAA16D7224B60673003C28FD /* ImportAsDictAction.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = DAA16D6624B60673003C28FD /* ImportAsDictAction.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		DACDF167300B672C00DC9410 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DACDF149300B662A00DC9410 /* WidgetKit.framework */; };
+		DACDF168300B672C00DC9410 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DACDF14B300B662A00DC9410 /* SwiftUI.framework */; };
+		DACDF175300B672D00DC9410 /* WordWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = DACDF166300B672C00DC9410 /* WordWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		DADCA5FA2F82AF7B00AC0C2A /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = DADCA5F92F82AF7B00AC0C2A /* PrivacyInfo.xcprivacy */; };
 /* End PBXBuildFile section */
 
@@ -35,6 +38,13 @@
 			remoteGlobalIDString = DAA16D6524B60673003C28FD;
 			remoteInfo = ImportAsDictAction;
 		};
+		DACDF173300B672D00DC9410 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DA246CA81F8A6E5E00A75ED1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DACDF165300B672C00DC9410;
+			remoteInfo = WordWidgetExtension;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -45,6 +55,7 @@
 			files = (
 				DA246CD61F8AA30E00A75ED1 /* Widget.appex in Embed Foundation Extensions */,
 				DAA16D7224B60673003C28FD /* ImportAsDictAction.appex in Embed Foundation Extensions */,
+				DACDF175300B672D00DC9410 /* WordWidgetExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 		};
@@ -56,10 +67,20 @@
 		DA32962C300AA1B200A0413A /* Unit Testing Bundle.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Unit Testing Bundle.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA58C03B2ED481E000B4A733 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIcon.icon; sourceTree = "<group>"; };
 		DAA16D6624B60673003C28FD /* ImportAsDictAction.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ImportAsDictAction.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		DACDF149300B662A00DC9410 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		DACDF14B300B662A00DC9410 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		DACDF166300B672C00DC9410 /* WordWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = WordWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		DADCA5F92F82AF7B00AC0C2A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		DACDF179300B672D00DC9410 /* Exceptions for "WordWidget" folder in "WordWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = DACDF165300B672C00DC9410 /* WordWidgetExtension */;
+		};
 		DADB609230083110002A71A8 /* Exceptions for "LearnWords" folder in "LearnWords" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -73,7 +94,9 @@
 			membershipExceptions = (
 				Model/Settings.swift,
 				Model/Storage.swift,
+				Model/UserDefaultsWordStore.swift,
 				Model/WordsModel.swift,
+				Model/WordStore.swift,
 				Settings.bundle,
 				Shared/AppConstants.swift,
 				Shared/Debug.swift,
@@ -104,6 +127,22 @@
 			);
 			target = DAA16D6524B60673003C28FD /* ImportAsDictAction */;
 		};
+		DACDF1F0300B9ABC00DC9410 /* Exceptions for "LearnWords" folder in "WordWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Model/Settings.swift,
+				Model/Storage.swift,
+				Model/UserDefaultsWordStore.swift,
+				Model/WordStore.swift,
+				Model/WordsModel.swift,
+				Settings.bundle,
+				Shared/AppConstants.swift,
+				Shared/Debug.swift,
+				"Shared/Extensions/String+.swift",
+				"Shared/Extensions/UserDefaults+Codable.swift",
+			);
+			target = DACDF165300B672C00DC9410 /* WordWidgetExtension */;
+		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -112,12 +151,26 @@
 			path = "Unit Testing Bundle";
 			sourceTree = "<group>";
 		};
+		DACDF14D300B662A00DC9410 /* WidgetKit */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = WidgetKit;
+			sourceTree = "<group>";
+		};
+		DACDF169300B672C00DC9410 /* WordWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				DACDF179300B672D00DC9410 /* Exceptions for "WordWidget" folder in "WordWidgetExtension" target */,
+			);
+			path = WordWidget;
+			sourceTree = "<group>";
+		};
 		DADB60643008310F002A71A8 /* LearnWords */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				DADB609230083110002A71A8 /* Exceptions for "LearnWords" folder in "LearnWords" target */,
 				DADB609330083110002A71A8 /* Exceptions for "LearnWords" folder in "Widget" target */,
 				DADB609430083110002A71A8 /* Exceptions for "LearnWords" folder in "ImportAsDictAction" target */,
+				DACDF1F0300B9ABC00DC9410 /* Exceptions for "LearnWords" folder in "WordWidgetExtension" target */,
 			);
 			path = LearnWords;
 			sourceTree = "<group>";
@@ -161,6 +214,13 @@
 			files = (
 			);
 		};
+		DACDF163300B672C00DC9410 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+				DACDF168300B672C00DC9410 /* SwiftUI.framework in Frameworks */,
+				DACDF167300B672C00DC9410 /* WidgetKit.framework in Frameworks */,
+			);
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -173,6 +233,9 @@
 				DADB609B3008312B002A71A8 /* Widget */,
 				DADB60A83008312D002A71A8 /* ImportAsDictAction */,
 				DA32962D300AA1B200A0413A /* Unit Testing Bundle */,
+				DACDF14D300B662A00DC9410 /* WidgetKit */,
+				DACDF169300B672C00DC9410 /* WordWidget */,
+				DACDF148300B662A00DC9410 /* Frameworks */,
 				DA246CB11F8A6E5E00A75ED1 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -184,8 +247,18 @@
 				DA246CC91F8AA30E00A75ED1 /* Widget.appex */,
 				DAA16D6624B60673003C28FD /* ImportAsDictAction.appex */,
 				DA32962C300AA1B200A0413A /* Unit Testing Bundle.xctest */,
+				DACDF166300B672C00DC9410 /* WordWidgetExtension.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		DACDF148300B662A00DC9410 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				DACDF149300B662A00DC9410 /* WidgetKit.framework */,
+				DACDF14B300B662A00DC9410 /* SwiftUI.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -205,6 +278,7 @@
 			dependencies = (
 				DA246CD51F8AA30E00A75ED1 /* PBXTargetDependency */,
 				DAA16D7124B60673003C28FD /* PBXTargetDependency */,
+				DACDF174300B672D00DC9410 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				DADB60643008310F002A71A8 /* LearnWords */,
@@ -268,6 +342,24 @@
 			productReference = DAA16D6624B60673003C28FD /* ImportAsDictAction.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		DACDF165300B672C00DC9410 /* WordWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DACDF176300B672D00DC9410 /* Build configuration list for PBXNativeTarget "WordWidgetExtension" */;
+			buildPhases = (
+				DACDF162300B672C00DC9410 /* Sources */,
+				DACDF163300B672C00DC9410 /* Frameworks */,
+				DACDF164300B672C00DC9410 /* Resources */,
+			);
+			buildRules = (
+			);
+			fileSystemSynchronizedGroups = (
+				DACDF169300B672C00DC9410 /* WordWidget */,
+			);
+			name = WordWidgetExtension;
+			productName = WordWidgetExtension;
+			productReference = DACDF166300B672C00DC9410 /* WordWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -304,6 +396,9 @@
 					DAA16D6524B60673003C28FD = {
 						CreatedOnToolsVersion = 11.5;
 					};
+					DACDF165300B672C00DC9410 = {
+						CreatedOnToolsVersion = 26.6;
+					};
 				};
 			};
 			buildConfigurationList = DA246CAB1F8A6E5E00A75ED1 /* Build configuration list for PBXProject "LearnWords" */;
@@ -325,6 +420,7 @@
 				DA246CC81F8AA30E00A75ED1 /* Widget */,
 				DAA16D6524B60673003C28FD /* ImportAsDictAction */,
 				DA32962B300AA1B200A0413A /* Unit Testing Bundle */,
+				DACDF165300B672C00DC9410 /* WordWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -352,6 +448,11 @@
 			files = (
 			);
 		};
+		DACDF164300B672C00DC9410 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -375,6 +476,11 @@
 			files = (
 			);
 		};
+		DACDF162300B672C00DC9410 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -392,6 +498,11 @@
 			isa = PBXTargetDependency;
 			target = DAA16D6524B60673003C28FD /* ImportAsDictAction */;
 			targetProxy = DAA16D7024B60673003C28FD /* PBXContainerItemProxy */;
+		};
+		DACDF174300B672D00DC9410 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DACDF165300B672C00DC9410 /* WordWidgetExtension */;
+			targetProxy = DACDF173300B672D00DC9410 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -731,6 +842,82 @@
 			};
 			name = Release;
 		};
+		DACDF177300B672D00DC9410 /* Debug configuration for PBXNativeTarget "WordWidgetExtension" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = WordWidget/WordWidget.entitlements;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = WEJF495R4D;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = WordWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = WordWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Paul. All rights reserved.";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = club.laconic.LearnWords.WordWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		DACDF178300B672D00DC9410 /* Release configuration for PBXNativeTarget "WordWidgetExtension" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = WordWidget/WordWidget.entitlements;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = WEJF495R4D;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = WordWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = WordWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Paul. All rights reserved.";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = club.laconic.LearnWords.WordWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -771,6 +958,14 @@
 			buildConfigurations = (
 				DAA16D7424B60673003C28FD /* Debug configuration for PBXNativeTarget "ImportAsDictAction" */,
 				DAA16D7524B60673003C28FD /* Release configuration for PBXNativeTarget "ImportAsDictAction" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		DACDF176300B672D00DC9410 /* Build configuration list for PBXNativeTarget "WordWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DACDF177300B672D00DC9410 /* Debug configuration for PBXNativeTarget "WordWidgetExtension" */,
+				DACDF178300B672D00DC9410 /* Release configuration for PBXNativeTarget "WordWidgetExtension" */,
 			);
 			defaultConfigurationName = Release;
 		};

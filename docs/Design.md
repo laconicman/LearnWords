@@ -84,6 +84,24 @@ place is DRY and dependency-inversion in practice, and it is where shared contro
 injected as the app grows. `AppDelegate` stays thin: appearance in `didFinishLaunching`,
 the `@available`-gated `configurationForConnecting`, and the iOS 12 URL fallback.
 
+## Decision: persistence behind a `WordStore` seam
+
+**Decision.** The app depends on a `WordStore` protocol, not on a concrete store.
+`UserDefaultsWordStore` is today's implementation (App-Group `UserDefaults` + Codable);
+`Storage` is a thin static facade forwarding to a swappable `Storage.backend: WordStore`.
+
+**Why.** A move to Core Data + `NSPersistentCloudKitContainer` (cross-device sync of word
+sets and progress) is planned. With the seam, that migration is a new conformer
+(`CoreDataWordStore: WordStore`) plus a one-line `backend` swap and composition-root
+injection — not an app-wide rewrite. The abstraction isn't speculative (YAGNI-safe): the
+swap is a concrete near-term goal. The injected `UserDefaults` + save executor also make the
+current store unit-testable.
+
+**Rejected.** *Full per-VC dependency injection now.* The 73 `Storage.…` call sites run
+through storyboard-instantiated view controllers, so proper injection needs the storyboard-DI
+work — and it would be thrown away when Core Data replaces this layer. The facade is the
+interim; full injection lands with the Core Data migration (TD-13).
+
 ## Path to the optimal non-dual modern structure
 
 The dual lifecycle is a deliberate, *reversible* compromise for Legacy. The target

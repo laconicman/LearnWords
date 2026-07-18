@@ -20,19 +20,34 @@ Priority-ordered. Rationale lives in [Design](Design.md); debt items in [TechDeb
   the single source.
 - **iOS 12 storyboard colors** (TD-11) — semantic colors → named asset colors; verified
   light/dark on a modern sim. Icons deferred (text-only on iOS 12).
-- **Test seed** (TD-6) — Swift Testing bundle, 13 passing cases (`WordAndStat` logic,
-  `canonicalise`, launch smoke test).
+- **Test seed** (TD-6) — Swift Testing bundle, now 21 passing cases (`WordAndStat` logic,
+  `canonicalise`, launch smoke test, `UserDefaultsWordStore`).
+- **`WordStore` persistence seam** (TD-12) — `WordStore` protocol + injectable
+  `UserDefaultsWordStore` + thin `Storage` facade; 8 store tests; app verified. Sets up the
+  Core Data migration (TD-13).
+
+## Done (2026-07-18)
+
+- **Dual widgets** (TD-4) — WidgetKit `WordWidgetExtension` (iOS 14+, floor 14.0, App Group
+  entitlement, reads `Storage` via shared membership) + legacy Today extension retained for
+  iOS 12–13 (already at the inherited 12.1 floor). Build green, `.appex` embedded. Remaining:
+  visual check on home screen; app-side `WidgetCenter` reload nudge.
 
 ## Next
 
 - **Verify / clean the deep link** (TD-3) — the `learnWords://shareaction` handler; note
   ImportAsDictAction targets iOS 14 (TD-10), so it can't fire below that yet.
-- **Make `Storage` injectable** (TD-12) — unlocks `Storage` unit tests; DI per
-  uikit-app-structure.
-- **Today extension** (TD-4) — decide: migrate to WidgetKit vs remove.
 - Storyboard split (TD-5) is **likely YAGNI** at this size — prefer creator-injection on the
   existing storyboard where a screen needs a dependency; revisit only if the one storyboard
   actually hurts.
+
+## Big rock — Core Data + CloudKit sync (TD-13)
+
+Replace `UserDefaultsWordStore` with `CoreDataWordStore: WordStore` backed by
+`NSPersistentCloudKitContainer`, so word sets + progress sync across a user's devices. The
+`WordStore` seam is already in place; this migration also finishes the DI deferred in TD-12
+(inject the store/context at the composition root, drop the `Storage` facade). Use
+`core-data-expert` / `axiom-data`.
 
 ## Later
 
