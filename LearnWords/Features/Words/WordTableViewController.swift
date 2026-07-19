@@ -89,32 +89,14 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
                 knownWords = savedWords
             }*/
 
-        if let importedString = userDefaultsGroup.string(forKey: "ImportedText") {
-            if  importedString.aproxWordCount > 1 {
-                let dictionaryEntries = split(importedString, by: "\n" + "\u{2028}", union: .newlines)
-                importedWords = dictionaryEntries.compactMap( {
-                    // FIXME: remove dash or mind it elsewhere
-                    let e = split($0, by: "|:-–")
-                    if e.first?.isEmpty ?? true || e.last?.isEmpty ?? true || e.count != 2 { return nil }
-                    let f = e[0].trimmingCharacters(in: .whitespaces)
-                    let s = e[1].trimmingCharacters(in: .whitespaces)
-                    return WordAndStat(firstWord: f, secondWord: s, correct: [:], incorrect: [:], skiped: 0)
-                })
-                // TODO: Create a screen to verify and select `importedWords`. Check for duplicates
-                importedWords = importedWords.filter({ (impW) -> Bool in
-                    !Storage.wordsAndStat.contains { (storedW) -> Bool in // TODO: make temporary `Set`
-                        impW.firstWord == storedW.firstWord
-                    }
-                })
-                Storage.wordsAndStat.append(contentsOf: importedWords)
-                Storage.saveWords(Storage.wordsAndStat.sorted(by: { $0.firstWord < $1.firstWord }))
-            } else {
-                // import one word
-                importedWord = lemmas(from: importedString).first ?? importedString
-                performSegue(withIdentifier: "AddWord", sender: self)
-            }
-            userDefaultsGroup.removeObject(forKey: "ImportedText")
-        }
+        // Import shared text on foregrounding and on the deep link too (see
+        // consumePendingImport). Without these, a share made while the app was running
+        // warm waited for an app relaunch (TD-3).
+        NotificationCenter.default.addObserver(self, selector: #selector(pendingImportMayHaveArrived),
+                                               name: UIApplication.willEnterForegroundNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(pendingImportMayHaveArrived),
+                                               name: AppRoot.shareActionReceived, object: nil)
+
         navigationItem.rightBarButtonItems?.insert(editButtonItem, at: 0)
             //  print("$\(PRODUCT_BUNDLE_IDENTIFIER)")
 
@@ -132,6 +114,48 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         let titleAttributes = [NSAttributedString.Key.font: headlineFont]
         navigationController?.navigationBar.titleTextAttributes = titleAttributes
         // title = "LearnWords" //better do this in IB
+        consumePendingImport()
+    }
+
+    // MARK: - Share-extension import (TD-3)
+
+    /// Consumes text shared via the ImportAsDictAction extension, if any is pending.
+    /// Idempotent (reads and clears the App-Group key), so it is safe to trigger from
+    /// every path that can bring pending text: first load / tab switch (`viewWillAppear`)
+    /// and foregrounding a warm app (`willEnterForegroundNotification` — the deep link
+    /// `learnWords://shareaction` lands here after `AppRoot` selects this tab).
+    private func consumePendingImport() {
+        guard let importedString = userDefaultsGroup.string(forKey: "ImportedText") else { return }
+        userDefaultsGroup.removeObject(forKey: "ImportedText")
+
+        if importedString.aproxWordCount > 1 {
+            // TODO: Create a screen to verify and select `importedWords`. Check for duplicates
+            importedWords = WordImport.parseDictionary(importedString)
+            importedWords = importedWords.filter({ (impW) -> Bool in
+                !Storage.wordsAndStat.contains { (storedW) -> Bool in // TODO: make temporary `Set`
+                    impW.firstWord == storedW.firstWord
+                }
+            })
+            Storage.wordsAndStat.append(contentsOf: importedWords)
+            Storage.saveWords(Storage.wordsAndStat.sorted(by: { $0.firstWord < $1.firstWord }))
+            tableView.reloadData()
+        } else {
+            // import one word
+            importedWord = lemmas(from: importedString).first ?? importedString
+            // Async: performSegue mid-appearance-transition is unreliable.
+            DispatchQueue.main.async { [weak self] in
+                self?.performSegue(withIdentifier: "AddWord", sender: self)
+            }
+        }
+    }
+
+    /// Foreground / deep-link trigger. Only when visible: the single-word path segues,
+    /// which needs an on-screen VC. If another tab is up, the pending import waits for
+    /// this tab's next viewWillAppear (the deep link selects this tab, so that's imminent).
+    @objc private func pendingImportMayHaveArrived() {
+        if viewIfLoaded?.window != nil {
+            consumePendingImport()
+        }
     }
     
     override func viewDidAppear(_ animated: Bool) {

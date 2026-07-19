@@ -25,18 +25,19 @@ enum AppRoot {
         return root
     }
 
-    /// Handles the share-extension hand-off (`learnWords://shareaction`) by resetting the UI to
-    /// the storyboard's initial view controller, mirroring the pre-scene behavior.
-    ///
-    /// Ported from the old `AppDelegate.application(_:open:)` (flagged unused/FIXME).
-    /// TODO(TD-3): verify the intended landing screen against the ImportAsDictAction extension —
-    /// the old code hinted at selecting a specific tab (`selectedIndex = 1`) rather than
-    /// rebuilding the root, which discards UI state.
+    /// Posted by `handle(_:on:)` when the share-extension deep link arrives; lets an
+    /// already-visible screen consume the pending import (no appearance event fires then).
+    static let shareActionReceived = Notification.Name("AppRoot.shareActionReceived")
+
+    /// Handles the share-extension hand-off (`learnWords://shareaction`) by landing on the
+    /// Word Set tab; `WordTableViewController` consumes the pending `ImportedText` on
+    /// appearance/foreground/this notification (TD-3). No root rebuild — UI state survives.
     @discardableResult
     static func handle(_ url: URL, on window: UIWindow?) -> Bool {
         debugLog(url.absoluteString)
         guard url.absoluteString.contains("shareaction") else { return false }
-        window?.rootViewController = makeRoot()
+        (window?.rootViewController as? UITabBarController)?.selectedIndex = 0
+        NotificationCenter.default.post(name: shareActionReceived, object: nil)
         return true
     }
 }

@@ -33,10 +33,12 @@ Priority-ordered. Rationale lives in [Design](Design.md); debt items in [TechDeb
   iOS 12–13 (already at the inherited 12.1 floor). Build green, `.appex` embedded. Remaining:
   visual check on home screen; app-side `WidgetCenter` reload nudge.
 
+- **Share-import deep link** (TD-3) — import extracted to `WordImport` (+10 tests), consumed
+  idempotently on appear/foreground/deep-link; `AppRoot` selects the tab instead of rebuilding
+  the root. Cold path verified on-sim end to end; one manual share-flow run covers the rest.
+
 ## Next
 
-- **Verify / clean the deep link** (TD-3) — the `learnWords://shareaction` handler; note
-  ImportAsDictAction targets iOS 14 (TD-10), so it can't fire below that yet.
 - Storyboard split (TD-5) is **likely YAGNI** at this size — prefer creator-injection on the
   existing storyboard where a screen needs a dependency; revisit only if the one storyboard
   actually hurts.

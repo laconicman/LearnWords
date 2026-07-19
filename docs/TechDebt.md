@@ -30,13 +30,33 @@ entry and build all three targets. Longer term, extract the shared core into a l
 Swift package with explicit membership so the coupling is compiler-enforced, not
 path-string-enforced.
 
-## TD-3 — Ported deep-link handler is unverified
+## TD-3 — Share-import deep link — **resolved (2026-07-18)**
 
-`learnWords://shareaction` was moved from `AppDelegate.application(_:open:)` (which was
-flagged `// FIXME: unused for now`) to `SceneDelegate`. The port rebuilds the home tab
-bar as root, mirroring the old behavior. **Cost:** may be dead code, or may need to
-select a specific tab index the old code left commented out. **Discharge:** exercise the
-share flow from ImportAsDictAction; confirm the intended landing screen; delete if unused.
+Was: the ported `learnWords://shareaction` handler rebuilt the root VC (discarding UI
+state), and the import itself only ran in `WordTableViewController.viewDidLoad` — so a
+share made while the app ran warm silently waited for an app *relaunch*. The old
+commented-out `selectedIndex` hinted the intent was tab selection, not a root rebuild
+(the rebuild existed purely to re-trigger `viewDidLoad`).
+
+Now:
+- **`WordImport.parseDictionary`** (`Model/WordImport.swift`) — the parsing extracted from
+  the VC into the model layer; **10 unit tests** (separators `| : - –`, U+2028 lines,
+  malformed-line skips, case preservation, and the known hyphenated-word limitation, kept
+  for parity with its FIXME).
+- **`consumePendingImport()`** in `WordTableViewController` — idempotent (reads + clears the
+  App-Group key), triggered from `viewWillAppear`, `willEnterForegroundNotification`, and
+  `AppRoot.shareActionReceived`; visible-only guard for the foreground/notification paths
+  because the single-word flow segues.
+- **`AppRoot.handle`** — selects the Word Set tab and posts `shareActionReceived`; no root
+  rebuild, UI state survives.
+
+**Verified:** cold launch with pending `ImportedText` imports, dedups, saves, clears the key,
+and shows the words (owl/wolf) in the UI — confirmed on the iOS 26 sim by injecting the key
+into the app's suite plist. **Caveats:** (a) the warm-foreground and notification triggers
+are code-identical but weren't exercised — `simctl openurl` stalls on the system "Open in
+LearnWords?" dialog, which CLI can't tap; one manual run of the real share flow covers it.
+(b) The unsigned CLI build has no App-Group entitlement, so its suite is app-container-local —
+a signing artifact only; Xcode-signed builds use the real group container.
 
 ## TD-4 — Widgets: WidgetKit (iOS 14+) + legacy Today (iOS 12–13) — **implemented (2026-07-18)**
 
