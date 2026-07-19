@@ -267,13 +267,28 @@ started with `afterDelay: 2.0` captured `[unowned self]`; leaving the screen dur
 delay deallocated the VC and the completion crashed. **Hotfixed** — all six animation
 blocks across Test/Dictation/Phonetics now use `[weak self]` (build green).
 
-The underlying debt: the exercise screens **copy-paste the same two animations** (spring-in,
-shrink-fade-out + `askQuestion()` completion), and the app has no feedback/delight effects.
-**Discharge (separate session):** per [AnimationSystem](AnimationSystem.md) — extract one
-shared `ExerciseTransitionAnimator` with lifetime-safe completions, then port a minimal
-Pow-inspired UIKit effects kit (SecondOrderDynamics + CADisplayLink core; Shake/Shine/Spray
-mapped to wrong/correct/learned) into `Shared/DesignSystem/Effects/`. Full research,
-options, and constraints in that doc.
+The underlying debt: the exercise screens **copy-pasted the same two animations** (spring-in,
+shrink-fade-out + `askQuestion()` completion), and the app had no feedback/delight effects.
+
+**Adoption executed (2026-07-19, per `TASK-TD16-adoption.md`):**
+- **`ExerciseTransition.advance`** (`Shared/DesignSystem/ExerciseTransition.swift`) — the
+  whole fade-out → refresh → spring-in cycle in one place; the six copied blocks are now
+  three one-call sites. Lifetime-safe by construction: holds the container weakly and skips
+  `refresh` once the container leaves its window — **proven by
+  `ExerciseTransitionTests.refreshSkippedWhenScreenIsLeftDuringDelay`** (the exact crash
+  scenario).
+- **KaPow** (the Pow→UIKit port, local SPM package at
+  `../Documents/Code/Animations/KaPow`, iOS 12 floor) linked into the app target.
+- **Product mapping wired** in all three `afterAnswer(isKnown:)`: wrong → `.kapow.shake()`
+  on the answer view; correct → `.kapow.shine()`; first time a word reaches the known
+  level → `ExerciseFeedback.levelUp(on:)` (SF-symbol spray; no-op below iOS 13, same
+  degradation tier as TD-11). Effects fire on child views; the transition animates the
+  container — per KaPow's coexistence rule.
+- 36/36 tests green; app launches with the package linked.
+
+**Remaining:** the manual pass from the task's verification section (transitions + all three
+effects on each exercise screen, on a device for feel); Spray's haptic burst is not ported
+yet (KaPow TD-4).
 
 ## Appendix: feature-first mapping (TD-1) — **executed for source (2026-07-17)**
 

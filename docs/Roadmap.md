@@ -50,11 +50,15 @@ Priority-ordered. Rationale lives in [Design](Design.md); debt items in [TechDeb
   six copy-pasted exercise animations; owner confirmed TD-14 settings screen and TD-15
   speech on-device (remaining console lines are benign — see TD-15).
 
+- **TD-16 adoption (2026-07-19)** — `ExerciseTransition.advance` replaces the six copied
+  animator blocks (lifetime-tested); KaPow linked (local SPM, iOS 12 floor); shake/shine/
+  level-up-spray wired in all three exercise screens. 36/36 tests green. Manual feel-pass
+  pending (see `TASK-TD16-adoption.md` § Verification).
+
 ## Next
 
-- **Animation-system session** (TD-16) — extract the shared `ExerciseTransitionAnimator`,
-  then the Pow-inspired UIKit effects kit. **Read [AnimationSystem](AnimationSystem.md)
-  first** — it holds the research, the options weighed, and the C-lite staged plan.
+- **Manual TD-16 pass** — all three exercise screens: transition in/out, wrong-answer shake,
+  correct-answer shine, level-up spray; the leave-during-delay scenario on a device.
 - **RU strings** for the new settings labels in `Localizable.xcstrings` (deferred by owner).
 - Storyboard split (TD-5) is **likely YAGNI** at this size — prefer creator-injection on the
   existing storyboard where a screen needs a dependency; revisit only if the one storyboard

@@ -299,24 +299,24 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
         
 
         //present(rlvc, animated: true)
-        
-        let animation = UIViewPropertyAnimator(duration: 0.5, dampingRatio: 0.5) { [weak self] in
-            guard let self else { return }
-            self.stackView.alpha = 1
-            self.stackView.transform = CGAffineTransform.identity
-        }
-//        animation.addAnimations {
-//            self.stackView.alpha = 0.5
-//        }
-        animation.startAnimation()
-
-    
     }
     
     func afterAnswer(isKnown: Bool) {
         if !wordsInTest.isEmpty {
             shownWord = wordsInTest.remove(at: 0)
+            let wasKnown = shownWord.known >= WordAndStat.maxKnownLevel
             isKnown ? shownWord.increaseCorrect(exercize: "P") : shownWord.decreaseCorrect(exercize: "P")
+
+            // Answer feedback on the child view; the container transition stays separate (TD-16).
+            if isKnown {
+                recognized.kapow.shine()
+                if !wasKnown && shownWord.known >= WordAndStat.maxKnownLevel {
+                    ExerciseFeedback.levelUp(on: view)
+                }
+            } else {
+                recognized.kapow.shake()
+            }
+
             Storage.shownWords.append(shownWord)
             roundProgress.progress = Float(Storage.shownWords.count) * progressStep
 //            //disable buttons and ShowNextButton Instead and autoSkip
@@ -398,21 +398,9 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
     }
     
     func prepareForNextQuestion(withPrewiousKnown: Bool = true) {
-        // weak: the delayed start (up to 2 s) can outlive the screen — unowned crashed in the
-        // identical Test-screen copy of this animation (TD-16).
-        let animation = UIViewPropertyAnimator(duration: 0.5, curve: .easeInOut) { [weak self] in
-            guard let self else { return }
-            self.stackView.transform =  CGAffineTransform(scaleX: 0.8, y: 0.8)
-            //self.stackView.transform =  CGAffineTransform(rotationAngle: 0.3*CGFloat.pi)
-            self.stackView.alpha = 0
+        ExerciseTransition.advance(stackView, afterDelay: withPrewiousKnown ? 0.1 : 2.0) { [weak self] in
+            self?.askQuestion()
         }
-        animation.addCompletion { [weak self] position in
-            guard let self else { return }
-            //self.prompt.textColor = UIColor.black
-            //self.translationInput.textColor = UIColor(red: 0, green: 0.7, blue: 0, alpha: 0)
-            self.askQuestion()
-        }
-        animation.startAnimation(afterDelay: withPrewiousKnown ? 0.1 : 2.0)
     }
     
 

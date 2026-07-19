@@ -40,9 +40,20 @@ final class WordTestViewController: UIViewController {
     func afterAnswer(isKnown: Bool) {
         if !wordsInTest.isEmpty {
             shownWord = wordsInTest.remove(at: 0)
-            
+            let wasKnown = shownWord.known >= WordAndStat.maxKnownLevel
+
             isKnown ? shownWord.increaseCorrect(exercize: "L") : shownWord.decreaseCorrect(exercize: "L")
-            
+
+            // Answer feedback on the child view; the container transition stays separate (TD-16).
+            if isKnown {
+                wordDefinition.kapow.shine()
+                if !wasKnown && shownWord.known >= WordAndStat.maxKnownLevel {
+                    ExerciseFeedback.levelUp(on: view)
+                }
+            } else {
+                wordDefinition.kapow.shake()
+            }
+
             Storage.shownWords.append(shownWord)
             roundProgress.progress = Float(Storage.shownWords.count) * progressStep
 //            //disable buttons and ShowNextButton Instead and autoSkip
@@ -212,44 +223,16 @@ final class WordTestViewController: UIViewController {
 //        rlvc.view.frame = container.bounds //not view.frame - mind the coodinate system
 //        rlvc.view.translatesAutoresizingMaskIntoConstraints = false
 //        container.addSubview(rlvc.view)
-        
-        
-        
-        
-        
 
         //present(rlvc, animated: true)
-        
-        let animation = UIViewPropertyAnimator(duration: 0.5, dampingRatio: 0.5) { [weak self] in
-            guard let self else { return }
-            self.stackView.alpha = 1
-            self.stackView.transform = CGAffineTransform.identity
-        }
-//        animation.addAnimations {
-//            self.stackView.alpha = 0.5
-//        }
-        animation.startAnimation()
-
-    
     }
-    
-
 
     func prepareForNextQuestion(withPrewiousKnown: Bool = true) {
-        // weak: the delayed start (up to 2 s) can outlive the screen — unowned crashed here (TD-16).
-        let animation = UIViewPropertyAnimator(duration: 0.5, curve: .easeInOut) { [weak self] in
+        ExerciseTransition.advance(stackView, afterDelay: withPrewiousKnown ? 0.1 : 2.0) { [weak self] in
             guard let self else { return }
-            self.stackView.transform =  CGAffineTransform(scaleX: 0.8, y: 0.8)
-            //self.stackView.transform =  CGAffineTransform(rotationAngle: 0.3*CGFloat.pi)
-            self.stackView.alpha = 0
-        }
-        animation.addCompletion { [weak self] position in
-            guard let self else { return }
-            // self.prompt.textColor = UIColor.black
             self.wordDefinition.textColor = UIColor(red: 0, green: 0.7, blue: 0, alpha: 0)
             self.askQuestion()
         }
-        animation.startAnimation(afterDelay: withPrewiousKnown ? 0.1 : 2.0)
     }
     
     override func didReceiveMemoryWarning() {

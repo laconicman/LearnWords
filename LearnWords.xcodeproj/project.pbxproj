@@ -14,6 +14,7 @@
 		DACDF168300B672C00DC9410 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DACDF14B300B662A00DC9410 /* SwiftUI.framework */; };
 		DACDF175300B672D00DC9410 /* WordWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = DACDF166300B672C00DC9410 /* WordWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		DADCA5FA2F82AF7B00AC0C2A /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = DADCA5F92F82AF7B00AC0C2A /* PrivacyInfo.xcprivacy */; };
+		DACAF0DE300C000300DC9410 /* KaPow in Frameworks */ = {isa = PBXBuildFile; productRef = DACAF0DE300C000200DC9410 /* KaPow */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -195,6 +196,7 @@
 		DA246CAD1F8A6E5E00A75ED1 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+				DACAF0DE300C000300DC9410 /* KaPow in Frameworks */,
 			);
 		};
 		DA246CC61F8AA30E00A75ED1 /* Frameworks */ = {
@@ -283,6 +285,9 @@
 			);
 			name = LearnWords;
 			productName = LearnWords;
+			packageProductDependencies = (
+				DACAF0DE300C000200DC9410 /* KaPow */,
+			);
 			productReference = DA246CB01F8A6E5E00A75ED1 /* LearnWords.app */;
 			productType = "com.apple.product-type.application";
 		};
@@ -409,6 +414,9 @@
 				es,
 			);
 			mainGroup = DA246CA71F8A6E5E00A75ED1;
+			packageReferences = (
+				DACAF0DE300C000100DC9410 /* XCLocalSwiftPackageReference "../../../../../Documents/Code/Animations/KaPow" */,
+			);
 			preferredProjectObjectVersion = 100;
 			productRefGroup = DA246CB11F8A6E5E00A75ED1 /* Products */;
 			projectDirPath = "";
@@ -968,6 +976,20 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		DACAF0DE300C000100DC9410 /* XCLocalSwiftPackageReference "../../../../../Documents/Code/Animations/KaPow" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "../../../../../Documents/Code/Animations/KaPow";
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		DACAF0DE300C000200DC9410 /* KaPow */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = KaPow;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = DA246CA81F8A6E5E00A75ED1 /* Project object */;
 }

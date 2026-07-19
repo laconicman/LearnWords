@@ -98,6 +98,36 @@ stalls — it's compatible with the same product mapping.
   perceived delight; they're iOS 10+.
 - Keep effects **fire-and-forget on layers**, never capturing the VC (the TD-16 crash class).
 
+## Port-precheck addendum (2026-07-19, second pass)
+
+Verified before starting the port that no one has done it already:
+
+- **Repo moved**: Pow is now maintained at [EmergeTools/Pow](https://github.com/EmergeTools/Pow)
+  (Moving Parts partnered with Emerge Tools to open-source it; MIT, active as of 2026-04,
+  ~4.3k stars). Links above to `movingparts-io/Pow` redirect there.
+- **No UIKit port exists.** GitHub code search for `SecondOrderDynamics` finds only Pow
+  itself, plain forks, and one unrelated render engine; repo search for a UIKit
+  port/adaptation is empty. The maintainer closed
+  ["Use in UIKit" (#58)](https://github.com/EmergeTools/Pow/issues/58) pointing to
+  `UIHostingController`/`UIHostingConfiguration` — i.e. the official answer is Option A,
+  and no UIKit API is planned.
+- **New input for Option C**: [jtrivedi/Wave](https://github.com/jtrivedi/Wave) (MIT,
+  iOS 13+, active 2026-03) is a maintained `CADisplayLink` spring-physics engine for
+  UIKit/Core Animation. It could serve as the port's simulation core instead of porting
+  `SecondOrderDynamics` — but it ships no effect presets (no Shake/Shine/Spray), and its
+  iOS 13 floor is above ours. Porting Pow's own math verbatim (~1 small file) stays the
+  default: zero dependencies, identical feel, works to 12.1. b3ll/Motion is the same idea
+  but dormant (last push 2024).
+- **Port started**: the `KaPow` SPM package at
+  `/Users/paul/Documents/Code/Animations/KaPow` (iOS 12 floor; core +
+  Shake ported, tests green) with the `KaPowShowcase` sibling app comparing each
+  effect side-by-side against original Pow. Direction docs live in the package's
+  DocC catalog — that is now the authoritative home for port decisions.
+- **Port complete for the TD-16 mapping** (Shake, Jump, Shine, Spray — all
+  verified side-by-side, 2026-07-19). Adoption is handed off to
+  `TASK-TD16-adoption.md` in this folder — **executed 2026-07-19** (see its status
+  header); only the manual feel-pass remains.
+
 ## Sources
 
 - [Pow repo](https://github.com/movingparts-io/Pow) — README (effects, iOS 15+, MIT);
