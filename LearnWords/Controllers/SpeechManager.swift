@@ -29,12 +29,14 @@ final class SpeechManager /*: NSObject */ {
     }
     
     func speak(_ utteranceString: NSAttributedString, language: String, immediately: Bool = true, rate: Float = Float(LWUserDefaults.standard.utteranceRatePreference), pitchMultiplier: Float = Float(LWUserDefaults.standard.pitchMultiplierPreference)) {
-        
+
         // Guard against too frequent calls to `synthesizer`.
         // Any frequent calls to `synthesizer` including stopping it cause it stop generating speech but no errors are emited.
         let currentDate = Date()
         guard currentDate.timeIntervalSince(latestTTSRequestDate ?? .distantPast) > 0.8 else { return }
         latestTTSRequestDate = currentDate
+
+        ensureAudioSession()
         
         let utterance = AVSpeechUtterance(attributedString: utteranceString)
         //We can get voices that are present in system and then use set them either with identifiers or by using default for language
@@ -73,6 +75,18 @@ final class SpeechManager /*: NSObject */ {
     func stopSpeaking() {
         synthesizer.stopSpeaking(at: .immediate)
         utteranceQueue.removeAll()
+    }
+
+    /// The synthesizer runs on the app's shared audio session (`usesApplicationAudioSession`),
+    /// so the app must configure/activate it or synthesis renders empty buffers
+    /// ("mDataByteSize (0)") — historically only the Phonetics screen did this, so speech was
+    /// silent until that screen was visited. Leaves `.playAndRecord` alone so the Phonetics
+    /// mic flow isn't clobbered.
+    private func ensureAudioSession() {
+        let session = AVAudioSession.sharedInstance()
+        guard session.category != .playback && session.category != .playAndRecord else { return }
+        try? session.setCategory(.playback, mode: .default, options: [])
+        try? session.setActive(true, options: .notifyOthersOnDeactivation)
     }
     
     private func processQueue() {

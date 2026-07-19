@@ -31,7 +31,7 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
     }
 
     @IBAction func goToSettings(_ sender: UIBarButtonItem) {
-        gotoAppSettings()
+        navigationController?.pushViewController(SettingsViewController(), animated: true)
     }
     // TODO: Make set selection screen
     @IBAction func unwindSegue(segue: UIStoryboardSegue) {

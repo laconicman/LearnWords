@@ -37,8 +37,25 @@ Priority-ordered. Rationale lives in [Design](Design.md); debt items in [TechDeb
   idempotently on appear/foreground/deep-link; `AppRoot` selects the tab instead of rebuilding
   the root. Cold path verified on-sim end to end; one manual share-flow run covers the rest.
 
+- **Speech silent until Phonetics** (TD-15, 2026-07-19) — root-caused to the shared
+  audio session only ever being configured by the Phonetics screen; `SpeechManager` now
+  ensures it on `speak()`. Regression test added (32 total). Owner to confirm by ear.
+
+- **In-app settings replace Settings.bundle** (TD-14, 2026-07-19) — pane deleted; defaults
+  code-registered into the App-Group suite (+ one-time migration); new `Features/Settings/`
+  screen with live slider values. Build green; test run + visual check pending a
+  CoreSimulator restart on the dev machine.
+
+- **Animation crash hotfix** (TD-16, 2026-07-19) — `[unowned self]` → `[weak self]` in all
+  six copy-pasted exercise animations; owner confirmed TD-14 settings screen and TD-15
+  speech on-device (remaining console lines are benign — see TD-15).
+
 ## Next
 
+- **Animation-system session** (TD-16) — extract the shared `ExerciseTransitionAnimator`,
+  then the Pow-inspired UIKit effects kit. **Read [AnimationSystem](AnimationSystem.md)
+  first** — it holds the research, the options weighed, and the C-lite staged plan.
+- **RU strings** for the new settings labels in `Localizable.xcstrings` (deferred by owner).
 - Storyboard split (TD-5) is **likely YAGNI** at this size — prefer creator-injection on the
   existing storyboard where a screen needs a dependency; revisit only if the one storyboard
   actually hurts.

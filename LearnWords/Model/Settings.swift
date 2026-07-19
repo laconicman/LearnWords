@@ -16,54 +16,46 @@ private let dictionaryPromptDisplayed = "firstUseDictionaryPromptDisplayed"
 let userDefaultsGroup = LWUserDefaults.standard.userDefaultsGroup
 let userDefaults = LWUserDefaults.standard.userDefaults
 
-// Useful links
-// parsing the whole settings bundle structure:
-// https://stackoverflow.com/questions/46453789/swift-4-settings-bundle-get-defaults
-// with Decodable:
-// https://stackoverflow.com/questions/24045570/how-do-i-get-a-plist-as-a-dictionary-in-swift
-// Unfortunately it is not recommended to write root.plist directly
-// register while init, easy get/set wrapper:
-// https://forums.developer.apple.com/thread/73266
-
-//Keep in sync with Root.plist in Settings.bundle
-
 final class LWUserDefaults {
-    
+
     static let standard = LWUserDefaults()
-    
-    func registerDefaultsFromSettingsBundle() {
-        // This seems to do the same thing as user defaults
-//        CFPreferencesSetAppValue("languageToStudyPreference" as CFString, ["a", "b", "c"] as CFArray, kCFPreferencesCurrentApplication)
-//        CFPreferencesAppSynchronize(kCFPreferencesCurrentApplication)
-        let settingsUrl = Bundle.main.url(forResource: "Settings", withExtension: "bundle")!.appendingPathComponent("Root.plist")
-        let settingsPlist = NSDictionary(contentsOf:settingsUrl)!
-        let preferences = settingsPlist["PreferenceSpecifiers"] as! [NSDictionary]
-        
-        var defaultsToRegister = Dictionary<String, Any>()
-        
-        for preference in preferences {
-            guard let key = preference["Key"] as? String else {
-                debugLog("Key not found in preferences \(preference)")
-                continue
-            }
-            defaultsToRegister[key] = preference["DefaultValue"]
-            debugLog(key + " " + preference["DefaultValue"].debugDescription)
-        }
-        //userDefaultsGroup.register(defaults: defaultsToRegister) //This is NOT done automatically for the first launch
-        userDefaults.register(defaults: defaultsToRegister)
 
-        //userDefaultsGroup?.register(defaults: defaultsToRegister) //This is what you probably want!
+    /// Single source of truth for preference defaults. Replaces the deleted
+    /// Settings.bundle/Root.plist (TD-14): preferences are edited in-app
+    /// (`SettingsViewController`) and live in the App-Group suite so the app and its
+    /// extensions agree.
+    static let defaultPreferences: [String: Any] = [
+        "languageToStudyPreference": "en-US",
+        "nativeLanguagePreference": "ru-RU",
+        "pitchMultiplierPreference": 1.1,
+        "utteranceRatePreference": 0.4,
+        "pronounceAnswersPreference": true,
+        "pronounceQuestionsPreference": true,
+        "maxKnownLevelPreference": 20.0,
+    ]
 
-    }
-    
     private init() {
-        // TODO: register only if first launch
-        registerDefaultsFromSettingsBundle()
-        
-        
+        migrateStandardPreferencesToGroupIfNeeded()
+        // register(defaults:) is non-persistent, so it must run every launch.
+        userDefaultsGroup.register(defaults: Self.defaultPreferences)
+
         // TO_DO: if first launch set native and dictionary langs
         // nativeLanguagePreference = UITextInputMode.activeInputModes.first?.primaryLanguage
         // languageToStudyPreference.UITextInputMode.activeInputModes.filter{ $0.contains("emoji") }.last?.primaryLanguage
+    }
+
+    /// Preferences historically lived in per-process *standard* defaults (the system
+    /// Settings pane wrote there). One-time copy of values the user had actually set
+    /// (the persistent domain excludes registered defaults) into the group suite.
+    private func migrateStandardPreferencesToGroupIfNeeded() {
+        let migratedKey = "preferencesMigratedToAppGroup"
+        guard !userDefaultsGroup.bool(forKey: migratedKey) else { return }
+        let domain = userDefaults.persistentDomain(forName: Bundle.main.bundleIdentifier ?? "") ?? [:]
+        let migratableKeys = Array(Self.defaultPreferences.keys) + [includeLearnedWordsKey, directionOfExersisesKey]
+        for key in migratableKeys {
+            if let value = domain[key] { userDefaultsGroup.set(value, forKey: key) }
+        }
+        userDefaultsGroup.set(true, forKey: migratedKey)
     }
     
     let userDefaultsGroup = AppGroup.userDefaults ?? UserDefaults.standard
@@ -71,64 +63,64 @@ final class LWUserDefaults {
     
     var utteranceRatePreference: Double {
         get {
-            userDefaults.double(forKey: "utteranceRatePreference")
+            userDefaultsGroup.double(forKey: "utteranceRatePreference")
         }
         set {
-            userDefaults.set(newValue, forKey: "utteranceRatePreference")
+            userDefaultsGroup.set(newValue, forKey: "utteranceRatePreference")
         }
     }
     
     var pitchMultiplierPreference: Double {
         get {
-            userDefaults.double(forKey: "pitchMultiplierPreference")
+            userDefaultsGroup.double(forKey: "pitchMultiplierPreference")
         }
         set {
-            userDefaults.set(newValue, forKey: "pitchMultiplierPreference")
+            userDefaultsGroup.set(newValue, forKey: "pitchMultiplierPreference")
         }
     }
     
     var pronounceAnswersPreference: Bool {
         get {
-            userDefaults.bool(forKey: "pronounceAnswersPreference")
+            userDefaultsGroup.bool(forKey: "pronounceAnswersPreference")
         }
         set {
-            userDefaults.set(newValue, forKey: "pronounceAnswersPreference")
+            userDefaultsGroup.set(newValue, forKey: "pronounceAnswersPreference")
         }
     }
     
     var pronounceQuestionsPreference: Bool {
         get {
-            userDefaults.bool(forKey: "pronounceQuestionsPreference")
+            userDefaultsGroup.bool(forKey: "pronounceQuestionsPreference")
         }
         set {
-userDefaults.set(newValue, forKey: "pronounceQuestionsPreference")
+userDefaultsGroup.set(newValue, forKey: "pronounceQuestionsPreference")
         }
     }
     
     var languageToStudyPreference: String? {
         get {
-            userDefaults.string(forKey: "languageToStudyPreference")
+            userDefaultsGroup.string(forKey: "languageToStudyPreference")
         }
         set {
-            userDefaults.set(newValue, forKey: "languageToStudyPreference")
+            userDefaultsGroup.set(newValue, forKey: "languageToStudyPreference")
         }
     }
     
     var nativeLanguagePreference: String? {
         get {
-            userDefaults.string(forKey: "nativeLanguagePreference")
+            userDefaultsGroup.string(forKey: "nativeLanguagePreference")
         }
         set {
-            userDefaults.set(newValue, forKey: "nativeLanguagePreference")
+            userDefaultsGroup.set(newValue, forKey: "nativeLanguagePreference")
         }
     }
     
     var maxKnownLevelPreference: Int {
         get {
-            Int(userDefaults.double(forKey: "maxKnownLevelPreference").rounded())
+            Int(userDefaultsGroup.double(forKey: "maxKnownLevelPreference").rounded())
         }
         set {
-            userDefaults.set(Double(newValue), forKey: "maxKnownLevelPreference")
+            userDefaultsGroup.set(Double(newValue), forKey: "maxKnownLevelPreference")
         }
     }
     
@@ -146,30 +138,30 @@ userDefaults.set(newValue, forKey: "pronounceQuestionsPreference")
     private let includeLearnedWordsKey = "includeLearnedWords"
     var includeLearnedWords: Bool {
         get {
-            userDefaults.bool(forKey: includeLearnedWordsKey)
+            userDefaultsGroup.bool(forKey: includeLearnedWordsKey)
         }
         set {
-            userDefaults.set(newValue, forKey: includeLearnedWordsKey)
+            userDefaultsGroup.set(newValue, forKey: includeLearnedWordsKey)
         }
     }
     
     private let directionOfExersisesKey = "directionOfExersises"
     var foreignToNative: Bool {
         get {
-            userDefaults.bool(forKey: directionOfExersisesKey)
+            userDefaultsGroup.bool(forKey: directionOfExersisesKey)
         }
         set {
-            userDefaults.set(newValue, forKey: directionOfExersisesKey)
+            userDefaultsGroup.set(newValue, forKey: directionOfExersisesKey)
         }
     }
     
 //    private let swapLanguageOrderKey = "swapLanguageOrder"
 //    var swapLanguageOrder: Bool {
 //        get {
-//            userDefaults.bool(forKey: swapLanguageOrderKey)
+//            userDefaultsGroup.bool(forKey: swapLanguageOrderKey)
 //        }
 //        set {
-//            userDefaults.set(newValue, forKey: swapLanguageOrderKey)
+//            userDefaultsGroup.set(newValue, forKey: swapLanguageOrderKey)
 //        }
 //    }
     

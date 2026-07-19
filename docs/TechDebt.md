@@ -209,6 +209,72 @@ settles — either find the workaround and lower to 12.1, raise consciously, or 
 
 ---
 
+## TD-14 — Settings.bundle pane — **replaced with in-app settings (2026-07-19)**
+
+Found while testing: the system-Settings pane (`Settings.bundle`) had three defects —
+(1) benign-but-alarming "Key not found" logs for `PSGroupSpecifier` headers, (2) blind
+`PSTitleValueSpecifier` rows ("Pitch"/"Rate"/"Study" never written by the app, shown blank
+next to unlabeled sliders), (3) **per-process registration**: defaults registered into
+*standard* `UserDefaults` (the group call was commented out with "This is what you probably
+want!"), so pane changes reached the app but not the Widget (which kept its own registered
+`maxKnownLevelPreference` = 20).
+
+**Resolution (owner's call: replace, not repair):**
+- `Settings.bundle` **deleted** (with its localizations and the registration parser — all
+  three defects gone at the root). Removed from Widget/WordWidgetExtension memberships;
+  the force-unwrap crash risk in extensions is gone too.
+- `LWUserDefaults`: defaults now defined in code (`defaultPreferences`) and registered into
+  the **App-Group suite** every launch; all preference accessors repointed to the group, so
+  app + Widget + extensions agree. One-time migration copies user-set values from the old
+  standard domain (via `persistentDomain`, which excludes registered defaults).
+- New `Features/Settings/`: programmatic `SettingsViewController` (grouped table; language
+  pickers, sliders **with live value labels** — the un-blind version of the old rows,
+  pronounce toggles, known-level slider) + `LanguagePickerViewController`. Pushed from the
+  Words tab's Settings button (`goToSettings:` no longer jumps to system Settings; the
+  permission-prompt `gotoAppSettings()` calls remain, correctly, system jumps).
+- New strings use `NSLocalizedString` — RU translations to be added in `Localizable.xcstrings`.
+
+**Verification state:** full build green (app + all extensions + test bundle). The three new
+tests (`LWUserDefaultsTests`, `SettingsViewControllerTests`) and a re-run of the suite were
+**blocked by a wedged CoreSimulator** on the dev machine (hangs before "Testing started";
+pre-change suite was 32/32). Run ⌘U and eyeball the new screen after a CoreSimulator restart.
+
+## TD-15 — Speech silent until Phonetics visited — **resolved (2026-07-19)**
+
+`SpeechManager` sets `usesApplicationAudioSession = true`, so synthesis depends on the app
+configuring/activating the shared `AVAudioSession` — but only `WordPhoneticsViewController`
+ever did (its `viewDidLoad`). On every other screen (Dictation, Test, Words) the synthesizer
+rendered empty buffers — the console's `mBuffers[0].mDataByteSize (0)` — until Phonetics
+ran once and left the session active app-wide. Not settings-related; the settings log was a
+red herring (see TD-14).
+
+**Fix:** `SpeechManager.ensureAudioSession()` — on each `speak()`, if the session category
+is neither `.playback` nor `.playAndRecord`, set `.playback` and activate. Leaves the
+Phonetics mic flow's `.playAndRecord` untouched; lazy (no session grab at app launch — the
+warm-up `_ = SpeechManager.shared` stays side-effect-free). Regression-tested:
+`SpeechManagerTests.speakConfiguresPlaybackAudioSession` (hosted test asserts the category).
+
+**Owner-confirmed (2026-07-19): pronunciation now works everywhere.** Two console lines
+remain and are **benign** — `IPCAUClient: bundle display name is nil` is well-known
+system/audio-unit host noise, and `mBuffers[0].mDataByteSize (0)` accompanying *audible*
+synthesis is the synthesizer flushing a leading empty buffer. Cosmetic; not actionable from
+app code.
+
+## TD-16 — Animation system: duplicated, fragile, and joyless
+
+Surfaced by a crash at `WordTestViewController` (2026-07-19): a `UIViewPropertyAnimator`
+started with `afterDelay: 2.0` captured `[unowned self]`; leaving the screen during the
+delay deallocated the VC and the completion crashed. **Hotfixed** — all six animation
+blocks across Test/Dictation/Phonetics now use `[weak self]` (build green).
+
+The underlying debt: the exercise screens **copy-paste the same two animations** (spring-in,
+shrink-fade-out + `askQuestion()` completion), and the app has no feedback/delight effects.
+**Discharge (separate session):** per [AnimationSystem](AnimationSystem.md) — extract one
+shared `ExerciseTransitionAnimator` with lifetime-safe completions, then port a minimal
+Pow-inspired UIKit effects kit (SecondOrderDynamics + CADisplayLink core; Shake/Shine/Spray
+mapped to wrong/correct/learned) into `Shared/DesignSystem/Effects/`. Full research,
+options, and constraints in that doc.
+
 ## Appendix: feature-first mapping (TD-1) — **executed for source (2026-07-17)**
 
 Target layout per `uikit-app-structure`, now the actual on-disk layout for `.swift` files

@@ -220,7 +220,8 @@ final class WordTestViewController: UIViewController {
 
         //present(rlvc, animated: true)
         
-        let animation = UIViewPropertyAnimator(duration: 0.5, dampingRatio: 0.5) { [unowned self] in
+        let animation = UIViewPropertyAnimator(duration: 0.5, dampingRatio: 0.5) { [weak self] in
+            guard let self else { return }
             self.stackView.alpha = 1
             self.stackView.transform = CGAffineTransform.identity
         }
@@ -235,12 +236,15 @@ final class WordTestViewController: UIViewController {
 
 
     func prepareForNextQuestion(withPrewiousKnown: Bool = true) {
-        let animation = UIViewPropertyAnimator(duration: 0.5, curve: .easeInOut) { [unowned self] in
+        // weak: the delayed start (up to 2 s) can outlive the screen — unowned crashed here (TD-16).
+        let animation = UIViewPropertyAnimator(duration: 0.5, curve: .easeInOut) { [weak self] in
+            guard let self else { return }
             self.stackView.transform =  CGAffineTransform(scaleX: 0.8, y: 0.8)
             //self.stackView.transform =  CGAffineTransform(rotationAngle: 0.3*CGFloat.pi)
             self.stackView.alpha = 0
         }
-        animation.addCompletion { [unowned self] position in
+        animation.addCompletion { [weak self] position in
+            guard let self else { return }
             // self.prompt.textColor = UIColor.black
             self.wordDefinition.textColor = UIColor(red: 0, green: 0.7, blue: 0, alpha: 0)
             self.askQuestion()
