@@ -57,10 +57,24 @@ Priority-ordered. Rationale lives in [Design](Design.md); debt items in [TechDeb
   locked by a storyboard-driven appearance test. 38/38 tests green. Manual feel-pass
   pending (see `TASK-TD16-adoption.md` § Verification).
 
+- **Word-cell constraint conflict fixed** (TD-17, 2026-07-20) — the per-row unsatisfiable-
+  constraints spam (1-pt over-constraint vs the 44-pt ring); pins relaxed to ≥ 4; verified
+  clean console + unchanged cells. Ring-replacement research recorded in TD-17.
+
+- **Progress model designed** (2026-07-20) — [ProgressModel](ProgressModel.md): append-only
+  `ReviewEvent` log (verbatim/judged/self-assessed outcomes, negatives never cancel
+  positives, response text kept for AI judging), derived effort/mastery/retention indexes,
+  pluggable near-miss judge (match3 → NL → Foundation Models iOS 26+). This is the TD-13
+  schema core; TD-17's ring displays its indexes.
+
 ## Next
 
 - **Manual TD-16 pass** — all three exercise screens: transition in/out, wrong-answer shake,
   correct-answer shine, level-up spray; the leave-during-delay scenario on a device.
+- **Owner review of [ProgressModel](ProgressModel.md)** — esp. the four open questions at
+  the end (near-miss weight, skip semantics, know/forgot buttons, legacy prior).
+- Then the big rock, in order: **TD-18** (word UUIDs) → **TD-13** (Core Data + CloudKit
+  implementing the ProgressModel schema) → screens append events → indexes → **TD-17** ring.
 - **RU strings** for the new settings labels in `Localizable.xcstrings` (deferred by owner).
 - Storyboard split (TD-5) is **likely YAGNI** at this size — prefer creator-injection on the
   existing storyboard where a screen needs a dependency; revisit only if the one storyboard

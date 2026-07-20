@@ -135,10 +135,15 @@ Owner intends to move persistence to Core Data with `NSPersistentCloudKitContain
 sets and learning progress sync across a user's devices. The `WordStore` seam (TD-12) is built
 for exactly this: write `CoreDataWordStore: WordStore`, swap `Storage.backend`, and inject the
 store/context at the composition root (finishing the DI that TD-12 deferred). Use the
-`core-data-expert` / `axiom-data` skills. Open considerations: the object model (Word, WordSet,
-per-exercise stats), CloudKit schema + entitlements and App-Group sharing with the extensions,
-migrating existing `UserDefaults` data, and whether the `WordStore` API should go async (CloudKit
-sync is background).
+`core-data-expert` / `axiom-data` skills.
+
+**The object model is designed: [ProgressModel](ProgressModel.md)** (2026-07-20) — `Word`
+(UUID identity, TD-18) → append-only `ReviewEvent` log (outcome taxonomy, response text,
+attachable AI judgments) + derived index caches. Event-sourcing is also the CloudKit-friendly
+shape (append-only records merge without counter conflicts). Remaining considerations:
+CloudKit entitlements + App-Group sharing with the extensions, migrating existing
+`UserDefaults` data (legacy aggregates carried as a one-time prior), and whether `WordStore`
+goes async.
 
 ## TD-7 — iOS 12 availability audit
 
@@ -294,6 +299,52 @@ shrink-fade-out + `askQuestion()` completion), and the app had no feedback/delig
 **Remaining:** the manual pass from the task's verification section (transitions + all three
 effects on each exercise screen, on a device for feel); Spray's haptic burst is not ported
 yet (KaPow TD-4).
+
+## TD-17 — Word-cell progress ring: modernize/replace KDCircularProgress
+
+Context (2026-07-20): the words list logged an unsatisfiable-constraint break per row —
+the cell's stack was pinned top = 4 **and** bottom = 4 **and** centerY while the 44-pt
+`KDCircularProgress` ring drove the stack height; at the 53-pt row that's 1 pt
+over-constrained. **Fixed**: both pins relaxed to ≥ 4 (centerY positions; the ring stays
+square). Verified: zero constraint messages in the app console; cells render unchanged.
+
+The remaining debt is the ring itself — a 556-line vendored 2015-era control
+(`Shared/DesignSystem/KDCircularProgress.swift`; note the name matches
+[kaandedeoglu/KDCircularProgress](https://github.com/kaandedeoglu/KDCircularProgress),
+MIT — worth confirming provenance/attribution), used only by `WordTableViewCell`.
+
+**Research (2026-07-20) — the UIKit ring-library shelf is EOL, like the animation shelf:**
+- [UICircularProgressRing](https://github.com/luispadron/UICircularProgressRing) — explicit
+  EOL; author's own advice is "use the system ProgressView on iOS 14+" (i.e. SwiftUI).
+- [MKRingProgressView](https://github.com/maxkonovalov/MKRingProgressView) — the richest
+  visual (Apple-Watch activity ring: gradient sweep, shadowed rounded cap), MIT, small —
+  but dormant (~2020). Viable as a vendor-swap if that look is wanted as-is.
+- SFProgressCircle / KYCircularProgress / MBCircularProgressBar — dead.
+- Native: UIKit has no ring; SwiftUI `Gauge` (iOS 16+) is the modern answer — right for the
+  TD-13 rewrite, wrong for the 12.1 floor (hosting-per-cell, gated).
+
+**Discharge options:** (a) keep as-is — it works and just got layout-fixed; (b) vendor-swap
+to MKRingProgressView for instant activity-ring looks; (c) **recommended**: a small
+in-house `ProgressRing` (~80 lines, CAShapeLayer + CAGradientLayer mask, rounded caps,
+iOS 12-safe, tint/dark-aware) in the design system — retires 556 vendored lines, and its
+progress can later be driven by KaPow's spring physics so level-ups *settle* instead of
+jump (pairs with the TD-16 Shine/Spray moments).
+
+**Blocked on [ProgressModel](ProgressModel.md) (owner decision, 2026-07-20):** the ring is a
+*view* of the progress indexes; what it displays (mastery/effort/retention) is defined
+there. When implemented, apply the R6 layout rule: ring size =
+`UIFontMetrics.scaledValue(for: 44)` (follows Dynamic Type), labels at natural size (no
+autoshrink), rows stay self-sizing — the indicator must never drive row height against the
+font. The fixed-44 constraint is interim.
+
+## TD-18 — Words have no stable identity
+
+Words are identified by their `firstWord` string (dedup on import, history keying, cell
+lookup). Renaming a word orphans its history; duplicates across sets collide; CloudKit
+(TD-13) requires stable record identity. **Cost:** blocks the ProgressModel event log and
+TD-13. **Discharge:** give `Word` a `UUID` (assigned on creation/first migration), key
+`ReviewEvent.wordID` and set membership by it; `firstWord` becomes display/search data.
+Sequenced as the first step of TD-13 — see [ProgressModel](ProgressModel.md).
 
 ## Appendix: feature-first mapping (TD-1) — **executed for source (2026-07-17)**
 

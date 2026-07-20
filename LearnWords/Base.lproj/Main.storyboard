@@ -94,10 +94,10 @@
                                     </subviews>
                                     <constraints>
                                         <constraint firstItem="GEF-nW-Bmr" firstAttribute="leading" secondItem="M1a-g7-jbG" secondAttribute="leading" constant="10" id="9M6-lr-Y8P"/>
-                                        <constraint firstAttribute="bottom" secondItem="GEF-nW-Bmr" secondAttribute="bottom" constant="4" id="Pyy-ot-dGp"/>
+                                        <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="GEF-nW-Bmr" secondAttribute="bottom" constant="4" id="Pyy-ot-dGp"/>
                                         <constraint firstItem="GEF-nW-Bmr" firstAttribute="centerY" secondItem="M1a-g7-jbG" secondAttribute="centerY" id="Tfg-vz-0PA"/>
                                         <constraint firstAttribute="trailing" secondItem="GEF-nW-Bmr" secondAttribute="trailing" constant="10" id="Xfw-rk-NrL"/>
-                                        <constraint firstItem="GEF-nW-Bmr" firstAttribute="top" secondItem="M1a-g7-jbG" secondAttribute="top" constant="4" id="p1M-91-ozZ"/>
+                                        <constraint firstItem="GEF-nW-Bmr" firstAttribute="top" relation="greaterThanOrEqual" secondItem="M1a-g7-jbG" secondAttribute="top" constant="4" id="p1M-91-ozZ"/>
                                     </constraints>
                                 </tableViewCellContentView>
                                 <connections>
