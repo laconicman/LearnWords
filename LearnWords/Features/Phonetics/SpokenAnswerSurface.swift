@@ -1,70 +1,69 @@
 //
-//  WordPhoneticsViewController.swift
+//  SpokenAnswerSurface.swift
 //  LearnWords
 //
-//  Created by  Paul on 24.06.2021.
-//  Copyright © 2021 Paul. All rights reserved.
+//  The Phonetics exercise: say the translation.
 //
-//  The spoken-production exercise.
-//
-//  Structure lives in `ExerciseViewController` (TD-20). What is genuinely this screen:
-//  speech recognition, the record button, and ownership of the audio session — which is
-//  why it is the one screen that overrides `willLeaveCurrentWord()` and `listenTapped()`,
-//  to hand the session back to playback before speaking or moving on.
+//  The only surface that owns the audio session, which is why it is the only one that
+//  implements `willLeaveCurrentWord()` — recording holds `.playAndRecord`, and anything
+//  that speaks or advances needs playback back first.
 //
 //  A recognised utterance is `.correctJudged`: `match3` decides whether the transcription
 //  was close enough, so it is matcher evidence, not verbatim.
+//
+//  Was `WordPhoneticsViewController`, a subclass of an abstract screen.
 //
 
 import UIKit
 import Speech
 
-final class WordPhoneticsViewController: ExerciseViewController, SFSpeechRecognizerDelegate {
+final class SpokenAnswerSurface: NSObject, ExerciseAnswerSurface, SFSpeechRecognizerDelegate {
 
     private let recognizedLabel = LWWordLabel()
     private let recordButton = LWButton(type: .system)
+    private weak var screen: ExerciseScreen?
 
-    private lazy var speechRecognizer = SFSpeechRecognizer(
-        locale: Locale(identifier: languages.answerLanguage))
+    private var speechRecognizer: SFSpeechRecognizer?
     private var recognitionRequest: SFSpeechAudioBufferRecognitionRequest?
     private var recognitionTask: SFSpeechRecognitionTask?
     private let audioEngine = AVAudioEngine()
     private let audioSession = AVAudioSession.sharedInstance()
 
-    override var exercise: ExerciseSession.Exercise { .phonetics }
+    var answerView: UIView { recognizedLabel }
+    var accessoryButton: LWButton? { recordButton }
 
-    override func makeAnswerView() -> UIView {
+    func attach(to screen: ExerciseScreen) {
+        self.screen = screen
         recognizedLabel.font = .systemFont(ofSize: 60)
-        return recognizedLabel
-    }
 
-    override var accessoryButton: LWButton? {
         recordButton.purpose = .prominent
         recordButton.setTitle(NSLocalizedString("Start recognition", comment: "Button title"), for: [])
         recordButton.addTarget(self, action: #selector(recordButtonTapped), for: .touchUpInside)
-        return recordButton
+        // Stays disabled until authorization comes back.
+        recordButton.isEnabled = false
+
+        speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: screen.languages.answerLanguage))
+        speechRecognizer?.delegate = self
+        requestMicrophoneAccess()
+        requestRecognitionAccess()
     }
 
-    // MARK: - Answer surface
-
-    override func prepareAnswerForQuestion() {
+    func prepareForQuestion() {
         recognizedLabel.attributedText = NSAttributedString(
             string: NSLocalizedString("pronounce the translation", comment: "label prompt"),
             attributes: [.foregroundColor: UIColor.lwAnswerPending])
     }
 
-    override func showAnswer(_ text: String, isPositive: Bool) {
+    func showAnswer(_ text: String, isPositive: Bool) {
         let colour = isPositive ? UIColor.lwAnswerCorrect : UIColor.lwAnswerWrong
         recognizedLabel.attributedText = NSAttributedString(
             string: text, attributes: [.foregroundColor: colour])
         recognizedLabel.textColor = colour
     }
 
-    // MARK: - Audio session ownership
-
-    /// Recording holds `.playAndRecord`; anything that speaks or advances needs playback
-    /// back first. This is the hook the base class calls before leaving a word.
-    override func willLeaveCurrentWord() {
+    /// Recording holds `.playAndRecord`; give playback back before anything speaks or the
+    /// screen moves on.
+    func willLeaveCurrentWord() {
         if audioEngine.isRunning {
             recordButtonTapped()
         }
@@ -72,25 +71,7 @@ final class WordPhoneticsViewController: ExerciseViewController, SFSpeechRecogni
         try? audioSession.setActive(true, options: .notifyOthersOnDeactivation)
     }
 
-    override func listenTapped() {
-        willLeaveCurrentWord()
-        super.listenTapped()
-    }
-
-    // MARK: - Lifecycle
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        // Stays disabled until authorization comes back.
-        recordButton.isEnabled = false
-    }
-
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        requestMicrophoneAccess()
-        speechRecognizer?.delegate = self
-        requestRecognitionAccess()
-    }
+    // MARK: - Permissions
 
     private func requestMicrophoneAccess() {
         audioSession.requestRecordPermission { [weak self] allowed in
@@ -98,8 +79,7 @@ final class WordPhoneticsViewController: ExerciseViewController, SFSpeechRecogni
                 guard let self, !allowed else { return }
                 self.recordButton.isEnabled = false
                 self.recordButton.setTitle(
-                    NSLocalizedString("Microphone access denied.", comment: "Button title"),
-                    for: .disabled)
+                    NSLocalizedString("Microphone access denied.", comment: "Button title"), for: .disabled)
                 self.presentPermissionAlert(
                     title: NSLocalizedString("Allow microphone usage", comment: "Alert title"),
                     message: NSLocalizedString("for phonetic exercises", comment: "Alert message"),
@@ -119,8 +99,7 @@ final class WordPhoneticsViewController: ExerciseViewController, SFSpeechRecogni
                 case .denied, .restricted:
                     self.recordButton.isEnabled = false
                     self.recordButton.setTitle(
-                        NSLocalizedString("Recognition not allowed", comment: "Button title"),
-                        for: .disabled)
+                        NSLocalizedString("Recognition not allowed", comment: "Button title"), for: .disabled)
                     self.presentPermissionAlert(
                         title: NSLocalizedString("Allow speech recognition", comment: "Alert title"),
                         message: NSLocalizedString("for phonetic exercises", comment: "Alert message"),
@@ -129,8 +108,7 @@ final class WordPhoneticsViewController: ExerciseViewController, SFSpeechRecogni
                 case .notDetermined:
                     self.recordButton.isEnabled = false
                     self.recordButton.setTitle(
-                        NSLocalizedString("Recognition permission needed", comment: "Button title"),
-                        for: .disabled)
+                        NSLocalizedString("Recognition permission needed", comment: "Button title"), for: .disabled)
                     self.presentPermissionAlert(
                         title: NSLocalizedString("Allow speech recognition", comment: "for phonetic exercises"),
                         message: nil, offeringSettings: false)
@@ -151,7 +129,7 @@ final class WordPhoneticsViewController: ExerciseViewController, SFSpeechRecogni
         }
         alert.addAction(UIAlertAction(
             title: NSLocalizedString("Got it", comment: "Button title"), style: .default))
-        present(alert, animated: true)
+        screen?.presentAlert(alert)
     }
 
     // MARK: - Recognition
@@ -170,7 +148,8 @@ final class WordPhoneticsViewController: ExerciseViewController, SFSpeechRecogni
             recordButton.setTitle(NSLocalizedString("Stop recognition", comment: "Button title"), for: [])
             recordButton.purpose = .negative
         } catch {
-            recordButton.setTitle(NSLocalizedString("Recognition Not Available", comment: "Button title"), for: [])
+            recordButton.setTitle(
+                NSLocalizedString("Recognition Not Available", comment: "Button title"), for: [])
             recordButton.purpose = .prominent
         }
     }
@@ -202,14 +181,14 @@ final class WordPhoneticsViewController: ExerciseViewController, SFSpeechRecogni
                 self.recognizedLabel.text = heard
                 isFinal = result.isFinal
 
-                if let word = self.session.currentWord,
-                   match3(pattern: self.languages.answer(for: word),
+                if let screen = self.screen, let word = screen.currentWord,
+                   match3(pattern: screen.languages.answer(for: word),
                           answer: heard,
-                          language: self.languages.answerLanguage,
+                          language: screen.languages.answerLanguage,
                           delimiters: ",; ") /* && isFinal */ {
                     self.recordButtonTapped() // stop the audio
                     // A matcher said it was close enough — judged, not verbatim.
-                    self.answer(.correctJudged)
+                    screen.answer(.correctJudged)
                 }
             }
 
@@ -252,7 +231,7 @@ final class WordPhoneticsViewController: ExerciseViewController, SFSpeechRecogni
             title: NSLocalizedString("Speech recognition error", comment: ""),
             message: detail, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: ""), style: .default))
-        present(alert, animated: true)
+        screen?.presentAlert(alert)
     }
 
     // MARK: - SFSpeechRecognizerDelegate

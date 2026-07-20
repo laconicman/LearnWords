@@ -177,6 +177,23 @@
         }
       }
     },
+    "Dictation" : {
+      "comment" : "Exercise screen title",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dictation"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Диктант"
+          }
+        }
+      }
+    },
     "DICTIONARY_ACTION" : {
       "comment" : "Action for dictionary prompt",
       "localizations" : {
@@ -315,6 +332,23 @@
         }
       }
     },
+    "Forgot" : {
+      "comment" : "Exercise button",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Forgot"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не знаю"
+          }
+        }
+      }
+    },
     "French" : {
       "comment" : "language"
     },
@@ -446,6 +480,23 @@
         }
       }
     },
+    "Know" : {
+      "comment" : "Exercise button",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Know"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Знаю"
+          }
+        }
+      }
+    },
     "Known level" : {
       "comment" : "setting"
     },
@@ -485,6 +536,57 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Изучено: "
+          }
+        }
+      }
+    },
+    "Learning" : {
+      "comment" : "Exercise screen title",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Learning"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Изучение"
+          }
+        }
+      }
+    },
+    "Listen" : {
+      "comment" : "Exercise button",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Listen"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Слушать"
+          }
+        }
+      }
+    },
+    "Look Up" : {
+      "comment" : "Exercise button",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Look Up"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "В словаре"
           }
         }
       }
@@ -610,6 +712,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "OK"
+          }
+        }
+      }
+    },
+    "Phonetic" : {
+      "comment" : "Exercise screen title",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Phonetic"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Фонетика"
           }
         }
       }

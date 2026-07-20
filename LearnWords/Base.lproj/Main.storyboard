@@ -131,22 +131,6 @@
             </objects>
             <point key="canvasLocation" x="1317.5999999999999" y="144.3778110944528"/>
         </scene>
-        <!--Learning-->
-        <scene sceneID="wxh-pH-4nn">
-            <objects>
-                <viewController storyboardIdentifier="WordTest" id="hhD-xo-ClW" customClass="WordTestViewController" customModule="LearnWords" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="qnA-8i-tp3">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <viewLayoutGuide key="safeArea" id="0M9-Kp-HX4"/>
-                        <color key="backgroundColor" name="Background"/>
-                    </view>
-                    <navigationItem key="navigationItem" title="Learning" id="fb2-Kp-cfL"/>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="SRw-lQ-ISg" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="3097" y="-1812"/>
-        </scene>
         <!--Word Set-->
         <scene sceneID="CkW-Ng-bgh">
             <objects>
@@ -365,22 +349,6 @@
             </objects>
             <point key="canvasLocation" x="503" y="-621"/>
         </scene>
-        <!--Dictation-->
-        <scene sceneID="8CF-no-xpW">
-            <objects>
-                <viewController storyboardIdentifier="WordTranslation" id="29i-mr-9oh" customClass="WordDictationController" customModule="LearnWords" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="YEe-JB-Tt3">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <viewLayoutGuide key="safeArea" id="Ftf-Jx-RTh"/>
-                        <color key="backgroundColor" name="Background"/>
-                    </view>
-                    <navigationItem key="navigationItem" title="Dictation" id="BpE-Jx-lIv"/>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="D3v-Vw-2e4" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="3097" y="-1160"/>
-        </scene>
         <!--Exercises-->
         <scene sceneID="xzu-Km-yX7">
             <objects>
@@ -458,7 +426,7 @@
                                             <imageReference key="image" image="folder.badge.questionmark" catalog="system" symbolScale="large"/>
                                         </state>
                                         <connections>
-                                            <segue destination="hhD-xo-ClW" kind="show" identifier="Learning Exercise" id="iAo-DO-Xu5"/>
+                                            <action selector="learningTapped:" destination="die-Zg-gg1" eventType="touchUpInside" id="iAo-DO-Xu5"/>
                                         </connections>
                                                                             <userDefinedRuntimeAttributes>
                                             <userDefinedRuntimeAttribute type="string" keyPath="purposeName" value="prominent"/>
@@ -472,7 +440,7 @@
                                             <imageReference key="image" image="keyboard.badge.ellipsis" catalog="system" symbolScale="large"/>
                                         </state>
                                         <connections>
-                                            <segue destination="29i-mr-9oh" kind="show" identifier="Dictation Exercise" id="Zrf-bW-q6e"/>
+                                            <action selector="dictationTapped:" destination="die-Zg-gg1" eventType="touchUpInside" id="Zrf-bW-q6e"/>
                                         </connections>
                                                                             <userDefinedRuntimeAttributes>
                                             <userDefinedRuntimeAttribute type="string" keyPath="purposeName" value="prominent"/>
@@ -486,7 +454,7 @@
                                             <imageReference key="image" image="mic" catalog="system" symbolScale="large"/>
                                         </state>
                                         <connections>
-                                            <segue destination="4os-y6-JWd" kind="show" identifier="Phonetic Exercise" id="Uvc-vz-Z2B"/>
+                                            <action selector="phoneticsTapped:" destination="die-Zg-gg1" eventType="touchUpInside" id="Uvc-vz-Z2B"/>
                                         </connections>
                                                                             <userDefinedRuntimeAttributes>
                                             <userDefinedRuntimeAttribute type="string" keyPath="purposeName" value="prominent"/>
@@ -540,22 +508,6 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="vHE-HZ-B8K" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1189.5999999999999" y="-1159.0704647676164"/>
-        </scene>
-        <!--Phonetic-->
-        <scene sceneID="BhD-9c-iFC">
-            <objects>
-                <viewController storyboardIdentifier="WordPhonetics" id="4os-y6-JWd" customClass="WordPhoneticsViewController" customModule="LearnWords" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="06J-xx-zjK">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <viewLayoutGuide key="safeArea" id="a6P-qz-BA2"/>
-                        <color key="backgroundColor" name="Background"/>
-                    </view>
-                    <navigationItem key="navigationItem" title="Phonetic" id="bIe-cz-JDG"/>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="cNd-7a-Edm" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="3097" y="-481"/>
         </scene>
     </scenes>
     <designables>

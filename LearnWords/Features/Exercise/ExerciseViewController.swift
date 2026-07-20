@@ -2,72 +2,85 @@
 //  ExerciseViewController.swift
 //  LearnWords
 //
-//  The exercise screen — built once, specialised three ways (TD-20 step 2).
+//  The exercise screen — one of it, for all three exercises (TD-20).
 //
 //  Test, Dictation and Phonetics are the same screen: a progress bar, the word, a place
-//  the answer appears, a pair of utility buttons and a pair of answer buttons. That
-//  screen used to exist three times in code *and* three times in the storyboard, which is
-//  why one layout change produced three different bugs — overlapping buttons here, buttons
-//  under the tab bar there, clipped text somewhere else, and three different leftover
-//  height caps. The layout is now assembled here, in code, so there is one of it.
+//  the answer appears, a pair of utility buttons and a pair of answer buttons. That screen
+//  used to exist three times in code *and* three times in the storyboard, which is why one
+//  layout change produced three different bugs. It is assembled here, in code, once.
 //
-//  Subclasses supply only what genuinely differs: which exercise they are, what the
-//  answer surface is, and how it is filled and cleared. Everything else — lifecycle,
-//  transitions, feedback, scoring, progress, the round-end save — lives here and runs
-//  identically for all three.
+//  What differs between the three is injected as an `ExerciseAnswerSurface`, not overridden
+//  — so this type is `final`, there is nothing abstract to instantiate by mistake, and the
+//  compiler (not a `fatalError`) enforces that every exercise supplies what it must.
 //
 
 import UIKit
 
-class ExerciseViewController: UIViewController {
+final class ExerciseViewController: UIViewController, ExerciseScreen {
 
-    // MARK: - Subclass contract
+    // MARK: - Construction
 
-    /// Which exercise this is. Scored per-exercise by `WordAndStat`.
-    var exercise: ExerciseSession.Exercise {
-        fatalError("\(type(of: self)) must override `exercise`")
+    private let kind: ExerciseSession.Exercise
+    private let surface: ExerciseAnswerSurface
+
+    init(exercise: ExerciseSession.Exercise, answerSurface: ExerciseAnswerSurface, title: String) {
+        self.kind = exercise
+        self.surface = answerSurface
+        super.init(nibName: nil, bundle: nil)
+        self.title = title
     }
 
-    /// The surface the answer appears on. Receives the KaPow shine/shake feedback, so it
-    /// must be a child view — the container is animated separately (TD-16).
-    func makeAnswerView() -> UIView {
-        fatalError("\(type(of: self)) must override `makeAnswerView()`")
+    /// Unavailable by design: a screen without an answer surface is not a valid screen,
+    /// which is why this is never storyboard-instantiated.
+    @available(*, unavailable)
+    required init?(coder: NSCoder) {
+        fatalError("use init(exercise:answerSurface:title:)")
     }
 
-    /// Reveal `text` as the answer to the current word.
-    func showAnswer(_ text: String, isPositive: Bool) {}
+    /// The three exercises the app offers. The only place that knows which surface goes
+    /// with which exercise.
+    static func make(_ exercise: ExerciseSession.Exercise) -> ExerciseViewController {
+        switch exercise {
+        case .learning:
+            return ExerciseViewController(
+                exercise: .learning, answerSurface: SelfAssessedAnswerSurface(),
+                title: NSLocalizedString("Learning", comment: "Exercise screen title"))
+        case .dictation:
+            return ExerciseViewController(
+                exercise: .dictation, answerSurface: TypedAnswerSurface(),
+                title: NSLocalizedString("Dictation", comment: "Exercise screen title"))
+        case .phonetics:
+            return ExerciseViewController(
+                exercise: .phonetics, answerSurface: SpokenAnswerSurface(),
+                title: NSLocalizedString("Phonetic", comment: "Exercise screen title"))
+        }
+    }
 
-    /// Return the answer surface to its waiting state for a new question.
-    func prepareAnswerForQuestion() {}
-
-    /// A control shown below the answer buttons — Phonetics' record button. `nil` if the
-    /// screen has none.
-    var accessoryButton: LWButton? { nil }
-
-    /// Called before the screen moves off the current word, by answer or by skip.
-    /// Phonetics hands the audio session back to playback here.
-    func willLeaveCurrentWord() {}
-
-    // MARK: - Shared views
+    // MARK: - Views
 
     private(set) var progressView = UIProgressView(progressViewStyle: .default)
     private(set) var promptLabel = LWWordLabel()
-    private(set) var answerView = UIView()
     private(set) var lookUpButton = LWButton(type: .system)
     private(set) var listenButton = LWButton(type: .system)
     private(set) var forgotButton = LWButton(type: .system)
     private(set) var knowButton = LWButton(type: .system)
 
     /// The animated container. `ExerciseTransition` drives this, never a child.
-    private(set) var contentStack = UIStackView()
+    /// `let`, so it is the same object before and after the view loads — reassigning it
+    /// in `buildLayout()` meant anything holding a reference early got a different stack.
+    let contentStack = UIStackView()
+
+    private let underKeyboardLayoutConstraint = UnderKeyboardLayoutConstraint()
 
     // MARK: - Round
 
     private(set) var session = ExerciseSession(exercise: .learning, words: [])
 
-    /// The languages this round runs in, resolved once per question so a mid-round
-    /// settings change cannot split a single word's prompt from its answer.
+    /// Resolved once per question, so a mid-round settings change cannot split a word's
+    /// prompt from its answer.
     private(set) var languages = LanguagePair.current
+
+    var currentWord: WordAndStat? { session.currentWord }
 
     // MARK: - Lifecycle
 
@@ -76,6 +89,7 @@ class ExerciseViewController: UIViewController {
 
         view.backgroundColor = UIColor(named: "Background")
         buildLayout()
+        surface.attach(to: self)
 
         navigationItem.rightBarButtonItem = UIBarButtonItem(
             barButtonSystemItem: .fastForward, target: self, action: #selector(nextTapped))
@@ -111,8 +125,6 @@ class ExerciseViewController: UIViewController {
     // MARK: - Layout
 
     private func buildLayout() {
-        answerView = makeAnswerView()
-
         progressView.progressTintColor = .lwAccent
         promptLabel.font = .systemFont(ofSize: 80)
 
@@ -124,26 +136,27 @@ class ExerciseViewController: UIViewController {
         var rows: [UIView] = [
             progressView,
             promptLabel,
-            answerView,
+            surface.answerView,
             row(lookUpButton, listenButton),
             row(forgotButton, knowButton),
         ]
-        if let accessory = accessoryButton {
+        if let accessory = surface.accessoryButton {
             rows.append(accessory)
         }
+        rows.forEach(contentStack.addArrangedSubview)
 
-        contentStack = UIStackView(arrangedSubviews: rows)
         contentStack.axis = .vertical
         contentStack.spacing = 8
         contentStack.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(contentStack)
 
         // Same overflow strategy as every other screen — one implementation.
-        scrollBottomConstraint = ScrollableContent.wrap(contentStack)?.bottomConstraint
+        let wrapped = ScrollableContent.wrap(contentStack)
+        // Harmless where nothing focuses; Dictation is the one that needs it.
+        if let bottom = wrapped?.bottomConstraint {
+            underKeyboardLayoutConstraint.setup(bottom, view: view, minMargin: 0)
+        }
     }
-
-    /// The scroll view's bottom pin. Dictation drives keyboard avoidance from it.
-    private(set) var scrollBottomConstraint: NSLayoutConstraint?
 
     private func configure(_ button: LWButton, title: String,
                            purpose: LWButton.Purpose, action: Selector) {
@@ -161,23 +174,23 @@ class ExerciseViewController: UIViewController {
 
     // MARK: - The round
 
-    func startRound() {
-        session = .start(exercise)
+    private func startRound() {
+        session = .start(kind)
     }
 
-    @objc func nextTapped() {
+    @objc private func nextTapped() {
         guard !session.isFinished else { return }
-        willLeaveCurrentWord()
+        surface.willLeaveCurrentWord()
         session.skip()
         progressView.progress = session.progress
         askQuestion()
     }
 
     /// Presents the next word, or ends the round.
-    func askQuestion() {
+    private func askQuestion() {
         guard let word = session.currentWord else {
             session.commit()
-            navigationController?.popToRootViewController(animated: true)
+            navigationController?.popViewController(animated: true)
             return
         }
         if session.skipsCurrentWord(includingLearned: LWUserDefaults.standard.includeLearnedWords) {
@@ -190,42 +203,49 @@ class ExerciseViewController: UIViewController {
         if LWUserDefaults.standard.pronounceQuestionsPreference {
             SpeechManager.shared.speak(promptLabel.attributedText!, language: languages.promptLanguage)
         }
-        prepareAnswerForQuestion()
+        surface.prepareForQuestion()
         ExerciseTransition.show(contentStack)
     }
 
-    /// Scores `outcome` against the current word and reveals the answer.
+    // MARK: - ExerciseScreen
+
     func answer(_ outcome: ReviewOutcome) {
-        willLeaveCurrentWord()
+        surface.willLeaveCurrentWord()
         guard let result = session.answer(outcome) else { // this never happens for now
-            navigationController?.popToRootViewController(animated: true)
+            navigationController?.popViewController(animated: true)
             return
         }
 
         // Feedback on the child view; the container transition stays separate (TD-16).
         if result.isPositive {
-            answerView.kapow.shine()
+            surface.answerView.kapow.shine()
             if result.reachedKnownLevel {
                 ExerciseFeedback.levelUp(on: view)
             }
         } else {
-            answerView.kapow.shake()
+            surface.answerView.kapow.shake()
         }
 
         progressView.progress = session.progress
         reveal(result)
     }
 
+    func presentAlert(_ alert: UIAlertController) {
+        present(alert, animated: true)
+    }
+
+    // MARK: - Revealing
+
     private func reveal(_ result: ExerciseSession.Answer) {
         let text = languages.answer(for: result.word)
         let isPositive = result.isPositive
 
-        UIView.transition(with: answerView,
+        UIView.transition(with: surface.answerView,
                           duration: isPositive ? 0.75 : 1.0,
                           options: [.transitionCrossDissolve],
                           animations: { [weak self] in
             self?.setAnswerButtons(enabled: false, dimming: isPositive)
-            self?.showAnswer(text, isPositive: isPositive)
+            self?.surface.showAnswer(text, isPositive: isPositive)
         }) { [weak self] _ in
             self?.setAnswerButtons(enabled: true, dimming: isPositive)
             self?.advance(afterCorrect: isPositive)
@@ -264,7 +284,8 @@ class ExerciseViewController: UIViewController {
         lookUp(term: promptLabel.text ?? "", sender: self)
     }
 
-    @objc func listenTapped() {
+    @objc private func listenTapped() {
+        surface.willLeaveCurrentWord()
         guard let text = promptLabel.attributedText else { return }
         SpeechManager.shared.speak(text, language: languages.promptLanguage)
     }

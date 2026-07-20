@@ -70,30 +70,41 @@ class ExersizeChooserViewController: UIViewController {
         })) + "."
     }
 
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if  ["Learning Exercise", "Dictation Exercise", "Phonetic Exercise"].contains(segue.identifier) {
-            let countOfWordsToShow: Int
-            var alertMessage: String = NSLocalizedString("Current set is empty. Add some words to learn.", comment: "Message for alert for empty set to display")
-            if includeLeanedWords.isOn {
-                countOfWordsToShow = Storage.wordsAndStat.count
-            } else {
-                countOfWordsToShow = Storage.wordsAndStat.filter({ $0.known < WordAndStat.maxKnownLevel}).count
-                if Storage.wordsAndStat.count > 0 {
-                    alertMessage = NSLocalizedString("You may opt to include learned words if you'd like to continue exercises.", comment: "Message for alert for empty set to display")
-                }
-            }
-            if countOfWordsToShow == 0 {
-                let alert = UIAlertController(
-                    title: NSLocalizedString("No words to study", comment: "Title for alert"),
-                    message: alertMessage,
-                    preferredStyle: .alert)
-                alert.addAction(UIAlertAction(
-                    title: NSLocalizedString("OK", comment: "Action for alert for empty set"),
-                    style: .default,
-                    handler: nil))
-                present(alert, animated: true, completion: nil)
-            }
-        }
+    // MARK: - Starting an exercise
+
+    @IBAction func learningTapped(_ sender: Any) { start(.learning) }
+    @IBAction func dictationTapped(_ sender: Any) { start(.dictation) }
+    @IBAction func phoneticsTapped(_ sender: Any) { start(.phonetics) }
+
+    /// Pushes the exercise, unless there is nothing to study.
+    ///
+    /// This guard used to live in `prepare(for:)`, which **cannot cancel a segue** — the
+    /// alert appeared and the empty exercise was pushed underneath it anyway. Building the
+    /// screen here instead of segueing makes refusing it a plain early return, and lets the
+    /// exercise screen take its answer surface through an initializer.
+    private func start(_ exercise: ExerciseSession.Exercise) {
+        guard hasWordsToStudy() else { return }
+        navigationController?.pushViewController(ExerciseViewController.make(exercise), animated: true)
     }
 
+    private func hasWordsToStudy() -> Bool {
+        let words = Storage.wordsAndStat
+        let studiable = includeLeanedWords.isOn
+            ? words.count
+            : words.filter { $0.known < WordAndStat.maxKnownLevel }.count
+        guard studiable == 0 else { return true }
+
+        let message = words.isEmpty
+            ? NSLocalizedString("Current set is empty. Add some words to learn.",
+                                comment: "Message for alert for empty set to display")
+            : NSLocalizedString("You may opt to include learned words if you'd like to continue exercises.",
+                                comment: "Message for alert for empty set to display")
+        let alert = UIAlertController(
+            title: NSLocalizedString("No words to study", comment: "Title for alert"),
+            message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(
+            title: NSLocalizedString("OK", comment: "Action for alert for empty set"), style: .default))
+        present(alert, animated: true)
+        return false
+    }
 }

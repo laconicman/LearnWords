@@ -531,16 +531,39 @@ A single shared layout would have made one fix cover all three — and would hav
      them, so the new suite raced `WordAndStatTests` over the global
      `maxKnownLevelPreference` — passing alone, failing in the full run. Both now nest
      under one serialized `MaxKnownLevel` parent, which also shares the pinning helper.
-2. **One exercise layout** — **done (2026-07-20)**. `Features/Exercise/ExerciseViewController.swift`
-   assembles the exercise screen once, in code: progress view, word, answer surface, utility
-   row, answer row, optional accessory, wrapped by `ScrollableContent`. The three storyboard
-   scenes are now bare view controllers — no view subtree, no outlets, no actions — so the
-   layout cannot diverge again. Subclasses declare only what differs: their `exercise`, their
-   answer surface (`makeAnswerView`), how it is filled and cleared, and (Phonetics only)
-   `willLeaveCurrentWord()` for audio-session ownership.
-   - `WordTestViewController` is **32 lines**; the three screens total ~380, against ~900 before.
-   - Prompt/answer text and speech languages come from `LanguagePair`, so a screen no longer
-     spells out `foreignToNative ? firstWord : secondWord` in four places.
+2. **One exercise screen** — **done (2026-07-20)**. `Features/Exercise/ExerciseViewController.swift`
+   assembles it once, in code: progress view, word, answer surface, utility row, answer row,
+   optional accessory, wrapped by `ScrollableContent`. The three storyboard scenes are gone
+   entirely, so the layout cannot diverge again. Prompt/answer text and speech languages come
+   from `LanguagePair`, so no screen spells out `foreignToNative ? firstWord : secondWord`.
+
+   **Composition, not an abstract base (owner review).** The first cut was an abstract
+   `ExerciseViewController` whose subclasses overrode members guarded by
+   `fatalError("must override")` — runtime traps for something the compiler can enforce.
+   Now the screen is `final` and is *given* what differs:
+   - **`ExerciseAnswerSurface`** — how an answer is taken and shown. **`ExerciseScreen`** is
+     the narrow back-channel a surface receives (current word, languages, `answer(_:)`,
+     `presentAlert`): it can read the question and submit an answer, not drive the round.
+   - The three subclasses became **`SelfAssessedAnswerSurface`**, **`TypedAnswerSurface`**,
+     **`SpokenAnswerSurface`** — plain objects, so they are testable without a view
+     controller, which a subclass never was.
+   - `init(exercise:answerSurface:title:)` with `init(coder:)` marked
+     `@available(*, unavailable)`. Nothing abstract to instantiate, no `fatalError` override
+     guard anywhere.
+   - *Why not a protocol with default implementations:* protocol extensions have no stored
+     properties, and the screen owns real state (session, languages, container, buttons). A
+     protocol could only declare them, pushing them back into each conformer and reinstating
+     the triplication. Extension-only members are statically dispatched too, so a conformer
+     "overriding" a default would be silently ignored — a worse trap than the one removed.
+   - Injection means these screens are no longer storyboard-instantiated (`init(coder:)`
+     takes no arguments, and `instantiateViewController(identifier:creator:)` is iOS 13+,
+     above the 12.1 floor). The chooser pushes `ExerciseViewController.make(_:)`.
+   - **Bug fixed on the way:** the "no words to study" guard lived in `prepare(for:)`, which
+     **cannot cancel a segue** — the alert appeared and the empty exercise was pushed
+     underneath it anyway. It is an early return in the button action now.
+   - Exercise titles and button labels moved from storyboard object-id keys to
+     `NSLocalizedString`, so their es/ru units were migrated into `Localizable.xcstrings`
+     rather than lost with the scenes.
 
 **Outcome taxonomy adopted (2026-07-20).** `ExerciseSession.answer` now takes a
 `ReviewOutcome` (`Model/ReviewOutcome.swift`) rather than `isKnown: Bool` — the exact
