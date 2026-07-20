@@ -50,9 +50,11 @@ Priority-ordered. Rationale lives in [Design](Design.md); debt items in [TechDeb
   six copy-pasted exercise animations; owner confirmed TD-14 settings screen and TD-15
   speech on-device (remaining console lines are benign — see TD-15).
 
-- **TD-16 adoption (2026-07-19)** — `ExerciseTransition.advance` replaces the six copied
-  animator blocks (lifetime-tested); KaPow linked (local SPM, iOS 12 floor); shake/shine/
-  level-up-spray wired in all three exercise screens. 36/36 tests green. Manual feel-pass
+- **TD-16 adoption (2026-07-19, fixed 07-20)** — `ExerciseTransition.show`/`advance`
+  replace the six copied animator blocks (lifetime-tested); KaPow linked (local SPM,
+  iOS 12 floor); shake/shine/level-up-spray wired in all three exercise screens. First
+  cut blanked the exercise screens (entry spring-in removed — owner caught it); fixed +
+  locked by a storyboard-driven appearance test. 38/38 tests green. Manual feel-pass
   pending (see `TASK-TD16-adoption.md` § Verification).
 
 ## Next

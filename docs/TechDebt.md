@@ -271,12 +271,17 @@ The underlying debt: the exercise screens **copy-pasted the same two animations*
 shrink-fade-out + `askQuestion()` completion), and the app had no feedback/delight effects.
 
 **Adoption executed (2026-07-19, per `TASK-TD16-adoption.md`):**
-- **`ExerciseTransition.advance`** (`Shared/DesignSystem/ExerciseTransition.swift`) — the
-  whole fade-out → refresh → spring-in cycle in one place; the six copied blocks are now
-  three one-call sites. Lifetime-safe by construction: holds the container weakly and skips
-  `refresh` once the container leaves its window — **proven by
+- **`ExerciseTransition`** (`Shared/DesignSystem/ExerciseTransition.swift`) — `show` (the
+  entry spring-in from the hidden state each screen's `viewDidLoad` sets) + `advance`
+  (fade-out → window-guarded `refresh`); the six copied blocks are now six one-line calls
+  of two shared methods. Lifetime-safe by construction: the container is held weakly and
+  `refresh` is skipped once it leaves its window — **proven by
   `ExerciseTransitionTests.refreshSkippedWhenScreenIsLeftDuringDelay`** (the exact crash
-  scenario).
+  scenario). *Correction (2026-07-20):* the first adoption folded `show` into `advance`,
+  which blanked every exercise screen — the standalone spring-in is the load-bearing
+  **entry** animation because the screens start at alpha 0. Caught by the owner; now locked
+  in by `ExerciseScreenAppearanceTests.exerciseScreenBecomesVisibleAfterAppearing`, which
+  drives the storyboard's `WordTest` scene through a real appearance cycle.
 - **KaPow** (the Pow→UIKit port, local SPM package at
   `../Documents/Code/Animations/KaPow`, iOS 12 floor) linked into the app target.
 - **Product mapping wired** in all three `afterAnswer(isKnown:)`: wrong → `.kapow.shake()`

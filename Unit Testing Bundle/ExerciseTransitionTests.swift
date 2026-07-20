@@ -26,11 +26,15 @@ struct ExerciseTransitionTests {
         defer { window.isHidden = true }
 
         var refreshed = false
-        ExerciseTransition.advance(container, afterDelay: 0.02) { refreshed = true }
+        // Mirrors the screens: refresh (askQuestion) ends by springing the container back in.
+        ExerciseTransition.advance(container, afterDelay: 0.02) {
+            refreshed = true
+            ExerciseTransition.show(container)
+        }
 
-        try await Task.sleep(nanoseconds: 1_200_000_000)  // delay + 0.5 s fade + margin
+        try await Task.sleep(nanoseconds: 1_600_000_000)  // delay + fade + spring + margin
         #expect(refreshed)
-        #expect(container.alpha == 1)  // spring-in restored the container
+        #expect(container.alpha == 1)  // show restored the container
     }
 
     @Test func refreshSkippedWhenScreenIsLeftDuringDelay() async throws {

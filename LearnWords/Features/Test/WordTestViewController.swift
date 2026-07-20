@@ -225,6 +225,8 @@ final class WordTestViewController: UIViewController {
 //        container.addSubview(rlvc.view)
 
         //present(rlvc, animated: true)
+
+        ExerciseTransition.show(stackView)
     }
 
     func prepareForNextQuestion(withPrewiousKnown: Bool = true) {

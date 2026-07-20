@@ -299,6 +299,8 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
         
 
         //present(rlvc, animated: true)
+
+        ExerciseTransition.show(stackView)
     }
     
     func afterAnswer(isKnown: Bool) {

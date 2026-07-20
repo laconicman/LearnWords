@@ -17,8 +17,19 @@ import KaPow
 
 enum ExerciseTransition {
 
-    /// The question-advance cycle: shrink-fade the exercise container out, run `refresh`
-    /// (swap in the next question's content), then spring the container back in.
+    /// Springs the exercise container in from its hidden state (alpha 0, scale 0.8 — set
+    /// in each screen's `viewDidLoad`). The screens call this at the end of `askQuestion`,
+    /// so it is both the entry animation and the second half of the advance cycle.
+    static func show(_ container: UIView) {
+        let springIn = UIViewPropertyAnimator(duration: 0.5, dampingRatio: 0.5) { [weak container] in
+            container?.alpha = 1
+            container?.transform = .identity
+        }
+        springIn.startAnimation()
+    }
+
+    /// The question-advance cycle: shrink-fade the exercise container out, then run
+    /// `refresh` (swap in the next question's content — which ends in `show(_:)`).
     ///
     /// Lifetime-safe by construction — this was the TD-16 crash: the delayed start (up to
     /// 2 s) can outlive the screen. The container is held weakly and `refresh` is skipped
@@ -34,11 +45,6 @@ enum ExerciseTransition {
         fadeOut.addCompletion { [weak container] _ in
             guard let container, container.window != nil else { return }
             refresh()
-            let springIn = UIViewPropertyAnimator(duration: 0.5, dampingRatio: 0.5) { [weak container] in
-                container?.alpha = 1
-                container?.transform = .identity
-            }
-            springIn.startAnimation()
         }
         fadeOut.startAnimation(afterDelay: delay)
     }

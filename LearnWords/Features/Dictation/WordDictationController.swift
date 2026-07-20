@@ -239,6 +239,8 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
         
 
         //present(rlvc, animated: true)
+
+        ExerciseTransition.show(stackView)
     }
 
     func prepareForNextQuestion(withPrewiousKnown: Bool = true) {

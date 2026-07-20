@@ -10,11 +10,11 @@
 		DA246CD61F8AA30E00A75ED1 /* Widget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = DA246CC91F8AA30E00A75ED1 /* Widget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		DA58C03C2ED481E000B4A733 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = DA58C03B2ED481E000B4A733 /* AppIcon.icon */; };
 		DAA16D7224B60673003C28FD /* ImportAsDictAction.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = DAA16D6624B60673003C28FD /* ImportAsDictAction.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		DACAF0DE300C000300DC9410 /* KaPow in Frameworks */ = {isa = PBXBuildFile; productRef = DACAF0DE300C000200DC9410 /* KaPow */; };
 		DACDF167300B672C00DC9410 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DACDF149300B662A00DC9410 /* WidgetKit.framework */; };
 		DACDF168300B672C00DC9410 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DACDF14B300B662A00DC9410 /* SwiftUI.framework */; };
 		DACDF175300B672D00DC9410 /* WordWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = DACDF166300B672C00DC9410 /* WordWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		DADCA5FA2F82AF7B00AC0C2A /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = DADCA5F92F82AF7B00AC0C2A /* PrivacyInfo.xcprivacy */; };
-		DACAF0DE300C000300DC9410 /* KaPow in Frameworks */ = {isa = PBXBuildFile; productRef = DACAF0DE300C000200DC9410 /* KaPow */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -82,6 +82,21 @@
 			);
 			target = DACDF165300B672C00DC9410 /* WordWidgetExtension */;
 		};
+		DACDF1F0300B9ABC00DC9410 /* Exceptions for "LearnWords" folder in "WordWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Model/Settings.swift,
+				Model/Storage.swift,
+				Model/UserDefaultsWordStore.swift,
+				Model/WordsModel.swift,
+				Model/WordStore.swift,
+				Shared/AppConstants.swift,
+				Shared/Debug.swift,
+				"Shared/Extensions/String+.swift",
+				"Shared/Extensions/UserDefaults+Codable.swift",
+			);
+			target = DACDF165300B672C00DC9410 /* WordWidgetExtension */;
+		};
 		DADB609230083110002A71A8 /* Exceptions for "LearnWords" folder in "LearnWords" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -126,21 +141,6 @@
 				Info.plist,
 			);
 			target = DAA16D6524B60673003C28FD /* ImportAsDictAction */;
-		};
-		DACDF1F0300B9ABC00DC9410 /* Exceptions for "LearnWords" folder in "WordWidgetExtension" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Model/Settings.swift,
-				Model/Storage.swift,
-				Model/UserDefaultsWordStore.swift,
-				Model/WordStore.swift,
-				Model/WordsModel.swift,
-				Shared/AppConstants.swift,
-				Shared/Debug.swift,
-				"Shared/Extensions/String+.swift",
-				"Shared/Extensions/UserDefaults+Codable.swift",
-			);
-			target = DACDF165300B672C00DC9410 /* WordWidgetExtension */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -284,10 +284,10 @@
 				DADB60643008310F002A71A8 /* LearnWords */,
 			);
 			name = LearnWords;
-			productName = LearnWords;
 			packageProductDependencies = (
 				DACAF0DE300C000200DC9410 /* KaPow */,
 			);
+			productName = LearnWords;
 			productReference = DA246CB01F8A6E5E00A75ED1 /* LearnWords.app */;
 			productType = "com.apple.product-type.application";
 		};
@@ -851,11 +851,11 @@
 		DACDF177300B672D00DC9410 /* Debug configuration for PBXNativeTarget "WordWidgetExtension" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = WordWidget/WordWidget.entitlements;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_ENTITLEMENTS = WordWidget/WordWidget.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -890,11 +890,11 @@
 		DACDF178300B672D00DC9410 /* Release configuration for PBXNativeTarget "WordWidgetExtension" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = WordWidget/WordWidget.entitlements;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_ENTITLEMENTS = WordWidget/WordWidget.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -980,7 +980,7 @@
 /* Begin XCLocalSwiftPackageReference section */
 		DACAF0DE300C000100DC9410 /* XCLocalSwiftPackageReference "../../../../../Documents/Code/Animations/KaPow" */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = "../../../../../Documents/Code/Animations/KaPow";
+			relativePath = ../../../../../Documents/Code/Animations/KaPow;
 		};
 /* End XCLocalSwiftPackageReference section */
 
