@@ -90,11 +90,16 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        underKeyboardLayoutConstraint.setup(stackBottomConstraint, view: view, minMargin: 0)
-        
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .fastForward, target: self, action: #selector(nextTapped))
         startRound()
-        
+
+        // Re-parenting drops `stackBottomConstraint` along with the stack, so keyboard
+        // avoidance moves to the scroll view's bottom pin — same helper, same behaviour.
+        let wrapped = ScrollableContent.wrap(stackView)
+        if let bottom = wrapped?.bottomConstraint {
+            underKeyboardLayoutConstraint.setup(bottom, view: view, minMargin: 0)
+        }
+
         stackView.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
         stackView.alpha = 0
         
@@ -177,8 +182,8 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
                             if isKnown { self?.knowButton?.layer.opacity = 0.1 } else { self?.forgotButton?.layer.opacity = 0.1 }
                             self?.translationInput.attributedText = NSAttributedString(
                                 string: LWUserDefaults.standard.foreignToNative ? shownWord.secondWord : shownWord.firstWord,
-                                attributes: [.foregroundColor: isKnown ? UIColor(red: 0, green: 0.7, blue: 0, alpha: 1) : UIColor(red: 0.7, green: 0.0, blue: 0, alpha: 1)])
-                            self?.translationInput.textColor = isKnown ? UIColor(red: 0, green: 0.7, blue: 0, alpha: 1) : UIColor(red: 0.7, green: 0.0, blue: 0, alpha: 1)
+                                attributes: [.foregroundColor: isKnown ? UIColor.lwAnswerCorrect : UIColor.lwAnswerWrong])
+                            self?.translationInput.textColor = isKnown ? .lwAnswerCorrect : .lwAnswerWrong
         }) { [weak self] (ended) in
             self?.knowButton?.isEnabled = true
             if isKnown { self?.knowButton?.layer.opacity = 1 } else { self?.forgotButton?.layer.opacity = 1 }
@@ -214,13 +219,9 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
         translationInput.isUserInteractionEnabled = true
         translationInput.attributedPlaceholder = NSAttributedString(
             string: NSLocalizedString("type in the translation", comment: "Placeholder promt"),
-            attributes: [.foregroundColor: UIColor(red: 0, green: 0.7, blue: 0.7, alpha: 1)])
+            attributes: [.foregroundColor: UIColor.lwAnswerPending])
         translationInput.text = ""
-        if #available(iOS 13.0, *) {
-            translationInput.textColor = .label
-        } else {
-            translationInput.textColor = .black
-        }
+        translationInput.textColor = .lwTextPrimary
         // prompt.textColor = UIColor(red: 0, green: 0.7, blue: 0, alpha: 1)
 
 

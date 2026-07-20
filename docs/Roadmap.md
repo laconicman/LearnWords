@@ -61,6 +61,21 @@ Priority-ordered. Rationale lives in [Design](Design.md); debt items in [TechDeb
   constraints spam (1-pt over-constraint vs the 44-pt ring); pins relaxed to ≥ 4; verified
   clean console + unchanged cells. Ring-replacement research recorded in TD-17.
 
+- **Buttons modernized** (TD-19, 2026-07-20) — `GradientButton` → **`LWButton`**: a button
+  states a `Purpose`, the control picks the appearance per OS in **one `#available` check**
+  (`UIButton.Configuration` + capsule on iOS 15+, 5pt radius on 12–14). Gradients/borders
+  kept as an off-by-default theming seam. Also: exercise button geometry equalized (2×2
+  grid, 56pt scaled, `Listen` added to Test), layout made stable across words
+  (`fillProportionally` → `fill` + `LWWordLabel` autoshrink), check/x symbols on the answer
+  pair, and the cramped Direction segmented control replaced by a swap row. Follow-up pass
+  after owner review: semantic `LWColors` replace 14 hard-coded RGB literals across the
+  exercise screens (answer text now shares the button's green/red and adapts to dark mode),
+  Dynamic Type audited end to end — `LWButtonRow` stacks button pairs vertically at
+  accessibility sizes instead of truncating, and the chooser became scrollable so
+  "Фонетика" stays reachable — and the new `Listen` button picked up its `es`/`ru` strings.
+  38/38 tests green; verified on the iOS 26.5 sim in light/dark, English/Russian, and at
+  `accessibility-extra-large`. iOS 12–14 path unverified (TD-8).
+
 - **Progress model designed** (2026-07-20) — [ProgressModel](ProgressModel.md): append-only
   `ReviewEvent` log (verbatim/judged/self-assessed outcomes, negatives never cancel
   positives, response text kept for AI judging), derived effort/mastery/retention indexes,

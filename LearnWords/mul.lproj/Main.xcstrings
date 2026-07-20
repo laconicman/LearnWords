@@ -553,50 +553,14 @@
         }
       }
     },
-    "K2v-wJ-d9a.segmentTitles[0]" : {
-      "comment" : "Class = \"UISegmentedControl\"; K2v-wJ-d9a.segmentTitles[0] = \" Straight\"; ObjectID = \"K2v-wJ-d9a\";",
+    "K2v-wJ-d9a.normalTitle" : {
+      "comment" : "Class = \"UIButton\"; normalTitle = \"Direction\"; ObjectID = \"K2v-wJ-d9a\";",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : " Straight"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : " Straight"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Прямой"
-          }
-        }
-      }
-    },
-    "K2v-wJ-d9a.segmentTitles[1]" : {
-      "comment" : "Class = \"UISegmentedControl\"; K2v-wJ-d9a.segmentTitles[1] = \"Reversed\"; ObjectID = \"K2v-wJ-d9a\";",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Reversed"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reversed"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Обратный"
+            "value" : "Direction"
           }
         }
       }
@@ -651,6 +615,30 @@
     },
     "Liq-qX-vPh.normalTitle" : {
       "comment" : "Class = \"UIButton\"; normalTitle = \"Listen\"; ObjectID = \"Liq-qX-vPh\";",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Listen"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Listen"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Слушать"
+          }
+        }
+      }
+    },
+    "Lwt-U0-lsn.normalTitle" : {
+      "comment" : "Class = \"UIButton\"; normalTitle = \"Listen\"; ObjectID = \"Lwt-U0-lsn\";",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {

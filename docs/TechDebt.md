@@ -347,6 +347,179 @@ TD-13. **Discharge:** give `Word` a `UUID` (assigned on creation/first migration
 `ReviewEvent.wordID` and set membership by it; `firstWord` becomes display/search data.
 Sequenced as the first step of TD-13 — see [ProgressModel](ProgressModel.md).
 
+## TD-19 — Buttons frozen in 2017 — **resolved (2026-07-20)**
+
+`GradientButton` drew the same chrome (gradient fill, 1pt `lightGray` border, 5pt corners,
+Title1) on **every** iOS version. Nothing about it adapted, so as iOS 26 modernized the
+surfaces around it — nav bar, tab bar, segmented control and alerts are all system-drawn
+Liquid Glass — the buttons alone stayed put and the mismatch became the app's most visible
+cosmetic defect. Three further faults were found while fixing it:
+
+- **Inverted hierarchy.** `Look Up` (a utility) was the widest control on the Test screen,
+  louder than `Know`/`Forgot`. The HIG asks for a prominent style on the *likely* action and
+  at most one or two prominent buttons per view; the exercise screens had four or five.
+- **No two screens agreed.** Button heights were 83 (Test), 100 (Dictation) and 71.5/72
+  (Phonetics); Test was also the only screen with a full-width utility button.
+- **Layout drifted per word.** The exercise stacks used `distribution="fillProportionally"`,
+  so every arranged view was sized from its content — a long translation resized *and moved*
+  the buttons between questions.
+
+**Resolution.**
+- **`LWButton`** (`Shared/DesignSystem/LWButton.swift`) replaces `GradientButton`. A button
+  declares a **`Purpose`** (`utility` / `affirmative` / `negative` / `prominent`) and the
+  control decides how that looks per OS. All 15 buttons already funnelled through one class,
+  so the whole version story is **one `#available` check in one file**:
+  `UIButton.Configuration` + `.capsule` on **iOS 15+** (both 15.0+; the system keeps drawing
+  them correctly as the platform moves), a 5pt radius on **12–14** — capsules are a later
+  epoch and aping them on iOS 12 would look more wrong than the flat rectangle. `.glass()`
+  is *not* adopted: it is opt-in on iOS 26, and tinted/filled remain correct there.
+  `cornerStyle` is set explicitly rather than relying on an SDK-linked default.
+- **Gradients and borders survive as a seam, off by default** (`startColor`/`endColor`/
+  `borderColor`/`borderWidth`). Setting either colour opts a button back into the old chrome
+  on any OS. This costs nothing because the 12–14 renderer has to exist regardless — it is a
+  seam for a future theme feature, deliberately **not** a theme system (YAGNI).
+- **`LWWordLabel`** (same folder) makes the word display the elastic part of the layout:
+  autoshrink (`minimumScaleFactor` 0.3, 2 lines) plus low vertical hugging. With the stacks
+  moved to `distribution="fill"` and `LWButton` pinning its own height
+  (`UIFontMetrics.scaledValue(for: 56)` — the TD-17 rule), buttons **keep size and position
+  between questions** and verbose text scales itself down instead.
+- **Geometry equalized.** All exercise buttons are half-width pairs at the same height; the
+  Test screen gained a `Listen` button (`listenAction`, mirroring `askQuestion`'s language
+  choice) so all three screens are a 2×2 grid.
+- **Accessibility.** `Know`/`Forgot` carry checkmark/xmark symbols, so the answer pair no
+  longer depends on red/green alone. `nil` below iOS 13 — text-only, the same degradation
+  tier as the tab icons (TD-11).
+- **Direction control** (`ExersizeChooserViewController`): the two-segment control had to fit
+  both directions side by side, and its titles are built from *localized language names*, so
+  ~170pt per segment shrank "Russian>English" to near-illegible (worse for longer pairs).
+  Replaced by a single `LWButton` row naming the current direction with a swap icon; the
+  names get the full width whatever languages are chosen.
+
+**Semantic colours and Dynamic Type (2026-07-20, owner review).** Follow-up pass:
+- **`LWColors`** (`Shared/DesignSystem/LWColors.swift`) names colours by meaning —
+  `lwAnswerCorrect` / `lwAnswerWrong` / `lwAnswerPending` / `lwAccent`. The exercise screens
+  had `UIColor(red: 0, green: 0.7, blue: 0, alpha: 1)` repeated across all three
+  controllers: a fixed triple can't adapt to dark mode, and three copies were free to drift.
+  Now the answer text and the button a learner presses share one definition. 14 literals
+  replaced; commented-out code left alone. Dictation's `#available(iOS 13)`
+  `.label`/`.black` branch collapsed to `lwTextPrimary`, deleting an availability check.
+  Phonetics' record button signalled recording with `tintColor`, which a button
+  configuration ignores — it now switches `purpose` (`.prominent` ⇄ `.negative`).
+- **Dynamic Type.** Titles use `.headline` and re-resolve on
+  `traitCollectionDidChange`; height is a `greaterThanOrEqual` **floor** of
+  `scaledValue(for: 56)`, so buttons still hold position with fixed titles but can grow
+  when a title wraps. Two real bugs surfaced and were fixed at accessibility sizes:
+  (a) half-width buttons truncated Russian titles to "В сло…" / "Зн…" — **`LWButtonRow`**
+  now stacks a button pair vertically when `isAccessibilityCategory`, the same thing
+  `UIAlertController` does, and titles wrap instead of truncating; (b) the chooser's
+  content overflowed off-screen leaving **"Фонетика" untappable** — its scene pins the
+  content stack's bottom at priority 250, which was harmless while buttons were a fixed
+  77pt but not once they scale, so `makeContentScrollable()` re-parents the stack into a
+  scroll view at load. The word labels stay at their scene point size (80/70/60) and only
+  scale *down*: they are already far larger than any Dynamic Type size, and `LWWordLabel`
+  autoshrink is what keeps them in their slot.
+- **Localization.** The new Test-screen `Listen` button carried only `en`; its `es`/`ru`
+  units were copied from the Dictation button in `mul.lproj/Main.xcstrings`
+  ("Слушать"), and the removed segmented control's two stale `segmentTitles` entries
+  deleted. Verified by running the app under `-AppleLanguages "(ru)"`.
+
+**Overflow, fixed once instead of three times (2026-07-20, owner review).** The owner's
+on-device screenshots showed each exercise screen failing *differently*: Phonetics
+overlapped its answer buttons, Test and Dictation pushed them under the tab bar, and
+Phonetics clipped "главный докладчик" even at the **default** text size. That divergence
+is the tell for TD-20 — the same layout lives in three storyboard scenes, so nothing
+forces the three to fail the same way, and a per-scene fix diverges too. Two root causes,
+each now fixed in one place:
+
+- **Labels clipped instead of shrinking.** `UILabel` only honours
+  `adjustsFontSizeToFitWidth` when `numberOfLines == 1`; at two lines it wraps and then
+  *clips*. `LWWordLabel` is now single-line, so it always scales down to fit and nothing
+  is ever cut off.
+- **No overflow strategy.** A pinned `UIStackView` has no answer when content outgrows the
+  screen — it compresses arranged views past their constraints until they overlap.
+  **`ScrollableContent.wrap`** (`Shared/DesignSystem/ScrollableContent.swift`) is the single
+  implementation: it re-parents a content stack into a scroll view pinned to the safe area,
+  with a `defaultHigh` "at least one screenful" constraint so short content still fills the
+  view and only taller content scrolls. Used by **all four** screens — the three exercise
+  scenes and the chooser, which replaced the one-off version written for it earlier.
+  Dictation keeps keyboard avoidance by handing the returned bottom constraint to
+  `UnderKeyboardLayoutConstraint` instead of the stack's own.
+- Also removed: three leftover `height ≤ 100` caps on the answer rows (`TKy-er-IOr`,
+  `fG9-GM-efN`, `c2Y-n1-Bdl`). They existed to rein in the old slabs and fought
+  `LWButtonRow`'s vertical mode, forcing the overlap. `LWButton` owns its height now.
+
+**Second overflow round (2026-07-20, owner review).** Three more defects, two root causes:
+
+- **The word vanished at extra-large text**, and the chooser drew its direction button over
+  the "include learned words" row. Cause: `ScrollableContent` pinned content height *equal*
+  to one screenful at `defaultHigh` (intended to make short content fill the view) **as well
+  as** `greaterThanOrEqual`. The `greaterThanOrEqual` alone already does that job; the
+  equality actively pulled tall content back down to one screen, and the arranged subviews
+  compressed until they overlapped — the word label first, because it had the lowest
+  compression resistance. The equality is gone: **never constrain scrolling content to fit.**
+  `LWWordLabel` also moved to `.defaultHigh` compression resistance — expanding is welcome,
+  disappearing is not, least of all for the word being studied.
+- **"В словаре" was shorter than its neighbours on Phonetics only.** Test's utility row was
+  `fillEqually`, while Dictation's and Phonetics' were plain `fill` with hand-drawn equal-
+  *width* constraints — which say nothing about height once `LWButtonRow` stacks a pair
+  vertically. `LWButtonRow` now sets `distribution = .fillEqually` itself, so the row decides
+  rather than three scenes. (Another TD-20 symptom: the same row, three different settings.)
+- **Bar appearance is now consistent as a side effect.** The app configures only bar
+  `tintColor`; backgrounds are system default, and UIKit picks `scrollEdgeAppearance`
+  (transparent) when it tracks a scroll view. That is why the Words tab's bars were
+  transparent with content flowing under while the exercise screens' were not — the others
+  had no scroll view. Now that every screen does, all of them get the iOS 26 treatment:
+  floating glass controls, no bar background. Verified by comparing the Words and Learning
+  nav bars.
+
+**Verified:** all targets build; **38/38 tests pass**, including the storyboard-driven
+`ExerciseScreenAppearanceTests` that drives the modified `WordTest` scene through a real
+appearance cycle. All four screens checked on the iOS 26.5 simulator, and button positions
+confirmed pixel-identical across successive words. **Not verified:** the iOS 12–14 renderer
+(TD-8 — no sub-15 simulator on Xcode 26); the `purpose == .prominent` style is `.tinted()`
+rather than `.filled()` because the chooser stacks three of them — one line to flip if a
+screen ever earns a single dominant CTA. New `Listen` / direction strings need RU
+translations in `Localizable.xcstrings` (same deferral as TD-14).
+
+## TD-21 — Words-tab nav title collides with its bar buttons
+
+Seen on the iOS 26 sim (2026-07-20) while checking bar consistency: `WordTableViewController`'s
+title ("… слова в наборе") renders *behind* the "Настройки" bar button. iOS 26 draws bar
+buttons as floating glass capsules, so a long title plus a left button and two right buttons
+(`+`, "Править") leaves no room, and the title is overlapped rather than truncated.
+**Cost:** the count of words in the set — the screen's only status line — is unreadable.
+**Discharge:** shorten the title (or move the count into the table header / a subtitle),
+or move "Настройки" out of the bar now that there is an in-app settings screen (TD-14).
+Not touched here: it is outside the button/layout pass and wants a product decision.
+
+## TD-20 — Exercise screens are triplicated in both code and storyboard
+
+`WordTestViewController`, `WordDictationController` and `WordPhoneticsViewController` are
+near-copies: `startRound`, `nextTapped`, `afterAnswer`, `showAnswer`, `askQuestion`,
+`prepareForNextQuestion` and both button actions are the same ~120 lines three times, and
+each screen has its own storyboard scene repeating the same progress-view / word-label /
+button-rows layout. Only ~110 lines are genuinely unique (Phonetics' speech recognition,
+Dictation's text matching, the exercise code `"L"`/`"D"`/`"P"`, and which view receives
+answer feedback).
+
+**Cost — demonstrated, not theoretical (2026-07-20).** The TD-19 layout pass had to be
+applied to three scenes, and the three then failed *differently* on device: overlapping
+buttons on Phonetics, buttons under the tab bar on Test and Dictation, clipped text on
+Phonetics at the default size, and three different leftover height caps (100/150/200).
+A single shared layout would have made one fix cover all three — and would have made one
+*bug* obvious instead of three subtly different ones.
+
+**Discharge.**
+1. **`ExerciseSession`** — lift the round logic (word queue, scoring, progress, skip) into
+   a UIKit-free, testable model type, per the four-layer MVC in [Design](Design.md). This is
+   also on the critical path for [ProgressModel](ProgressModel.md): the screens will append
+   `ReviewEvent`s, and without the extraction that lands in three places (TD-18/TD-13).
+2. **One exercise layout** — a shared container (base view controller or a single scene the
+   three specialise) so the structure exists once. `ScrollableContent` and `LWButtonRow` are
+   the first pieces of this; the storyboard triplication is what remains.
+
+Sequenced before TD-18/TD-13 for the reason in (1).
+
 ## Appendix: feature-first mapping (TD-1) — **executed for source (2026-07-17)**
 
 Target layout per `uikit-app-structure`, now the actual on-disk layout for `.swift` files

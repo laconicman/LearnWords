@@ -29,7 +29,16 @@ final class WordTestViewController: UIViewController {
     @IBAction func lookUpAction(_ sender: UIButton) {
         lookUp(term: prompt.text ?? "", sender: self)
     }
-    
+
+    /// Speaks the question on demand. Mirrors the language choice `askQuestion()` makes
+    /// for its automatic pronunciation, so manual and automatic playback never disagree.
+    @IBAction func listenAction(_ sender: Any) {
+        guard let text = prompt.attributedText else { return }
+        SpeechManager.shared.speak(text, language: LWUserDefaults.standard.foreignToNative
+                                   ? LWUserDefaults.standard.languageToStudyPreference!
+                                   : LWUserDefaults.standard.nativeLanguagePreference!)
+    }
+
     var wordsInTest = [WordAndStat]()
     var shownWord: WordAndStat!
 
@@ -118,7 +127,9 @@ final class WordTestViewController: UIViewController {
 
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .fastForward, target: self, action: #selector(nextTapped))
         startRound()
-        
+
+        ScrollableContent.wrap(stackView)
+
         stackView.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
         stackView.alpha = 0
 
@@ -176,7 +187,7 @@ final class WordTestViewController: UIViewController {
                             self?.forgotButton?.isEnabled = false
                             self?.wordDefinition.attributedText = NSAttributedString(
                                 string: LWUserDefaults.standard.foreignToNative ? shownWord.secondWord : shownWord.firstWord,
-                                attributes: [.foregroundColor: isKnown ? UIColor(red: 0, green: 0.7, blue: 0, alpha: 1) : UIColor(red: 0.7, green: 0.0, blue: 0, alpha: 1)])
+                                attributes: [.foregroundColor: isKnown ? UIColor.lwAnswerCorrect : UIColor.lwAnswerWrong])
                             // prompt.textColor = UIColor(red: 0, green: 0.7, blue: 0, alpha: 1)
         }) { [weak self] (ended) in
             self?.knowButton?.isEnabled = true
@@ -212,7 +223,7 @@ final class WordTestViewController: UIViewController {
         }
         wordDefinition.attributedText = NSAttributedString(
             string: "?",
-            attributes: [.foregroundColor: UIColor(red: 0, green: 0.7, blue: 0.7, alpha: 1)])
+            attributes: [.foregroundColor: UIColor.lwAnswerPending])
         // prompt.textColor = UIColor(red: 0, green: 0.7, blue: 0, alpha: 1)
 
 //        let rlvc = UIReferenceLibraryViewController(term: "apple")
@@ -232,7 +243,7 @@ final class WordTestViewController: UIViewController {
     func prepareForNextQuestion(withPrewiousKnown: Bool = true) {
         ExerciseTransition.advance(stackView, afterDelay: withPrewiousKnown ? 0.1 : 2.0) { [weak self] in
             guard let self else { return }
-            self.wordDefinition.textColor = UIColor(red: 0, green: 0.7, blue: 0, alpha: 0)
+            self.wordDefinition.textColor = .clear
             self.askQuestion()
         }
     }

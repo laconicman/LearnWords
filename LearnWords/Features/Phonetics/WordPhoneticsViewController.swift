@@ -50,7 +50,7 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
     
     @IBOutlet var recognized: UILabel!
     
-    @IBOutlet var recordButton: UIButton!
+    @IBOutlet var recordButton: LWButton!
     
     // MARK: - View Controller Lifecycle
     
@@ -59,7 +59,9 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
 
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .fastForward, target: self, action: #selector(nextTapped))
         startRound()
-        
+
+        ScrollableContent.wrap(stackView)
+
         stackView.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
         stackView.alpha = 0
         
@@ -197,7 +199,7 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
 
                 self?.recordButton.isEnabled = true
                 self?.recordButton.setTitle(NSLocalizedString("Start recognition", comment: "Button title"), for: [])
-                self?.recordButton.tintColor = .black
+                self?.recordButton.purpose = .prominent
                 if let error, (error as NSError).code != 203 {
                     
                     var ac = UIAlertController(title: NSLocalizedString("Speech recognition error", comment: ""), message: error.localizedDescription + "\n" + (error as NSError).userInfo.debugDescription, preferredStyle: .alert)
@@ -234,7 +236,7 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
             recordButton.setTitle(NSLocalizedString("Recognition Not Available", comment: "Button title"), for: .disabled)
             // print("Unavalible")
         }
-        recordButton.tintColor = .black
+        recordButton.purpose = .prominent
     }
     
     // MARK: - Interface Builder actions
@@ -246,15 +248,15 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
             
             recordButton.isEnabled = false
             recordButton.setTitle(NSLocalizedString("Stopping", comment: "Button title"), for: .disabled)
-            recordButton.tintColor = .black
+            recordButton.purpose = .prominent
         } else {
             do {
                 try startRecording()
                 recordButton.setTitle(NSLocalizedString("Stop recognition", comment: "Button title"), for: [])
-                recordButton.tintColor = .red
+                recordButton.purpose = .negative
             } catch {
                 recordButton.setTitle(NSLocalizedString("Recognition Not Available", comment: "Button title"), for: [])
-                recordButton.tintColor = .black
+                recordButton.purpose = .prominent
             }
         }
     }
@@ -280,7 +282,7 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
         }
         recognized.attributedText = NSAttributedString(
             string: NSLocalizedString("pronounce the translation", comment: "label prompt"),
-            attributes: [.foregroundColor: UIColor(red: 0, green: 0.7, blue: 0.7, alpha: 1)])
+            attributes: [.foregroundColor: UIColor.lwAnswerPending])
         // prompt.textColor = UIColor(red: 0, green: 0.7, blue: 0, alpha: 1)
 
 
@@ -376,10 +378,10 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
                             if isKnown { self?.knowButton?.layer.opacity = 0.1 } else { self?.forgotButton?.layer.opacity = 0.1 }
                             self?.recognized.attributedText = NSAttributedString(
                                 string: LWUserDefaults.standard.foreignToNative ? shownWord.secondWord : shownWord.firstWord,
-                                attributes: [.foregroundColor: isKnown ? UIColor(red: 0, green: 0.7, blue: 0, alpha: 1) : UIColor(red: 0.7, green: 0.0, blue: 0, alpha: 1)])
+                                attributes: [.foregroundColor: isKnown ? UIColor.lwAnswerCorrect : UIColor.lwAnswerWrong])
                             self?.view.layoutIfNeeded()
                             debugLog("begin transition")
-                            self?.recognized.textColor = isKnown ? UIColor(red: 0, green: 0.7, blue: 0, alpha: 1) : UIColor(red: 0.7, green: 0.0, blue: 0, alpha: 1)
+                            self?.recognized.textColor = isKnown ? .lwAnswerCorrect : .lwAnswerWrong
         }) { [weak self] (ended) in
             self?.knowButton?.isEnabled = true
             if isKnown { self?.knowButton?.layer.opacity = 1 } else { self?.forgotButton?.layer.opacity = 1 }
