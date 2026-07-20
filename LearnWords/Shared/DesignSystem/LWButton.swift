@@ -101,6 +101,11 @@ final class LWButton: UIButton {
         titleLabel?.minimumScaleFactor = 0.5
         titleLabel?.adjustsFontForContentSizeCategory = true
         titleLabel?.numberOfLines = 0
+        // Hug vertically: a button is the size its purpose says it is. Spare room in a
+        // stack belongs to the content — the word being studied — not to inflating the
+        // controls, which is what happened to the exercise chooser once its screen
+        // stopped being force-fit.
+        setContentHuggingPriority(.defaultHigh, for: .vertical)
     }
 
     override func awakeFromNib() {

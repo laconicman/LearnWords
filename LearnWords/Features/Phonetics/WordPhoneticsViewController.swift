@@ -31,12 +31,11 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
         // try? audioSession.setCategory(.playback, mode: .measurement, options: [])
         try? audioSession.setCategory(.playback, mode: .default, policy: .default, options: [])
         try? audioSession.setActive(true, options: .notifyOthersOnDeactivation)
-        SpeechManager.shared.speak(NSAttributedString(string: wordsInTest[0].firstWord), language: LWUserDefaults.standard.languageToStudyPreference!)
+        guard let word = session.currentWord else { return }
+        SpeechManager.shared.speak(NSAttributedString(string: word.firstWord), language: LWUserDefaults.standard.languageToStudyPreference!)
     }
-    var wordsInTest = [WordAndStat]()
-    var shownWord: WordAndStat!
-    
-    private var progressStep: Float = 0.0
+    /// The round: queue, scoring and progress (TD-20). The screen keeps only its views.
+    private var session = ExerciseSession(exercise: .phonetics, words: [])
     
     private let speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: LWUserDefaults.standard.foreignToNative ? LWUserDefaults.standard.nativeLanguagePreference! : LWUserDefaults.standard.languageToStudyPreference!))!
     
@@ -72,7 +71,7 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
     override public func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         navigationController?.hidesBarsOnTap = false
-        if wordsInTest.isEmpty {
+        if session.isFinished {
             startRound()
         }
         askQuestion()
@@ -173,15 +172,15 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
                 isFinal = result.isFinal
                 // print("Text \(result.bestTranscription.formattedString)")
                 // print("Transcriptions \(result.transcriptions.map{ $0.formattedString.lowercased() })")
-                if !(self?.wordsInTest.isEmpty ?? true),  match3(
-                    pattern: (LWUserDefaults.standard.foreignToNative ? self?.wordsInTest[0].secondWord: self?.wordsInTest[0].firstWord) ?? "",
+                if let expected = self?.session.currentWord, match3(
+                    pattern: LWUserDefaults.standard.foreignToNative ? expected.secondWord : expected.firstWord,
                     answer: result.bestTranscription.formattedString.lowercased(),
                     language: (LWUserDefaults.standard.foreignToNative ? LWUserDefaults.standard.nativeLanguagePreference :
                                 LWUserDefaults.standard.languageToStudyPreference)!,
                     delimiters: ",; ")    /* && isFinal */ {
                     self?.recordButtonTapped() // stop the audio
                     
-                    self?.recognized.text = LWUserDefaults.standard.foreignToNative ? self?.wordsInTest[0].secondWord : self?.wordsInTest[0].firstWord
+                    self?.recognized.text = LWUserDefaults.standard.foreignToNative ? expected.secondWord : expected.firstWord
                     self?.afterAnswer(isKnown: true)
                 } else {
                    // self.correct.text = ""
@@ -266,17 +265,16 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
     
     func askQuestion() {
         //prompt.text = wordsInTest[questionCounter].components(separatedBy: "::")[1]
-        guard !wordsInTest.isEmpty else {
-            Storage.saveWords(Storage.shownWords)
-            Storage.wordsAndStat = Storage.shownWords
+        guard let word = session.currentWord else {
+            session.commit()
             navigationController?.popToRootViewController(animated: true)
             return
         }
-        if  (wordsInTest[0].known >= WordAndStat.maxKnownLevel) && (!LWUserDefaults.standard.includeLearnedWords) {
+        if session.skipsCurrentWord(includingLearned: LWUserDefaults.standard.includeLearnedWords) {
             nextTapped()
             return
         }
-        prompt.attributedText = NSAttributedString(string: LWUserDefaults.standard.foreignToNative ? wordsInTest[0].firstWord : wordsInTest[0].secondWord)
+        prompt.attributedText = NSAttributedString(string: LWUserDefaults.standard.foreignToNative ? word.firstWord : word.secondWord)
         if LWUserDefaults.standard.pronounceQuestionsPreference {
             SpeechManager.shared.speak(prompt.attributedText!, language: LWUserDefaults.standard.foreignToNative ? LWUserDefaults.standard.languageToStudyPreference! : LWUserDefaults.standard.nativeLanguagePreference!)
         }
@@ -306,29 +304,23 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
     }
     
     func afterAnswer(isKnown: Bool) {
-        if !wordsInTest.isEmpty {
-            shownWord = wordsInTest.remove(at: 0)
-            let wasKnown = shownWord.known >= WordAndStat.maxKnownLevel
-            isKnown ? shownWord.increaseCorrect(exercize: "P") : shownWord.decreaseCorrect(exercize: "P")
-
-            // Answer feedback on the child view; the container transition stays separate (TD-16).
-            if isKnown {
-                recognized.kapow.shine()
-                if !wasKnown && shownWord.known >= WordAndStat.maxKnownLevel {
-                    ExerciseFeedback.levelUp(on: view)
-                }
-            } else {
-                recognized.kapow.shake()
-            }
-
-            Storage.shownWords.append(shownWord)
-            roundProgress.progress = Float(Storage.shownWords.count) * progressStep
-//            //disable buttons and ShowNextButton Instead and autoSkip
-//            //prepareForNextQuestion()
-            showAnswer(for: shownWord, isKnown: isKnown)
-        } else { // this never happens for now
+        guard let answer = session.answer(isKnown: isKnown) else { // this never happens for now
             navigationController?.popToRootViewController(animated: true)
+            return
         }
+
+        // Answer feedback on the child view; the container transition stays separate (TD-16).
+        if answer.isKnown {
+            recognized.kapow.shine()
+            if answer.reachedKnownLevel {
+                ExerciseFeedback.levelUp(on: view)
+            }
+        } else {
+            recognized.kapow.shake()
+        }
+
+        roundProgress.progress = session.progress
+        showAnswer(for: answer.word, isKnown: answer.isKnown)
     }
     
     @IBAction func knowButtonAction(_ sender: UIButton) {
@@ -341,28 +333,23 @@ class WordPhoneticsViewController: UIViewController, SFSpeechRecognizerDelegate 
     }
     
     func startRound() {
-        wordsInTest = Storage.wordsAndStat.shuffled()
-        Storage.shownWords = []
-        progressStep = 1.0 / Float(wordsInTest.count)
+        session = .start(.phonetics)
     }
     
     @objc func nextTapped() {
 //        showingQuestion = true
-        if !wordsInTest.isEmpty {
-            var knownWord = wordsInTest.remove(at: 0)
-            knownWord.skiped += 1
-            Storage.shownWords.append(knownWord)
-            roundProgress.progress = Float(Storage.shownWords.count) * progressStep
-            
-            if audioEngine.isRunning {
-                recordButtonTapped()
-            }
-            // try? audioSession.setCategory(.playback, mode: .measurement, options: [])
-            try? audioSession.setCategory(.playback, mode: .default, policy: .default, options: [])
-            try? audioSession.setActive(true, options: .notifyOthersOnDeactivation)
-            
-            askQuestion()
+        guard !session.isFinished else { return }
+        session.skip()
+        roundProgress.progress = session.progress
+
+        // Unique to this screen: hand the audio session back to playback before moving on.
+        if audioEngine.isRunning {
+            recordButtonTapped()
         }
+        try? audioSession.setCategory(.playback, mode: .default, policy: .default, options: [])
+        try? audioSession.setActive(true, options: .notifyOthersOnDeactivation)
+
+        askQuestion()
         //prepareForNextQuestion()
         
     }

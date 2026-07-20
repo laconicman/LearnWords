@@ -25,7 +25,6 @@ final class UserDefaultsWordStore: WordStore {
 
     // In-memory session state (see WordStore).
     var wordsAndStat: [WordAndStat] = []
-    var shownWords: [WordAndStat] = []
 
     init(defaults: UserDefaults = userDefaultsGroup,
          saveExecutor: @escaping (@escaping () -> Void) -> Void = { UserDefaultsWordStore.backgroundSaveQueue.async(execute: $0) }) {

@@ -61,6 +61,13 @@ Priority-ordered. Rationale lives in [Design](Design.md); debt items in [TechDeb
   constraints spam (1-pt over-constraint vs the 44-pt ring); pins relaxed to ≥ 4; verified
   clean console + unchanged cells. Ring-replacement research recorded in TD-17.
 
+- **`ExerciseSession` extracted** (TD-20 step 1, 2026-07-20) — the round (queue, scoring,
+  progress, skip rule, round-end save) lifted out of the three exercise controllers into a
+  UIKit-free model type; −53 net lines in the screens, 15 new storyboard-free tests, and
+  `Storage.shownWords` retired from the persistence seam. `ReviewEvent` logging for TD-13
+  now has one place to land instead of three. Remaining: the shared exercise *layout*, still
+  triplicated across three storyboard scenes.
+
 - **Buttons modernized** (TD-19, 2026-07-20) — `GradientButton` → **`LWButton`**: a button
   states a `Purpose`, the control picks the appearance per OS in **one `#available` check**
   (`UIButton.Configuration` + capsule on iOS 15+, 5pt radius on 12–14). Gradients/borders

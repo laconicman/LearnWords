@@ -510,15 +510,35 @@ A single shared layout would have made one fix cover all three — and would hav
 *bug* obvious instead of three subtly different ones.
 
 **Discharge.**
-1. **`ExerciseSession`** — lift the round logic (word queue, scoring, progress, skip) into
-   a UIKit-free, testable model type, per the four-layer MVC in [Design](Design.md). This is
-   also on the critical path for [ProgressModel](ProgressModel.md): the screens will append
-   `ReviewEvent`s, and without the extraction that lands in three places (TD-18/TD-13).
-2. **One exercise layout** — a shared container (base view controller or a single scene the
-   three specialise) so the structure exists once. `ScrollableContent` and `LWButtonRow` are
-   the first pieces of this; the storyboard triplication is what remains.
+1. **`ExerciseSession`** — **done (2026-07-20)**. `Model/ExerciseSession.swift` owns the
+   round: the shuffled queue, per-exercise scoring, progress, the skip rule and the
+   round-end save. The three screens keep only their views — `startRound` is one line,
+   `nextTapped` is four, and `afterAnswer` is feedback plus one call. **−53 net lines across
+   the three controllers**, and the triplicated logic is gone.
+   - **15 new tests** (`ExerciseSessionTests`) run without a storyboard or a view
+     controller, which is the point of the extraction. They pin down what the copies only
+     implied: `reachedKnownLevel` fires *only* on the crossing answer (so the level-up
+     spray can't repeat), skipping never scores, an exercise scores only its own tally,
+     and progress is 0 for an empty set rather than the `1.0 / 0` the screens computed.
+   - **`Storage.shownWords` removed.** It was a scratch buffer living in the persistence
+     protocol — never written to `UserDefaults`, used only by these three screens. With the
+     session owning its own `finished` array it was orphaned, so it is gone from
+     `WordStore`, `Storage` and `UserDefaultsWordStore`.
+   - A latent crash went with it: Dictation and Phonetics indexed `wordsInTest[0]` from
+     text-field and speech-recognition callbacks that can outlive the last word;
+     `session.currentWord` is an `Optional` and the call sites now guard.
+   - **New test-isolation fix:** `.serialized` orders tests *within* a suite, not across
+     them, so the new suite raced `WordAndStatTests` over the global
+     `maxKnownLevelPreference` — passing alone, failing in the full run. Both now nest
+     under one serialized `MaxKnownLevel` parent, which also shares the pinning helper.
+2. **One exercise layout** — still open. A shared container (base view controller, or one
+   scene the three specialise) so the structure exists once. `ScrollableContent`,
+   `LWButtonRow` and `LWWordLabel` are the first pieces; the storyboard triplication is
+   what remains.
 
-Sequenced before TD-18/TD-13 for the reason in (1).
+Verified: all targets build; **53/53 tests pass**; a full Learning round played on the iOS
+26.5 sim — progress tracks, the round commits and pops back, and the chooser reports the
+set unchanged.
 
 ## Appendix: feature-first mapping (TD-1) — **executed for source (2026-07-17)**
 

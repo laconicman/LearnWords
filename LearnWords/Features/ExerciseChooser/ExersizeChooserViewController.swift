@@ -18,7 +18,8 @@ class ExersizeChooserViewController: UIViewController {
         // Before the storyboard's placeholder title can show.
         showDirection()
         ScrollableContent.wrap(contentStack,
-                               insets: UIEdgeInsets(top: 20, left: 16, bottom: 20, right: 16))
+                               insets: UIEdgeInsets(top: 20, left: 16, bottom: 20, right: 16),
+                               fillsScreen: false)
     }
 
     override func viewDidAppear(_ animated: Bool) {

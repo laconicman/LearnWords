@@ -31,13 +31,12 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
     }
     
     @IBAction func listenAction(_ sender: Any) {
-        SpeechManager.shared.speak(NSAttributedString(string: wordsInTest[0].firstWord), language: LWUserDefaults.standard.languageToStudyPreference!)
+        guard let word = session.currentWord else { return }
+        SpeechManager.shared.speak(NSAttributedString(string: word.firstWord), language: LWUserDefaults.standard.languageToStudyPreference!)
     }
     
-    var wordsInTest = [WordAndStat]()
-    var shownWord: WordAndStat!
-    
-    private var progressStep: Float = 0.0
+    /// The round: queue, scoring and progress (TD-20). The screen keeps only its views.
+    private var session = ExerciseSession(exercise: .dictation, words: [])
     
     var answerMatched: Bool = false {
         didSet {
@@ -53,11 +52,8 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
     
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         let answer = textField.text?.replacingCharacters(in: Range(range, in: textField.text!)!, with: string).lowercased().trimmingCharacters(in: .whitespaces)
-        if LWUserDefaults.standard.foreignToNative {
-            answerMatched = answer == wordsInTest[0].secondWord
-        } else {
-            answerMatched = answer == wordsInTest[0].firstWord
-        }
+        guard let word = session.currentWord else { return true }
+        answerMatched = answer == (LWUserDefaults.standard.foreignToNative ? word.secondWord : word.firstWord)
         // print("Answer matched \(answerMatched)", string, textField.text, wordsInTest[0].pair.components(separatedBy: "::")[0])
         return true
     }
@@ -73,8 +69,8 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
 //            afterAnswer(isKnown: false)
 //        }
         
-        if let answer = textField.text?.trimmingCharacters(in: .whitespaces) {
-            let res = match3(pattern: (LWUserDefaults.standard.foreignToNative ? wordsInTest[0].secondWord : wordsInTest[0].firstWord),
+        if let answer = textField.text?.trimmingCharacters(in: .whitespaces), let word = session.currentWord {
+            let res = match3(pattern: (LWUserDefaults.standard.foreignToNative ? word.secondWord : word.firstWord),
                             answer: answer,
                             language: (LWUserDefaults.standard.foreignToNative ? LWUserDefaults.standard.nativeLanguagePreference :
                                         LWUserDefaults.standard.languageToStudyPreference)!)
@@ -110,37 +106,30 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         navigationController?.hidesBarsOnTap = false
-        if wordsInTest.isEmpty {
+        if session.isFinished {
             startRound()
         }
         askQuestion()
     }
     
     func afterAnswer(isKnown: Bool) {
-        if !wordsInTest.isEmpty {
-            shownWord = wordsInTest.remove(at: 0)
-            let wasKnown = shownWord.known >= WordAndStat.maxKnownLevel
-
-            isKnown ? shownWord.increaseCorrect(exercize: "D") : shownWord.decreaseCorrect(exercize: "D")
-
-            // Answer feedback on the child view; the container transition stays separate (TD-16).
-            if isKnown {
-                translationInput.kapow.shine()
-                if !wasKnown && shownWord.known >= WordAndStat.maxKnownLevel {
-                    ExerciseFeedback.levelUp(on: view)
-                }
-            } else {
-                translationInput.kapow.shake()
-            }
-
-            Storage.shownWords.append(shownWord)
-            roundProgress.progress = Float(Storage.shownWords.count) * progressStep
-//            //disable buttons and ShowNextButton Instead and autoSkip
-//            //prepareForNextQuestion()
-            showAnswer(for: shownWord, isKnown: isKnown)
-        } else { // this never happens for now
+        guard let answer = session.answer(isKnown: isKnown) else { // this never happens for now
             navigationController?.popToRootViewController(animated: true)
+            return
         }
+
+        // Answer feedback on the child view; the container transition stays separate (TD-16).
+        if answer.isKnown {
+            translationInput.kapow.shine()
+            if answer.reachedKnownLevel {
+                ExerciseFeedback.levelUp(on: view)
+            }
+        } else {
+            translationInput.kapow.shake()
+        }
+
+        roundProgress.progress = session.progress
+        showAnswer(for: answer.word, isKnown: answer.isKnown)
     }
     
     @IBAction func knowButtonAction(_ sender: UIButton) {
@@ -153,22 +142,14 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
     }
     
     func startRound() {
-        wordsInTest = Storage.wordsAndStat.shuffled()
-        Storage.shownWords = []
-        progressStep = 1.0 / Float(wordsInTest.count)
+        session = .start(.dictation)
     }
     
     @objc func nextTapped() {
-//        showingQuestion = true
-        if !wordsInTest.isEmpty {
-            var knownWord = wordsInTest.remove(at: 0)
-            knownWord.skiped += 1
-            Storage.shownWords.append(knownWord)
-            roundProgress.progress = Float(Storage.shownWords.count) * progressStep
-            askQuestion()
-        }
-        //prepareForNextQuestion()
-        
+        guard !session.isFinished else { return }
+        session.skip()
+        roundProgress.progress = session.progress
+        askQuestion()
     }
     
     func showAnswer(for shownWord: WordAndStat, isKnown: Bool = false) {
@@ -201,18 +182,17 @@ final class WordDictationController: UIViewController, UITextFieldDelegate {
     
     func askQuestion() {
         //prompt.text = wordsInTest[questionCounter].components(separatedBy: "::")[1]
-        guard !wordsInTest.isEmpty else {
-            Storage.saveWords(Storage.shownWords)
-            Storage.wordsAndStat = Storage.shownWords
+        guard let word = session.currentWord else {
+            session.commit()
             navigationController?.popToRootViewController(animated: true)
             return
         }
-        if  (wordsInTest[0].known >= WordAndStat.maxKnownLevel) && (!LWUserDefaults.standard.includeLearnedWords) {
+        if session.skipsCurrentWord(includingLearned: LWUserDefaults.standard.includeLearnedWords) {
             nextTapped()
             return
         }
         prompt.attributedText = NSAttributedString(string: LWUserDefaults.standard.foreignToNative ?
-                                                   wordsInTest[0].firstWord : wordsInTest[0].secondWord)
+                                                   word.firstWord : word.secondWord)
         if LWUserDefaults.standard.pronounceQuestionsPreference {
             SpeechManager.shared.speak(prompt.attributedText!, language: LWUserDefaults.standard.foreignToNative ? LWUserDefaults.standard.languageToStudyPreference!: LWUserDefaults.standard.nativeLanguagePreference!)
         }

@@ -39,38 +39,29 @@ final class WordTestViewController: UIViewController {
                                    : LWUserDefaults.standard.nativeLanguagePreference!)
     }
 
-    var wordsInTest = [WordAndStat]()
-    var shownWord: WordAndStat!
-
-    private var progressStep: Float = 0.0
-    //   var showingQuestion = true
+    /// The round: queue, scoring and progress (TD-20). The screen keeps only its views.
+    private var session = ExerciseSession(exercise: .learning, words: [])
 
     // MARK: -
     func afterAnswer(isKnown: Bool) {
-        if !wordsInTest.isEmpty {
-            shownWord = wordsInTest.remove(at: 0)
-            let wasKnown = shownWord.known >= WordAndStat.maxKnownLevel
-
-            isKnown ? shownWord.increaseCorrect(exercize: "L") : shownWord.decreaseCorrect(exercize: "L")
-
-            // Answer feedback on the child view; the container transition stays separate (TD-16).
-            if isKnown {
-                wordDefinition.kapow.shine()
-                if !wasKnown && shownWord.known >= WordAndStat.maxKnownLevel {
-                    ExerciseFeedback.levelUp(on: view)
-                }
-            } else {
-                wordDefinition.kapow.shake()
-            }
-
-            Storage.shownWords.append(shownWord)
-            roundProgress.progress = Float(Storage.shownWords.count) * progressStep
-//            //disable buttons and ShowNextButton Instead and autoSkip
-//            //prepareForNextQuestion()
-            showAnswer(for: shownWord, isKnown: isKnown)
-        } else { // this never happens for now
+        guard let answer = session.answer(isKnown: isKnown) else {
+            // this never happens for now
             navigationController?.tabBarController?.selectedIndex = 0
+            return
         }
+
+        // Answer feedback on the child view; the container transition stays separate (TD-16).
+        if answer.isKnown {
+            wordDefinition.kapow.shine()
+            if answer.reachedKnownLevel {
+                ExerciseFeedback.levelUp(on: view)
+            }
+        } else {
+            wordDefinition.kapow.shake()
+        }
+
+        roundProgress.progress = session.progress
+        showAnswer(for: answer.word, isKnown: answer.isKnown)
     }
     
     // MARK: - Interface Builder actions
@@ -142,38 +133,28 @@ final class WordTestViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         navigationController?.hidesBarsOnTap = false
-        if wordsInTest.isEmpty {
+        if session.isFinished {
             startRound()
         }
         askQuestion()
     }
-    
+
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         navigationController?.hidesBarsOnTap = false
     }
-    
-    // MARK: - 
-    
+
+    // MARK: -
+
     func startRound() {
-        wordsInTest = Storage.wordsAndStat.shuffled()
-        Storage.shownWords = []
-        progressStep = 1.0 / Float(wordsInTest.count)
+        session = .start(.learning)
     }
-    
+
     @objc func nextTapped() {
-//        showingQuestion = true
-        if !wordsInTest.isEmpty {
-            var knownWord = wordsInTest.remove(at: 0)
-            
-            knownWord.skiped += 1
-            
-            Storage.shownWords.append(knownWord)
-            roundProgress.progress = Float(Storage.shownWords.count) * progressStep
-            askQuestion()
-        }
-        //prepareForNextQuestion()
-        
+        guard !session.isFinished else { return }
+        session.skip()
+        roundProgress.progress = session.progress
+        askQuestion()
     }
     
     func showAnswer(for shownWord: WordAndStat, isKnown: Bool = false) {
@@ -207,17 +188,16 @@ final class WordTestViewController: UIViewController {
     
     func askQuestion() {
         //prompt.text = wordsInTest[questionCounter].components(separatedBy: "::")[1]
-        guard !wordsInTest.isEmpty else {
-            Storage.saveWords(Storage.shownWords)
-            Storage.wordsAndStat = Storage.shownWords
+        guard let word = session.currentWord else {
+            session.commit()
             navigationController?.popToRootViewController(animated: true)
             return
         }
-        if  (wordsInTest[0].known >= WordAndStat.maxKnownLevel) && (!LWUserDefaults.standard.includeLearnedWords) {
+        if session.skipsCurrentWord(includingLearned: LWUserDefaults.standard.includeLearnedWords) {
             nextTapped()
             return
         }
-        prompt.attributedText = NSAttributedString(string: LWUserDefaults.standard.foreignToNative ? wordsInTest[0].firstWord : wordsInTest[0].secondWord)
+        prompt.attributedText = NSAttributedString(string: LWUserDefaults.standard.foreignToNative ? word.firstWord : word.secondWord)
         if LWUserDefaults.standard.pronounceQuestionsPreference {
             SpeechManager.shared.speak(prompt.attributedText!, language: LWUserDefaults.standard.foreignToNative ? LWUserDefaults.standard.languageToStudyPreference! :  LWUserDefaults.standard.nativeLanguagePreference!)
         }

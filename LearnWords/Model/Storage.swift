@@ -23,11 +23,6 @@ enum Storage {
         set { backend.wordsAndStat = newValue }
     }
 
-    static var shownWords: [WordAndStat] {
-        get { backend.shownWords }
-        set { backend.shownWords = newValue }
-    }
-
     static var wordSets: [String] {
         get { backend.wordSets }
         set { backend.wordSets = newValue }

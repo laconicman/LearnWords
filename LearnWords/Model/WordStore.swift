@@ -11,13 +11,11 @@
 
 import Foundation
 
-/// Everything the app needs from persistence. Reference type: `wordsAndStat` / `shownWords`
-/// are shared session state, so all call sites must see one instance.
+/// Everything the app needs from persistence. Reference type: `wordsAndStat` is shared
+/// session state, so all call sites must see one instance.
 protocol WordStore: AnyObject {
     /// The current set's word/stat pairs, held in memory for the session.
     var wordsAndStat: [WordAndStat] { get set }
-    /// Word pairs shown during the last session.
-    var shownWords: [WordAndStat] { get set }
     /// The names of all word sets (persisted).
     var wordSets: [String] { get set }
     /// The active word set's name (persisted); setting it loads that set into `wordsAndStat`.

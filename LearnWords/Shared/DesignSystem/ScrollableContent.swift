@@ -33,9 +33,16 @@ enum ScrollableContent {
     /// Re-parents `content` into a vertically scrolling view pinned to its container's
     /// safe area. Any constraints the scene had on `content` are dropped with it and
     /// replaced here.
+    ///
+    /// - Parameter fillsScreen: whether short content should stretch to a full screen.
+    ///   True for the exercise screens, where `LWWordLabel` absorbs the slack and keeps
+    ///   the flashcard centred. False for list-like screens such as the exercise chooser,
+    ///   which have nothing elastic — there, stretching only opens a gap above the first
+    ///   row, so the content keeps its natural height and sits at the top.
     @discardableResult
     static func wrap(_ content: UIView,
-                     insets: UIEdgeInsets = UIEdgeInsets(top: 20, left: 20, bottom: 20, right: 20)) -> Wrapped? {
+                     insets: UIEdgeInsets = UIEdgeInsets(top: 20, left: 20, bottom: 20, right: 20),
+                     fillsScreen: Bool = true) -> Wrapped? {
         guard let container = content.superview else { return nil }
 
         let scrollView = UIScrollView()
@@ -68,17 +75,20 @@ enum ScrollableContent {
             content.widthAnchor.constraint(equalTo: frameGuide.widthAnchor,
                                            constant: -(insets.left + insets.right)),
 
-            // At least one screenful, and *only* that. An earlier version also pinned
-            // the height *equal* to one screen at `defaultHigh`, meaning to make short
-            // content fill the view — but this `greaterThanOrEqual` already does that,
-            // and the equality actively forced tall content back down to one screen.
-            // Arranged subviews then compressed until they overlapped: it is why the
-            // word and its translation vanished at extra-large text, and why the
-            // chooser drew its direction button over the "include learned words" row.
+        ])
+
+        if fillsScreen {
+            // At least one screenful, and *only* that. An earlier version also pinned the
+            // height *equal* to one screen at `defaultHigh`, meaning to make short content
+            // fill the view — but this `greaterThanOrEqual` already does that, and the
+            // equality actively forced tall content back down to one screen. Arranged
+            // subviews then compressed until they overlapped: it is why the word and its
+            // translation vanished at extra-large text, and why the chooser drew its
+            // direction button over the "include learned words" row.
             // Never constrain scrolling content to fit.
             content.heightAnchor.constraint(greaterThanOrEqualTo: frameGuide.heightAnchor,
-                                            constant: -(insets.top + insets.bottom)),
-        ])
+                                            constant: -(insets.top + insets.bottom)).isActive = true
+        }
 
         return Wrapped(scrollView: scrollView, bottomConstraint: bottom)
     }
