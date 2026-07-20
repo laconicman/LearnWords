@@ -45,10 +45,19 @@ mutated (except attaching a judgment), never deleted by scoring changes:
 | `id` | UUID | |
 | `wordID` | UUID | stable word identity (TD-18) |
 | `date` | Date | enables retention/spacing math |
+| `sessionID` † | UUID | sitting identity (new UUID when practice starts) — same-sitting retries are effort, not fresh long-term evidence; sittings are the effort index's unit of persistence |
 | `task` | enum | `.test`, `.dictation`, `.phonetics` (today's "L"/"D"/"P"), extensible |
-| `outcome` | enum | see taxonomy below |
+| `direction` † | enum | which side was the cue: `.foreignToNative` (receptive) / `.nativeToForeign` (productive) — Nation's receptive/productive split; unrecoverable if not logged |
+| `outcome` | enum | see taxonomy below; decoding must tolerate unknown future cases (skip, never crash — the log outlives the code) |
 | `response` | String? | what the user typed/said — **kept**, fuels R5 |
-| `judgment` | struct? | `verdict` (score 0…1), `judge` (id + version), `judgedAt` — attached async, re-judgeable by better models later |
+| `expected` † | String | target answer snapshot at review time — words are editable, so re-judging (R5) against today's text would corrupt history |
+| `prompt` † | String? | cue text snapshot (optional; gives the FM judge its context) |
+| `latencyMS` † | Int? | prompt→answer time — retrieval fluency: feeds the Hard/Easy grade split, effort time-on-task, and automaticity display |
+| `judgment` | struct? | `verdict` (score 0…1), `judge` (id + version), `judgedAt`, `errorTags: [String]?` † — attached async, re-judgeable by better models later |
+| `schemaVersion` † | Int16 | format insurance for a log that will outlive several codebases |
+
+† Added by the research audit (`ProgressResearch.md`, Phase 2) — fields that cannot be
+backfilled into an append-only log.
 
 **Outcome taxonomy** (R1 + R2 explicit in the data, not inferred from the task):
 
@@ -57,19 +66,53 @@ mutated (except attaching a judgment), never deleted by scoring changes:
 - Negative: `.incorrect` (wrong answer given) · `.selfAssessedForgot` (the "forgot" button)
 - Neutral: `.skipped` (today's `skiped` counter)
 
+**Self-assessment flow (audit):** the know/forgot buttons are **reveal-then-grade** — the
+user attempts retrieval, reveals the answer, then self-grades. That makes
+`.selfAssessedKnown` an Anki-grade self-graded retrieval, not a mere prediction; a
+pre-reveal "know" would be a JOL-class signal (much weaker — Rhodes & Tauber 2011). If a
+pre-reveal grading path ever ships, it must become a distinct outcome or field.
+
 **Derived, never stored as truth: `ScoringPolicy`** — weights live in *code*, not data, so
 indexes recompute across the whole log without migration (and an FM-based policy can slot
 in later, R4):
 
-- **Effort index** — volume & persistence: events over time, sessions, negatives included
-  *positively* (a mistake is effort spent).
-- **Mastery index** — recency-weighted positive evidence; verbatim > judged-close >
-  self-assessed.
-- **Retention risk** — time-decay since last strong evidence. The mature non-AI baseline
-  here is FSRS-style spaced-repetition scheduling; the event log (timestamps + outcomes) is
-  exactly its required input. An FM can complement, never required.
+- **Effort index** — volume & persistence: events over time, sittings (`sessionID`),
+  time-on-task (`latencyMS`), negatives included *positively* (a mistake is effort spent).
+  **No FSRS counterpart — this index is ours, and it never decreases.**
+- **Mastery index** — a monotone display function of **FSRS stability S** (≈ Bjork's
+  storage strength): grows with successful spaced retrieval, unaffected by mere elapsed
+  time. Evidence strength (verbatim > judged-close > self-assessed, R2) enters via the
+  outcome→grade mapping below — *not* via recency-weighting, which would smuggle decay
+  into mastery and make the ring show forgetting twice (decay belongs to retention alone).
+- **Retention risk** — **FSRS retrievability** R(elapsed, S). Computed, not invented:
+  adopt the official Swift package
+  ([open-spaced-repetition/swift-fsrs](https://github.com/open-spaced-repetition/swift-fsrs),
+  FSRS-6; alternative: [4rays/swift-fsrs](https://github.com/4rays/swift-fsrs), v5) rather
+  than hand-rolling decay math. The event log (timestamps + graded outcomes) is exactly the
+  algorithm's required input, and FSRS's optimizer can later fit per-user parameters from
+  this same log. An FM can complement, never required.
 - `known` (today's number) becomes one more derived value — computed with a compatibility
   policy so existing behavior survives.
+
+**Outcome → FSRS grade mapping** (versioned in `ScoringPolicy`; FSRS consumes ordinal
+grades Again/Hard/Good/Easy):
+
+| Outcome | Grade |
+|---|---|
+| `.incorrect`, `.selfAssessedForgot` | Again |
+| `.correctJudged` | Hard (verdict below ~0.9), else Good |
+| `.correctVerbatim` | Good; Easy when `latencyMS` is fast |
+| `.selfAssessedKnown` | Good (post-reveal self-grade — Anki-equivalent; per-user calibration may scale its weight later) |
+| `.skipped` | not fed to the scheduler (exposure, not retrieval) |
+
+Scheduler grades and evidence-tier weights are distinct concerns: the tiers (R2) shape the
+mastery display and calibration; the grades shape scheduling. Only the **first attempt per
+word per sitting** feeds long-term scheduling — same-sitting retries count as effort only
+(`sessionID` makes this exact; FSRS-6's short-term component covers the massed case).
+
+**Memory-state scope (v1, deliberate deferral):** one FSRS state per word — all tasks and
+directions feed it through the mapping. Because `direction` is recorded per event, a
+per-direction (receptive/productive) split stays computable later without any backfill.
 
 **Display caches (agreed in principle, mechanism negotiable — owner, 2026-07-20)** —
 index values must not be recomputed per cell display. Per-word cached index values,
@@ -89,7 +132,8 @@ This design is therefore not extra work *before* TD-13 — it **is** the TD-13 s
 **Do not implement the event log on UserDefaults first** — same rule as TD-12 (don't
 polish a layer being replaced). Sequence: agree on this doc → TD-18 identity → TD-13 Core
 Data with this schema → screens start appending events (the `afterAnswer(isKnown:)`
-signature widens to carry outcome + response text) → indexes + ring.
+signature widens to carry outcome, response text, direction, latency, and session) →
+indexes + ring.
 
 ## The near-miss judge (R5)
 
@@ -97,8 +141,12 @@ A pluggable protocol, availability-laddered:
 
 1. **Today**: `match3` (already the de-facto judge in Dictation) → recorded as
    `.correctJudged` with `judge: "match3/v1"`.
-2. **All-iOS upgrade**: edit-distance + lemma comparison (NaturalLanguage, iOS 12+).
-3. **iOS 26+**: Apple **Foundation Models** on-device judging ("was the user close?" with a
+2. **iOS 12 floor**: Damerau-Levenshtein edit distance + lemma comparison (`NLTagger`,
+   iOS 12+).
+3. **iOS 13/14+**: semantic near-miss via `NLEmbedding` cosine similarity — word
+   embeddings need iOS 13, sentence embeddings iOS 14 (audit correction: this step is
+   *not* available at the iOS 12 floor).
+4. **iOS 26+**: Apple **Foundation Models** on-device judging ("was the user close?" with a
    graded verdict) — gated `#available`, async post-hoc: the event is stored immediately
    with the cheap verdict, the FM verdict *attaches* when computed. `judge` + `version`
    fields make re-judging the backlog with better models a batch job, not a migration.
@@ -126,9 +174,14 @@ against the font.
    fresh from the event log. Rationale: backward compatibility isn't worth the code
    complexity at this data scale.
 
-## Pending external input
+## Research audit — applied (2026-07-20)
 
-A research pass on vocabulary-acquisition science and shipping products' progress models is
-commissioned (`TASK-vocab-research.md`, same folder; report lands as `ProgressResearch.md`).
-Its Phase-2 audit may amend this document — **apply the audit before implementing the TD-13
-schema**, since the event log is append-only and schema gaps are the expensive kind.
+The commissioned research pass (`TASK-vocab-research.md`) landed as `ProgressResearch.md`
+(same folder) and its Phase-2 audit is incorporated above: indexes re-grounded in FSRS
+S/R (mastery = stability, retention = retrievability; effort confirmed as this model's own
+contribution with no FSRS counterpart), an explicit outcome→grade mapping added, the
+self-assessment flow pinned to reveal-then-grade, the near-miss ladder's availability
+claims corrected (NLEmbedding needs iOS 13/14), and the schema extended with the
+†-marked fields — additions that could not be backfilled later. See the report for
+citations and the Phase-3 mechanics shortlist; the TD-13 schema is now clear to implement
+from this document.
