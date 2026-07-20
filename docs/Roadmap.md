@@ -61,6 +61,14 @@ Priority-ordered. Rationale lives in [Design](Design.md); debt items in [TechDeb
   constraints spam (1-pt over-constraint vs the 44-pt ring); pins relaxed to ≥ 4; verified
   clean console + unchanged cells. Ring-replacement research recorded in TD-17.
 
+- **TD-20 complete** (step 2, 2026-07-20) — `ExerciseViewController` builds the exercise
+  screen once in code; the three storyboard scenes are bare view controllers, so the layout
+  can no longer diverge. `WordTestViewController` is 32 lines. Also adopted the
+  `ReviewOutcome` taxonomy (verbatim vs judged vs self-assessed — the distinction the screens
+  had and discarded) and the `LanguagePair` seam for the per-set-languages decision. 56 tests
+  green. **Next up is the big rock**: apply the research audit → TD-18 (word + set identity)
+  → TD-13 (Core Data + CloudKit, carrying set languages and the `ReviewEvent` log).
+
 - **`ExerciseSession` extracted** (TD-20 step 1, 2026-07-20) — the round (queue, scoring,
   progress, skip rule, round-end save) lifted out of the three exercise controllers into a
   UIKit-free model type; −53 net lines in the screens, 15 new storyboard-free tests, and

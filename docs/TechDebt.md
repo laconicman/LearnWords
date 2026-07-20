@@ -531,10 +531,32 @@ A single shared layout would have made one fix cover all three — and would hav
      them, so the new suite raced `WordAndStatTests` over the global
      `maxKnownLevelPreference` — passing alone, failing in the full run. Both now nest
      under one serialized `MaxKnownLevel` parent, which also shares the pinning helper.
-2. **One exercise layout** — still open. A shared container (base view controller, or one
-   scene the three specialise) so the structure exists once. `ScrollableContent`,
-   `LWButtonRow` and `LWWordLabel` are the first pieces; the storyboard triplication is
-   what remains.
+2. **One exercise layout** — **done (2026-07-20)**. `Features/Exercise/ExerciseViewController.swift`
+   assembles the exercise screen once, in code: progress view, word, answer surface, utility
+   row, answer row, optional accessory, wrapped by `ScrollableContent`. The three storyboard
+   scenes are now bare view controllers — no view subtree, no outlets, no actions — so the
+   layout cannot diverge again. Subclasses declare only what differs: their `exercise`, their
+   answer surface (`makeAnswerView`), how it is filled and cleared, and (Phonetics only)
+   `willLeaveCurrentWord()` for audio-session ownership.
+   - `WordTestViewController` is **32 lines**; the three screens total ~380, against ~900 before.
+   - Prompt/answer text and speech languages come from `LanguagePair`, so a screen no longer
+     spells out `foreignToNative ? firstWord : secondWord` in four places.
+
+**Outcome taxonomy adopted (2026-07-20).** `ExerciseSession.answer` now takes a
+`ReviewOutcome` (`Model/ReviewOutcome.swift`) rather than `isKnown: Bool` — the exact
+"outcome conflation" [ProgressModel](ProgressModel.md) lists as its second hard limit, which
+the first cut of the extraction reproduced. The screens already *had* the distinction and
+were discarding it: Dictation's live compare is exact (`.correctVerbatim`) while its submit
+path runs `match3` (`.correctJudged`), Phonetics' recognition is judged, and the buttons are
+self-assessed. Only `isPositive` reaches today's scoring; the rest is carried so TD-13's
+event log receives real evidence strength from day one. `sessionID` needs no work —
+`ExerciseSession` *is* the sitting.
+
+**`LanguagePair` seam (2026-07-20).** See [Design](Design.md) → "a language pair belongs to a
+word set". `Model/LanguagePair.swift` resolves the pair and direction in one place — today
+from the global preferences, at TD-13 from the word set. It also gives the exercise screens
+`prompt(for:)` / `answer(for:)` / `promptLanguage` / `answerLanguage`, which is what let the
+scattered ternaries collapse.
 
 Verified: all targets build; **53/53 tests pass**; a full Learning round played on the iOS
 26.5 sim — progress tracks, the round commits and pops back, and the chooser reports the

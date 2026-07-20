@@ -35,10 +35,14 @@ struct ExerciseSession {
     struct Answer {
         /// The word, with this answer already scored into it.
         let word: WordAndStat
-        let isKnown: Bool
+        /// How the answer was judged. Carried verbatim to the `ReviewEvent` log at TD-13.
+        let outcome: ReviewOutcome
         /// `true` only on the answer that first takes the word to the known level, so a
         /// screen can celebrate once rather than on every correct answer thereafter.
         let reachedKnownLevel: Bool
+
+        /// Whether the screen should present this as a success.
+        var isPositive: Bool { outcome.isPositive }
     }
 
     let exercise: Exercise
@@ -85,14 +89,17 @@ struct ExerciseSession {
     // MARK: - Advancing
 
     /// Scores the current word and moves past it. `nil` once the round is over.
+    ///
+    /// Only `outcome.isPositive` reaches today's scoring; the finer distinctions are
+    /// recorded so they survive to the event log rather than being decided here.
     @discardableResult
-    mutating func answer(isKnown: Bool) -> Answer? {
+    mutating func answer(_ outcome: ReviewOutcome) -> Answer? {
         guard !remaining.isEmpty else { return nil }
 
         var word = remaining.removeFirst()
         let wasKnown = word.known >= WordAndStat.maxKnownLevel
 
-        if isKnown {
+        if outcome.isPositive {
             word.increaseCorrect(exercize: exercise.rawValue)
         } else {
             word.decreaseCorrect(exercize: exercise.rawValue)
@@ -100,11 +107,12 @@ struct ExerciseSession {
         finished.append(word)
 
         return Answer(word: word,
-                      isKnown: isKnown,
+                      outcome: outcome,
                       reachedKnownLevel: !wasKnown && word.known >= WordAndStat.maxKnownLevel)
     }
 
-    /// Moves past the current word without scoring it, recording the skip.
+    /// Moves past the current word without attempting it — a `.skipped` outcome, which
+    /// neither scores nor counts against the word.
     mutating func skip() {
         guard !remaining.isEmpty else { return }
         var word = remaining.removeFirst()

@@ -39,7 +39,7 @@ struct ExerciseSessionTests {
         var session = ExerciseSession(exercise: .learning, words: [word("a"), word("b")])
         let current = session.currentWord!
 
-        let answer = session.answer(isKnown: true)
+        let answer = session.answer(.correctVerbatim)
 
         #expect(answer?.word.firstWord == current.firstWord)
         #expect(session.remaining.count == 1)
@@ -49,9 +49,9 @@ struct ExerciseSessionTests {
 
     @Test func answeringPastTheEndReturnsNil() {
         var session = ExerciseSession(exercise: .learning, words: [word("a")])
-        _ = session.answer(isKnown: true)
+        _ = session.answer(.correctVerbatim)
         #expect(session.isFinished)
-        #expect(session.answer(isKnown: true) == nil)
+        #expect(session.answer(.correctVerbatim) == nil)
     }
 
     @Test func skipRecordsASkipWithoutScoring() {
@@ -76,7 +76,7 @@ struct ExerciseSessionTests {
     @Test func correctAnswerScoresAgainstItsOwnExercise() {
         MaxKnownLevel.pinned(5) {
             var session = ExerciseSession(exercise: .phonetics, words: [word("a")])
-            let answer = session.answer(isKnown: true)
+            let answer = session.answer(.correctVerbatim)
             // Phonetics tallies under "P" and must not touch the other exercises.
             #expect(answer?.word.correct["P"] == 1)
             #expect(answer?.word.correct["L"] == nil)
@@ -88,9 +88,9 @@ struct ExerciseSessionTests {
         MaxKnownLevel.pinned(5) {
             var session = ExerciseSession(exercise: .learning,
                                           words: [word("a", correct: ["L": 3])])
-            let answer = session.answer(isKnown: false)
+            let answer = session.answer(.incorrect)
             #expect(answer?.word.correct["L"] == 2)
-            #expect(answer?.isKnown == false)
+            #expect(answer?.isPositive == false)
         }
     }
 
@@ -100,7 +100,7 @@ struct ExerciseSessionTests {
         MaxKnownLevel.pinned(2) {
             var session = ExerciseSession(exercise: .learning,
                                           words: [word("a", correct: ["L": 1])])
-            let crossing = session.answer(isKnown: true)
+            let crossing = session.answer(.correctVerbatim)
             #expect(crossing?.reachedKnownLevel == true)
         }
     }
@@ -109,7 +109,7 @@ struct ExerciseSessionTests {
         MaxKnownLevel.pinned(2) {
             var session = ExerciseSession(exercise: .learning,
                                           words: [word("a", correct: ["L": 2])])
-            let answer = session.answer(isKnown: true)
+            let answer = session.answer(.correctVerbatim)
             #expect(answer?.word.known == 2)
             // Already at the level, so this must not re-trigger the celebration.
             #expect(answer?.reachedKnownLevel == false)
@@ -119,7 +119,7 @@ struct ExerciseSessionTests {
     @Test func reachedKnownLevelIsFalseWhenStillShort() {
         MaxKnownLevel.pinned(5) {
             var session = ExerciseSession(exercise: .learning, words: [word("a")])
-            #expect(session.answer(isKnown: true)?.reachedKnownLevel == false)
+            #expect(session.answer(.correctVerbatim)?.reachedKnownLevel == false)
         }
     }
 
@@ -168,6 +168,33 @@ struct ExerciseSessionTests {
     @Test func finishedSessionSkipsNothing() {
         let session = ExerciseSession(exercise: .learning, words: [])
         #expect(session.skipsCurrentWord(includingLearned: false) == false)
+    }
+
+    // MARK: - Outcome taxonomy
+
+    @Test func answerCarriesTheOutcomeItWasGiven() {
+        var session = ExerciseSession(exercise: .dictation, words: [word("a")])
+        // The distinction ProgressModel exists to preserve: a matcher's verdict is not
+        // the same evidence as an exact reproduction, even though both score the same.
+        #expect(session.answer(.correctJudged)?.outcome == .correctJudged)
+    }
+
+    @Test func everyPositiveOutcomeScoresAndEveryNegativeDoesNot() {
+        MaxKnownLevel.pinned(5) {
+            for outcome in [ReviewOutcome.correctVerbatim, .correctJudged, .selfAssessedKnown] {
+                var session = ExerciseSession(exercise: .learning, words: [word("a")])
+                #expect(session.answer(outcome)?.word.correct["L"] == 1, "\(outcome) should score")
+            }
+            for outcome in [ReviewOutcome.incorrect, .selfAssessedForgot] {
+                var session = ExerciseSession(exercise: .learning,
+                                              words: [word("a", correct: ["L": 2])])
+                #expect(session.answer(outcome)?.word.correct["L"] == 1, "\(outcome) should decrease")
+            }
+        }
+    }
+
+    @Test func skippedIsNeverPositive() {
+        #expect(ReviewOutcome.skipped.isPositive == false)
     }
 }
 }

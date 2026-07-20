@@ -102,6 +102,34 @@ through storyboard-instantiated view controllers, so proper injection needs the 
 work — and it would be thrown away when Core Data replaces this layer. The facade is the
 interim; full injection lands with the Core Data migration (TD-13).
 
+## Decision: a language pair belongs to a word set, not to the app
+
+**Decision (owner, 2026-07-20).** A word set carries its own `native`/`foreign` languages.
+The app-wide `nativeLanguagePreference` / `languageToStudyPreference` become a *default* for
+new sets, not the truth for every set. Implemented as part of the TD-13 schema, where a word
+set gains real identity; until then `LanguagePair` (`Model/LanguagePair.swift`) is the seam
+that resolves the pair in one place.
+
+**Why.** The current model has nowhere to put a pair, and the data already shows the strain:
+the default set is literally named `"Initial Sample Set (En->Ru)"` — the pair encoded in a
+*display string*. Two sets with different pairs cannot both be correct under one global
+setting, so today the app can only be used for one language pair at a time.
+
+It is also a correctness problem for the progress model. [ProgressModel](ProgressModel.md) records
+`direction` (receptive vs productive) on every `ReviewEvent`, and direction is only meaningful
+relative to a pair. With a global pair, switching sets silently reinterprets the direction of
+every event already logged — and the log is append-only, so that corruption is permanent.
+This must therefore land **with** the TD-13 schema, not after it.
+
+**Rejected.** *Word sets as an entity on `UserDefaults` now.* It would deliver per-set pairs
+sooner, but builds a model layer Core Data replaces immediately — the same rule
+`ProgressModel` states for the event log, and TD-12 for the store: don't polish a layer that
+is being replaced. The seam costs nothing and makes the eventual swap one place.
+
+**Note.** Word sets are keyed by their name string (`wordSets: [String]`), so they have the
+same string-identity problem as words (TD-18): renaming a set orphans its contents. Set
+identity and set languages are one piece of work, sequenced with TD-18/TD-13.
+
 ## Path to the optimal non-dual modern structure
 
 The dual lifecycle is a deliberate, *reversible* compromise for Legacy. The target

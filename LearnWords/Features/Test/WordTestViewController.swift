@@ -5,246 +5,35 @@
 //  Created by Paul on 09.10.2017.
 //  Copyright © 2017 Paul. All rights reserved.
 //
-// TODO: Different animation for right and wrong answers
-// TODO: Show translation under the word instead of replacing it. Done
-// TODO: Show translation in red (black) if forgot (plus some animation, native lang prounosation or even taptic), in green if know.
-
+//  The recognition exercise: show the word, let the learner self-grade.
+//
+//  Everything structural — layout, lifecycle, transitions, scoring, progress — is in
+//  `ExerciseViewController` (TD-20). What is left here is the whole of what makes this
+//  screen the Learning screen: it reveals the answer in a label, and it has no input of
+//  its own, so both outcomes are self-assessed.
+//
 
 import UIKit
-import GameplayKit
-import AVFoundation
 
-final class WordTestViewController: UIViewController {
-    
-    // MARK: - Properties
-    
-    @IBOutlet weak var roundProgress: UIProgressView!
-    @IBOutlet weak var wordDefinition: UILabel! //?
-    @IBOutlet weak var stackView: UIStackView!
-    @IBOutlet weak var prompt: UILabel!
+final class WordTestViewController: ExerciseViewController {
 
-    @IBOutlet weak var knowButton: UIButton!
-    @IBOutlet weak var forgotButton: UIButton!
-    
-    @IBAction func lookUpAction(_ sender: UIButton) {
-        lookUp(term: prompt.text ?? "", sender: self)
+    private let definitionLabel = LWWordLabel()
+
+    override var exercise: ExerciseSession.Exercise { .learning }
+
+    override func makeAnswerView() -> UIView {
+        definitionLabel.font = .systemFont(ofSize: 80)
+        return definitionLabel
     }
 
-    /// Speaks the question on demand. Mirrors the language choice `askQuestion()` makes
-    /// for its automatic pronunciation, so manual and automatic playback never disagree.
-    @IBAction func listenAction(_ sender: Any) {
-        guard let text = prompt.attributedText else { return }
-        SpeechManager.shared.speak(text, language: LWUserDefaults.standard.foreignToNative
-                                   ? LWUserDefaults.standard.languageToStudyPreference!
-                                   : LWUserDefaults.standard.nativeLanguagePreference!)
+    override func prepareAnswerForQuestion() {
+        definitionLabel.attributedText = NSAttributedString(
+            string: "?", attributes: [.foregroundColor: UIColor.lwAnswerPending])
     }
 
-    /// The round: queue, scoring and progress (TD-20). The screen keeps only its views.
-    private var session = ExerciseSession(exercise: .learning, words: [])
-
-    // MARK: -
-    func afterAnswer(isKnown: Bool) {
-        guard let answer = session.answer(isKnown: isKnown) else {
-            // this never happens for now
-            navigationController?.tabBarController?.selectedIndex = 0
-            return
-        }
-
-        // Answer feedback on the child view; the container transition stays separate (TD-16).
-        if answer.isKnown {
-            wordDefinition.kapow.shine()
-            if answer.reachedKnownLevel {
-                ExerciseFeedback.levelUp(on: view)
-            }
-        } else {
-            wordDefinition.kapow.shake()
-        }
-
-        roundProgress.progress = session.progress
-        showAnswer(for: answer.word, isKnown: answer.isKnown)
+    override func showAnswer(_ text: String, isPositive: Bool) {
+        definitionLabel.attributedText = NSAttributedString(
+            string: text,
+            attributes: [.foregroundColor: isPositive ? UIColor.lwAnswerCorrect : UIColor.lwAnswerWrong])
     }
-    
-    // MARK: - Interface Builder actions
-    @IBAction func knowButtonAction(_ sender: UIButton) {
-        afterAnswer(isKnown: true)
-        /*
-        if UIReferenceLibraryViewController.dictionaryHasDefinition(forTerm: prompt.text ?? "") {
-            let rlvc = UIReferenceLibraryViewController(term: prompt.text!)
-            //rlvc.editButtonItem what is this
-            //rlvc.setEditing(true, animated: true)
-            //rlvc.modalPresentationStyle = .popover //no effect on iphone
-            //wordDefinition.text =  rlvc.editButtonItem.title
-            //present(rlvc, animated: true)
-            
-            if let definitionValues = rlvc.value(forKey: "_definitionValues") as? NSArray {
-                var definitions = [NSAttributedString]()
-                
-                for (i, definitionValue) in definitionValues.enumerated() {
-                    if let dvObj = (definitionValue as? NSObject) {
-                        if let def = dvObj.value(forKey: "_definition") as? NSAttributedString {
-                            definitions.append(def)
-                            print("Index: \(i) \(def.string)")
-                        }
-                    }
-                }
-                
-                // let terms = definitions[0].string.split(separator: ";")
-                var i=0
-                definitions[0].string.enumerateLines { (line, stop) in
-                    print("\(line) i=\(i) stop=\(stop)")
-                    if i<10 {
-                        i += 1
-                    } else {
-                        stop = true
-                    }
-                }
-                
-                let dictionaryMain = split(definitions[0].string, by: "\n" + "\u{2028}")[1]
-                print(dictionaryMain)
-            }
-        } */
-    }
-    
-    @IBAction func forgotButtonAction(_ sender: UIButton) {
-        haptic(feedback: .warning)
-        //        showingQuestion = !showingQuestion
-        afterAnswer(isKnown: false)
-    }
-    
-    // MARK: - View Controller Lifecycle
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .fastForward, target: self, action: #selector(nextTapped))
-        startRound()
-
-        ScrollableContent.wrap(stackView)
-
-        stackView.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
-        stackView.alpha = 0
-
-        if ProcessInfo().isOperatingSystemAtLeast(OperatingSystemVersion(majorVersion: 11, minorVersion: 0, patchVersion: 0)) {
-            navigationItem.largeTitleDisplayMode = .never
-        }
-        
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        navigationController?.hidesBarsOnTap = false
-        if session.isFinished {
-            startRound()
-        }
-        askQuestion()
-    }
-
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        navigationController?.hidesBarsOnTap = false
-    }
-
-    // MARK: -
-
-    func startRound() {
-        session = .start(.learning)
-    }
-
-    @objc func nextTapped() {
-        guard !session.isFinished else { return }
-        session.skip()
-        roundProgress.progress = session.progress
-        askQuestion()
-    }
-    
-    func showAnswer(for shownWord: WordAndStat, isKnown: Bool = false) {
-        
-        UIView.transition(with: wordDefinition,
-                          duration: isKnown ? 0.75 : 1.0,
-                          options: [.transitionCrossDissolve],
-                          animations: { [weak self] in
-                            self?.knowButton?.isEnabled = false
-                            if isKnown { self?.knowButton?.layer.opacity = 0.1 } else { self?.forgotButton?.layer.opacity = 0.1 }
-                            self?.forgotButton?.isEnabled = false
-                            self?.wordDefinition.attributedText = NSAttributedString(
-                                string: LWUserDefaults.standard.foreignToNative ? shownWord.secondWord : shownWord.firstWord,
-                                attributes: [.foregroundColor: isKnown ? UIColor.lwAnswerCorrect : UIColor.lwAnswerWrong])
-                            // prompt.textColor = UIColor(red: 0, green: 0.7, blue: 0, alpha: 1)
-        }) { [weak self] (ended) in
-            self?.knowButton?.isEnabled = true
-            if isKnown { self?.knowButton?.layer.opacity = 1 } else { self?.forgotButton?.layer.opacity = 1 }
-            self?.forgotButton?.isEnabled = true
-            self?.prepareForNextQuestion(withPrewiousKnown: isKnown)
-        }
-        //            prompt.text = wordsInTest[questionCounter].components(separatedBy: "::")[0]
-        //            prompt.textColor = UIColor(red: 0, green: 0.7, blue: 0, alpha: 1)
-        
-        if LWUserDefaults.standard.pronounceAnswersPreference {
-            SpeechManager.shared.speak(wordDefinition.attributedText!, language:
-                                            LWUserDefaults.standard.foreignToNative ?
-                                            LWUserDefaults.standard.nativeLanguagePreference! :  LWUserDefaults.standard.languageToStudyPreference!)
-        }
-    }
-    
-    func askQuestion() {
-        //prompt.text = wordsInTest[questionCounter].components(separatedBy: "::")[1]
-        guard let word = session.currentWord else {
-            session.commit()
-            navigationController?.popToRootViewController(animated: true)
-            return
-        }
-        if session.skipsCurrentWord(includingLearned: LWUserDefaults.standard.includeLearnedWords) {
-            nextTapped()
-            return
-        }
-        prompt.attributedText = NSAttributedString(string: LWUserDefaults.standard.foreignToNative ? word.firstWord : word.secondWord)
-        if LWUserDefaults.standard.pronounceQuestionsPreference {
-            SpeechManager.shared.speak(prompt.attributedText!, language: LWUserDefaults.standard.foreignToNative ? LWUserDefaults.standard.languageToStudyPreference! :  LWUserDefaults.standard.nativeLanguagePreference!)
-        }
-        wordDefinition.attributedText = NSAttributedString(
-            string: "?",
-            attributes: [.foregroundColor: UIColor.lwAnswerPending])
-        // prompt.textColor = UIColor(red: 0, green: 0.7, blue: 0, alpha: 1)
-
-//        let rlvc = UIReferenceLibraryViewController(term: "apple")
-//
-//        addChildViewController(rlvc)
-//
-//        // 3: give the child a meaningfull frame: make it fill our view
-//        rlvc.view.frame = container.bounds //not view.frame - mind the coodinate system
-//        rlvc.view.translatesAutoresizingMaskIntoConstraints = false
-//        container.addSubview(rlvc.view)
-
-        //present(rlvc, animated: true)
-
-        ExerciseTransition.show(stackView)
-    }
-
-    func prepareForNextQuestion(withPrewiousKnown: Bool = true) {
-        ExerciseTransition.advance(stackView, afterDelay: withPrewiousKnown ? 0.1 : 2.0) { [weak self] in
-            guard let self else { return }
-            self.wordDefinition.textColor = .clear
-            self.askQuestion()
-        }
-    }
-    
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-    
-    override var prefersHomeIndicatorAutoHidden: Bool {
-        return navigationController?.hidesBarsOnTap ?? true
-    }
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
 }
