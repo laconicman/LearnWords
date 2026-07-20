@@ -141,9 +141,10 @@ store/context at the composition root (finishing the DI that TD-12 deferred). Us
 (UUID identity, TD-18) → append-only `ReviewEvent` log (outcome taxonomy, response text,
 attachable AI judgments) + derived index caches. Event-sourcing is also the CloudKit-friendly
 shape (append-only records merge without counter conflicts). Remaining considerations:
-CloudKit entitlements + App-Group sharing with the extensions, migrating existing
-`UserDefaults` data (legacy aggregates carried as a one-time prior), and whether `WordStore`
-goes async.
+CloudKit entitlements + App-Group sharing with the extensions, and whether `WordStore`
+goes async. Words/sets migrate from `UserDefaults`; **legacy progress aggregates do not**
+(owner, 2026-07-20 — progress starts fresh from the event log; compatibility isn't worth
+the code). Apply the `ProgressResearch.md` audit (pending) before implementing the schema.
 
 ## TD-7 — iOS 12 availability audit
 

@@ -71,10 +71,13 @@ Priority-ordered. Rationale lives in [Design](Design.md); debt items in [TechDeb
 
 - **Manual TD-16 pass** — all three exercise screens: transition in/out, wrong-answer shake,
   correct-answer shine, level-up spray; the leave-during-delay scenario on a device.
-- **Owner review of [ProgressModel](ProgressModel.md)** — esp. the four open questions at
-  the end (near-miss weight, skip semantics, know/forgot buttons, legacy prior).
-- Then the big rock, in order: **TD-18** (word UUIDs) → **TD-13** (Core Data + CloudKit
-  implementing the ProgressModel schema) → screens append events → indexes → **TD-17** ring.
+- **Vocabulary-science research in Cowork** — hand `TASK-vocab-research.md` +
+  `ProgressModel.md` to a Cowork session; its report (`ProgressResearch.md`) audits the
+  model before the schema is implemented. (Model questions resolved 2026-07-20: defaults
+  on 1–3; legacy progress NOT migrated; display caching agreed in principle.)
+- Then the big rock, in order: apply research audit → **TD-18** (word UUIDs) → **TD-13**
+  (Core Data + CloudKit implementing the ProgressModel schema) → screens append events →
+  indexes → **TD-17** ring.
 - **RU strings** for the new settings labels in `Localizable.xcstrings` (deferred by owner).
 - Storyboard split (TD-5) is **likely YAGNI** at this size — prefer creator-injection on the
   existing storyboard where a screen needs a dependency; revisit only if the one storyboard

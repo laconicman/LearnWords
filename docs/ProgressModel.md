@@ -71,8 +71,12 @@ in later, R4):
 - `known` (today's number) becomes one more derived value — computed with a compatibility
   policy so existing behavior survives.
 
-**Display caches** — per-word index values cached for cell rendering, recomputed lazily
-(log is small: single user, a few events per word).
+**Display caches (agreed in principle, mechanism negotiable — owner, 2026-07-20)** —
+index values must not be recomputed per cell display. Per-word cached index values,
+invalidated when an event is appended for that word, recomputed off the cell path (on
+append, or lazily on first display after invalidation). In the Core Data schema this is a
+small per-word cache entity (or transient attributes recomputed per launch); exact
+mechanism decided at TD-13 implementation.
 
 ## Why event-sourcing is the right TD-13 shape
 
@@ -111,12 +115,20 @@ their natural Dynamic Type size (no autoshrink), rows stay self-sizing with the 
 margins already in place. The indicator follows the text scale; it never drives row height
 against the font.
 
-## Open questions (defaults chosen, owner may override)
+## Resolved questions (owner, 2026-07-20)
 
-1. Does `.correctJudged` (near-miss) count toward "known" at full weight? *Default: lower
-   weight than verbatim, higher than self-assessed.*
-2. Is `.skipped` effort? *Default: tiny effort weight, zero mastery signal.*
-3. Keep the know/forgot buttons on screens that can judge verbatim (Dictation/Phonetics)?
-   *Default: yes — they capture honest self-assessment, now distinguishable in data.*
-4. Migration of existing aggregates: carried as a one-time `legacyPrior` on the word
-   (they cannot be exploded into events). *Default: yes, so `known` doesn't reset.*
+1. `.correctJudged` (near-miss) weight: **between verbatim and self-assessed** — confirmed.
+2. `.skipped`: **tiny effort weight, zero mastery signal** — confirmed.
+3. Know/forgot buttons stay on all screens — **confirmed** (honest self-assessment, now
+   distinguishable in data).
+4. Legacy aggregates: **NOT migrated** (owner reversed the default). No `legacyPrior`;
+   existing `correct`/`incorrect` counts are discarded when TD-13 lands and progress starts
+   fresh from the event log. Rationale: backward compatibility isn't worth the code
+   complexity at this data scale.
+
+## Pending external input
+
+A research pass on vocabulary-acquisition science and shipping products' progress models is
+commissioned (`TASK-vocab-research.md`, same folder; report lands as `ProgressResearch.md`).
+Its Phase-2 audit may amend this document — **apply the audit before implementing the TD-13
+schema**, since the event log is append-only and schema gaps are the expensive kind.
