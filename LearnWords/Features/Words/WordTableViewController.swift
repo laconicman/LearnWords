@@ -433,17 +433,24 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
     }
     
     // MARK: SearchController for filtering WordTableView
+    /// Hands the search bar to the navigation item rather than parking it in the table
+    /// header (TD-21).
+    ///
+    /// As a `tableHeaderView` it was scrolled just out of sight by nudging
+    /// `contentOffset` — which worked while navigation bars were opaque. Under iOS 26 the
+    /// bar is transparent and content flows beneath it, so the search field showed
+    /// *through* the bar and collided with the floating "Settings" / "+" / "Edit"
+    /// capsules. `navigationItem.searchController` lets UIKit place and collapse it,
+    /// correctly on every version, and `hidesSearchBarWhenScrolling` replaces the offset
+    /// hack. Both are iOS 11+, so they clear the 12.1 floor without a check.
     private func setupSearchController(placeholder: String = "", hideWhenAppear: Bool = true) { //Unify with searchViewControllers
         definesPresentationContext = true
-        // searchController.dimsBackgroundDuringPresentation = false
         searchController.searchResultsUpdater = self
-        // searchController.searchBar.barTintColor = UIColor(white: 0.9, alpha: 0.4)
         searchController.searchBar.placeholder = placeholder
         searchController.hidesNavigationBarDuringPresentation = false
-        tableView.tableHeaderView = searchController.searchBar
-        if hideWhenAppear {
-            tableView.contentOffset = CGPoint(x: 0, y: searchController.searchBar.frame.height)
-        }
+        searchController.obscuresBackgroundDuringPresentation = false
+        navigationItem.searchController = searchController
+        navigationItem.hidesSearchBarWhenScrolling = hideWhenAppear
     }
     
     func filterRows(for searchText: String) {

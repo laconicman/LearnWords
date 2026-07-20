@@ -286,10 +286,26 @@
       }
     },
     "English (GB)" : {
-      "comment" : "language"
+      "comment" : "language",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Английский (Великобритания)"
+          }
+        }
+      }
     },
     "English (US)" : {
-      "comment" : "language"
+      "comment" : "language",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Английский (США)"
+          }
+        }
+      }
     },
     "EXPORT_WORDS_MESSAGE" : {
       "comment" : "Count of words to be exported",
@@ -350,10 +366,26 @@
       }
     },
     "French" : {
-      "comment" : "language"
+      "comment" : "language",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Французский"
+          }
+        }
+      }
     },
     "German" : {
-      "comment" : "language"
+      "comment" : "language",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Немецкий"
+          }
+        }
+      }
     },
     "Got it" : {
       "comment" : "Button title",
@@ -444,7 +476,15 @@
       }
     },
     "Italian" : {
-      "comment" : "language"
+      "comment" : "language",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Итальянский"
+          }
+        }
+      }
     },
     "Keyboard for language to study (%@) is not installed now. " : {
       "comment" : "Alert message, langID inside",
@@ -498,13 +538,37 @@
       }
     },
     "Known level" : {
-      "comment" : "setting"
+      "comment" : "setting",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Уровень знания"
+          }
+        }
+      }
     },
     "Language to study" : {
-      "comment" : "setting"
+      "comment" : "setting",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Изучаемый язык"
+          }
+        }
+      }
     },
     "Languages" : {
-      "comment" : "settings section"
+      "comment" : "settings section",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Языки"
+          }
+        }
+      }
     },
     "Learned " : {
       "comment" : "Label learned words",
@@ -643,7 +707,15 @@
       }
     },
     "Microphone Access Required" : {
-      "comment" : "PermissionManager - `onDenied`"
+      "comment" : "PermissionManager - `onDenied`",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Требуется доступ к микрофону"
+          }
+        }
+      }
     },
     "Name of set" : {
       "localizations" : {
@@ -662,7 +734,15 @@
       }
     },
     "Native language" : {
-      "comment" : "setting"
+      "comment" : "setting",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Родной язык"
+          }
+        }
+      }
     },
     "New word" : {
       "comment" : "placeholder for adding new word to vocabulary",
@@ -734,19 +814,59 @@
       }
     },
     "Pitch" : {
-      "comment" : "setting"
+      "comment" : "setting",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Высота голоса"
+          }
+        }
+      }
     },
     "Please enable Microphone access in Settings to use voice features." : {
-      "comment" : "PermissionManager - `onDenied`"
+      "comment" : "PermissionManager - `onDenied`",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Разрешите доступ к микрофону в Настройках, чтобы пользоваться голосовыми функциями."
+          }
+        }
+      }
     },
     "Please enable Speech Recognition in Settings to use voice features." : {
-      "comment" : "PermissionManager - `onDenied`"
+      "comment" : "PermissionManager - `onDenied`",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Разрешите распознавание речи в Настройках, чтобы пользоваться голосовыми функциями."
+          }
+        }
+      }
     },
     "Pronounce answers" : {
-      "comment" : "setting"
+      "comment" : "setting",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Произносить ответы"
+          }
+        }
+      }
     },
     "Pronounce questions" : {
-      "comment" : "setting"
+      "comment" : "setting",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Произносить вопросы"
+          }
+        }
+      }
     },
     "pronounce the translation" : {
       "comment" : "label prompt",
@@ -766,7 +886,15 @@
       }
     },
     "Rate" : {
-      "comment" : "setting"
+      "comment" : "setting",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скорость речи"
+          }
+        }
+      }
     },
     "Recognition not allowed" : {
       "comment" : "Button title",
@@ -820,7 +948,15 @@
       }
     },
     "Russian" : {
-      "comment" : "language"
+      "comment" : "language",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Русский"
+          }
+        }
+      }
     },
     "Save" : {
       "comment" : "AlertAction title",
@@ -868,10 +1004,26 @@
       }
     },
     "Spanish" : {
-      "comment" : "language"
+      "comment" : "language",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Испанский"
+          }
+        }
+      }
     },
     "Speech" : {
-      "comment" : "settings section"
+      "comment" : "settings section",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Речь"
+          }
+        }
+      }
     },
     "Speech recognition error" : {
       "localizations" : {
@@ -890,7 +1042,15 @@
       }
     },
     "Speech Recognition Required" : {
-      "comment" : "PermissionManager - `onDenied`"
+      "comment" : "PermissionManager - `onDenied`",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Требуется распознавание речи"
+          }
+        }
+      }
     },
     "Start recognition" : {
       "comment" : "Button title",
@@ -961,7 +1121,15 @@
       }
     },
     "Study" : {
-      "comment" : "settings section"
+      "comment" : "settings section",
+      "localizations" : {
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Обучение"
+          }
+        }
+      }
     },
     "Total " : {
       "comment" : "Label total words",

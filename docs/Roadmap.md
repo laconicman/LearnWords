@@ -57,6 +57,13 @@ Priority-ordered. Rationale lives in [Design](Design.md); debt items in [TechDeb
   locked by a storyboard-driven appearance test. 38/38 tests green. Manual feel-pass
   pending (see `TASK-TD16-adoption.md` § Verification).
 
+- **TD-21 + RU strings** (2026-07-20) — the Words tab's search bar moved from
+  `tableView.tableHeaderView` to `navigationItem.searchController`, so it no longer shows
+  through the transparent iOS 26 nav bar behind the button capsules (the original TD-21
+  diagnosis blamed a nav title; there is none). 21 missing Russian strings added — the
+  TD-14 settings screen, language names and the permission alerts; `Localizable.xcstrings`
+  now has full `ru` coverage. Manual TD-16 feel pass done by owner: animations OK.
+
 - **Word-cell constraint conflict fixed** (TD-17, 2026-07-20) — the per-row unsatisfiable-
   constraints spam (1-pt over-constraint vs the 44-pt ring); pins relaxed to ≥ 4; verified
   clean console + unchanged cells. Ring-replacement research recorded in TD-17.
@@ -102,16 +109,15 @@ Priority-ordered. Rationale lives in [Design](Design.md); debt items in [TechDeb
 
 ## Next
 
-- **Manual TD-16 pass** — all three exercise screens: transition in/out, wrong-answer shake,
-  correct-answer shine, level-up spray; the leave-during-delay scenario on a device.
-- **Vocabulary-science research in Cowork** — hand `TASK-vocab-research.md` +
-  `ProgressModel.md` to a Cowork session; its report (`ProgressResearch.md`) audits the
-  model before the schema is implemented. (Model questions resolved 2026-07-20: defaults
-  on 1–3; legacy progress NOT migrated; display caching agreed in principle.)
-- Then the big rock, in order: apply research audit → **TD-18** (word UUIDs) → **TD-13**
-  (Core Data + CloudKit implementing the ProgressModel schema) → screens append events →
-  indexes → **TD-17** ring.
-- **RU strings** for the new settings labels in `Localizable.xcstrings` (deferred by owner).
+- The big rock, in order: **TD-18** (word **and word-set** identity — see the language-pair
+  decision in [Design](Design.md)) → **TD-13** (Core Data + CloudKit implementing the
+  ProgressModel schema, carrying set languages) → screens append events → indexes →
+  **TD-17** ring. The research audit that gated this is **applied** (see
+  [ProgressModel](ProgressModel.md) § "Research audit — applied").
+  *Open question:* whether TD-18 is worth doing on `UserDefaults` first or should be folded
+  into the TD-13 schema — progress starts fresh at TD-13, so identity has no consumer until
+  the event log exists.
+- **`docs/ProgressResearch.md` is untracked** — the document gating TD-13 is not in git yet.
 - Storyboard split (TD-5) is **likely YAGNI** at this size — prefer creator-injection on the
   existing storyboard where a screen needs a dependency; revisit only if the one storyboard
   actually hurts.

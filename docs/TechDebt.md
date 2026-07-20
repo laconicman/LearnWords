@@ -481,16 +481,25 @@ rather than `.filled()` because the chooser stacks three of them — one line to
 screen ever earns a single dominant CTA. New `Listen` / direction strings need RU
 translations in `Localizable.xcstrings` (same deferral as TD-14).
 
-## TD-21 — Words-tab nav title collides with its bar buttons
+## TD-21 — Search bar shows through the Words nav bar — **resolved (2026-07-20)**
 
-Seen on the iOS 26 sim (2026-07-20) while checking bar consistency: `WordTableViewController`'s
-title ("… слова в наборе") renders *behind* the "Настройки" bar button. iOS 26 draws bar
-buttons as floating glass capsules, so a long title plus a left button and two right buttons
-(`+`, "Править") leaves no room, and the title is overlapped rather than truncated.
-**Cost:** the count of words in the set — the screen's only status line — is unreadable.
-**Discharge:** shorten the title (or move the count into the table header / a subtitle),
-or move "Настройки" out of the bar now that there is an in-app settings screen (TD-14).
-Not touched here: it is outside the button/layout pass and wants a product decision.
+Seen on the iOS 26 sim while checking bar consistency: text rendered *behind* the
+"Настройки" bar button on the Words tab. **The first diagnosis here was wrong** — it was
+recorded as a nav *title* colliding with the bar buttons, and no title is set on that
+screen. The text was the **search bar placeholder** ("Search words in sets" / "Искать
+слова в наборе").
+
+Root cause: `setupSearchController` installed the search bar as `tableView.tableHeaderView`
+— the pre-iOS 11 pattern — and hid it by nudging `contentOffset` down by its height. That
+worked while navigation bars were opaque. Under iOS 26 the bar is transparent and content
+flows beneath it (see TD-19), so the parked search field showed *through* the bar and
+collided with the floating "Настройки" / `+` / "Править" capsules.
+
+**Fix:** hand the search bar to `navigationItem.searchController` and replace the offset
+hack with `navigationItem.hidesSearchBarWhenScrolling`. UIKit then places and collapses it
+— on iOS 26 it gets its own row below the buttons, revealed by pulling down. Both APIs are
+iOS 11+, so no availability check at the 12.1 floor, and the `contentOffset` fiddling is
+gone. Verified on the sim: bar buttons clear, search legible and functional when revealed.
 
 ## TD-20 — Exercise screens are triplicated in both code and storyboard
 
