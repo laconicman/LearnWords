@@ -60,3 +60,17 @@ enum ReviewOutcome: String {
         }
     }
 }
+
+/// Which side of the pair was the cue — Nation's receptive/productive split, and the
+/// reason a language pair has to travel with the event (docs/ProgressResearch.md §1.4).
+/// Unrecoverable if not logged, which is why it is written from the first event onward.
+enum ReviewDirection: String {
+    /// Foreign word shown, native answer wanted — recognition.
+    case foreignToNative
+    /// Native word shown, foreign answer wanted — production.
+    case nativeToForeign
+
+    init(showsForeignAsPrompt: Bool) {
+        self = showsForeignAsPrompt ? .foreignToNative : .nativeToForeign
+    }
+}

@@ -102,6 +102,37 @@ through storyboard-instantiated view controllers, so proper injection needs the 
 work — and it would be thrown away when Core Data replaces this layer. The facade is the
 interim; full injection lands with the Core Data migration (TD-13).
 
+## Decision: no migration into Core Data — start fresh
+
+**Decision (owner, 2026-07-20).** TD-13 builds the Core Data model for the *new*
+requirements rather than shaping it to fit `UserDefaults`. **Nothing is migrated** — not
+progress, not words, not sets. Users re-import their dictionary. TD-18 (stable identity) is
+therefore not a separate `UserDefaults` step: identity is *born* with the Core Data model.
+
+**Why.** Owner's words: "I don't care for backwards compatibility. The user can always
+import the dictionary. The loss of progress is not an issue here at all." Progress was
+already going to start fresh ([ProgressModel](ProgressModel.md) Q4), so the only thing a
+migration would carry is the word list — which the import feature already handles. Writing
+a UUID migration against a store being deleted would be work done twice, which is the same
+rule TD-12 and ProgressModel state: don't polish a layer being replaced.
+
+**Supersedes** the "words and sets migrate from `UserDefaults`" line in
+`TASK-TD13-schema.md` §Phase B, and folds its Phase A into Phase B.
+
+**Cost (accepted).** Existing users lose their word sets and all progress on upgrade. The
+owner has accepted this explicitly, for themselves as well.
+
+## Decision: `WordStore` stays synchronous
+
+**Decision.** The persistence protocol does **not** go async — the open question in
+`TASK-TD13-schema.md` §Decisions 2.
+
+**Why.** Not a preference: Swift Concurrency back-deploys only to **iOS 13**
+([Xcode 13.2 release notes](https://developer.apple.com/documentation/xcode-release-notes/xcode-13_2-release-notes)),
+so at the 12.1 floor `async`/`await` cannot be used at all. Core Data's
+`performAndWait` is the pre-concurrency way to stay on the right queue, and it keeps the
+existing synchronous call sites working unchanged. Revisit only if Legacy drops iOS 12.
+
 ## Decision: a language pair belongs to a word set, not to the app
 
 **Decision (owner, 2026-07-20).** A word set carries its own `native`/`foreign` languages.

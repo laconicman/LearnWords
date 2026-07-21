@@ -129,7 +129,46 @@ Was: `Storage` was all-`static` over the global App-Group `UserDefaults`, untest
 per-VC injection — deliberately, because Core Data (TD-13) will replace this layer, making
 per-VC injection of the UserDefaults store throwaway. Full injection lands with that migration.
 
-## TD-13 — Core Data + CloudKit migration (planned direction)
+## TD-13 — Core Data + CloudKit — **iteration 1 landed (2026-07-20)**
+
+Implementation runs from [`TASK-TD13-schema.md`](TASK-TD13-schema.md). Two of its four
+"decide before coding" questions are now answered, in [Design](Design.md): `WordStore`
+stays **synchronous** (Swift Concurrency back-deploys only to iOS 13, so `async` is
+unavailable at the 12.1 floor), and **nothing migrates** — TD-18's identity is born with
+the Core Data model instead of being retrofitted onto `UserDefaults`, so Phase A folds into
+Phase B. The other two are deferred with reasons: the FSRS dependency is a Phase-D concern
+(the log is FSRS-independent; FSRS *consumes* it), and the per-word index cache is *derived*
+data whose columns depend on a `ScoringPolicy` that does not exist yet — guessing its shape
+now would be worse than adding it later, and derived data carries no backfill risk.
+
+**Iteration 1 — the schema, nothing wired to it yet:**
+- `Model/CoreData/LearnWords.xcdatamodeld` — `WordSet` (id, name, **nativeLanguage /
+  foreignLanguage**, createdAt) → `Word` (id, firstWord, secondWord, createdAt) →
+  `ReviewEvent` with **every †-marked field** from the research audit (sessionID, direction,
+  expected, prompt, latencyMS, judgment verdict/judge/judgedAt/errorTags, schemaVersion).
+- `ManagedObjects.swift` — hand-written subclasses (manual codegen) so the schema is
+  reviewable in the repo rather than generated invisibly at build time.
+- `LWPersistence.swift` — the stack: one shared `NSManagedObjectModel` (loading it twice is
+  the classic "failed to find a unique match for an NSEntityDescription" crash), App-Group
+  store URL, an in-memory initialiser for tests, and a `write` that saves on a background
+  context and rolls back on error.
+- **Authored to CloudKit's rules from the start** — all attributes optional or defaulted,
+  every relationship optional with an inverse, no unique constraints (CloudKit rejects
+  them). A test enforces this, so enabling `NSPersistentCloudKitContainer` later is a
+  container swap rather than a redesign.
+- **10 tests** against an in-memory store, including the two that are expensive to get
+  wrong later: every audited event field round-trips (append-only — a missing field can
+  never be backfilled), and an unknown future `outcome` decodes to `nil` with its raw value
+  intact instead of crashing.
+- Noted for iteration 4: `NSPersistentCloudKitContainer` and remote-change notifications
+  are **iOS 13+**, so on iOS 12 this store is simply local. Correct degradation — Legacy
+  keeps working, sync is a modern-OS feature.
+
+**Remaining:** ② `CoreDataWordStore: WordStore` + swap `Storage.backend` + seed the sample
+set · ③ screens append events (Phase C) · ④ CloudKit + App Group + widget · ⑤ indexes and
+the TD-17 ring (Phase D).
+
+## TD-13 (original note) — Core Data + CloudKit migration (planned direction)
 
 Owner intends to move persistence to Core Data with `NSPersistentCloudKitContainer` so word
 sets and learning progress sync across a user's devices. The `WordStore` seam (TD-12) is built

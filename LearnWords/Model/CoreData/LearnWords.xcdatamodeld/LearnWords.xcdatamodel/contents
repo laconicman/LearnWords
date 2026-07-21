@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23504" systemVersion="24F74" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="YES" userDefinedModelVersionIdentifier="">
+    <entity name="WordSet" representedClassName="CDWordSet" syncable="YES">
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="foreignLanguage" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="nativeLanguage" optional="YES" attributeType="String"/>
+        <relationship name="words" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Word" inverseName="set" inverseEntity="Word"/>
+    </entity>
+    <entity name="Word" representedClassName="CDWord" syncable="YES">
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="firstWord" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="secondWord" optional="YES" attributeType="String"/>
+        <relationship name="events" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="ReviewEvent" inverseName="word" inverseEntity="ReviewEvent"/>
+        <relationship name="set" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="WordSet" inverseName="words" inverseEntity="WordSet"/>
+    </entity>
+    <entity name="ReviewEvent" representedClassName="CDReviewEvent" syncable="YES">
+        <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="direction" optional="YES" attributeType="String"/>
+        <attribute name="expected" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="judgedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="judgeID" optional="YES" attributeType="String"/>
+        <attribute name="judgmentErrorTags" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[String]"/>
+        <attribute name="judgmentVerdict" optional="YES" attributeType="Double" usesScalarValueType="NO"/>
+        <attribute name="latencyMS" optional="YES" attributeType="Integer 64" usesScalarValueType="NO"/>
+        <attribute name="outcome" optional="YES" attributeType="String"/>
+        <attribute name="prompt" optional="YES" attributeType="String"/>
+        <attribute name="response" optional="YES" attributeType="String"/>
+        <attribute name="schemaVersion" optional="YES" attributeType="Integer 16" defaultValueString="1" usesScalarValueType="YES"/>
+        <attribute name="sessionID" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="task" optional="YES" attributeType="String"/>
+        <relationship name="word" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Word" inverseName="events" inverseEntity="Word"/>
+    </entity>
+</model>
