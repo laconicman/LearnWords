@@ -61,6 +61,11 @@ final class CDSynset: NSManagedObject {
     /// Sense disambiguation shown at practice ("bear — the animal"). Lives here, not on
     /// the term: a term-level comment cannot tell two senses of one word apart.
     @NSManaged var note: String?
+    /// Free-form facets of this sense: subject field ("medicine", "finance") and usage
+    /// register ("slang", "formal", "dated"). Lexicography keeps these as *labels*, not
+    /// a taxonomy — register is a characteristic, not a theme — so this is a folksonomy
+    /// the user can grow, never an enum the schema must chase. (Owner, 2026-07-23.)
+    @NSManaged var tags: [String]?
     @NSManaged var createdAt: Date?
     @NSManaged var terms: NSSet?
     @NSManaged var sets: NSSet?

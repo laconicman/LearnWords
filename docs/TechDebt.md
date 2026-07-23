@@ -554,6 +554,36 @@ hack with `navigationItem.hidesSearchBarWhenScrolling`. UIKit then places and co
 iOS 11+, so no availability check at the 12.1 floor, and the `contentOffset` fiddling is
 gone. Verified on the sim: bar buttons clear, search legible and functional when revealed.
 
+## TD-22 — Dictionary enrichment: prefill terms from open lexical data
+
+When adding a word, the app could prefill transcription, part of speech, forms, senses
+and sense tags. **Not** from the iOS system dictionary: `DCSCopyTextDefinition` is
+macOS-only, `UIReferenceLibraryViewController` displays but returns no data, and the
+owner's prior experience shows Apple resists reflection-based extraction. Researched
+sources (2026-07-23):
+
+- **[kaikki.org](https://kaikki.org/dictionary/rawdata.html) (wiktextract)** — the
+  strongest fit: per-language machine-readable Wiktionary extracts (JSON Lines) with
+  lemmas, **inflected forms**, translations, **IPA + audio**, senses with topical and
+  register annotations — the exact shape of `Term`/`WordForm`/`Synset.tags`. Updated
+  weekly; licensed CC BY-SA/GFDL (attribution + share-alike apply to redistributed
+  content). Downloadable, so enrichment is **offline and private** — no query ever
+  leaves the device, which matches the app's privacy constraint.
+- **[Wikimedia REST definition endpoint](https://www.mediawiki.org/wiki/Wikimedia_REST_API)**
+  — structured Wiktionary definitions on demand; experimental, en.wiktionary only.
+- **[dictionaryapi.dev](https://dictionaryapi.dev/)** — free, keyless, community-run;
+  English-centric, no uptime guarantees.
+- **[Merriam-Webster API](https://dictionaryapi.com/)** — free non-commercial tier
+  (1000 queries/day), English + Spanish; strongest quality for English only.
+- **A macOS companion app** (owner's suggestion) — `DCSCopyTextDefinition` is public
+  there; enrichment done on the Mac would reach iOS via CloudKit sync. Long-term option.
+
+**Privacy note:** online lookups leak the user's vocabulary to a third party; prefer
+the downloadable-dataset route, or make lookups explicitly user-initiated per word.
+**Discharge:** when the word-editing UI is built (post-TD-13), start with a kaikki
+subset for the user's language pairs; keep the fetch behind a protocol so sources can
+be added. Blocked on iteration 2+ of TD-13.
+
 ## TD-20 — Exercise screens are triplicated in both code and storyboard
 
 `WordTestViewController`, `WordDictationController` and `WordPhoneticsViewController` are

@@ -149,6 +149,20 @@ struct PersistenceSchemaTests {
         #expect(set.synsetList.first?.terms(in: "de").first?.text == "Bär")
     }
 
+    /// Domain and register ride on the sense as free-form tags — "bread = money" is
+    /// slang in that *sense*, not as a word.
+    @Test func senseTagsRoundTrip() throws {
+        let context = makeContext()
+        let synset = makeSynset(context, terms: [makeTerm(context, "bread", "en"),
+                                                 makeTerm(context, "деньги", "ru")],
+                                note: "money, not the food")
+        synset.tags = ["slang", "domain:everyday"]
+        try context.save()
+
+        let fetched = try #require(try context.fetch(CDSynset.fetchRequest()).first)
+        #expect(fetched.tags == ["slang", "domain:everyday"])
+    }
+
     @Test func aSynsetIsSharedAcrossSetsAndSurvivesSetDeletion() throws {
         let context = makeContext()
         let synset = makeSynset(context, terms: [makeTerm(context, "bear", "en"),

@@ -107,9 +107,27 @@ survives future set-sharing, where two users of one set have different primaries
 - **Illustration sync**: URL strings don't travel across devices for local files;
   the CloudKit-era answer is `CKAsset`/binary-with-external-storage — an additive
   schema change when needed.
-- **Look Up enrichment opportunity** (from the NSHipster piece): `DCSCopyTextDefinition`
-  can pull system-dictionary definitions to prefill transcription/senses when adding
-  words — worth a TD entry when the editing UI is touched.
+- **Dictionary enrichment** — see TD-22 in [TechDebt](TechDebt.md). *(Correction,
+  2026-07-23: an earlier version of this doc suggested `DCSCopyTextDefinition` — that
+  API is **macOS-only**. On iOS, `UIReferenceLibraryViewController` displays system
+  dictionaries but returns no data, and the owner's past experience confirms Apple
+  pushes back on reflection-based extraction. Enrichment therefore comes from open
+  data or a future macOS companion, not from the iOS system dictionary.)*
+
+## Sense weights, domains and register (owner question, 2026-07-23)
+
+What Apple's format actually has: senses are **ordered** (conventionally by frequency),
+and `d:priority` marks what survives in the condensed lookup pane — display concerns,
+not weights. Domain ("Medicine") and register ("slang", "informal", "dated") appear as
+*labels on senses* in real dictionaries; wiktextract exposes the same as per-sense
+topical/dialectal annotations. Lexicography keeps the two facets distinct — **register
+is a characteristic of usage, not a theme**, which matches the owner's instinct — and
+neither is a closed taxonomy.
+
+Decision: **`Synset.tags: [String]`** — a folksonomy with an optional facet convention
+("slang" vs "domain:medicine"), not an enum the schema would have to chase. No numeric
+sense weights (YAGNI): ordering emerges from the scoring policy and set membership, and
+the wrong-thematic coefficient already keys off `wordSetID` + tags at judge time.
 
 ## Rejected alternatives
 
