@@ -565,10 +565,17 @@ sources (2026-07-23):
 - **[kaikki.org](https://kaikki.org/dictionary/rawdata.html) (wiktextract)** — the
   strongest fit: per-language machine-readable Wiktionary extracts (JSON Lines) with
   lemmas, **inflected forms**, translations, **IPA + audio**, senses with topical and
-  register annotations — the exact shape of `Term`/`WordForm`/`Synset.tags`. Updated
+  register annotations — the exact shape of `Term`/`WordForm`/`Tag`. Updated
   weekly; licensed CC BY-SA/GFDL (attribution + share-alike apply to redistributed
-  content). Downloadable, so enrichment is **offline and private** — no query ever
-  leaves the device, which matches the app's privacy constraint.
+  content; owner: not a problem). Downloadable, so enrichment is **offline and
+  private** — no query ever leaves the device, which matches the app's privacy
+  constraint. **Sense-to-sense (owner question, 2026-07-23): yes** — Wiktionary's
+  translation tables are gloss-headed per sense, and wiktextract preserves this: each
+  translation entry carries a `sense` field naming the gloss it belongs to, and each
+  sense carries `tags` ("colloquial", "chemistry", …) that map straight onto our `Tag`
+  rows. Caveat: the linkage is by gloss *text*, not stable IDs, and is occasionally
+  broken in the source; DBnary is the same data already modelled as OntoLex-Lemon
+  (sense-to-sense `vartrans`) if stricter structure is ever wanted.
 - **[Wikimedia REST definition endpoint](https://www.mediawiki.org/wiki/Wikimedia_REST_API)**
   — structured Wiktionary definitions on demand; experimental, en.wiktionary only.
 - **[dictionaryapi.dev](https://dictionaryapi.dev/)** — free, keyless, community-run;

@@ -47,6 +47,10 @@ extension CDWordSet {
     var synsetList: [CDSynset] {
         (synsets as? Set<CDSynset>).map { Array($0) } ?? []
     }
+
+    /// See the note on `CDSynset`'s helpers: to-many writes only via `mutableSetValue`.
+    func addSynset(_ synset: CDSynset) { mutableSetValue(forKey: "synsets").add(synset) }
+    func removeSynset(_ synset: CDSynset) { mutableSetValue(forKey: "synsets").remove(synset) }
 }
 
 // MARK: - Synset
@@ -61,14 +65,10 @@ final class CDSynset: NSManagedObject {
     /// Sense disambiguation shown at practice ("bear — the animal"). Lives here, not on
     /// the term: a term-level comment cannot tell two senses of one word apart.
     @NSManaged var note: String?
-    /// Free-form facets of this sense: subject field ("medicine", "finance") and usage
-    /// register ("slang", "formal", "dated"). Lexicography keeps these as *labels*, not
-    /// a taxonomy — register is a characteristic, not a theme — so this is a folksonomy
-    /// the user can grow, never an enum the schema must chase. (Owner, 2026-07-23.)
-    @NSManaged var tags: [String]?
     @NSManaged var createdAt: Date?
     @NSManaged var terms: NSSet?
     @NSManaged var sets: NSSet?
+    @NSManaged var tags: NSSet?
     @NSManaged var events: NSSet?
 }
 
@@ -96,6 +96,48 @@ extension CDSynset {
     var reviewHistory: [CDReviewEvent] {
         let all = (events as? Set<CDReviewEvent>).map { Array($0) } ?? []
         return all.sorted { ($0.date ?? .distantPast) < ($1.date ?? .distantPast) }
+    }
+
+    var tagList: [CDTag] {
+        let all = (tags as? Set<CDTag>).map { Array($0) } ?? []
+        return all.sorted { ($0.name ?? "") < ($1.name ?? "") }
+    }
+
+    // To-many writes go through `mutableSetValue` — the hand-written-subclass
+    // equivalent of Xcode's generated accessors. Assignment of a whole `NSSet` replaces
+    // the relationship and forces Core Data to diff it; these express the actual
+    // intent (add/remove one link) and are the conventional safe write path.
+
+    func addTerm(_ term: CDTerm) { mutableSetValue(forKey: "terms").add(term) }
+    func removeTerm(_ term: CDTerm) { mutableSetValue(forKey: "terms").remove(term) }
+    func addTag(_ tag: CDTag) { mutableSetValue(forKey: "tags").add(tag) }
+    func removeTag(_ tag: CDTag) { mutableSetValue(forKey: "tags").remove(tag) }
+}
+
+// MARK: - Tag
+
+/// A facet of a sense: subject field ("domain:medicine") or usage register ("slang",
+/// "dated"). A row, not a string-array blob on the synset — tags are a *query
+/// dimension* ("all slang senses"), and a transformable array is invisible to SQLite:
+/// no predicate can look inside it, nothing can index it, and renaming a tag would
+/// mean rewriting every blob (Codd's information rule / 1NF, applied to the one place
+/// it pays: things that appear in a WHERE clause are rows). One `Tag` row per name —
+/// dedup by name is store logic, since CloudKit forbids unique constraints.
+///
+/// A folksonomy, not an enum: lexicography keeps register and domain as open label
+/// sets, and the register-vs-domain split is a naming convention ("slang" vs
+/// "domain:medicine"), promotable to a `facet` attribute later — an additive change.
+@objc(CDTag)
+final class CDTag: NSManagedObject {
+    @NSManaged var id: UUID?
+    @NSManaged var name: String?
+    @NSManaged var createdAt: Date?
+    @NSManaged var synsets: NSSet?
+}
+
+extension CDTag {
+    static func fetchRequest() -> NSFetchRequest<CDTag> {
+        NSFetchRequest<CDTag>(entityName: "Tag")
     }
 }
 

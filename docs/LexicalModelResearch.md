@@ -124,10 +124,30 @@ topical/dialectal annotations. Lexicography keeps the two facets distinct — **
 is a characteristic of usage, not a theme**, which matches the owner's instinct — and
 neither is a closed taxonomy.
 
-Decision: **`Synset.tags: [String]`** — a folksonomy with an optional facet convention
-("slang" vs "domain:medicine"), not an enum the schema would have to chase. No numeric
-sense weights (YAGNI): ordering emerges from the scoring policy and set membership, and
-the wrong-thematic coefficient already keys off `wordSetID` + tags at judge time.
+Decision: a **`Tag` entity, many-to-many with `Synset`** — a folksonomy with an optional
+facet convention ("slang" vs "domain:medicine"), not an enum the schema would have to
+chase. No numeric sense weights (YAGNI): ordering emerges from the scoring policy and
+set membership, and the wrong-thematic coefficient already keys off `wordSetID` + tags
+at judge time.
+
+*(Corrected the same day, owner review — Codd's information rule / 1NF.)* The first cut
+was `tags: [String]` as a transformable attribute. That is a binary blob in one column:
+SQLite predicates cannot see inside it (`ANY tags.name == "slang"` is impossible),
+nothing can index it, and renaming a tag means rewriting every blob — an update anomaly.
+Tags exist precisely to *filter* senses, so they are a **query dimension** and therefore
+rows. The working rule for this schema, recorded for future fields:
+
+> **If it will ever appear in a WHERE clause, it is a row. If it is opaque payload, a
+> transformable is acceptable.**
+
+Audit of the remaining transformables under that rule: `ReviewEvent.judgmentErrorTags`
+stays — diagnostic payload on immutable events, read by `ScoringPolicy` over fetched
+history, never a store-level filter. `WordSet.languageCodes` stays — display/validation
+data over tens of sets, derivable from synset terms; revisit only if sets are ever
+queried by language at scale. (Core Data itself is an object graph, not an RDBMS —
+Codd's rules about ad-hoc query languages and views don't apply to it — but
+normalization discipline does, because the SQLite store only optimises what the model
+exposes.)
 
 ## Rejected alternatives
 

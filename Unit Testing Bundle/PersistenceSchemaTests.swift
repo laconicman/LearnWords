@@ -16,6 +16,13 @@ import Testing
 import CoreData
 @testable import LearnWords
 
+// @MainActor: these tests drive `viewContext`, a *main-queue* context, and Swift
+// Testing otherwise runs test functions on background tasks — a context-confinement
+// violation (the crash was a race inside `-[NSManagedObjectContext save:]`, surfacing
+// only once the many-to-many graph made relationship maintenance heavy enough to lose
+// the race). Same rule as Apple's "Using Core Data in the background": use a context
+// only on its own queue.
+@MainActor
 struct PersistenceSchemaTests {
 
     private func makeContext() -> NSManagedObjectContext {
@@ -42,7 +49,7 @@ struct PersistenceSchemaTests {
         synset.id = UUID()
         synset.note = note
         synset.createdAt = Date()
-        synset.terms = NSSet(array: terms)
+        terms.forEach(synset.addTerm)
         return synset
     }
 
@@ -55,7 +62,7 @@ struct PersistenceSchemaTests {
         set.name = name
         set.languageCodes = languages
         set.createdAt = Date()
-        set.synsets = NSSet(array: synsets)
+        synsets.forEach(set.addSynset)
         return set
     }
 
@@ -64,7 +71,7 @@ struct PersistenceSchemaTests {
     @Test func modelDefinesTheLexicalEntities() {
         let names = Set(LWPersistence.model.entities.compactMap(\.name))
         #expect(names == ["WordSet", "Synset", "Term", "Comment", "Illustration",
-                          "WordForm", "ReviewEvent"])
+                          "WordForm", "Tag", "ReviewEvent"])
     }
 
     /// CloudKit refuses non-optional attributes without defaults, relationships without
@@ -149,18 +156,37 @@ struct PersistenceSchemaTests {
         #expect(set.synsetList.first?.terms(in: "de").first?.text == "Bär")
     }
 
-    /// Domain and register ride on the sense as free-form tags — "bread = money" is
-    /// slang in that *sense*, not as a word.
-    @Test func senseTagsRoundTrip() throws {
+    /// Domain and register ride on the sense as tag *rows* — "bread = money" is slang
+    /// in that *sense*, not as a word. Rows, because tags are a query dimension: this
+    /// test proves the thing a `[String]` transformable blob could never do — a SQLite
+    /// predicate straight into the store, and rename-in-one-place.
+    @Test func tagsAreQueryableRowsSharedAcrossSenses() throws {
         let context = makeContext()
-        let synset = makeSynset(context, terms: [makeTerm(context, "bread", "en"),
-                                                 makeTerm(context, "деньги", "ru")],
-                                note: "money, not the food")
-        synset.tags = ["slang", "domain:everyday"]
+        let slang = CDTag(context: context)
+        slang.id = UUID()
+        slang.name = "slang"
+
+        let bread = makeSynset(context, terms: [makeTerm(context, "bread", "en"),
+                                                makeTerm(context, "деньги", "ru")],
+                               note: "money, not the food")
+        bread.addTag(slang)
+        let grand = makeSynset(context, terms: [makeTerm(context, "grand", "en"),
+                                                makeTerm(context, "штука", "ru")])
+        grand.addTag(slang)
+        makeSynset(context, terms: [makeTerm(context, "bear", "en")])   // untagged
         try context.save()
 
-        let fetched = try #require(try context.fetch(CDSynset.fetchRequest()).first)
-        #expect(fetched.tags == ["slang", "domain:everyday"])
+        // The WHERE clause the blob design made impossible.
+        let request = CDSynset.fetchRequest()
+        request.predicate = NSPredicate(format: "ANY tags.name == %@", "slang")
+        #expect(try context.count(for: request) == 2)
+
+        // One row per tag: rename once, both senses see it — no update anomaly.
+        slang.name = "register:slang"
+        try context.save()
+        #expect(bread.tagList.first?.name == "register:slang")
+        #expect(grand.tagList.first?.name == "register:slang")
+        #expect(try context.count(for: CDTag.fetchRequest()) == 1)
     }
 
     @Test func aSynsetIsSharedAcrossSetsAndSurvivesSetDeletion() throws {
