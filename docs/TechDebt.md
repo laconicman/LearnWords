@@ -141,7 +141,21 @@ Phase B. The other two are deferred with reasons: the FSRS dependency is a Phase
 data whose columns depend on a `ScoringPolicy` that does not exist yet — guessing its shape
 now would be worse than adding it later, and derived data carries no backfill risk.
 
-**Iteration 1 — the schema, nothing wired to it yet:**
+**Iteration 1 — REDONE (owner review, 2026-07-23).** The first cut replicated the
+word-pair model in Core Data. The owner rejected that as "a very naive and limited
+solution" and commissioned research ([LexicalModelResearch](LexicalModelResearch.md));
+the schema is now the lexical model: **`Term`** (atomic word in one language —
+transcription, part of speech, variant forms, comments, illustrations) ↔ **`Synset`**
+(one shared meaning, the owner's "language tuple"; synonyms are same-language terms and
+all are valid answers; sense note lives here) ↔ **`WordSet`** (multilingual: declares
+`languageCodes`, ranks nothing). All links many-to-many; nothing cascades into the
+event log — snapshots keep orphan events judgeable. Events gained `promptLanguage` /
+`answerLanguage` / `promptTermID` / `wordSetID`; `ReviewDirection` renamed to
+receptive/productive and `LanguagePair` to primary/secondary (owner naming). 14 schema
+tests (73 total green). Original iteration-1 notes below for the parts that survive
+(stack, CloudKit rules, decisions).
+
+**Iteration 1 (original) — the schema, nothing wired to it yet:**
 - `Model/CoreData/LearnWords.xcdatamodeld` — `WordSet` (id, name, **nativeLanguage /
   foreignLanguage**, createdAt) → `Word` (id, firstWord, secondWord, createdAt) →
   `ReviewEvent` with **every †-marked field** from the research audit (sessionID, direction,

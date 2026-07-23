@@ -133,7 +133,57 @@ so at the 12.1 floor `async`/`await` cannot be used at all. Core Data's
 `performAndWait` is the pre-concurrency way to stay on the right queue, and it keeps the
 existing synchronous call sites working unchanged. Revisit only if Legacy drops iOS 12.
 
+## Decision: the lexical model — terms, synsets, multilingual sets
+
+**Decision (owner, 2026-07-23).** The TD-13 schema is **not** a word-pair table. It is a
+lexical model, researched in [LexicalModelResearch](LexicalModelResearch.md):
+
+- **`Term`** — an atomic word in one language, existing once, carrying transcription,
+  part of speech, variant forms (Apple's `d:index` shape), comments and illustrations.
+- **`Synset`** — one shared meaning linking any number of terms in any languages — the
+  owner's "language tuple". Synonyms are same-language terms in one synset, and each is
+  a valid answer. Sense-disambiguation notes live here, not on terms.
+- **`WordSet`** — a named collection of synsets declaring its `languageCodes` (two *or
+  more*) — without ranking them, because roles are the session's to assign.
+
+All three links are many-to-many: a term serves several senses, a sense several sets.
+Translation connects senses, never words — the shape Apple's dictionary format, W3C
+OntoLex-Lemon, LMF and BabelNet all converge on, and what Anki's note/card split
+approximates. The word-pair schema from the first cut of iteration 1 is **rejected**:
+no synonyms, no third language, duplicates across sets (see the research doc's
+rejected-alternatives section).
+
+**Naming (owner):** *primary/secondary*, not *native/foreign* — switching practice
+direction doesn't switch your native language. `ReviewDirection` records the skill
+(*receptive/productive*, Nation's terms); the event's `promptLanguage`/`answerLanguage`
+snapshots carry the concrete pair, which direction alone cannot once a synset spans
+more than two languages.
+
+**Event-log consequences (append-only, so decided now):** events link to the synset and
+snapshot `promptLanguage`, `answerLanguage`, `promptTermID`, `wordSetID`. **Nothing
+cascades into the log** — deleting sets, synsets or terms nullifies the link and the
+snapshots keep orphan events judgeable ("history heals").
+
+## Decision: managed objects never escape the store
+
+**Decision (owner, 2026-07-23 — "it saved me from many troubles since 2012").**
+`NSManagedObject` instances stay inside the persistence layer. The `WordStore`
+implementation maps to value types at its boundary; view controllers, sessions and
+widgets never see a `CD*` type. Across queues, only `NSManagedObjectID` travels.
+Reads happen on the view context; imports and writes run on background contexts
+(`performAndWait` at the 12.1 floor). References: Apple, *Using Core Data in the
+background*; WWDC 2012 session 214, *Core Data Best Practices*.
+
+**Why.** Managed objects are queue-bound and context-bound; letting them into the UI
+couples every screen to Core Data's threading rules and makes a future SwiftData (or
+any other) migration app-wide instead of one file. This is the same seam discipline as
+TD-12, enforced at the type level.
+
 ## Decision: a language pair belongs to a word set, not to the app
+
+*(2026-07-23: generalized by the lexical-model decision above — a set now declares a
+language **list**, and the pair is chosen per practice session. The reasoning below
+still stands; "native/foreign" naming is superseded by primary/secondary.)*
 
 **Decision (owner, 2026-07-20).** A word set carries its own `native`/`foreign` languages.
 The app-wide `nativeLanguagePreference` / `languageToStudyPreference` become a *default* for

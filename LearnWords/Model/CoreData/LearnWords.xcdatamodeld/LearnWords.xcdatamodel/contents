@@ -2,21 +2,51 @@
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23504" systemVersion="24F74" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="YES" userDefinedModelVersionIdentifier="">
     <entity name="WordSet" representedClassName="CDWordSet" syncable="YES">
         <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
-        <attribute name="foreignLanguage" optional="YES" attributeType="String"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="languageCodes" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[String]"/>
         <attribute name="name" optional="YES" attributeType="String"/>
-        <attribute name="nativeLanguage" optional="YES" attributeType="String"/>
-        <relationship name="words" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Word" inverseName="set" inverseEntity="Word"/>
+        <relationship name="synsets" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Synset" inverseName="sets" inverseEntity="Synset"/>
     </entity>
-    <entity name="Word" representedClassName="CDWord" syncable="YES">
+    <entity name="Synset" representedClassName="CDSynset" syncable="YES">
         <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
-        <attribute name="firstWord" optional="YES" attributeType="String"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
-        <attribute name="secondWord" optional="YES" attributeType="String"/>
-        <relationship name="events" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="ReviewEvent" inverseName="word" inverseEntity="ReviewEvent"/>
-        <relationship name="set" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="WordSet" inverseName="words" inverseEntity="WordSet"/>
+        <attribute name="note" optional="YES" attributeType="String"/>
+        <relationship name="events" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="ReviewEvent" inverseName="synset" inverseEntity="ReviewEvent"/>
+        <relationship name="sets" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="WordSet" inverseName="synsets" inverseEntity="WordSet"/>
+        <relationship name="terms" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Term" inverseName="synsets" inverseEntity="Term"/>
+    </entity>
+    <entity name="Term" representedClassName="CDTerm" syncable="YES">
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="languageCode" optional="YES" attributeType="String"/>
+        <attribute name="partOfSpeech" optional="YES" attributeType="String"/>
+        <attribute name="text" optional="YES" attributeType="String"/>
+        <attribute name="transcription" optional="YES" attributeType="String"/>
+        <relationship name="comments" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Comment" inverseName="term" inverseEntity="Comment"/>
+        <relationship name="forms" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="WordForm" inverseName="term" inverseEntity="WordForm"/>
+        <relationship name="illustrations" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Illustration" inverseName="term" inverseEntity="Illustration"/>
+        <relationship name="synsets" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Synset" inverseName="terms" inverseEntity="Synset"/>
+    </entity>
+    <entity name="Comment" representedClassName="CDComment" syncable="YES">
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="text" optional="YES" attributeType="String"/>
+        <relationship name="term" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Term" inverseName="comments" inverseEntity="Term"/>
+    </entity>
+    <entity name="Illustration" representedClassName="CDIllustration" syncable="YES">
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="urlString" optional="YES" attributeType="String"/>
+        <relationship name="term" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Term" inverseName="illustrations" inverseEntity="Term"/>
+    </entity>
+    <entity name="WordForm" representedClassName="CDWordForm" syncable="YES">
+        <attribute name="formType" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="text" optional="YES" attributeType="String"/>
+        <relationship name="term" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Term" inverseName="forms" inverseEntity="Term"/>
     </entity>
     <entity name="ReviewEvent" representedClassName="CDReviewEvent" syncable="YES">
+        <attribute name="answerLanguage" optional="YES" attributeType="String"/>
         <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="direction" optional="YES" attributeType="String"/>
         <attribute name="expected" optional="YES" attributeType="String"/>
@@ -28,10 +58,13 @@
         <attribute name="latencyMS" optional="YES" attributeType="Integer 64" usesScalarValueType="NO"/>
         <attribute name="outcome" optional="YES" attributeType="String"/>
         <attribute name="prompt" optional="YES" attributeType="String"/>
+        <attribute name="promptLanguage" optional="YES" attributeType="String"/>
+        <attribute name="promptTermID" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="response" optional="YES" attributeType="String"/>
         <attribute name="schemaVersion" optional="YES" attributeType="Integer 16" defaultValueString="1" usesScalarValueType="YES"/>
         <attribute name="sessionID" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="task" optional="YES" attributeType="String"/>
-        <relationship name="word" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Word" inverseName="events" inverseEntity="Word"/>
+        <attribute name="wordSetID" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <relationship name="synset" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Synset" inverseName="events" inverseEntity="Synset"/>
     </entity>
 </model>

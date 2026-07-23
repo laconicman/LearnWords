@@ -4,6 +4,15 @@ Owner requirements (2026-07-20) distilled, and the data design that satisfies th
 This document is the intended **core of the TD-13 Core Data + CloudKit schema**; the
 progress ring (TD-17) and future indexes are views over it.
 
+> **Schema update (owner, 2026-07-23).** The TD-13 schema generalized from word pairs to
+> the lexical model in [LexicalModelResearch](LexicalModelResearch.md): events attach to a
+> **synset** (the practised meaning) rather than a word, `wordID` → the synset's UUID
+> (identity semantics unchanged), `direction` is now **receptive/productive** with
+> explicit `promptLanguage`/`answerLanguage` snapshots, and two more unbackfillable
+> snapshots were added — `promptTermID` (which synonym cued the question) and `wordSetID`
+> (which thematic framed it; the different-set answer coefficient needs it). Everything
+> else in this document stands.
+
 ## Requirements (owner's words, distilled)
 
 - **R1** Negative progress (mistakes, "forgot"/unknown) tracked as its own story —

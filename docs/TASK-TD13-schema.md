@@ -10,6 +10,12 @@ Implementation brief. Design is **settled** — do not redesign it here. Read, i
 The event log is **append-only**: a field omitted now cannot be backfilled. That is the one
 irreversible risk in this task; everything else is refactorable.
 
+> **2026-07-23:** Phase A is folded into Phase B (owner: no migration, fresh start), and
+> Phase B's entities are superseded by the lexical model — `Term`/`Synset`/`WordSet`
+> per [Design](Design.md) and [LexicalModelResearch](LexicalModelResearch.md), not
+> `Word (id, firstWord, secondWord, set)`. The event-log rules and Phases C–D stand,
+> with events keyed to synsets.
+
 ## Context
 
 LearnWords: solo-developer iOS vocabulary app, word pairs in named sets, three exercises —

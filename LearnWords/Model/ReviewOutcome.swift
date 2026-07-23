@@ -61,16 +61,21 @@ enum ReviewOutcome: String {
     }
 }
 
-/// Which side of the pair was the cue — Nation's receptive/productive split, and the
-/// reason a language pair has to travel with the event (docs/ProgressResearch.md §1.4).
-/// Unrecoverable if not logged, which is why it is written from the first event onward.
+/// Which way the question ran — Nation's receptive/productive split
+/// (docs/ProgressResearch.md §1.4). Unrecoverable if not logged, which is why it is
+/// written from the first event onward.
+///
+/// Named for the *skill*, not the languages: with multilingual synsets "foreignToNative"
+/// stops meaning anything, and the event's `promptLanguage`/`answerLanguage` snapshots
+/// carry the concrete pair. (Naming per owner: primary/secondary, not native/foreign —
+/// switching practice direction doesn't switch your native language.)
 enum ReviewDirection: String {
-    /// Foreign word shown, native answer wanted — recognition.
-    case foreignToNative
-    /// Native word shown, foreign answer wanted — production.
-    case nativeToForeign
+    /// The study language was shown; the learner recognised it.
+    case receptive
+    /// The study language had to be produced — typed or spoken.
+    case productive
 
-    init(showsForeignAsPrompt: Bool) {
-        self = showsForeignAsPrompt ? .foreignToNative : .nativeToForeign
+    init(showsSecondaryAsPrompt: Bool) {
+        self = showsSecondaryAsPrompt ? .receptive : .productive
     }
 }

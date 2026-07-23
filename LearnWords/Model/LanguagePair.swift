@@ -2,64 +2,66 @@
 //  LanguagePair.swift
 //  LearnWords
 //
-//  The two languages a round is practised in, and which way round it is being asked.
+//  The two languages a practice round runs in, and which side is being asked.
 //
-//  **Direction of travel (owner, 2026-07-20): a language pair belongs to a word set, not
-//  to the app.** Today it is two global preferences, and the evidence that this is wrong
-//  is already in the data — the default set is named `"Initial Sample Set (En->Ru)"`,
-//  encoding the pair in a *display string* because the model has nowhere to put it. Two
-//  sets with different pairs cannot both be right under one global setting, and
-//  `ProgressModel`'s per-event `direction` (receptive vs productive) is only meaningful
-//  relative to a pair — so a global one silently reinterprets past events when the user
-//  switches sets.
+//  **Primary / secondary, not native / foreign** (owner, 2026-07-23): switching practice
+//  direction doesn't switch your native language, and once a word set covers more than
+//  two languages the session — not the data — decides which language plays which role.
+//  A round is always a pair, drawn at practice time from the set's `languageCodes`;
+//  the set itself ranks nothing.
 //
-//  This type is the seam, not the fix. `current` resolves from the global preferences for
-//  now; when TD-13 gives a word set real identity and its own languages, that resolution
-//  changes here and nowhere else. Building a `WordSet` entity on `UserDefaults` first is
-//  exactly what `ProgressModel` warns against — don't polish a layer Core Data replaces.
+//  This type remains the seam from the pair-preferences era: `current` still resolves
+//  from the app-wide settings while the exercise screens run on `UserDefaultsWordStore`.
+//  When the Core Data store lands, the session builds a `LanguagePair` from the chosen
+//  set languages instead — same type, different construction site.
 //
 
 import Foundation
 
 struct LanguagePair {
 
-    /// The learner's own language.
-    let native: String
+    /// The learner's own reference language (usually their native one).
+    let primary: String
 
-    /// The language being studied.
-    let foreign: String
+    /// The language being studied this round.
+    let secondary: String
 
-    /// Which side is being shown as the cue.
+    /// Whether the secondary (study) language is the cue.
     ///
-    /// `true` means the foreign word is the prompt and the native word is the answer —
-    /// recognition. `false` is production. This is `ProgressModel`'s `direction`, and it
-    /// is why the pair has to travel with it.
-    let showsForeignAsPrompt: Bool
+    /// `true` is receptive practice — recognise the study language; `false` is
+    /// productive — produce it. `ReviewDirection` records exactly this per event.
+    let showsSecondaryAsPrompt: Bool
 
-    /// Today's resolution: the app-wide preferences. The single place TD-13 repoints at
-    /// the current word set.
+    /// Today's resolution: the app-wide preferences. (The preference *keys* keep their
+    /// historical names — they are persisted data; only the code vocabulary changed.)
     static var current: LanguagePair {
         let defaults = LWUserDefaults.standard
-        return LanguagePair(native: defaults.nativeLanguagePreference ?? "en",
-                            foreign: defaults.languageToStudyPreference ?? "en",
-                            showsForeignAsPrompt: defaults.foreignToNative)
+        return LanguagePair(primary: defaults.nativeLanguagePreference ?? "en",
+                            secondary: defaults.languageToStudyPreference ?? "en",
+                            showsSecondaryAsPrompt: defaults.foreignToNative)
+    }
+
+    /// The direction of a question asked this round, in ProgressModel terms.
+    var direction: ReviewDirection {
+        ReviewDirection(showsSecondaryAsPrompt: showsSecondaryAsPrompt)
     }
 
     // MARK: - Reading a word
 
     /// The cue text for `word` — what the learner is shown.
+    /// (`WordAndStat.firstWord` is the study-language side in the legacy model.)
     func prompt(for word: WordAndStat) -> String {
-        showsForeignAsPrompt ? word.firstWord : word.secondWord
+        showsSecondaryAsPrompt ? word.firstWord : word.secondWord
     }
 
     /// The expected answer for `word` — what the learner must produce or recognise.
     func answer(for word: WordAndStat) -> String {
-        showsForeignAsPrompt ? word.secondWord : word.firstWord
+        showsSecondaryAsPrompt ? word.secondWord : word.firstWord
     }
 
     /// The language the cue is spoken in.
-    var promptLanguage: String { showsForeignAsPrompt ? foreign : native }
+    var promptLanguage: String { showsSecondaryAsPrompt ? secondary : primary }
 
     /// The language the answer is spoken in.
-    var answerLanguage: String { showsForeignAsPrompt ? native : foreign }
+    var answerLanguage: String { showsSecondaryAsPrompt ? primary : secondary }
 }
