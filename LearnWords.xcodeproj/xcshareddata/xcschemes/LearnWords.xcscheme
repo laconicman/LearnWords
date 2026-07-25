@@ -30,8 +30,6 @@
       shouldUseLaunchSchemeArgsEnv = "NO"
       shouldAutocreateTestPlan = "YES">
       <CommandLineArguments>
-         <!-- Traps any Core Data cross-queue access at the first offense, instead of
-              letting it surface as an intermittent save() crash. -->
          <CommandLineArgument
             argument = "-com.apple.CoreData.ConcurrencyDebug 1"
             isEnabled = "YES">
