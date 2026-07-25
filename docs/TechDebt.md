@@ -195,7 +195,23 @@ fetched properties, scalar types and transients considered and declined with rea
 schema versioning under lightweight-migration rules and CloudKit's immutable production
 schema). 79 tests green.
 
-**Remaining:** ② `CoreDataWordStore: WordStore` + swap `Storage.backend` + seed the sample
+**Optionality, Spotlight, inheritance (owner review, 2026-07-25).** The claim that
+CloudKit forces blanket optionality was **wrong** — `momc` enforces *optional or
+defaulted*, so everything the creating API always supplies is now non-optional with a
+default (validated on save, non-optional in Swift, intent stated in the schema), and only
+attributes where **absence is meaningful** stay optional (`latencyMS`, `judgmentVerdict`,
+`response`, `transcription`, `partOfSpeech`, `Synset.note`). A test pins the split. Found
+by experiment: Core Data *ignores* `defaultValueString` on UUID attributes while `momc`
+requires one — so non-optional UUIDs are a guarantee the code makes, documented and
+exempted in the CloudKit test. Spotlight indexing enabled on the searchable text
+(`Term.text`, `WordForm.text`, `WordSet.name`, `Synset.note`, `Comment.text`, `Tag.name`)
+with `NSCoreDataCoreSpotlightDelegate` started for the SQLite store; the review log is
+deliberately **excluded** so practice answers never leak into system search. Parent
+entities were measured (a throwaway model proved Core Data stores a whole hierarchy in one
+table) and declined, with the one future case where they would pay recorded. 81 tests green.
+
+**Remaining:** handling `CSSearchableItemActionType` to open the right screen from a
+Spotlight result (UI, after the store); ② `CoreDataWordStore: WordStore` + swap `Storage.backend` + seed the sample
 set · ③ screens append events (Phase C) · ④ CloudKit + App Group + widget · ⑤ indexes and
 the TD-17 ring (Phase D).
 

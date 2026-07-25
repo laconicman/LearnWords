@@ -12,14 +12,23 @@
 //  sets. Translation connects *senses*, never words — the shape every lexical standard
 //  converged on (OntoLex-Lemon, LMF, BabelNet; see the research doc).
 //
-//  **Optionality is CloudKit's price, not a design choice.**
-//  `NSPersistentCloudKitContainer` requires every attribute to be optional or carry a
-//  default, and every relationship to be optional with an inverse. The store therefore
-//  cannot express "this is always present" — so the *typed accessors* below do it
-//  instead: each entity exposes non-optional Swift properties with the store-level
-//  optional as the private truth. Callers never unwrap; the mapping layer
-//  (`CoreDataWordStore`, iteration 2) converts to value types at the boundary and this
-//  is the only file that sees an `Optional` from the store.
+//  **Optionality is a modelling decision, not a blanket.** An attribute is optional only
+//  where *absence is meaningful* — an unmeasured latency is not 0 ms, an unjudged answer
+//  is not scored 0.0, a word with no recorded transcription is not a word transcribed as
+//  "". Everything the creating API always supplies is non-optional with a default, which
+//  makes Core Data validate it on save and makes the Swift property non-optional, so no
+//  caller unwraps. (CloudKit's rule, enforced by the model compiler because the model is
+//  `usedWithCloudKit`: a non-optional attribute must carry a default value. Relationships
+//  must always be optional — that one *is* a blanket.)
+//
+//  **The UUID defaults are a compiler formality, not a runtime one.** `momc` demands a
+//  default for every non-optional attribute, but Core Data *ignores* `defaultValueString`
+//  on UUID attributes — at runtime the default is nil and a save fails validation. So a
+//  non-optional UUID is a promise the code keeps, not the store: `id` is assigned in
+//  `awakeFromInsert`, and `ReviewEvent`'s three snapshot IDs are assigned by the call
+//  site that logs the answer. (Verified by experiment, not folklore — see the research
+//  doc. Date defaults, by contrast, are honoured; `awakeFromInsert` overwrites them
+//  anyway so no object keeps the 2001 placeholder.)
 //
 //  **Nothing cascades into the review log.** Deleting sets, synsets or terms never
 //  deletes events — the log is append-only and its text/language snapshots keep orphan
@@ -29,23 +38,29 @@
 //  Identity: entities the app *references* (`WordSet`, `Synset`, `Term`) carry a `UUID`;
 //  entities that are pure lookup rows (`Tag`, `Language`, `ErrorTag`) and owned
 //  satellites (`Comment`, `Illustration`, `WordForm`) do not — Core Data's own
-//  `objectID` is their identity, and a second identifier would be a second source of
-//  truth to keep in sync. See docs/Design.md, "identity: objectID vs UUID".
+//  `objectID` is their identity. See docs/Design.md, "identity: objectID vs UUID".
 //
 
 import CoreData
 
 // MARK: - Timestamps
 
-/// `createdAt` / `modifiedAt` on every user-editable entity. Both are maintained by
-/// `willSave()` rather than by call sites, so a forgotten assignment cannot make the
-/// pair lie (owner: "those two usually come in pairs").
+/// `createdAt` / `modifiedAt` on every user-editable entity, maintained by `willSave()`
+/// rather than by call sites, so a forgotten assignment cannot make the pair lie.
 protocol Timestamped: NSManagedObject {
-    var createdAt: Date? { get set }
-    var modifiedAt: Date? { get set }
+    var createdAt: Date { get set }
+    var modifiedAt: Date { get set }
 }
 
 extension Timestamped {
+    /// Called from `awakeFromInsert()`. The model's literal date defaults exist only to
+    /// satisfy the CloudKit rule; real objects get real times here.
+    func startTimestamps() {
+        let now = Date()
+        createdAt = now
+        modifiedAt = now
+    }
+
     /// Called from `willSave()`.
     ///
     /// **Primitive accessors, deliberately.** Assigning through the normal setter inside
@@ -55,12 +70,8 @@ extension Timestamped {
     /// pass always compared unequal, so it never converged). `setPrimitiveValue` writes
     /// without change tracking, which is what Apple's `willSave()` documentation
     /// prescribes for this case.
-    func touchTimestamps() {
-        let now = Date()
-        if primitiveValue(forKey: "createdAt") == nil {
-            setPrimitiveValue(now, forKey: "createdAt")
-        }
-        setPrimitiveValue(now, forKey: "modifiedAt")
+    func touchModified() {
+        setPrimitiveValue(Date(), forKey: "modifiedAt")
     }
 }
 
@@ -71,22 +82,22 @@ extension Timestamped {
 /// not the data (see the research doc).
 @objc(CDWordSet)
 final class CDWordSet: NSManagedObject, Timestamped {
-    @NSManaged var id: UUID?
-    @NSManaged var name: String?
-    @NSManaged var createdAt: Date?
-    @NSManaged var modifiedAt: Date?
-    @NSManaged var languages: NSSet?
-    @NSManaged var synsets: NSSet?
+    @NSManaged var id: UUID
+    @NSManaged var name: String
+    @NSManaged var createdAt: Date
+    @NSManaged var modifiedAt: Date
+    @NSManaged var languages: Set<CDLanguage>
+    @NSManaged var synsets: Set<CDSynset>
 
     override func awakeFromInsert() {
         super.awakeFromInsert()
         id = UUID()
-        createdAt = Date()
+        startTimestamps()
     }
 
     override func willSave() {
         super.willSave()
-        touchTimestamps()
+        touchModified()
     }
 }
 
@@ -95,20 +106,13 @@ extension CDWordSet {
         NSFetchRequest<CDWordSet>(entityName: "WordSet")
     }
 
-    /// Non-optional face of the store's optional. `id` is assigned in `awakeFromInsert`,
-    /// so the fallback is unreachable for objects this app creates.
-    var identifier: UUID { id ?? UUID() }
-
-    var title: String { name ?? "" }
-
-    var synsetList: [CDSynset] {
-        (synsets as? Set<CDSynset>).map { Array($0) } ?? []
-    }
-
     /// The languages this set covers, as codes.
-    var languageCodes: Set<String> {
-        Set((languages as? Set<CDLanguage>)?.compactMap(\.code) ?? [])
-    }
+    var languageCodes: Set<String> { Set(languages.map(\.code)) }
+
+    // To-many writes go through `mutableSetValue` — the hand-written-subclass
+    // equivalent of Xcode's generated accessors. Assigning a whole set replaces the
+    // relationship and forces Core Data to diff it; these express the actual intent
+    // (add or remove one link) and are the conventional safe write path.
 
     func addLanguage(_ language: CDLanguage) { mutableSetValue(forKey: "languages").add(language) }
     func removeLanguage(_ language: CDLanguage) { mutableSetValue(forKey: "languages").remove(language) }
@@ -124,26 +128,27 @@ extension CDWordSet {
 /// definitions.
 @objc(CDSynset)
 final class CDSynset: NSManagedObject, Timestamped {
-    @NSManaged var id: UUID?
-    /// Sense disambiguation shown at practice ("bear — the animal"). Lives here, not on
-    /// the term: a term-level comment cannot tell two senses of one word apart.
+    @NSManaged var id: UUID
+    /// Sense disambiguation shown at practice ("bear — the animal"). Optional: most
+    /// senses need none. Lives here, not on the term — a term-level comment cannot tell
+    /// two senses of one word apart.
     @NSManaged var note: String?
-    @NSManaged var createdAt: Date?
-    @NSManaged var modifiedAt: Date?
-    @NSManaged var terms: NSSet?
-    @NSManaged var sets: NSSet?
-    @NSManaged var tags: NSSet?
-    @NSManaged var events: NSSet?
+    @NSManaged var createdAt: Date
+    @NSManaged var modifiedAt: Date
+    @NSManaged var terms: Set<CDTerm>
+    @NSManaged var sets: Set<CDWordSet>
+    @NSManaged var tags: Set<CDTag>
+    @NSManaged var events: Set<CDReviewEvent>
 
     override func awakeFromInsert() {
         super.awakeFromInsert()
         id = UUID()
-        createdAt = Date()
+        startTimestamps()
     }
 
     override func willSave() {
         super.willSave()
-        touchTimestamps()
+        touchModified()
     }
 }
 
@@ -152,38 +157,23 @@ extension CDSynset {
         NSFetchRequest<CDSynset>(entityName: "Synset")
     }
 
-    var identifier: UUID { id ?? UUID() }
-
-    var termList: [CDTerm] {
-        (terms as? Set<CDTerm>).map { Array($0) } ?? []
-    }
-
     /// The terms of this sense in one language — all of them valid answers when that
     /// language is the answer side.
     func terms(in languageCode: String) -> [CDTerm] {
-        termList.filter { $0.languageCode == languageCode }
+        terms.filter { $0.languageCode == languageCode }
     }
 
     /// The distinct languages this sense covers.
-    var languageCodes: Set<String> {
-        Set(termList.map(\.languageCode))
-    }
+    var languageCodes: Set<String> { Set(terms.map(\.languageCode)) }
 
     /// History, oldest first — the slice of the append-only log for this sense.
     var reviewHistory: [CDReviewEvent] {
-        let all = (events as? Set<CDReviewEvent>).map { Array($0) } ?? []
-        return all.sorted { $0.reviewedAt < $1.reviewedAt }
+        events.sorted { $0.date < $1.date }
     }
 
-    var tagList: [CDTag] {
-        let all = (tags as? Set<CDTag>).map { Array($0) } ?? []
-        return all.sorted { $0.label < $1.label }
+    var sortedTags: [CDTag] {
+        tags.sorted { $0.name < $1.name }
     }
-
-    // To-many writes go through `mutableSetValue` — the hand-written-subclass
-    // equivalent of Xcode's generated accessors. Assignment of a whole `NSSet` replaces
-    // the relationship and forces Core Data to diff it; these express the actual
-    // intent (add/remove one link) and are the conventional safe write path.
 
     func addTerm(_ term: CDTerm) { mutableSetValue(forKey: "terms").add(term) }
     func removeTerm(_ term: CDTerm) { mutableSetValue(forKey: "terms").remove(term) }
@@ -198,29 +188,30 @@ extension CDSynset {
 /// forms, transcription and part of speech as entry-level data.
 @objc(CDTerm)
 final class CDTerm: NSManagedObject, Timestamped {
-    @NSManaged var id: UUID?
-    @NSManaged var text: String?
-    /// Pronunciation — Apple's `d:pr` / Japanese yomi. Single value for now; the format
-    /// allows several notations, an additive change if ever wanted.
+    @NSManaged var id: UUID
+    @NSManaged var text: String
+    /// Pronunciation — Apple's `d:pr` / Japanese yomi. Optional because "not recorded"
+    /// is a real state, distinct from "transcribed as empty".
     @NSManaged var transcription: String?
+    /// Also optional: unknown until someone (or an enrichment source) supplies it.
     @NSManaged var partOfSpeech: String?
-    @NSManaged var createdAt: Date?
-    @NSManaged var modifiedAt: Date?
+    @NSManaged var createdAt: Date
+    @NSManaged var modifiedAt: Date
     @NSManaged var language: CDLanguage?
-    @NSManaged var synsets: NSSet?
-    @NSManaged var comments: NSSet?
-    @NSManaged var illustrations: NSSet?
-    @NSManaged var forms: NSSet?
+    @NSManaged var synsets: Set<CDSynset>
+    @NSManaged var comments: Set<CDComment>
+    @NSManaged var illustrations: Set<CDIllustration>
+    @NSManaged var forms: Set<CDWordForm>
 
     override func awakeFromInsert() {
         super.awakeFromInsert()
         id = UUID()
-        createdAt = Date()
+        startTimestamps()
     }
 
     override func willSave() {
         super.willSave()
-        touchTimestamps()
+        touchModified()
     }
 }
 
@@ -229,32 +220,15 @@ extension CDTerm {
         NSFetchRequest<CDTerm>(entityName: "Term")
     }
 
-    var identifier: UUID { id ?? UUID() }
-
-    /// The word itself.
-    var spelling: String { text ?? "" }
-
-    /// BCP-47 code ("en", "ru", "de") of this term's language.
+    /// BCP-47 code ("en", "ru", "de") of this term's language. Empty only for a term
+    /// whose language row has not been attached yet — relationships must stay optional
+    /// for CloudKit, so this is the one place the model cannot enforce presence.
     var languageCode: String { language?.code ?? "" }
 
-    var synsetList: [CDSynset] {
-        (synsets as? Set<CDSynset>).map { Array($0) } ?? []
+    var sortedComments: [CDComment] {
+        comments.sorted { $0.createdAt < $1.createdAt }
     }
 
-    var commentList: [CDComment] {
-        let all = (comments as? Set<CDComment>).map { Array($0) } ?? []
-        return all.sorted { ($0.createdAt ?? .distantPast) < ($1.createdAt ?? .distantPast) }
-    }
-
-    var formList: [CDWordForm] {
-        (forms as? Set<CDWordForm>).map { Array($0) } ?? []
-    }
-
-    var illustrationList: [CDIllustration] {
-        (illustrations as? Set<CDIllustration>).map { Array($0) } ?? []
-    }
-
-    /// See the note on `CDSynset`'s helpers: to-many writes only via `mutableSetValue`.
     func addSynset(_ synset: CDSynset) { mutableSetValue(forKey: "synsets").add(synset) }
     func removeSynset(_ synset: CDSynset) { mutableSetValue(forKey: "synsets").remove(synset) }
 }
@@ -271,17 +245,15 @@ extension CDTerm {
 /// unique constraints.
 @objc(CDLanguage)
 final class CDLanguage: NSManagedObject {
-    @NSManaged var code: String?
-    @NSManaged var terms: NSSet?
-    @NSManaged var sets: NSSet?
+    @NSManaged var code: String
+    @NSManaged var terms: Set<CDTerm>
+    @NSManaged var sets: Set<CDWordSet>
 }
 
 extension CDLanguage {
     static func fetchRequest() -> NSFetchRequest<CDLanguage> {
         NSFetchRequest<CDLanguage>(entityName: "Language")
     }
-
-    var identifier: String { code ?? "" }
 }
 
 /// A facet of a sense: subject field ("domain:medicine") or usage register ("slang",
@@ -295,9 +267,9 @@ extension CDLanguage {
 /// "domain:medicine"), promotable to a `facet` attribute later — an additive change.
 @objc(CDTag)
 final class CDTag: NSManagedObject {
-    @NSManaged var name: String?
-    @NSManaged var createdAt: Date?
-    @NSManaged var synsets: NSSet?
+    @NSManaged var name: String
+    @NSManaged var createdAt: Date
+    @NSManaged var synsets: Set<CDSynset>
 
     override func awakeFromInsert() {
         super.awakeFromInsert()
@@ -309,8 +281,6 @@ extension CDTag {
     static func fetchRequest() -> NSFetchRequest<CDTag> {
         NSFetchRequest<CDTag>(entityName: "Tag")
     }
-
-    var label: String { name ?? "" }
 }
 
 /// What a judge said was wrong with an answer ("gender", "consonant-voicing"). Rows for
@@ -318,16 +288,14 @@ extension CDTag {
 /// whole point of recording them, and that is a predicate.
 @objc(CDErrorTag)
 final class CDErrorTag: NSManagedObject {
-    @NSManaged var name: String?
-    @NSManaged var events: NSSet?
+    @NSManaged var name: String
+    @NSManaged var events: Set<CDReviewEvent>
 }
 
 extension CDErrorTag {
     static func fetchRequest() -> NSFetchRequest<CDErrorTag> {
         NSFetchRequest<CDErrorTag>(entityName: "ErrorTag")
     }
-
-    var label: String { name ?? "" }
 }
 
 // MARK: - Term satellites
@@ -336,19 +304,19 @@ extension CDErrorTag {
 /// `CDSynset.note` instead.
 @objc(CDComment)
 final class CDComment: NSManagedObject, Timestamped {
-    @NSManaged var text: String?
-    @NSManaged var createdAt: Date?
-    @NSManaged var modifiedAt: Date?
+    @NSManaged var text: String
+    @NSManaged var createdAt: Date
+    @NSManaged var modifiedAt: Date
     @NSManaged var term: CDTerm?
 
     override func awakeFromInsert() {
         super.awakeFromInsert()
-        createdAt = Date()
+        startTimestamps()
     }
 
     override func willSave() {
         super.willSave()
-        touchTimestamps()
+        touchModified()
     }
 }
 
@@ -356,8 +324,6 @@ extension CDComment {
     static func fetchRequest() -> NSFetchRequest<CDComment> {
         NSFetchRequest<CDComment>(entityName: "Comment")
     }
-
-    var body: String { text ?? "" }
 }
 
 /// A picture for a term. `urlString` holds a local file URL or a remote one; local
@@ -365,28 +331,28 @@ extension CDComment {
 /// an additive change recorded in the research doc.
 @objc(CDIllustration)
 final class CDIllustration: NSManagedObject, Timestamped {
-    @NSManaged var urlString: String?
-    @NSManaged var createdAt: Date?
-    @NSManaged var modifiedAt: Date?
+    @NSManaged var urlString: String
+    @NSManaged var createdAt: Date
+    @NSManaged var modifiedAt: Date
     @NSManaged var term: CDTerm?
 
     override func awakeFromInsert() {
         super.awakeFromInsert()
-        createdAt = Date()
+        startTimestamps()
     }
 
     override func willSave() {
         super.willSave()
-        touchTimestamps()
+        touchModified()
     }
 }
 
 extension CDIllustration {
-    var url: URL? { urlString.flatMap(URL.init(string:)) }
-
     static func fetchRequest() -> NSFetchRequest<CDIllustration> {
         NSFetchRequest<CDIllustration>(entityName: "Illustration")
     }
+
+    var url: URL? { URL(string: urlString) }
 }
 
 /// An inflected or variant form ("made", "making") — Apple's `d:index` rows: alternate
@@ -395,20 +361,20 @@ extension CDIllustration {
 final class CDWordForm: NSManagedObject, Timestamped {
     /// Free-form kind ("plural", "past", "yomi") — a vocabulary, not an enum, so new
     /// kinds are data rather than schema.
-    @NSManaged var formType: String?
-    @NSManaged var text: String?
-    @NSManaged var createdAt: Date?
-    @NSManaged var modifiedAt: Date?
+    @NSManaged var formType: String
+    @NSManaged var text: String
+    @NSManaged var createdAt: Date
+    @NSManaged var modifiedAt: Date
     @NSManaged var term: CDTerm?
 
     override func awakeFromInsert() {
         super.awakeFromInsert()
-        createdAt = Date()
+        startTimestamps()
     }
 
     override func willSave() {
         super.willSave()
-        touchTimestamps()
+        touchModified()
     }
 }
 
@@ -416,9 +382,6 @@ extension CDWordForm {
     static func fetchRequest() -> NSFetchRequest<CDWordForm> {
         NSFetchRequest<CDWordForm>(entityName: "WordForm")
     }
-
-    var spelling: String { text ?? "" }
-    var kind: String { formType ?? "" }
 }
 
 // MARK: - Review event
@@ -432,31 +395,44 @@ extension CDWordForm {
 /// carries its own `judgedAt`.
 @objc(CDReviewEvent)
 final class CDReviewEvent: NSManagedObject {
-    @NSManaged var id: UUID?
-    @NSManaged var date: Date?
-    @NSManaged var sessionID: UUID?
-    @NSManaged var task: String?
-    @NSManaged var direction: String?
-    @NSManaged var outcome: String?
-    @NSManaged var response: String?
-    @NSManaged var expected: String?
-    @NSManaged var prompt: String?
+    // Non-optional UUIDs. Core Data ignores `defaultValueString` on UUID attributes —
+    // momc accepts one, but the runtime default is nil and the save fails validation —
+    // so a non-optional UUID is a promise the *code* keeps: `id` in `awakeFromInsert`,
+    // the three snapshots at the call site that logs the answer.
+    @NSManaged var id: UUID
+    @NSManaged var date: Date
+    @NSManaged var sessionID: UUID
+    @NSManaged var task: String
+    @NSManaged var direction: String
+    @NSManaged var outcome: String
+    @NSManaged var expected: String
+    @NSManaged var prompt: String
     /// Language snapshots — with multilingual synsets, direction alone cannot identify
     /// the pair practised. Append-only: impossible to backfill, so written from day one.
-    @NSManaged var promptLanguage: String?
-    @NSManaged var answerLanguage: String?
+    @NSManaged var promptLanguage: String
+    @NSManaged var answerLanguage: String
     /// Which synonym cued the question — prompt *text* can be edited later.
-    @NSManaged var promptTermID: UUID?
+    @NSManaged var promptTermID: UUID
     /// Which thematic set framed the question — the different-set answer coefficient
     /// (research doc) is unjudgeable without it.
-    @NSManaged var wordSetID: UUID?
+    @NSManaged var wordSetID: UUID
+    /// The format this event was written in — see `currentSchemaVersion`.
+    @NSManaged var schemaVersion: Int16
+
+    // Genuinely optional: absence carries meaning and must not be confused with a value.
+
+    /// What the learner typed or said. `nil` for self-assessed answers, where there is
+    /// no response to record — distinct from an empty answer.
+    @NSManaged var response: String?
+    /// Prompt→answer time. `nil` when unmeasured, which is not the same as 0 ms.
     @NSManaged var latencyMS: NSNumber?
+    /// Judgment, attached later and possibly re-attached by a better judge. `nil` means
+    /// unjudged — not "scored zero".
     @NSManaged var judgmentVerdict: NSNumber?
     @NSManaged var judgeID: String?
     @NSManaged var judgedAt: Date?
-    /// The format this event was written in — see `currentSchemaVersion`.
-    @NSManaged var schemaVersion: Int16
-    @NSManaged var errorTags: NSSet?
+
+    @NSManaged var errorTags: Set<CDErrorTag>
     @NSManaged var synset: CDSynset?
 
     override func awakeFromInsert() {
@@ -482,30 +458,18 @@ extension CDReviewEvent {
     /// each row under the rules that were true when it was written.
     static let currentSchemaVersion: Int16 = 1
 
-    var identifier: UUID { id ?? UUID() }
-
-    /// When the answer was given. Every event has one (`awakeFromInsert`).
-    var reviewedAt: Date { date ?? .distantPast }
-
     /// How the answer was judged.
     ///
     /// Returns `nil` for a value this build does not know — the log outlives the code,
     /// so decoding **skips** unknown cases rather than crashing (ProgressModel's rule).
-    var reviewOutcome: ReviewOutcome? {
-        outcome.flatMap(ReviewOutcome.init(rawValue:))
-    }
+    var reviewOutcome: ReviewOutcome? { ReviewOutcome(rawValue: outcome) }
 
-    var exercise: ExerciseSession.Exercise? {
-        task.flatMap(ExerciseSession.Exercise.init(rawValue:))
-    }
+    var exercise: ExerciseSession.Exercise? { ExerciseSession.Exercise(rawValue: task) }
 
-    var promptDirection: ReviewDirection? {
-        direction.flatMap(ReviewDirection.init(rawValue:))
-    }
+    var promptDirection: ReviewDirection? { ReviewDirection(rawValue: direction) }
 
-    var errorTagList: [CDErrorTag] {
-        let all = (errorTags as? Set<CDErrorTag>).map { Array($0) } ?? []
-        return all.sorted { $0.label < $1.label }
+    var sortedErrorTags: [CDErrorTag] {
+        errorTags.sorted { $0.name < $1.name }
     }
 
     func addErrorTag(_ tag: CDErrorTag) { mutableSetValue(forKey: "errorTags").add(tag) }

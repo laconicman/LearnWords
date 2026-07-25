@@ -136,6 +136,78 @@ after a relationship traversal, where the relationship is already the index.
   fetched or sorted on, and the ring needs sorting by mastery. Decided at Phase D with
   the cache entity, per the brief.
 
+## Optionality, Spotlight and inheritance (owner review, 2026-07-25)
+
+### Optionality is a decision per attribute, not a blanket
+
+The earlier claim that "CloudKit requires every attribute optional" was **wrong**, and the
+owner caught it. The real rule, from the model compiler itself (the model is
+`usedWithCloudKit`, so `momc` enforces it at build time):
+
+> `WordSet.name: error: WordSet.name must have a default value`
+
+So the rule is **optional _or_ defaulted** — exactly what the CloudKit-rules test already
+asserted while the model ignored it. Attributes the creating API always supplies are now
+non-optional with a default, which buys three things: Core Data validates them on save,
+the Swift property is non-optional so nothing unwraps, and the intent is documented in the
+schema instead of in prose. Attributes stay optional **only where absence is meaningful** —
+an unmeasured `latencyMS` is not 0 ms, an unjudged answer is not scored 0.0, a term with no
+recorded `transcription` is not one transcribed as "". A test pins which is which.
+
+**The UUID trap (found by experiment).** `momc` demands a default for non-optional UUID
+attributes *and Core Data ignores it*: `defaultValue` is nil at runtime and the save fails
+with "…is a required value". Both statements are true simultaneously, so the model keeps a
+placeholder `defaultValueString` to satisfy the compiler while the **code** provides the
+real guarantee — `id` in `awakeFromInsert`, `ReviewEvent`'s three snapshot IDs at the call
+site that logs an answer. Safe because those fields exist from v1, so no synced record can
+arrive without them. The CloudKit-rules test carries an explicit, explained exemption.
+
+### Spotlight
+
+Indexed (`spotlightIndexingEnabled`, plus `NSCoreDataCoreSpotlightDelegate` started for the
+SQLite store — it reads the persistent-history stream, which is why history tracking is on):
+
+| Indexed | Why |
+|---|---|
+| `Term.text` | the word itself — the thing a learner searches for |
+| `WordForm.text` | people remember "made", not "make" |
+| `WordSet.name` | jump to a set from system search |
+| `Synset.note`, `Comment.text`, `Tag.name` | the user's own words about a word |
+
+**Deliberately not indexed: the review log.** `ReviewEvent.prompt` / `.expected` /
+`.response` are private practice history; indexing them would surface answers in system
+search and leak what the user got wrong. A test asserts the exclusion.
+
+*Remaining:* handling `CSSearchableItemActionType` so tapping a result opens the right
+screen — UI work, after the store lands.
+
+### Parent entities: measured, then declined
+
+Core Data implements inheritance as **one table per hierarchy**, verified by building a
+throwaway model and dumping the SQLite schema — an abstract `Satellite` parent with
+`Comment` and `Illustration` children produced a single table holding the union of every
+subentity's columns, discriminated by `Z_ENT`:
+
+```
+CREATE TABLE ZSATELLITE ( Z_PK, Z_ENT, Z_OPT, ZCREATEDAT, ZBODY, ZCAPTION, ZURLSTRING )
+```
+
+No `ZCOMMENT` or `ZILLUSTRATION` table exists. So inheritance buys polymorphism and costs
+table width, sparse NULLs and shared indexes. Against that:
+
+- **`Comment` / `Illustration` / `WordForm`** share a parent conceptually, but are always
+  used *separately* (a notes list, an image gallery, a forms table). One table would put
+  `WordForm.text`'s index alongside unrelated comment rows and make every "forms for this
+  term" fetch a filtered scan of all satellites. **Declined.**
+- **`Tag` / `ErrorTag`** are both `name` + a many-to-many, but they are never fetched
+  together, and merging them would make the find-or-create lookup — which runs on *every*
+  insert — scan rows of both kinds. **Actively worse. Declined.**
+
+**Where it would pay**, recorded for later: if illustrations grow into general media
+(audio pronunciation alongside images), a `Media` parent with `Image`/`Audio` subentities
+gives `Term` one `media` relationship holding both, and they *are* used together — the
+polymorphic-collection shape inheritance is actually for.
+
 ## Schema versioning (owner question)
 
 `.xcdatamodeld` is a *versioned bundle*: adding a model version and pointing

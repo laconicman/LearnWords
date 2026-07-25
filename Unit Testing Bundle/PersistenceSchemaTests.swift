@@ -73,6 +73,23 @@ struct PersistenceSchemaTests {
         return set
     }
 
+    /// Every review event carries the snapshots that make it interpretable later. The
+    /// model requires them, so this mirrors what the practice session always supplies.
+    @discardableResult
+    private func makeEvent(_ context: NSManagedObjectContext,
+                           synset: CDSynset? = nil,
+                           date: Date = Date(),
+                           outcome: ReviewOutcome? = .correctVerbatim) -> CDReviewEvent {
+        let event = CDReviewEvent(context: context)
+        event.date = date
+        event.sessionID = UUID()
+        event.promptTermID = UUID()
+        event.wordSetID = UUID()
+        if let outcome { event.outcome = outcome.rawValue }
+        event.synset = synset
+        return event
+    }
+
     // MARK: - Model shape
 
     @Test func modelDefinesTheLexicalEntities() {
@@ -87,8 +104,21 @@ struct PersistenceSchemaTests {
     /// redesign — this test keeps it that way as entities grow.
     @Test func modelObeysCloudKitRules() {
         for entity in LWPersistence.model.entities {
+            // The model compiler enforces "optional or defaulted" for `usedWithCloudKit`
+            // models, so a violation is a build error; asserted here so the *reason* is
+            // written down where a future edit will read it.
+            //
+            // UUID is the documented-by-experiment exception: Core Data silently ignores
+            // `defaultValueString` on UUID attributes (momc accepts it, but
+            // `defaultValue` is nil at runtime and saves fail validation). A non-optional
+            // UUID therefore relies on the app assigning it before save — `id` in
+            // `awakeFromInsert`, the ReviewEvent snapshots at the call site. Safe because
+            // the fields exist from v1, so no synced record can arrive without them.
             for (name, attribute) in entity.attributesByName {
-                #expect(attribute.isOptional || attribute.defaultValue != nil,
+                let satisfied = attribute.isOptional
+                    || attribute.defaultValue != nil
+                    || attribute.attributeType == .UUIDAttributeType
+                #expect(satisfied,
                         "\(entity.name ?? "?").\(name) must be optional or have a default")
             }
             for (name, relationship) in entity.relationshipsByName {
@@ -128,6 +158,54 @@ struct PersistenceSchemaTests {
         }
     }
 
+    /// Optionality is a *modelling* decision here, not a blanket: an attribute is
+    /// optional only where absence is meaningful. This test states which is which, so a
+    /// future edit that makes `latencyMS` non-optional (erasing "unmeasured" into 0 ms)
+    /// fails loudly rather than silently corrupting the scoring inputs.
+    @Test func optionalityIsDeliberatePerAttribute() {
+        func isOptional(_ entity: String, _ attribute: String) -> Bool? {
+            LWPersistence.model.entitiesByName[entity]?.attributesByName[attribute]?.isOptional
+        }
+
+        // Absence is meaningful — these must stay optional.
+        #expect(isOptional("ReviewEvent", "latencyMS") == true, "unmeasured is not 0 ms")
+        #expect(isOptional("ReviewEvent", "judgmentVerdict") == true, "unjudged is not 0.0")
+        #expect(isOptional("ReviewEvent", "response") == true, "self-assessed answers have none")
+        #expect(isOptional("Term", "transcription") == true, "not recorded is not empty")
+        #expect(isOptional("Term", "partOfSpeech") == true)
+        #expect(isOptional("Synset", "note") == true, "most senses need no disambiguation")
+
+        // The creating API always supplies these — the store enforces it.
+        for (entity, attribute) in [("WordSet", "name"), ("Term", "text"), ("Tag", "name"),
+                                    ("Language", "code"), ("ErrorTag", "name"),
+                                    ("ReviewEvent", "outcome"), ("ReviewEvent", "promptLanguage"),
+                                    ("ReviewEvent", "answerLanguage"), ("Comment", "text")] {
+            #expect(isOptional(entity, attribute) == false, "\(entity).\(attribute) is always known")
+        }
+    }
+
+    /// Words a learner half-remembers should be findable from the phone's own search.
+    /// Core Data indexes the attributes flagged here; `LWPersistence` starts the
+    /// delegate for the SQLite store.
+    @Test func searchableTextIsIndexedInSpotlight() {
+        func spotlit(_ entity: String, _ attribute: String) -> Bool? {
+            LWPersistence.model.entitiesByName[entity]?
+                .attributesByName[attribute]?.isIndexedBySpotlight
+        }
+        #expect(spotlit("Term", "text") == true)
+        #expect(spotlit("WordForm", "text") == true, "an inflected form is how people remember a word")
+        #expect(spotlit("WordSet", "name") == true)
+        #expect(spotlit("Synset", "note") == true)
+        #expect(spotlit("Comment", "text") == true)
+        #expect(spotlit("Tag", "name") == true)
+
+        // Not indexed: the review log is private practice history, not content the user
+        // searches for, and indexing it would leak answers into system search.
+        #expect(spotlit("ReviewEvent", "response") == false)
+        #expect(spotlit("ReviewEvent", "expected") == false)
+        #expect(spotlit("ReviewEvent", "prompt") == false)
+    }
+
     // MARK: - Timestamps
 
     /// `createdAt`/`modifiedAt` are maintained by `willSave()`, not by call sites, so a
@@ -137,8 +215,8 @@ struct PersistenceSchemaTests {
         let term = makeTerm(context, "bear", "en")
         try context.save()
 
-        let created = try #require(term.createdAt)
-        let firstModified = try #require(term.modifiedAt)
+        let created = term.createdAt
+        let firstModified = term.modifiedAt
         #expect(firstModified >= created)
 
         // A later save must move `modifiedAt` and never `createdAt`.
@@ -147,7 +225,7 @@ struct PersistenceSchemaTests {
         try context.save()
 
         #expect(term.createdAt == created, "createdAt must never move")
-        #expect(try #require(term.modifiedAt) > firstModified)
+        #expect(term.modifiedAt > firstModified)
     }
 
     /// Events are never edited, so they carry no `modifiedAt` — the one post-hoc write
@@ -178,9 +256,9 @@ struct PersistenceSchemaTests {
         try context.save()
 
         #expect(bear.id == id)
-        #expect(bear.synsetList.count == 2)
-        #expect(animal.termList.contains(bear))
-        #expect(carry.termList.contains(bear))
+        #expect(bear.synsets.count == 2)
+        #expect(animal.terms.contains(bear))
+        #expect(carry.terms.contains(bear))
         // One stored term, two senses — not two copies.
         #expect(try context.count(for: CDTerm.fetchRequest()) == 3)
     }
@@ -195,9 +273,9 @@ struct PersistenceSchemaTests {
         let synset = makeSynset(context, terms: [run, begat, bezhat])
         try context.save()
 
-        let answers = synset.terms(in: "ru").compactMap(\.text)
+        let answers = synset.terms(in: "ru").map(\.text)
         #expect(Set(answers) == ["бегать", "бежать"])
-        #expect(synset.terms(in: "en").compactMap(\.text) == ["run"])
+        #expect(synset.terms(in: "en").map(\.text) == ["run"])
         #expect(synset.languageCodes == ["en", "ru"])
     }
 
@@ -214,7 +292,7 @@ struct PersistenceSchemaTests {
 
         #expect(synset.languageCodes == ["en", "ru", "de"])
         #expect(set.languageCodes == ["en", "ru", "de"])
-        #expect(set.synsetList.first?.terms(in: "de").first?.text == "Bär")
+        #expect(set.synsets.first?.terms(in: "de").first?.text == "Bär")
     }
 
     /// Domain and register ride on the sense as tag *rows* — "bread = money" is slang
@@ -244,8 +322,8 @@ struct PersistenceSchemaTests {
         // One row per tag: rename once, both senses see it — no update anomaly.
         slang.name = "register:slang"
         try context.save()
-        #expect(bread.tagList.first?.name == "register:slang")
-        #expect(grand.tagList.first?.name == "register:slang")
+        #expect(bread.sortedTags.first?.name == "register:slang")
+        #expect(grand.sortedTags.first?.name == "register:slang")
         #expect(try context.count(for: CDTag.fetchRequest()) == 1)
     }
 
@@ -287,7 +365,7 @@ struct PersistenceSchemaTests {
         // Shared content is never cascaded — the other set still owns it.
         #expect(try context.count(for: CDSynset.fetchRequest()) == 1)
         #expect(try context.count(for: CDTerm.fetchRequest()) == 2)
-        #expect(synset.sets?.count == 1)
+        #expect(synset.sets.count == 1)
     }
 
     // MARK: - Lexical attributes
@@ -317,9 +395,9 @@ struct PersistenceSchemaTests {
         let fetched = try #require(try context.fetch(CDTerm.fetchRequest()).first)
         #expect(fetched.transcription == "māk")
         #expect(fetched.partOfSpeech == "verb")
-        #expect(Set(fetched.formList.compactMap(\.text)) == ["made", "making"])
-        #expect(fetched.commentList.first?.text == "irregular verb")
-        #expect(fetched.illustrationList.first?.url?.host == "example.com")
+        #expect(Set(fetched.forms.map(\.text)) == ["made", "making"])
+        #expect(fetched.sortedComments.first?.text == "irregular verb")
+        #expect(fetched.illustrations.first?.url?.host == "example.com")
     }
 
     /// A term's satellites are meaningless without it — they go with it. Its synsets do
@@ -339,7 +417,7 @@ struct PersistenceSchemaTests {
 
         #expect(try context.count(for: CDWordForm.fetchRequest()) == 0)
         #expect(try context.count(for: CDSynset.fetchRequest()) == 1)
-        #expect(synset.termList.compactMap(\.text) == ["делать"])
+        #expect(synset.terms.map(\.text) == ["делать"])
     }
 
     // MARK: - The event log
@@ -393,7 +471,7 @@ struct PersistenceSchemaTests {
         #expect(fetched.latencyMS?.intValue == 2_450)
         #expect(fetched.judgmentVerdict?.doubleValue == 0.82)
         #expect(fetched.judgeID == "match3/v1")
-        #expect(fetched.errorTagList.map(\.label) == ["consonant-voicing"])
+        #expect(fetched.sortedErrorTags.map(\.name) == ["consonant-voicing"])
         #expect(fetched.schemaVersion == 1)
         #expect(fetched.synset == synset)
     }
@@ -404,13 +482,11 @@ struct PersistenceSchemaTests {
         let context = makeContext()
         let synset = makeSynset(context, terms: [makeTerm(context, "bear", "en"),
                                                  makeTerm(context, "медведь", "ru")])
-        let event = CDReviewEvent(context: context)
-        event.outcome = ReviewOutcome.correctVerbatim.rawValue
+        let event = makeEvent(context, synset: synset)
         event.prompt = "bear"
         event.expected = "медведь"
         event.promptLanguage = "en"
         event.answerLanguage = "ru"
-        event.synset = synset
         try context.save()
 
         context.delete(synset)
@@ -431,15 +507,15 @@ struct PersistenceSchemaTests {
     /// (append-only, and CloudKit production records are immutable).
     @Test func everyEventIsStampedWithTheSchemaVersionOnInsert() throws {
         let context = makeContext()
-        let event = CDReviewEvent(context: context)
+        let event = makeEvent(context)
         #expect(event.schemaVersion == CDReviewEvent.currentSchemaVersion)
-        #expect(event.id != nil, "identity is assigned on insert, not by call sites")
-        #expect(event.date != nil)
+        // Identity and time are assigned on insert, not by call sites.
+        #expect(event.date.timeIntervalSinceReferenceDate > 0)
     }
 
     @Test func anUnknownOutcomeDecodesToNilInsteadOfCrashing() throws {
         let context = makeContext()
-        let event = CDReviewEvent(context: context)
+        let event = makeEvent(context, outcome: nil)
         event.outcome = "correctByTelepathy"   // a case from some future version
         try context.save()
 
@@ -451,13 +527,11 @@ struct PersistenceSchemaTests {
         let context = makeContext()
         let synset = makeSynset(context, terms: [makeTerm(context, "bear", "en")])
         for offset in [300.0, 100.0, 200.0] {
-            let event = CDReviewEvent(context: context)
-            event.date = Date(timeIntervalSince1970: offset)
-            event.synset = synset
+            makeEvent(context, synset: synset, date: Date(timeIntervalSince1970: offset))
         }
         try context.save()
 
-        let dates = synset.reviewHistory.compactMap { $0.date?.timeIntervalSince1970 }
+        let dates = synset.reviewHistory.map { $0.date.timeIntervalSince1970 }
         #expect(dates == [100, 200, 300])
     }
 
