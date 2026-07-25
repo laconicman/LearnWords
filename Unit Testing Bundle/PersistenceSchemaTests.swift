@@ -31,14 +31,25 @@ struct PersistenceSchemaTests {
 
     // MARK: - Builders
 
+    /// One `Language` row per code, as `CoreDataWordStore` will do (dedup is store
+    /// logic — CloudKit forbids unique constraints).
+    @discardableResult
+    private func language(_ context: NSManagedObjectContext, _ code: String) -> CDLanguage {
+        let request = CDLanguage.fetchRequest()
+        request.predicate = NSPredicate(format: "code == %@", code)
+        request.fetchLimit = 1
+        if let existing = try? context.fetch(request).first { return existing }
+        let language = CDLanguage(context: context)
+        language.code = code
+        return language
+    }
+
     @discardableResult
     private func makeTerm(_ context: NSManagedObjectContext,
-                          _ text: String, _ language: String) -> CDTerm {
+                          _ text: String, _ code: String) -> CDTerm {
         let term = CDTerm(context: context)
-        term.id = UUID()
         term.text = text
-        term.languageCode = language
-        term.createdAt = Date()
+        term.language = language(context, code)
         return term
     }
 
@@ -46,9 +57,7 @@ struct PersistenceSchemaTests {
     private func makeSynset(_ context: NSManagedObjectContext,
                             terms: [CDTerm], note: String? = nil) -> CDSynset {
         let synset = CDSynset(context: context)
-        synset.id = UUID()
         synset.note = note
-        synset.createdAt = Date()
         terms.forEach(synset.addTerm)
         return synset
     }
@@ -58,10 +67,8 @@ struct PersistenceSchemaTests {
                          name: String, languages: [String],
                          synsets: [CDSynset]) -> CDWordSet {
         let set = CDWordSet(context: context)
-        set.id = UUID()
         set.name = name
-        set.languageCodes = languages
-        set.createdAt = Date()
+        languages.forEach { set.addLanguage(language(context, $0)) }
         synsets.forEach(set.addSynset)
         return set
     }
@@ -71,7 +78,7 @@ struct PersistenceSchemaTests {
     @Test func modelDefinesTheLexicalEntities() {
         let names = Set(LWPersistence.model.entities.compactMap(\.name))
         #expect(names == ["WordSet", "Synset", "Term", "Comment", "Illustration",
-                          "WordForm", "Tag", "ReviewEvent"])
+                          "WordForm", "Tag", "Language", "ErrorTag", "ReviewEvent"])
     }
 
     /// CloudKit refuses non-optional attributes without defaults, relationships without
@@ -95,6 +102,60 @@ struct PersistenceSchemaTests {
             #expect(entity.uniquenessConstraints.isEmpty,
                     "\(entity.name ?? "?") must not use unique constraints — CloudKit rejects them")
         }
+    }
+
+    /// Indexes are invisible until a fetch is slow, so they are asserted rather than
+    /// hoped for. Each one backs a predicate the app will actually run: term lookup by
+    /// spelling (search, import dedup), tag and language rows by name (dedup on every
+    /// insert), event history by date and by sitting (`ScoringPolicy`).
+    @Test func indexesExistForEveryQueriedAttribute() {
+        let expected = [
+            "Term": ["text"],
+            "WordForm": ["text"],
+            "Tag": ["name"],
+            "ErrorTag": ["name"],
+            "Language": ["code"],
+            "ReviewEvent": ["date", "sessionID"],
+        ]
+        for (entityName, properties) in expected {
+            let entity = LWPersistence.model.entitiesByName[entityName]
+            let indexed = Set((entity?.indexes ?? []).flatMap { index in
+                index.elements.compactMap { ($0.property as? NSAttributeDescription)?.name }
+            })
+            for property in properties {
+                #expect(indexed.contains(property), "\(entityName).\(property) must be indexed")
+            }
+        }
+    }
+
+    // MARK: - Timestamps
+
+    /// `createdAt`/`modifiedAt` are maintained by `willSave()`, not by call sites, so a
+    /// forgotten assignment cannot make the pair lie.
+    @Test func timestampsAreMaintainedAutomatically() throws {
+        let context = makeContext()
+        let term = makeTerm(context, "bear", "en")
+        try context.save()
+
+        let created = try #require(term.createdAt)
+        let firstModified = try #require(term.modifiedAt)
+        #expect(firstModified >= created)
+
+        // A later save must move `modifiedAt` and never `createdAt`.
+        Thread.sleep(forTimeInterval: 0.01)
+        term.transcription = "bɛə"
+        try context.save()
+
+        #expect(term.createdAt == created, "createdAt must never move")
+        #expect(try #require(term.modifiedAt) > firstModified)
+    }
+
+    /// Events are never edited, so they carry no `modifiedAt` — the one post-hoc write
+    /// is a judgment, which has its own `judgedAt`.
+    @Test func reviewEventsHaveNoModifiedTimestamp() {
+        let attributes = LWPersistence.model.entitiesByName["ReviewEvent"]?.attributesByName ?? [:]
+        #expect(attributes["modifiedAt"] == nil)
+        #expect(attributes["judgedAt"] != nil)
     }
 
     // MARK: - Atomic terms
@@ -163,7 +224,6 @@ struct PersistenceSchemaTests {
     @Test func tagsAreQueryableRowsSharedAcrossSenses() throws {
         let context = makeContext()
         let slang = CDTag(context: context)
-        slang.id = UUID()
         slang.name = "slang"
 
         let bread = makeSynset(context, terms: [makeTerm(context, "bread", "en"),
@@ -187,6 +247,30 @@ struct PersistenceSchemaTests {
         #expect(bread.tagList.first?.name == "register:slang")
         #expect(grand.tagList.first?.name == "register:slang")
         #expect(try context.count(for: CDTag.fetchRequest()) == 1)
+    }
+
+    /// Languages are rows for the same reason tags are: "every set that covers German"
+    /// and "every term in German" are predicates, and predicates want rows. This is the
+    /// query the `languageCodes: [String]` transformable could not serve.
+    @Test func languagesAreQueryableRowsSharedAcrossTermsAndSets() throws {
+        let context = makeContext()
+        let synset = makeSynset(context, terms: [makeTerm(context, "bear", "en"),
+                                                 makeTerm(context, "Bär", "de")])
+        makeSet(context, name: "Animals", languages: ["en", "de"], synsets: [synset])
+        makeSynset(context, terms: [makeTerm(context, "run", "en"),
+                                    makeTerm(context, "бегать", "ru")])
+        try context.save()
+
+        // One row per code, reused by every term and set that names it.
+        #expect(try context.count(for: CDLanguage.fetchRequest()) == 3)
+
+        let german = CDTerm.fetchRequest()
+        german.predicate = NSPredicate(format: "language.code == %@", "de")
+        #expect(try context.count(for: german) == 1)
+
+        let coversGerman = CDWordSet.fetchRequest()
+        coversGerman.predicate = NSPredicate(format: "ANY languages.code == %@", "de")
+        #expect(try context.count(for: coversGerman) == 1)
     }
 
     @Test func aSynsetIsSharedAcrossSetsAndSurvivesSetDeletion() throws {
@@ -217,19 +301,15 @@ struct PersistenceSchemaTests {
         // Apple's d:index rows: variant forms that should reach the same entry.
         for (kind, text) in [("past", "made"), ("gerund", "making")] {
             let form = CDWordForm(context: context)
-            form.id = UUID()
             form.formType = kind
             form.text = text
             form.term = term
         }
         let comment = CDComment(context: context)
-        comment.id = UUID()
         comment.text = "irregular verb"
-        comment.createdAt = Date()
         comment.term = term
 
         let illustration = CDIllustration(context: context)
-        illustration.id = UUID()
         illustration.urlString = "https://example.com/make.png"
         illustration.term = term
         try context.save()
@@ -248,7 +328,6 @@ struct PersistenceSchemaTests {
         let context = makeContext()
         let term = makeTerm(context, "make", "en")
         let form = CDWordForm(context: context)
-        form.id = UUID()
         form.formType = "past"
         form.text = "made"
         form.term = term
@@ -277,7 +356,6 @@ struct PersistenceSchemaTests {
 
         let session = UUID()
         let event = CDReviewEvent(context: context)
-        event.id = UUID()
         event.date = Date(timeIntervalSince1970: 1_000_000)
         event.sessionID = session
         event.task = ExerciseSession.Exercise.dictation.rawValue
@@ -294,8 +372,9 @@ struct PersistenceSchemaTests {
         event.judgmentVerdict = 0.82
         event.judgeID = "match3/v1"
         event.judgedAt = Date(timeIntervalSince1970: 1_000_001)
-        event.judgmentErrorTags = ["consonant-voicing"]
-        event.schemaVersion = CDReviewEvent.currentSchemaVersion
+        let voicing = CDErrorTag(context: context)
+        voicing.name = "consonant-voicing"
+        event.addErrorTag(voicing)
         event.synset = synset
         try context.save()
 
@@ -314,7 +393,7 @@ struct PersistenceSchemaTests {
         #expect(fetched.latencyMS?.intValue == 2_450)
         #expect(fetched.judgmentVerdict?.doubleValue == 0.82)
         #expect(fetched.judgeID == "match3/v1")
-        #expect(fetched.judgmentErrorTags == ["consonant-voicing"])
+        #expect(fetched.errorTagList.map(\.label) == ["consonant-voicing"])
         #expect(fetched.schemaVersion == 1)
         #expect(fetched.synset == synset)
     }
@@ -326,8 +405,6 @@ struct PersistenceSchemaTests {
         let synset = makeSynset(context, terms: [makeTerm(context, "bear", "en"),
                                                  makeTerm(context, "медведь", "ru")])
         let event = CDReviewEvent(context: context)
-        event.id = UUID()
-        event.date = Date()
         event.outcome = ReviewOutcome.correctVerbatim.rawValue
         event.prompt = "bear"
         event.expected = "медведь"
@@ -347,10 +424,22 @@ struct PersistenceSchemaTests {
 
     /// An outcome this build has never heard of must decode to `nil` — skipped, never a
     /// crash, never coerced — with the raw value preserved for a newer build.
+    /// The event's `schemaVersion` is the *semantic* version of its contents, distinct
+    /// from the Core Data model version the store tracks in its own metadata. Rows are
+    /// stamped on insert so a future `ScoringPolicy` can interpret each one under the
+    /// rules that were true when it was written — old rows can never be rewritten
+    /// (append-only, and CloudKit production records are immutable).
+    @Test func everyEventIsStampedWithTheSchemaVersionOnInsert() throws {
+        let context = makeContext()
+        let event = CDReviewEvent(context: context)
+        #expect(event.schemaVersion == CDReviewEvent.currentSchemaVersion)
+        #expect(event.id != nil, "identity is assigned on insert, not by call sites")
+        #expect(event.date != nil)
+    }
+
     @Test func anUnknownOutcomeDecodesToNilInsteadOfCrashing() throws {
         let context = makeContext()
         let event = CDReviewEvent(context: context)
-        event.id = UUID()
         event.outcome = "correctByTelepathy"   // a case from some future version
         try context.save()
 
@@ -363,7 +452,6 @@ struct PersistenceSchemaTests {
         let synset = makeSynset(context, terms: [makeTerm(context, "bear", "en")])
         for offset in [300.0, 100.0, 200.0] {
             let event = CDReviewEvent(context: context)
-            event.id = UUID()
             event.date = Date(timeIntervalSince1970: offset)
             event.synset = synset
         }
@@ -379,9 +467,7 @@ struct PersistenceSchemaTests {
         let stack = LWPersistence(inMemory: true)
         try stack.write { context in
             let term = CDTerm(context: context)
-            term.id = UUID()
             term.text = "written in the background"
-            term.languageCode = "en"
         }
         #expect(try stack.viewContext.count(for: CDTerm.fetchRequest()) == 1)
     }
@@ -392,8 +478,7 @@ struct PersistenceSchemaTests {
 
         #expect(throws: Boom.self) {
             try stack.write { context in
-                let term = CDTerm(context: context)
-                term.id = UUID()
+                _ = CDTerm(context: context)
                 throw Boom()
             }
         }

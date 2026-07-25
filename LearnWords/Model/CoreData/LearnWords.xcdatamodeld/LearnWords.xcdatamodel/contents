@@ -1,56 +1,31 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23504" systemVersion="24F74" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="YES" userDefinedModelVersionIdentifier="">
-    <entity name="WordSet" representedClassName="CDWordSet" syncable="YES">
-        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
-        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
-        <attribute name="languageCodes" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[String]"/>
-        <attribute name="name" optional="YES" attributeType="String"/>
-        <relationship name="synsets" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Synset" inverseName="sets" inverseEntity="Synset"/>
-    </entity>
-    <entity name="Synset" representedClassName="CDSynset" syncable="YES">
-        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
-        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
-        <attribute name="note" optional="YES" attributeType="String"/>
-        <relationship name="events" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="ReviewEvent" inverseName="synset" inverseEntity="ReviewEvent"/>
-        <relationship name="sets" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="WordSet" inverseName="synsets" inverseEntity="WordSet"/>
-        <relationship name="tags" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Tag" inverseName="synsets" inverseEntity="Tag"/>
-        <relationship name="terms" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Term" inverseName="synsets" inverseEntity="Term"/>
-    </entity>
-    <entity name="Tag" representedClassName="CDTag" syncable="YES">
-        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
-        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
-        <attribute name="name" optional="YES" attributeType="String"/>
-        <relationship name="synsets" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Synset" inverseName="tags" inverseEntity="Synset"/>
-    </entity>
-    <entity name="Term" representedClassName="CDTerm" syncable="YES">
-        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
-        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
-        <attribute name="languageCode" optional="YES" attributeType="String"/>
-        <attribute name="partOfSpeech" optional="YES" attributeType="String"/>
-        <attribute name="text" optional="YES" attributeType="String"/>
-        <attribute name="transcription" optional="YES" attributeType="String"/>
-        <relationship name="comments" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Comment" inverseName="term" inverseEntity="Comment"/>
-        <relationship name="forms" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="WordForm" inverseName="term" inverseEntity="WordForm"/>
-        <relationship name="illustrations" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Illustration" inverseName="term" inverseEntity="Illustration"/>
-        <relationship name="synsets" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Synset" inverseName="terms" inverseEntity="Synset"/>
-    </entity>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="24902" systemVersion="25F84" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="YES" userDefinedModelVersionIdentifier="">
     <entity name="Comment" representedClassName="CDComment" syncable="YES">
         <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
-        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="modifiedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="text" optional="YES" attributeType="String"/>
         <relationship name="term" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Term" inverseName="comments" inverseEntity="Term"/>
     </entity>
+    <entity name="ErrorTag" representedClassName="CDErrorTag" syncable="YES">
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <relationship name="events" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="ReviewEvent" inverseName="errorTags" inverseEntity="ReviewEvent"/>
+        <fetchIndex name="byName">
+            <fetchIndexElement property="name" type="Binary" order="ascending"/>
+        </fetchIndex>
+    </entity>
     <entity name="Illustration" representedClassName="CDIllustration" syncable="YES">
         <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
-        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="modifiedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="urlString" optional="YES" attributeType="String"/>
         <relationship name="term" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Term" inverseName="illustrations" inverseEntity="Term"/>
     </entity>
-    <entity name="WordForm" representedClassName="CDWordForm" syncable="YES">
-        <attribute name="formType" optional="YES" attributeType="String"/>
-        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
-        <attribute name="text" optional="YES" attributeType="String"/>
-        <relationship name="term" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Term" inverseName="forms" inverseEntity="Term"/>
+    <entity name="Language" representedClassName="CDLanguage" syncable="YES">
+        <attribute name="code" optional="YES" attributeType="String"/>
+        <relationship name="sets" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="WordSet" inverseName="languages" inverseEntity="WordSet"/>
+        <relationship name="terms" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Term" inverseName="language" inverseEntity="Term"/>
+        <fetchIndex name="byCode">
+            <fetchIndexElement property="code" type="Binary" order="ascending"/>
+        </fetchIndex>
     </entity>
     <entity name="ReviewEvent" representedClassName="CDReviewEvent" syncable="YES">
         <attribute name="answerLanguage" optional="YES" attributeType="String"/>
@@ -60,7 +35,6 @@
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="judgedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="judgeID" optional="YES" attributeType="String"/>
-        <attribute name="judgmentErrorTags" optional="YES" attributeType="Transformable" valueTransformerName="NSSecureUnarchiveFromData" customClassName="[String]"/>
         <attribute name="judgmentVerdict" optional="YES" attributeType="Double" usesScalarValueType="NO"/>
         <attribute name="latencyMS" optional="YES" attributeType="Integer 64" usesScalarValueType="NO"/>
         <attribute name="outcome" optional="YES" attributeType="String"/>
@@ -72,6 +46,65 @@
         <attribute name="sessionID" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="task" optional="YES" attributeType="String"/>
         <attribute name="wordSetID" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <relationship name="errorTags" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="ErrorTag" inverseName="events" inverseEntity="ErrorTag"/>
         <relationship name="synset" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Synset" inverseName="events" inverseEntity="Synset"/>
+        <fetchIndex name="byDate">
+            <fetchIndexElement property="date" type="Binary" order="ascending"/>
+        </fetchIndex>
+        <fetchIndex name="bySession">
+            <fetchIndexElement property="sessionID" type="Binary" order="ascending"/>
+        </fetchIndex>
+    </entity>
+    <entity name="Synset" representedClassName="CDSynset" syncable="YES">
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="modifiedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="note" optional="YES" attributeType="String"/>
+        <relationship name="events" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="ReviewEvent" inverseName="synset" inverseEntity="ReviewEvent"/>
+        <relationship name="sets" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="WordSet" inverseName="synsets" inverseEntity="WordSet"/>
+        <relationship name="tags" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Tag" inverseName="synsets" inverseEntity="Tag"/>
+        <relationship name="terms" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Term" inverseName="synsets" inverseEntity="Term"/>
+    </entity>
+    <entity name="Tag" representedClassName="CDTag" syncable="YES">
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <relationship name="synsets" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Synset" inverseName="tags" inverseEntity="Synset"/>
+        <fetchIndex name="byName">
+            <fetchIndexElement property="name" type="Binary" order="ascending"/>
+        </fetchIndex>
+    </entity>
+    <entity name="Term" representedClassName="CDTerm" syncable="YES">
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="modifiedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="partOfSpeech" optional="YES" attributeType="String"/>
+        <attribute name="text" optional="YES" attributeType="String"/>
+        <attribute name="transcription" optional="YES" attributeType="String"/>
+        <relationship name="comments" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Comment" inverseName="term" inverseEntity="Comment"/>
+        <relationship name="forms" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="WordForm" inverseName="term" inverseEntity="WordForm"/>
+        <relationship name="illustrations" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Illustration" inverseName="term" inverseEntity="Illustration"/>
+        <relationship name="language" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Language" inverseName="terms" inverseEntity="Language"/>
+        <relationship name="synsets" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Synset" inverseName="terms" inverseEntity="Synset"/>
+        <fetchIndex name="byText">
+            <fetchIndexElement property="text" type="Binary" order="ascending"/>
+        </fetchIndex>
+    </entity>
+    <entity name="WordForm" representedClassName="CDWordForm" syncable="YES">
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="formType" optional="YES" attributeType="String"/>
+        <attribute name="modifiedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="text" optional="YES" attributeType="String"/>
+        <relationship name="term" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Term" inverseName="forms" inverseEntity="Term"/>
+        <fetchIndex name="byText">
+            <fetchIndexElement property="text" type="Binary" order="ascending"/>
+        </fetchIndex>
+    </entity>
+    <entity name="WordSet" representedClassName="CDWordSet" syncable="YES">
+        <attribute name="createdAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="modifiedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <relationship name="languages" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Language" inverseName="sets" inverseEntity="Language"/>
+        <relationship name="synsets" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Synset" inverseName="sets" inverseEntity="Synset"/>
     </entity>
 </model>

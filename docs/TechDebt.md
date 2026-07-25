@@ -178,6 +178,23 @@ tests (73 total green). Original iteration-1 notes below for the parts that surv
   are **iOS 13+**, so on iOS 12 this store is simply local. Correct degradation — Legacy
   keeps working, sync is a modern-OS feature.
 
+**Normalization + metadata pass (owner review, 2026-07-25).** Applying the schema's own
+WHERE-clause rule everywhere it belongs: `Synset.tags`, `ReviewEvent.judgmentErrorTags`
+and the language strings became **`Tag`, `ErrorTag` and `Language` rows** — no
+transformable attributes remain. Added `fetchIndex` entries for every attribute a
+predicate actually touches (asserted by a test, since a missing index is invisible until
+something is slow), `createdAt`/`modifiedAt` pairs on all user-editable entities
+(maintained in `willSave()` via **primitive accessors** — the first cut re-dirtied the
+object each pass and Core Data aborted the save after ~100 iterations), and
+`awakeFromInsert` to assign identity and timestamps so call sites cannot forget.
+Non-optional typed accessors were added to every managed-object class so CloudKit's
+mandatory optionality is paid once here rather than at every call site. Decisions
+recorded in [Design](Design.md) (identity: `objectID` for lookup rows vs `UUID` for
+referenced entities; optionality at the boundary) and the research doc (indexes;
+fetched properties, scalar types and transients considered and declined with reasons;
+schema versioning under lightweight-migration rules and CloudKit's immutable production
+schema). 79 tests green.
+
 **Remaining:** ② `CoreDataWordStore: WordStore` + swap `Storage.backend` + seed the sample
 set · ③ screens append events (Phase C) · ④ CloudKit + App Group + widget · ⑤ indexes and
 the TD-17 ring (Phase D).

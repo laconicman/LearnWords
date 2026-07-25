@@ -51,7 +51,7 @@
     },
     "8WT-Dx-fov.text" : {
       "comment" : "Class = \"UILabel\"; text = \"Word\"; ObjectID = \"8WT-Dx-fov\";",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -123,7 +123,7 @@
     },
     "643-wN-0oS.normalTitle" : {
       "comment" : "Class = \"UIButton\"; normalTitle = \"Forgot\"; ObjectID = \"643-wN-0oS\";",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -171,7 +171,7 @@
     },
     "bDd-aK-Z4N.normalTitle" : {
       "comment" : "Class = \"UIButton\"; normalTitle = \"Know\"; ObjectID = \"bDd-aK-Z4N\";",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -195,7 +195,7 @@
     },
     "Bf1-2B-pAQ.normalTitle" : {
       "comment" : "Class = \"UIButton\"; normalTitle = \"Forgot\"; ObjectID = \"Bf1-2B-pAQ\";",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -219,7 +219,7 @@
     },
     "bIe-cz-JDG.title" : {
       "comment" : "Class = \"UINavigationItem\"; title = \"Phonetic\"; ObjectID = \"bIe-cz-JDG\";",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -243,7 +243,7 @@
     },
     "BpE-Jx-lIv.title" : {
       "comment" : "Class = \"UINavigationItem\"; title = \"Dictation\"; ObjectID = \"BpE-Jx-lIv\";",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -267,7 +267,7 @@
     },
     "Djr-xr-GdQ.normalTitle" : {
       "comment" : "Class = \"UIButton\"; normalTitle = \"Know\"; ObjectID = \"Djr-xr-GdQ\";",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -363,7 +363,7 @@
     },
     "fb2-Kp-cfL.title" : {
       "comment" : "Class = \"UINavigationItem\"; title = \"Learning\"; ObjectID = \"fb2-Kp-cfL\";",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -411,7 +411,7 @@
     },
     "Fh8-vi-hwf.normalTitle" : {
       "comment" : "Class = \"UIButton\"; normalTitle = \"Listen\"; ObjectID = \"Fh8-vi-hwf\";",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -507,7 +507,7 @@
     },
     "jVV-UW-vd8.normalTitle" : {
       "comment" : "Class = \"UIButton\"; normalTitle = \"Start recognition\"; ObjectID = \"jVV-UW-vd8\";",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -567,7 +567,7 @@
     },
     "keD-qV-ddK.normalTitle" : {
       "comment" : "Class = \"UIButton\"; normalTitle = \"Look Up\"; ObjectID = \"keD-qV-ddK\";",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -615,7 +615,7 @@
     },
     "Liq-qX-vPh.normalTitle" : {
       "comment" : "Class = \"UIButton\"; normalTitle = \"Listen\"; ObjectID = \"Liq-qX-vPh\";",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -639,7 +639,7 @@
     },
     "Lwt-U0-lsn.normalTitle" : {
       "comment" : "Class = \"UIButton\"; normalTitle = \"Listen\"; ObjectID = \"Lwt-U0-lsn\";",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -735,7 +735,7 @@
     },
     "P1B-tp-yvT.text" : {
       "comment" : "Class = \"UILabel\"; text = \"Word\"; ObjectID = \"P1B-tp-yvT\";",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -759,7 +759,7 @@
     },
     "ph3-GE-3p7.normalTitle" : {
       "comment" : "Class = \"UIButton\"; normalTitle = \"Look Up\"; ObjectID = \"ph3-GE-3p7\";",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -783,7 +783,7 @@
     },
     "Q8X-kw-NHO.normalTitle" : {
       "comment" : "Class = \"UIButton\"; normalTitle = \"Forgot\"; ObjectID = \"Q8X-kw-NHO\";",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -807,7 +807,7 @@
     },
     "qaf-Gn-jV1.normalTitle" : {
       "comment" : "Class = \"UIButton\"; normalTitle = \"Look Up\"; ObjectID = \"qaf-Gn-jV1\";",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -831,7 +831,7 @@
     },
     "s4E-Gx-k1b.text" : {
       "comment" : "Class = \"UILabel\"; text = \"Word\"; ObjectID = \"s4E-Gx-k1b\";",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -927,7 +927,7 @@
     },
     "uEJ-4s-E9l.text" : {
       "comment" : "Class = \"UILabel\"; text = \"pronounce the translation\"; ObjectID = \"uEJ-4s-E9l\";",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -975,7 +975,7 @@
     },
     "VvQ-x8-gCl.text" : {
       "comment" : "Class = \"UITextField\"; text = \"type in the translation\"; ObjectID = \"VvQ-x8-gCl\";",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1047,7 +1047,7 @@
     },
     "x6b-1p-EXm.normalTitle" : {
       "comment" : "Class = \"UIButton\"; normalTitle = \"Know\"; ObjectID = \"x6b-1p-EXm\";",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1119,7 +1119,7 @@
     },
     "yxM-vR-ero.text" : {
       "comment" : "Class = \"UILabel\"; text = \"Word\"; ObjectID = \"yxM-vR-ero\";",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {

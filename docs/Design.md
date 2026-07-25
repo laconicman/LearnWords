@@ -164,6 +164,42 @@ snapshot `promptLanguage`, `answerLanguage`, `promptTermID`, `wordSetID`. **Noth
 cascades into the log** — deleting sets, synsets or terms nullifies the link and the
 snapshots keep orphan events judgeable ("history heals").
 
+## Decision: identity — `objectID` for lookup rows, `UUID` for referenced entities
+
+**Decision (owner question, 2026-07-23).** Only entities the app *refers to* carry a
+`UUID`: `WordSet`, `Synset`, `Term`. Lookup rows (`Tag`, `Language`, `ErrorTag`) and
+owned satellites (`Comment`, `Illustration`, `WordForm`) have none — Core Data's
+`objectID` is their identity.
+
+**Why not override `objectID` to avoid a second identifier.** It cannot be overridden:
+`NSManagedObjectID` is issued by the persistent store coordinator, is *temporary* until
+first save, and changes when an object moves between stores. It is also not portable —
+a URI containing the store UUID, meaningless on another device, which rules it out for
+CloudKit. So a synced identity has to be an attribute.
+
+The rule is therefore about *reach*: a `UUID` exists where something outside the object
+graph must name the row — `ReviewEvent` snapshots `promptTermID`/`wordSetID`, and
+CloudKit needs stable identity for records the user's other devices resolve. A tag or a
+language is only ever reached *through* a relationship, so a second identifier would be
+a second source of truth to keep in sync, for nothing. Dedup by natural key (`Tag.name`,
+`Language.code`) is store logic — CloudKit forbids unique constraints — and remote
+enrichment matches on that natural key: find the row, or create it (owner's note on
+kaikki tags).
+
+## Decision: optionality is CloudKit's price, paid once at the boundary
+
+**Decision (owner question, 2026-07-23).** Every attribute is optional in the *model*
+because `NSPersistentCloudKitContainer` requires it (attributes optional or defaulted;
+relationships optional with an inverse). The app never pays for that: each managed-object
+class exposes **non-optional typed accessors** (`term.spelling`, `synset.identifier`,
+`event.reviewedAt`), and `awakeFromInsert` assigns identity and timestamps so the
+fallbacks are unreachable for objects this app creates. `CoreDataWordStore` then maps to
+value types at the seam, so no unwrapping ever escapes `Model/CoreData/`.
+
+**Rejected.** *Non-optional attributes with defaults in the model.* It reads better in
+isolation but lies: a default is not "always present", it is "silently zero", and it
+would still be `Optional` in the generated Swift for anything CloudKit syncs.
+
 ## Decision: managed objects never escape the store
 
 **Decision (owner, 2026-07-23 — "it saved me from many troubles since 2012").**

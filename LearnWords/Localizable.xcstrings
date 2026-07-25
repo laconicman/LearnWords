@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "\n Probably there is no internet connection. \n Recognition happens on Apple servers for most of devices. " : {
+      "comment" : "Speech recognition error detail"
+    },
     "Add" : {
       "comment" : "AlertAction title",
       "localizations" : {
@@ -350,6 +353,7 @@
     },
     "Forgot" : {
       "comment" : "Exercise button",
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -522,6 +526,7 @@
     },
     "Know" : {
       "comment" : "Exercise button",
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -623,6 +628,7 @@
     },
     "Listen" : {
       "comment" : "Exercise button",
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -640,6 +646,7 @@
     },
     "Look Up" : {
       "comment" : "Exercise button",
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {

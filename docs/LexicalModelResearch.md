@@ -60,7 +60,7 @@ can grow.
 
 | Owner's ask | Schema element |
 |---|---|
-| Word as atomic entity, per language | `Term` (text, languageCode, transcription, partOfSpeech) |
+| Word as atomic entity, per language | `Term` (text, `language` → `Language` row, transcription, partOfSpeech) |
 | Lexical attributes, extensible | attributes on `Term`; `WordForm` rows (additive, mirrors `d:index`) |
 | Comments for context during testing | `Comment` → term; `Synset.note` for sense disambiguation (see below) |
 | Illustrations, local or remote URLs | `Illustration` (urlString) → term |
@@ -68,7 +68,7 @@ can grow.
 | Language tuples, not only pairs | `Synset` links any number of terms in any languages |
 | Several definitions, any accepted | several same-language terms in one synset — all valid answers |
 | Answer from another thematic: right-with-warning | judged at answer time against *other* synsets of the prompt term; recorded as `correctJudged` with a verdict coefficient — policy, not schema |
-| Multilingual sets, choose study language | `WordSet.languageCodes: [String]`; the session picks (primary, secondary) |
+| Multilingual sets, choose study language | `WordSet.languages` → `Language` rows; the session picks (primary, secondary) |
 | "primary/secondary" over "native/foreign" | renamed in `LanguagePair` and `ReviewDirection` (receptive/productive) |
 
 **Why `Synset.note` exists alongside `Comment`:** a comment hangs off a *term* (usage,
@@ -95,6 +95,77 @@ survives future set-sharing, where two users of one set have different primaries
 - **Nothing cascades into the log.** Deleting a synset or set nullifies the event's
   relationship; the event keeps its text/language snapshots and stays judgeable.
   The log outlives edits by design ("history heals").
+
+## Normalization pass (owner review, 2026-07-25)
+
+Applying the WHERE-clause rule to everything, not just tags — the owner was right that
+the earlier audit under-applied it:
+
+| Was | Now | Why |
+|---|---|---|
+| `Synset.tags: [String]` | **`Tag`** rows, m2m | "all slang senses" is a predicate |
+| `ReviewEvent.judgmentErrorTags: [String]` | **`ErrorTag`** rows, m2m | "every event where I got the gender wrong" is the whole point of recording them |
+| `Term.languageCode: String` + `WordSet.languageCodes: [String]` | **`Language`** rows | "every term in German", "every set covering German"; also the natural home for display name or script direction, additively |
+
+**No transformable attributes remain in the model.**
+
+**Indexes** (`fetchIndex` in the model, asserted by a test): `Term.text` and
+`WordForm.text` (search, import dedup), `Tag.name` / `ErrorTag.name` /
+`Language.code` (dedup on every insert — the store looks a row up before creating it),
+`ReviewEvent.date` and `.sessionID` (history windows and per-sitting grouping, the two
+axes `ScoringPolicy` walks). Deliberately *not* indexed: attributes only ever read
+after a relationship traversal, where the relationship is already the index.
+
+**Not adopted, with reasons:**
+
+- **Fetched properties** — a stored, arbitrary-predicate query on an entity. Tempting
+  for "other senses of this term", but they are not `NSFetchedResultsController`-
+  friendly, are faulted lazily with no batching control, and cannot use a
+  `$FETCH_SOURCE` substitution against a *related* object's attribute in the shapes we
+  need. The same queries are one `NSFetchRequest` in `CoreDataWordStore`, where they are
+  testable. Reconsider if a predicate proves genuinely reusable across call sites.
+- **Scalar types (`usesScalarValueType`)** — only meaningful for numeric/boolean
+  attributes, and the model has three: `schemaVersion` (already scalar `Int16`),
+  `latencyMS` and `judgmentVerdict`. Those two stay `NSNumber?` **because absence is
+  meaningful**: a review with no measured latency is not a review that took 0 ms, and an
+  unjudged answer is not one scored 0.0. A scalar would erase that distinction — the
+  same reason `ProgressModel` insists unknown outcomes stay `nil` rather than defaulting.
+- **Transient attributes** — computed values Core Data holds in memory but never
+  persists. The derived indexes (effort/mastery/retention) are the obvious candidate,
+  and `ProgressModel` leaves the caching mechanism open; but transients cannot be
+  fetched or sorted on, and the ring needs sorting by mastery. Decided at Phase D with
+  the cache entity, per the brief.
+
+## Schema versioning (owner question)
+
+`.xcdatamodeld` is a *versioned bundle*: adding a model version and pointing
+`.xccurrentversion` at it is how the schema evolves. Apple's rules
+([WWDC22 "Evolve your Core Data schema"](https://sosumi.ai/videos/play/wwdc2022/10120)):
+lightweight migration handles **adding/removing attributes, making a non-optional
+attribute optional, adding/deleting/renaming relationships, changing cardinality, and
+adding/removing/renaming entities**; anything beyond that is decomposed into a chain of
+intermediate versions that each satisfy those rules. `NSPersistentContainer` enables
+`NSMigratePersistentStoresAutomatically` and `NSInferMappingModelAutomatically` for us,
+so no code is needed for the lightweight path.
+
+Two consequences specific to this app:
+
+1. **CloudKit production schema is immutable** — only *adding* record types and fields
+   is permitted. Every prospective change must therefore be additive, and the local
+   migration must be coordinated with a CloudKit Console schema push. This is why the
+   †-marked event fields and the four language/term/set snapshots went in before any
+   data exists, and why "additive" appears as the escape hatch in so many notes above.
+2. **`ReviewEvent.schemaVersion` is not the model version.** The store already tracks
+   which model version it was written with. `schemaVersion` records the *semantics* of a
+   row's contents, because the log is append-only and outlives the code: if latency is
+   ever measured from a different anchor, or an outcome's meaning shifts, old rows
+   cannot be rewritten (immutable in production, and other devices hold copies), so
+   `ScoringPolicy` must be able to interpret each row under the rules that were true
+   when it was written.
+
+Pre-release, while no user data exists, the model is edited **in place** rather than
+versioned — a new version per edit would leave a chain of migrations between schemas
+nobody ever ran. The first shipped build freezes that; from then on, versions.
 
 ## Deliberately store-level, not schema (iteration 2+)
 
