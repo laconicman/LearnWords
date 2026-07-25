@@ -69,7 +69,7 @@ struct PersistenceSchemaTests {
         let set = CDWordSet(context: context)
         set.name = name
         languages.forEach { set.addLanguage(language(context, $0)) }
-        synsets.forEach(set.addSynset)
+        synsets.forEach(set.addSense)
         return set
     }
 

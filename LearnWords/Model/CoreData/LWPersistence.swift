@@ -62,6 +62,17 @@ final class LWPersistence {
         Self.configure(container)
     }
 
+    /// A SQLite stack at an explicit location, outside the App Group.
+    ///
+    /// For tests that must exercise the *real* store type — indexes, predicates and
+    /// persistence-across-launches behave differently in memory, so a suite that only
+    /// ever ran in memory would not be testing what ships.
+    init(storeAt url: URL) {
+        container = NSPersistentContainer(name: Self.modelName, managedObjectModel: Self.model)
+        container.persistentStoreDescriptions = [NSPersistentStoreDescription(url: url)]
+        Self.configure(container)
+    }
+
     /// Keeps the Spotlight index alive for the lifetime of the stack. Only set for the
     /// on-disk store — Core Spotlight integration requires a SQLite store with history
     /// tracking, so the in-memory test stack never has one.

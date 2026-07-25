@@ -87,6 +87,7 @@ final class CDWordSet: NSManagedObject, Timestamped {
     @NSManaged var createdAt: Date
     @NSManaged var modifiedAt: Date
     @NSManaged var languages: Set<CDLanguage>
+    /// Named `synsets` in the model (the entity is `Synset`); the app calls them senses.
     @NSManaged var synsets: Set<CDSynset>
 
     override func awakeFromInsert() {
@@ -109,6 +110,10 @@ extension CDWordSet {
     /// The languages this set covers, as codes.
     var languageCodes: Set<String> { Set(languages.map(\.code)) }
 
+    /// The meanings in this set. `Lexicon` and the app speak of *senses*; the entity is
+    /// still called `Synset` because that is the lexicographic term for the row.
+    var senses: Set<CDSynset> { synsets }
+
     // To-many writes go through `mutableSetValue` — the hand-written-subclass
     // equivalent of Xcode's generated accessors. Assigning a whole set replaces the
     // relationship and forces Core Data to diff it; these express the actual intent
@@ -116,8 +121,8 @@ extension CDWordSet {
 
     func addLanguage(_ language: CDLanguage) { mutableSetValue(forKey: "languages").add(language) }
     func removeLanguage(_ language: CDLanguage) { mutableSetValue(forKey: "languages").remove(language) }
-    func addSynset(_ synset: CDSynset) { mutableSetValue(forKey: "synsets").add(synset) }
-    func removeSynset(_ synset: CDSynset) { mutableSetValue(forKey: "synsets").remove(synset) }
+    func addSense(_ sense: CDSynset) { mutableSetValue(forKey: "synsets").add(sense) }
+    func removeSense(_ sense: CDSynset) { mutableSetValue(forKey: "synsets").remove(sense) }
 }
 
 // MARK: - Synset
@@ -229,8 +234,8 @@ extension CDTerm {
         comments.sorted { $0.createdAt < $1.createdAt }
     }
 
-    func addSynset(_ synset: CDSynset) { mutableSetValue(forKey: "synsets").add(synset) }
-    func removeSynset(_ synset: CDSynset) { mutableSetValue(forKey: "synsets").remove(synset) }
+    func addSense(_ sense: CDSynset) { mutableSetValue(forKey: "synsets").add(sense) }
+    func removeSense(_ sense: CDSynset) { mutableSetValue(forKey: "synsets").remove(sense) }
 }
 
 // MARK: - Lookup rows

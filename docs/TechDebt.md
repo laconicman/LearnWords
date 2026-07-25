@@ -210,7 +210,35 @@ deliberately **excluded** so practice answers never leak into system search. Par
 entities were measured (a throwaway model proved Core Data stores a whole hierarchy in one
 table) and declined, with the one future case where they would pay recorded. 81 tests green.
 
-**Remaining:** handling `CSSearchableItemActionType` to open the right screen from a
+**Iteration 2 — the store (2026-07-25).** `Model/Lexicon/`: **`Lexicon`** is the only
+type that talks to Core Data. Reads return value types, writes take value types, and no
+managed object crosses the boundary — the rule that keeps a future store change confined
+to one file. Naming: **value types take the clean names** (`WordSet`, `Sense`, `Term`,
+`ReviewEvent`, each with a `Draft` where creation differs from reading) and the entities
+keep the `CD` prefix; nothing above `Lexicon` mentions a `CD` type.
+
+- **No protocol** (YAGNI): one implementation, and `LWPersistence(inMemory:)` already
+  makes it testable, so a protocol would be a second name to keep in sync for no gain.
+- **Not a `WordStore` conformer** (owner: "care not about compatibility"): that protocol
+  is a flat `[WordAndStat]` mutated by index, and mapping senses onto it would collapse
+  synonyms and multilingual tuples back into pairs — destroying what the redesign was
+  for. The old store is untouched and still serves the screens; it goes when they move.
+- Behaviour worth naming: words dedup by **(text, language)** so the same word is one
+  shared row (`sale` en ≠ `sale` fr); adding words **widens the set's languages**;
+  `senses(in:from:to:)` filters to what can actually be asked; deleting a set or a sense
+  **never** deletes review events, and orphan collection is explicit and refuses anything
+  carrying history. A `LanguageCache` prevents duplicate language rows inside one write
+  block, where an unsaved insert is invisible to a fetch.
+- **`LexiconSeed`** gives a fresh install a starter set (nothing migrates), including
+  synonyms so the payoff is visible in the first round.
+- **23 tests**, including one that writes a **real SQLite file** and reads it back through
+  a fresh stack — everything else runs in memory, which never exercises the store type
+  that ships. 104 green overall.
+
+**Remaining:** ③ the screens still read the old `Storage`; moving them over (and deleting
+`WordStore`/`UserDefaultsWordStore`/`WordAndStat`) is the next iteration, together with
+`ExerciseSession` recording real events. Then ④ CloudKit + App Group + widget, ⑤ indexes
+and the TD-17 ring. Also open: handling `CSSearchableItemActionType` to open the right screen from a
 Spotlight result (UI, after the store); ② `CoreDataWordStore: WordStore` + swap `Storage.backend` + seed the sample
 set · ③ screens append events (Phase C) · ④ CloudKit + App Group + widget · ⑤ indexes and
 the TD-17 ring (Phase D).
