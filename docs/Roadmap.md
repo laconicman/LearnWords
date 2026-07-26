@@ -122,10 +122,6 @@ Priority-ordered. Rationale lives in [Design](Design.md); debt items in [TechDeb
   meaning, but `PracticeSession` still queues the whole set shuffled. Making practice
   due-driven, plus a rolling-window local notification (64-pending cap; a countless daily
   reminder at the 12.1 floor, `BGAppRefreshTask` as the iOS 13+ upgrade).
-- **Close the store/UI gap.** `addTerm`, `deleteSense`, `renameWordSet`, `findTerms` and
-  `deleteOrphanedSenses` are called from no screen — most visibly, **a user cannot create
-  a synonym**; the seed is the only source of one. `PlainText` round-trips synonyms
-  lossily too (`render` writes `fox : лиса, лисица`, `parse` reads that as one term).
 - **Anki interchange format** — alongside `PlainText`, the shape Anki's file importer
   reads. Reference:
   [Word-Hoarder's flashcard export](https://github.com/itincknell/Word-Hoarder#creating-a-flashcard-file).
@@ -140,6 +136,15 @@ Priority-ordered. Rationale lives in [Design](Design.md); debt items in [TechDeb
 - Storyboard split (TD-5) is **likely YAGNI** at this size — prefer creator-injection on the
   existing storyboard where a screen needs a dependency; revisit only if the one storyboard
   actually hurts.
+
+## Done (2026-07-27) — the store/UI gap
+
+`addTerm`, `removeTerm`, `renameWordSet` and `findTerms` are reachable from screens.
+`MeaningEditorViewController` adds and removes synonyms per language and edits the note —
+the first time a user could create the arrangement the seed had been showing them.
+`PlainText` round-trips synonyms losslessly, and `LWPersistence.write` now makes a write
+visible to the next read (see [Design](Design.md)). Still open: orphan collection has no UI
+(TD-26).
 
 ## Big rock — Core Data (TD-13) — **iterations 1–5 done (2026-07-26)**
 

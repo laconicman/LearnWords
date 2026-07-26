@@ -427,6 +427,33 @@ CloudKit's own schedule — it is simply not immediate. Adding `aps-environment`
 the capability on the App ID, so it belongs in Xcode's Signing & Capabilities where the
 App ID is updated in the same step, not in a hand-edited plist that would break signing.
 
+## Decision: a write is visible to the next read, synchronously
+
+**Decision (2026-07-27).** `LWPersistence.write` merges its save into the view context
+**before it returns**. When a write completes, every subsequent read sees it.
+
+**Why.** `automaticallyMergesChangesFromParent` merges when the did-save notification is
+delivered, which for a main-queue view context is the next turn of the run loop. Meanwhile
+a fetch returns already-registered objects *without* refreshing their values
+(`shouldRefreshRefetchedObjects` is false by default). So a caller that wrote and
+immediately re-read got the previous values back — and a second edit to the same field
+appeared to do nothing at all, because the screen re-read the stale copy and wrote it
+again. Every editor screen reads straight after writing; so does every test.
+
+**How.** The did-save notification is captured and merged *after* `performAndWait` returns,
+not inside the observer: the notification fires on the background queue, and hopping to the
+main queue from there while the main thread is blocked on that same `performAndWait` would
+deadlock.
+
+**Rejected.** *`shouldRefreshRefetchedObjects = true` on each fetch.* It patches the fetch
+paths one at a time and says nothing about relationship traversal, where `senses(in:)`
+reads. The contract belongs on the write, which is the one place that knows something
+changed.
+
+**Found by probing, not reasoning.** Two tests failed in a way the code did not explain;
+the answer came from printing what was actually stored across three successive writes.
+Worth remembering as the faster route when a Core Data result contradicts the code.
+
 ## Decision: a manual reset appends a marker; it never deletes history
 
 **Decision (2026-07-26).** "Reset progress" on a word appends a `ReviewEvent` of kind

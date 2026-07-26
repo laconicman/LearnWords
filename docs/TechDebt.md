@@ -813,7 +813,7 @@ LearnWords/
 Slice order (build green after each): **App/ → Model/ → Shared/ → Controllers/ → Features/**.
 Move the ⚠ shared files last and in isolation, updating their pbxproj exception paths first.
 
-## TD-23 — Dead KDCircularProgress attributes left in the storyboard
+## TD-23 — Dead KDCircularProgress attributes left in the storyboard — **resolved (2026-07-27)**
 
 The word cell's ring view changed `customClass` to `ProgressRing` (TD-13 iteration 5), but
 its eight `userDefinedRuntimeAttribute` entries still name KDCircularProgress's
@@ -821,9 +821,8 @@ IBInspectables — `angle`, `startAngle`, `progressThickness`, `trackThickness`,
 `gradientRotateSpeed`, `glowAmount`, `trackColor`, `IBColor2`. Each one raises
 `setValue:forUndefinedKey:` **per cell, on every creation**. **Cost:** eight console lines
 per row on every scroll, and the noise hides real messages — the constraint break that
-opened TD-17 was found by reading exactly this console. Non-fatal. **Discharge:** delete
-the eight entries from `Main.storyboard` (lines 43–68). Belongs to whoever next owns the
-storyboard, so it does not race a concurrent edit.
+opened TD-17 was found by reading exactly this console. Non-fatal. **Discharged** with the meaning editor: the eight entries are gone from
+`Main.storyboard`, and the console is quiet on scroll again.
 
 ## TD-24 — Extension bundle versions drift from the app's
 
@@ -833,20 +832,33 @@ submission**. **Cost:** invisible until the first upload, then a blocked release
 **Discharge:** drive all four targets' `CURRENT_PROJECT_VERSION` from one place — a shared
 `.xcconfig`, or `$(inherited)` from the project level — rather than per-target literals.
 
-## TD-25 — A nil UUID from a peer would trap on read
+## TD-25 — A nil UUID would trap on read, if anything ever inserted one
 
-`@NSManaged var id: UUID` is non-optional Swift over an attribute the model now marks
-optional (CloudKit's price, TD-13 iteration 4). Locally that is safe: `awakeFromInsert`
-assigns every `id`. But the value can now also arrive **from another device**, and reading
-a nil through a non-optional `@NSManaged` accessor traps rather than returning nil.
-`StoreDeduplicator` also sorts by `id` to pick a convergent winner, so a nil would break
-the ordering that stops two devices deleting each other's survivor.
+`@NSManaged var id: UUID` is non-optional Swift over an attribute the model marks optional
+(CloudKit's price, TD-13 iteration 4). Reading nil through a non-optional `@NSManaged`
+accessor traps, and `StoreDeduplicator` sorts by `id` to elect a convergent winner, so a
+nil would also break the ordering that stops two devices deleting each other's survivor.
 
-This is the same species of reasoning as the exemption iteration 4 removed — "the code
-keeps the promise the schema cannot" — and the difference is only that no external checker
-can falsify it. **Cost:** low likelihood, crash-grade impact, and it defeats dedup
-convergence. **Discharge (cheap):** have the deduplication pass, which already runs after
-every remote merge, repair rows with a nil `id` before it sorts. That turns a potential
-trap into self-healing, in the file that already owns post-merge repair. **Alternative
-(thorough):** make the managed-object accessors optional and unwrap in `Lexicon`'s snapshot
-initialisers, which is where "optionality at the boundary" actually puts the seam.
+**Filed initially as "a peer might send nil"; that was overstated** (owner's question,
+2026-07-27). CloudKit's import inserts managed objects normally, so `awakeFromInsert` runs
+and assigns an id before any record field is applied, and an absent CKRecord field is not
+applied over it. Optional in the *schema* does not mean nullable in *practice*: every
+insert path in the codebase assigns one.
+
+The concrete way to break it is **`NSBatchInsertRequest`, which bypasses
+`awakeFromInsert` entirely.** There is none today — but `Lexicon.addSenses` exists
+precisely to make bulk import one transaction, and it is exactly the method someone would
+later convert. **Cost:** nil today, crash-grade the day that conversion happens.
+**Discharge:** a repair pass in `StoreDeduplicator` — which already runs after every remote
+merge — assigning an id to any row missing one before it sorts. That turns a future trap
+into self-healing, in the file that already owns post-merge repair. Cheap enough to do
+before the two-device test; not urgent enough to block it.
+
+## TD-26 — Orphan collection has no way to run
+
+`deleteOrphanedSenses` and `deleteOrphanedTerms` are "explicit, never automatic" by design
+(docs/Design.md), and nothing in the app is that explicit thing: no screen calls either.
+Rows accumulate — a meaning removed from its last set, a synonym unlinked in the editor —
+and only a test has ever collected them. **Cost:** slow growth of dead rows, which sync
+then copies to every device. **Discharge:** one row in Settings ("Clean up unused words"),
+reporting how many it removed, so the user chooses rather than the app guessing.
