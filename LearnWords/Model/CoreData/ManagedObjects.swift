@@ -250,9 +250,19 @@ extension CDTerm {
 /// unique constraints.
 @objc(CDLanguage)
 final class CDLanguage: NSManagedObject {
+    /// Not for lookup — `code` is the natural key. This exists so two devices that each
+    /// create "en" offline can agree, deterministically, which row survives the merge
+    /// (`StoreDeduplicator`). CloudKit makes `objectID` device-local, so it cannot order
+    /// anything; a UUID can. Optional in the store, non-optional here — see `CDReviewEvent`.
+    @NSManaged var id: UUID
     @NSManaged var code: String
     @NSManaged var terms: Set<CDTerm>
     @NSManaged var sets: Set<CDWordSet>
+
+    override func awakeFromInsert() {
+        super.awakeFromInsert()
+        id = UUID()
+    }
 }
 
 extension CDLanguage {
@@ -272,12 +282,15 @@ extension CDLanguage {
 /// "domain:medicine"), promotable to a `facet` attribute later — an additive change.
 @objc(CDTag)
 final class CDTag: NSManagedObject {
+    /// Merge tie-breaker, not a lookup key — see `CDLanguage.id`.
+    @NSManaged var id: UUID
     @NSManaged var name: String
     @NSManaged var createdAt: Date
     @NSManaged var synsets: Set<CDSynset>
 
     override func awakeFromInsert() {
         super.awakeFromInsert()
+        id = UUID()
         createdAt = Date()
     }
 }
@@ -293,8 +306,15 @@ extension CDTag {
 /// whole point of recording them, and that is a predicate.
 @objc(CDErrorTag)
 final class CDErrorTag: NSManagedObject {
+    /// Merge tie-breaker, not a lookup key — see `CDLanguage.id`.
+    @NSManaged var id: UUID
     @NSManaged var name: String
     @NSManaged var events: Set<CDReviewEvent>
+
+    override func awakeFromInsert() {
+        super.awakeFromInsert()
+        id = UUID()
+    }
 }
 
 extension CDErrorTag {
@@ -400,10 +420,17 @@ extension CDWordForm {
 /// carries its own `judgedAt`.
 @objc(CDReviewEvent)
 final class CDReviewEvent: NSManagedObject {
-    // Non-optional UUIDs. Core Data ignores `defaultValueString` on UUID attributes —
-    // momc accepts one, but the runtime default is nil and the save fails validation —
-    // so a non-optional UUID is a promise the *code* keeps: `id` in `awakeFromInsert`,
-    // the three snapshots at the call site that logs the answer.
+    // UUIDs are **optional in the store, non-optional here**.
+    //
+    // CloudKit's runtime check rejects any non-optional attribute whose `defaultValue` is
+    // nil, and Core Data ignores `defaultValueString` on UUID attributes — momc accepts
+    // one, but nothing reads it. So an "optional or defaulted" UUID can only be the
+    // optional kind. Proven by the store refusing to open: see docs/Design.md.
+    //
+    // The Swift type stays non-optional because the *code* keeps the promise the schema
+    // no longer can — `id` in `awakeFromInsert`, the three snapshots at the call site that
+    // logs an answer — and because these fields exist from v1, so no synced record can
+    // arrive without them. Optionality at the boundary, not in the API (docs/Design.md).
     @NSManaged var id: UUID
     @NSManaged var date: Date
     @NSManaged var sessionID: UUID

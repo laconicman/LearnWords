@@ -102,24 +102,23 @@ struct PersistenceSchemaTests {
     /// inverses, and unique constraints. The model is authored to those rules now so
     /// enabling `NSPersistentCloudKitContainer` later is a container swap, not a
     /// redesign — this test keeps it that way as entities grow.
+    /// Exactly the check `NSPersistentCloudKitContainer` runs when it opens the store.
+    ///
+    /// This test used to carry a UUID exemption, reasoning that `momc` accepts
+    /// `defaultValueString` on a UUID so the attribute was "defaulted". It is not: Core
+    /// Data ignores that string, `defaultValue` stays nil, and CloudKit rejected all ten
+    /// UUIDs at load — which is how the exemption was found to be wrong rather than
+    /// merely unverified. The rule below has no exceptions, because CloudKit has none.
     @Test func modelObeysCloudKitRules() {
         for entity in LWPersistence.model.entities {
-            // The model compiler enforces "optional or defaulted" for `usedWithCloudKit`
-            // models, so a violation is a build error; asserted here so the *reason* is
-            // written down where a future edit will read it.
-            //
-            // UUID is the documented-by-experiment exception: Core Data silently ignores
-            // `defaultValueString` on UUID attributes (momc accepts it, but
-            // `defaultValue` is nil at runtime and saves fail validation). A non-optional
-            // UUID therefore relies on the app assigning it before save — `id` in
-            // `awakeFromInsert`, the ReviewEvent snapshots at the call site. Safe because
-            // the fields exist from v1, so no synced record can arrive without them.
             for (name, attribute) in entity.attributesByName {
-                let satisfied = attribute.isOptional
-                    || attribute.defaultValue != nil
-                    || attribute.attributeType == .UUIDAttributeType
-                #expect(satisfied,
-                        "\(entity.name ?? "?").\(name) must be optional or have a default")
+                #expect(attribute.isOptional || attribute.defaultValue != nil,
+                        """
+                        \(entity.name ?? "?").\(name) must be optional or have a default. \
+                        CloudKit refuses to open a store otherwise — and a UUID can only \
+                        satisfy this by being optional, since Core Data ignores \
+                        defaultValueString on UUID attributes.
+                        """)
             }
             for (name, relationship) in entity.relationshipsByName {
                 #expect(relationship.isOptional,

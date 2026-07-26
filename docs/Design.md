@@ -196,6 +196,14 @@ a second source of truth to keep in sync, for nothing. Dedup by natural key (`Ta
 enrichment matches on that natural key: find the row, or create it (owner's note on
 kaikki tags).
 
+**Amended (2026-07-26, iteration 4).** `Tag`, `Language` and `ErrorTag` *do* now carry a
+`UUID`, and the reasoning above is why it took a real cause to add one. Enabling CloudKit
+supplied it: `objectID` is device-local, so it cannot order two rows that arrived from
+different devices, and merging duplicates requires every device to choose the **same**
+survivor. The UUID is a merge tie-breaker, never a lookup key — `code` and `name` remain
+the natural keys. The satellites (`Comment`, `Illustration`, `WordForm`) still have none:
+they are created only as part of their owner, so two devices never author "the same" one.
+
 ## Decision: optionality is CloudKit's price, paid once at the boundary
 
 **Decision (owner question, 2026-07-23).** Every attribute is optional in the *model*
@@ -209,6 +217,30 @@ value types at the seam, so no unwrapping ever escapes `Model/CoreData/`.
 **Rejected.** *Non-optional attributes with defaults in the model.* It reads better in
 isolation but lies: a default is not "always present", it is "silently zero", and it
 would still be `Optional` in the generated Swift for anything CloudKit syncs.
+
+**Corrected (2026-07-26, iteration 4) — a UUID can only satisfy the rule by being
+optional.** Iteration 1 read `momc`'s acceptance of `defaultValueString` on a UUID as
+"defaulted", recorded it as a documented exception, and the schema test carried an
+explicit UUID exemption. That was wrong, and switching the container proved it: the store
+refused to open.
+
+```
+CloudKit integration requires that all attributes be optional, or have a default value
+set. The following attributes are marked non-optional but do not have a default value:
+ErrorTag: id, Language: id, ReviewEvent: id, ReviewEvent: promptTermID,
+ReviewEvent: sessionID, ReviewEvent: wordSetID, Synset: id, Tag: id, Term: id,
+WordSet: id
+```
+
+Core Data ignores that string — `defaultValue` stays nil — and CloudKit's runtime check
+reads `defaultValue`, not the model file. So **every UUID attribute is now `optional`**
+and the placeholder defaults are gone; they only ever looked like a guarantee. The Swift
+accessors stay non-optional, which is this decision working exactly as written: the code
+keeps the promise (`awakeFromInsert`, and the call site that logs an answer), and these
+fields exist from v1, so no synced record can arrive without them.
+
+The schema test lost its exemption and now runs CloudKit's rule verbatim, with no
+exceptions — it would have caught this.
 
 ## Decision: managed objects never escape the store
 
@@ -348,6 +380,52 @@ produces the value it will be keyed on.
 **Also pending under this decision:** `Term.transcription: String?` cannot hold both
 /ˈskedʒuːl/ and /ˈʃedjuːl/. It becomes a child row with a variety when pronunciations are
 ingested; wiktextract's `sounds[]` is the shape to copy.
+
+## Decision: CloudKit mirrors in the app only, and duplicates are repaired after the fact
+
+**Decision (2026-07-26, iteration 4).** The host app opens the store through
+`NSPersistentCloudKitContainer` on iOS 13+. Extensions and iOS 12 open the same store
+through a plain `NSPersistentContainer`.
+
+**Why extensions do not sync.** A widget reads what the app has already pulled down.
+Giving an extension its own mirroring engine would have it compete with the app for the
+same store, on a schedule nobody controls, to show the same words.
+
+**Why a failure falls back instead of trapping.** A store that will not open is fatal; a
+store that will not *sync* is not. `LWPersistence` attempts CloudKit, and on failure logs
+the underlying error and opens the same local store the app has always used. A
+provisioning mistake should cost the user sync, not their vocabulary. The error is logged
+in full rather than swallowed, because "no iCloud container in this environment" and "the
+model is not CloudKit-compatible" both land there and mean very different things — that
+logging is what turned the second one from a silent fallback into a fixed bug.
+
+**Deduplication is part of enabling sync, not a follow-up.** Four entities are
+found-or-created by a natural key — `Language.code`, `Tag.name`, `ErrorTag.name`, and
+`Term` by (text, language) — and uniqueness is enforced in `Lexicon`, in code, because
+CloudKit forbids unique constraints. That holds inside one store and **cannot** hold
+across two: a phone and an iPad, both offline, each correctly find no existing "bear" and
+each create one. Unrepaired, `terms(in: "en")` returns the words hanging off one of the
+two `en` rows and half a set silently disappears from practice.
+
+`StoreDeduplicator` merges them on the remote-change notification. Two properties matter:
+
+* **The survivor must be chosen identically everywhere.** If one device merges into row A
+  while the other merges into row B, each deletes what the other kept, both deletions
+  sync, and the row is gone along with everything pointing at it. Lowest `id` wins — the
+  one rule a device can apply without coordinating, and the reason the lookup rows gained
+  a UUID.
+* **`Language` is merged before `Term`**, because a term's natural key includes its
+  language; comparing against un-merged language rows would call two identical words
+  distinct.
+
+Relationships are re-pointed from the entity description rather than written out per
+entity, so a relationship added later is carried automatically.
+
+**Not done, and deliberately.** The Push Notifications capability is *not* in the
+entitlements. Without it sync still works — it runs at launch, on foregrounding, and on
+CloudKit's own schedule — it is simply not immediate. Adding `aps-environment` requires
+the capability on the App ID, so it belongs in Xcode's Signing & Capabilities where the
+App ID is updated in the same step, not in a hand-edited plist that would break signing.
 
 ## Decision: a manual reset appends a marker; it never deletes history
 
