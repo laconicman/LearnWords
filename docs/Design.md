@@ -257,23 +257,97 @@ is being replaced. The seam costs nothing and makes the eventual swap one place.
 same string-identity problem as words (TD-18): renaming a set orphans its contents. Set
 identity and set languages are one piece of work, sequenced with TD-18/TD-13.
 
-## Decision: a language is stored by its subtag; region lives in settings
+## Decision: language codes are Wiktionary-shaped; variety is its own dimension
 
-**Decision (2026-07-26).** `Language.code` holds a BCP-47 **language subtag** — `en`, not
-`en-US`. `LanguageCode.canonical` normalises every code entering or querying the store.
-The full regioned tag survives in preferences, where `SpeechManager` reads it.
+**Decision (owner, 2026-07-26).** `Language.code` holds a **bare language subtag in
+Wiktionary's spelling** — `en`, `ru`, `zh`, `haw`. Two letters where ISO 639-1 has a code,
+three where it does not (BCP 47's shortest-code rule, which is why the set of codes looks
+like a mix of lengths). Region and script are **not** part of a language's identity:
+`en-US`, `en-GB` and `en` are one language, and so are `zh-Hans` and `zh-Hant`.
 
-**Why.** A voice has a region; a word does not. "bear" is English whether it is read in a
-US or a British voice. Settings ship defaults of `en-US`/`ru-RU`, while the seed and every
-import write `en`/`ru` — so without normalising, one launch would create `en-US` rows
-beside another launch's `en` rows, and "every word in English" would quietly return half
-of them. That is the same duplicate-row problem that normalising tags and error tags into
-their own tables was meant to end (Codd's information rule: if it will ever appear in a
-`WHERE` clause, it is a row — and one row per thing).
+**Why Wiktionary rather than Apple's `Locale`.** The corpora we intend to read for
+enrichment (TD-22) speak it, and it is internally consistent. `LanguageCode` implements it
+with an explicit table, verified against the live registry
+(`Module:languages/data/2`, 177 two-letter codes) — which caught two cases where following
+`Locale` would have corrupted the store:
 
-**Cost (accepted).** Script is dropped along with region: `zh-Hans` → `zh`. Distinguishing
-scripts needs a decision about what counts as one language, and nothing in the app asks
-for one yet. Written down in `LanguageCode` so it reads as a choice, not an oversight.
+* `iw`, `in`, `ji`, `jw`, `mo` are **absent** from Wiktionary, so they must resolve to
+  `he`, `id`, `yi`, `jv`, `ro`. Left alone they are *second rows for languages already in
+  the store* — a worse instance of the duplicate-row problem than the region case that
+  prompted this decision.
+* `no`, `nb` and `nn` are **three distinct** Wiktionary languages.
+  `Locale.canonicalLanguageIdentifier` maps `no` → `nb`; doing the same here would merge
+  two of them.
+
+**Why our own table rather than `Locale` at all.** The stored code is an identity that
+syncs between devices, so it must not depend on which OS computed it. `Locale`'s answers
+come from the ICU/CLDR data bundled with the system — they vary by OS version, and its
+three entry points disagree with each other today. Measured on macOS 15 / iOS 26:
+
+| input | `canonicalLanguageIdentifier` | `components(fromIdentifier:)` | `Locale.Language.languageCode` |
+|---|---|---|---|
+| `iw` | `he` | `iw` | `iw` |
+| `no` | `nb` | `no` | `nb` |
+| `zh_CN` | `zh-Hans` | `zh` / `CN` | `zh` |
+| `cmn` | `zh` | `cmn` | `cmn` (not ISO) |
+
+`Locale` is for **display names** and **voice lookup**. Identity is decided by us.
+(`Locale.Language.maximalIdentifier`, which would resolve `zh-TW` → `zh-Hant-TW`, is
+iOS 16+ and unavailable at the floor regardless.)
+
+**Deliberate divergence: `hr`, `sr`, `bs` stay distinct.** Wiktionary folds them into
+Serbo-Croatian (`m["sh"]`, `wikimedia_codes = "sh, bs, hr, sr"`). We do not: iOS, the
+keyboard and the learner all call them separate languages, and labelling someone's own word
+set "Serbo-Croatian" is a worse outcome than a harder enrichment lookup. Wiktionary's own
+registry marks the seam — it records `ietf_subtag = "hbs"` because `sh` is ISO-deprecated.
+The mapping belongs on the `Language` row when TD-22 lands.
+
+**Region is not lost.** `LanguageCode.parse` returns the stripped subtags as `variety`
+("US", "Hans", "Latn-RS") in stable BCP-47 casing. Nothing consumes it yet; it is returned
+rather than discarded because silently dropping part of the input is how `en-US` and `en`
+became two rows in the first place, and because it is what a `Variety` row will be built
+from. Speech is unaffected either way — measured:
+`AVSpeechSynthesisVoice(language: "en")` resolves to `en-US`, so a bare subtag never
+silences playback; it just forfeits the user's chosen accent, which is a *preference*
+concern.
+
+## Decision: variety is a lookup row, not a tag
+
+**Decision (owner, 2026-07-26).** US/UK, Simplified/Traditional and similar belong to a
+`Variety` entity related to `Term` (and later to pronunciation rows) — **not** to the
+existing `Tag` folksonomy, and not to a `Tag.kind` discriminator.
+
+**Why not tags, given that Wiktionary uses them.** wiktextract emits `sounds[].tags:
+["UK","US"]`, `senses[].tags: ["UK"]` and `forms[].tags` — region is never a field anywhere
+in its schema. But that is an *interchange format*: denormalised JSONL, one line per entry,
+every dimension a string array, because a serialisation format has no joins to protect. It
+is not a schema recommendation. The consistent position is to speak Wiktionary's vocabulary
+**at the boundary** and store it normalised inside — adopting a JSON file's shape as a
+database schema is how `tags: [String]` got into this model in the first place.
+
+**Three reasons a typed tag is worse here.**
+
+1. **Wrong owner.** `Tag` attaches to `Synset` — a folksonomy over *meanings* ("slang",
+   "domain:medicine"). Variety is a property of the **`Term`** (which spelling) and of a
+   pronunciation (which accent). Reusing `Tag` means adding a second many-to-many
+   `Tag`↔`Term`, so the "reuse" saves no table and costs the reader clarity.
+2. **Closed registry vs open folksonomy.** Tags are deliberately open — invent
+   `domain:knitting` and it works. Variety is closed and registry-backed (BCP 47
+   region/script subtags). In one table neither can be validated: the open half forbids the
+   constraint the closed half needs.
+3. **A `kind` column is a discriminated union in a table.** The kinds have different
+   owners, different validity rules and different UI. Anki is the cautionary case: one
+   space-separated `notes.tags` string holds user tags, `marked`, `leech` and `::`
+   hierarchy at once, with prefix conventions as the only structure.
+
+**Sequenced, not built yet.** Nothing reads a variety today, so the entity waits for its
+first consumer — the near-miss coefficient in `ScoringPolicy` (a variety mismatch is
+`correctJudged` with a note, never `incorrect`) or enrichment. `LanguageCode.parse` already
+produces the value it will be keyed on.
+
+**Also pending under this decision:** `Term.transcription: String?` cannot hold both
+/ˈskedʒuːl/ and /ˈʃedjuːl/. It becomes a child row with a variety when pronunciations are
+ingested; wiktextract's `sounds[]` is the shape to copy.
 
 ## Decision: a manual reset appends a marker; it never deletes history
 

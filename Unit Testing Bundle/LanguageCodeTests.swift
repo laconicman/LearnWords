@@ -8,6 +8,11 @@
 //  every import write "en". Without canonicalising, the two would be separate `Language`
 //  rows and "every word in English" would return half of them.
 //
+//  The alias cases are the ones a hand-rolled "take everything before the hyphen" rule got
+//  wrong — they are *second rows for languages we already have*, which is worse than the
+//  region problem this type was written for. Each expectation below was checked against the
+//  live Wiktionary registry, not inferred.
+//
 
 import Testing
 import Foundation
@@ -20,10 +25,44 @@ struct LanguageCodeTests {
         Lexicon(persistence: LWPersistence(inMemory: true))
     }
 
-    @Test(arguments: [("en-US", "en"), ("ru_RU", "ru"), ("EN", "en"),
-                      ("en", "en"), ("zh-Hans", "zh")])
+    @Test(arguments: [("en-US", "en"), ("ru_RU", "ru"), ("EN", "en"), ("en", "en"),
+                      ("zh-Hans", "zh"), ("zh-TW", "zh"), ("sr-Latn-RS", "sr"),
+                      ("ar-001", "ar"), ("haw", "haw"), ("yue-HK", "yue")])
     func canonicalKeepsTheLanguageSubtag(tag: String, expected: String) {
         #expect(LanguageCode.canonical(tag) == expected)
+    }
+
+    /// Codes Wiktionary does not use must resolve to the ones it does, or they become a
+    /// second row for a language already in the store.
+    @Test(arguments: [("iw", "he"), ("in", "id"), ("ji", "yi"), ("jw", "jv"),
+                      ("mo", "ro"), ("cmn", "zh"), ("iw-IL", "he")])
+    func withdrawnCodesResolveToTheirReplacement(tag: String, expected: String) {
+        #expect(LanguageCode.canonical(tag) == expected)
+    }
+
+    /// `Locale.canonicalLanguageIdentifier` maps "no" to "nb". Wiktionary lists `no`, `nb`
+    /// and `nn` as three languages, so doing the same here would merge two of them.
+    @Test(arguments: ["no", "nb", "nn", "sh", "tl", "fil", "hr", "sr", "bs"])
+    func distinctWiktionaryLanguagesAreLeftAlone(tag: String) {
+        #expect(LanguageCode.canonical(tag) == tag)
+    }
+
+    @Test(arguments: [("en-US", "US"), ("en_us", "US"), ("zh-hans", "Hans"),
+                      ("sr-latn-rs", "Latn-RS"), ("ar-001", "001"),
+                      ("ca-ES-valencia", "ES-valencia")])
+    func theStrippedVarietyIsReportedInBcp47Casing(tag: String, expected: String) {
+        #expect(LanguageCode.parse(tag).variety == expected)
+    }
+
+    @Test func abareTagHasNoVariety() {
+        #expect(LanguageCode.parse("en").variety == nil)
+        #expect(LanguageCode.parse("haw").variety == nil)
+    }
+
+    /// Two spellings of one variety must compare equal, since a `Variety` row will be
+    /// keyed on this string once one exists.
+    @Test func varietyCasingIsStable() {
+        #expect(LanguageCode.parse("EN-us") == LanguageCode.parse("en_US"))
     }
 
     @Test func aRegionedTagAndItsSubtagAreOneLanguage() throws {

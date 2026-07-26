@@ -124,6 +124,17 @@ Priority-ordered. Rationale lives in [Design](Design.md); debt items in [TechDeb
   does not yet route into the app.
 - **A screen for synonyms.** A meaning's words can be edited two-at-a-time in an alert;
   adding or removing a synonym has no UI, and neither does reviewing import duplicates.
+- **Anki interchange format** (owner, 2026-07-26) — alongside `PlainText`, export in the
+  shape Anki's file importer reads: a separator character plus permitted HTML per field.
+  Worth having because it makes a word set usable in the tool most learners already run,
+  and because `PlainText.render` is one function away from it.
+  Reference: [Word-Hoarder's flashcard export](https://github.com/itincknell/Word-Hoarder#creating-a-flashcard-file),
+  and [Anki](https://apps.ankiweb.net/) itself. Note from the language research that Anki's
+  TTS tag takes an **underscored full locale** (`{{tts en_US:Front}}`) matched by exact
+  string equality — so an export must emit the learner's locale preference, not our bare
+  `Language.code`, or the card gets no voice.
+- **`Variety` rows** — see [Design](Design.md). Waits for its first consumer: the near-miss
+  coefficient in `ScoringPolicy`, or enrichment.
 - Storyboard split (TD-5) is **likely YAGNI** at this size — prefer creator-injection on the
   existing storyboard where a screen needs a dependency; revisit only if the one storyboard
   actually hurts.

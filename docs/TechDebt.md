@@ -22,7 +22,8 @@ These files are compiled into the **Widget** and/or **ImportAsDictAction** targe
 their post-reorg paths. Since TD-13 iteration 3 the widget list is the store rather than
 the old model: `Controllers/Library.swift`, `Model/CoreData/LearnWords.xcdatamodeld`,
 `Model/CoreData/LWPersistence.swift`, `Model/CoreData/ManagedObjects.swift`,
-`Model/Lexicon/Lexicon.swift`, `Model/Lexicon/LexiconSeed.swift`,
+`Model/Lexicon/LanguageCode.swift`, `Model/Lexicon/Lexicon.swift`,
+`Model/Lexicon/LexiconSeed.swift`,
 `Model/Lexicon/LexiconTypes.swift`, `Model/Practice/Exercise.swift`,
 `Model/Practice/LanguagePair.swift`, `Model/ReviewOutcome.swift`, `Model/Settings.swift`,
 `Shared/AppConstants.swift`, `Shared/Debug.swift`, `Shared/Extensions/String+.swift`,
