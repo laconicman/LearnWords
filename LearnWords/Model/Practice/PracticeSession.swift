@@ -80,9 +80,8 @@ final class PracticeSession {
     /// Opens a sitting over one set.
     ///
     /// Only meanings that can actually be asked in this direction are queued — a sense
-    /// with no word on the answer side is not a question. `includingLearned` keeps the
-    /// user's existing setting working; what "learned" means is `InterimMastery`'s
-    /// stand-in until `ScoringPolicy` lands (Phase D).
+    /// with no word on the answer side is not a question. `includingLearned` is the user's
+    /// switch; "learned" means `ScoringPolicy` puts its mastery at the horizon.
     static func start(_ exercise: Exercise,
                       in wordSetID: UUID,
                       languages: LanguagePair,
@@ -95,8 +94,8 @@ final class PracticeSession {
         if includingLearned {
             senses = askable
         } else {
-            let mastery = try InterimMastery(lexicon: lexicon, senses: askable)
-            senses = askable.filter { !mastery.isLearned($0.id) }
+            let index = try ProgressIndex(lexicon: lexicon, senses: askable)
+            senses = index.senses(askable) { !$0.isLearned }
         }
         return PracticeSession(exercise: exercise,
                                languages: languages,
@@ -190,60 +189,5 @@ final class PracticeSession {
     private func elapsedMS() -> Int? {
         guard let askedAt else { return nil }
         return Int(Date().timeIntervalSince(askedAt) * 1000)
-    }
-}
-
-// MARK: - Interim mastery
-
-/// A stand-in for "has this been learned?" until `ScoringPolicy` exists (TD-13 Phase D).
-///
-/// The real answer is FSRS stability over the event log (docs/ProgressModel.md). This is
-/// deliberately the crudest thing that preserves the user's existing "include learned
-/// words" switch: a meaning counts as learned once it has as many positive answers as the
-/// known-level preference, and a wrong answer since then un-learns it.
-///
-/// Isolated in its own type, with this comment, so it is impossible to mistake for the
-/// scoring model — and so replacing it is a deletion, not an excavation.
-struct InterimMastery {
-
-    /// Consecutive positive answers per meaning, as of now.
-    private let streaks: [UUID: Int]
-    private let threshold: Int
-
-    init(lexicon: Lexicon, senses: [Sense]) throws {
-        var streaks: [UUID: Int] = [:]
-        for sense in senses {
-            streaks[sense.id] = Self.streak(in: try lexicon.history(ofSense: sense.id))
-        }
-        self.streaks = streaks
-        self.threshold = max(1, LWUserDefaults.standard.maxKnownLevelPreference)
-    }
-
-    /// Positives since the last thing that broke the run — a mistake, or a manual reset.
-    ///
-    /// A `.progressReset` row truncates rather than deletes: the earlier answers stay in
-    /// the log as the record of work done, they simply stop counting toward this level.
-    private static func streak(in history: [ReviewEvent]) -> Int {
-        var positives = 0
-        for event in history {
-            guard event.kind == .answer else {
-                positives = 0       // a reset starts the meaning over
-                continue
-            }
-            guard let outcome = event.outcome else { continue }
-            if outcome.isPositive {
-                positives += 1
-            } else if outcome != .skipped {
-                positives = 0       // a mistake sends it back to the queue
-            }
-        }
-        return positives
-    }
-
-    func isLearned(_ senseID: UUID) -> Bool { level(of: senseID) >= 1 }
-
-    /// How far along a meaning is, 0...1 — what the progress ring shows.
-    func level(of senseID: UUID) -> Float {
-        min(Float(streaks[senseID] ?? 0) / Float(threshold), 1)
     }
 }

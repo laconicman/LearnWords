@@ -93,11 +93,8 @@ in later, R4):
   time. Evidence strength (verbatim > judged-close > self-assessed, R2) enters via the
   outcome→grade mapping below — *not* via recency-weighting, which would smuggle decay
   into mastery and make the ring show forgetting twice (decay belongs to retention alone).
-- **Retention risk** — **FSRS retrievability** R(elapsed, S). Computed, not invented:
-  adopt the official Swift package
-  ([open-spaced-repetition/swift-fsrs](https://github.com/open-spaced-repetition/swift-fsrs),
-  FSRS-6; alternative: [4rays/swift-fsrs](https://github.com/4rays/swift-fsrs), v5) rather
-  than hand-rolling decay math. The event log (timestamps + graded outcomes) is exactly the
+- **Retention risk** — **FSRS retrievability** R(elapsed, S). Computed, not invented —
+  though **ported rather than depended on**, see the implementation note below. The event log (timestamps + graded outcomes) is exactly the
   algorithm's required input, and FSRS's optimizer can later fit per-user parameters from
   this same log. An FM can complement, never required.
 - `known` (today's number) becomes one more derived value — computed with a compatibility
@@ -194,3 +191,59 @@ claims corrected (NLEmbedding needs iOS 13/14), and the schema extended with the
 †-marked fields — additions that could not be backfilled later. See the report for
 citations and the Phase-3 mechanics shortlist; the TD-13 schema is now clear to implement
 from this document.
+
+
+## Implementation note (2026-07-26) — `ScoringPolicy` landed
+
+**Reversal: the FSRS package is ported, not adopted.**
+[open-spaced-repetition/swift-fsrs](https://github.com/open-spaced-repetition/swift-fsrs)
+declares `.iOS(.v14)` and builds with `StrictConcurrency=complete`; this app's floor is
+12.1, so it cannot be a dependency. What the indexes actually need is the pure state
+transition (`nextState`) — about 80 lines of arithmetic — and `FSRSMemory.swift` ports
+exactly that. The scheduler wrapped around it (learning steps, fuzzing, interval ordering,
+card lifecycle) is Anki's review-queue problem, not ours.
+
+**The port is verified against the library's own test oracles**, not against a reading of
+the paper: first-review stability `[0.212, 1.2931, 2.3065, 8.2956]` and difficulty
+`[6.4133, 5.11217071, 2.11810397, 1.0]`, plus its six-review sequence landing on
+S = 53.62691 / D = 6.3574867 (short-term on) and S = 53.335106 (off). FSRS-6 defaults, 21
+weights. Details and the pitfalls checked for — calendar-day vs seconds/86400 elapsed,
+first-review special case, mean reversion toward D₀(**easy**) raw, the lapse floor
+`S / e^(w17·w18)`, intermediate rounding — came from a
+[DeepWiki consult](https://deepwiki.com/search/im-implementing-a-scoring-laye_8b69c7f7-e075-4df0-b435-0ab9d6ecc314?mode=deep)
+cross-checked against the source.
+
+**"Known level" is reinterpreted, not retired.** The preference was "how many correct
+answers in a row"; it is now the **mastery horizon in days** — the stability at which a
+meaning counts as learned. Same question ("how much is enough"), same default (20), same
+1…100 slider range, which reads sensibly as days. *The settings label still says "Known
+level" and wants to become "Remembered for (days)".*
+
+**Behaviour changes worth expecting.** Answering the same word ten times in one minute no
+longer marks it learned: FSRS-6's short-term model credits same-day repetition, but far
+less than spacing. That is the point of a spacing model, and it is what the old counter
+could not express because it had no clock.
+
+**Not yet done here:** `.correctJudged` maps to Hard unconditionally, because the near-miss
+judge (R5) records no graded verdict yet — `judgmentVerdict` exists on the entity but never
+reaches `ReviewEvent`. When it does, a confident verdict should promote to Good.
+
+**Caching.** No cache entity was added. `ProgressIndex` computes a screen's worth from one
+fetch and every row reads it, which satisfies "not recomputed per cell display" without
+storing a derived value that could disagree with the log.
+
+## Ring — implemented (TD-17)
+
+`ProgressRing` replaces the 556-line vendored `KDCircularProgress`: two `CAShapeLayer`
+arcs, **outer = mastery, inner = effort**, the outer tinted from accent toward the "wrong"
+tone as retention falls. It springs rather than jumps (`CASpringAnimation`), re-resolves its
+`CGColor`s on trait changes, and takes its size from
+`UIFontMetrics(forTextStyle: .body).scaledValue(for: 44)` per R6.
+
+Two rings rather than one because they are the two stories: a word fought with for a month
+and still missed shows a full inner arc and a thin outer one, which one arc cannot
+distinguish from a word never touched.
+
+**Outstanding:** the cell's ring still has fixed 44×44 constraints in the storyboard, so the
+scaled `intrinsicContentSize` is overridden. Relaxing them belongs with the words-screen
+rebuild that owns that storyboard scene.

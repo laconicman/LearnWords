@@ -108,6 +108,9 @@ struct WordSet: Hashable, Identifiable {
 /// One row of the log, as recorded. Immutable by construction — the log is append-only.
 struct ReviewEvent: Hashable, Identifiable {
     let id: UUID
+    /// The meaning this row is about. `nil` once that meaning has been deleted — the
+    /// text snapshots below keep the row judgeable, but it no longer scores anything.
+    var senseID: UUID?
     var date: Date
     var sessionID: UUID
     /// Answer or manual reset. On a reset every answer-shaped field below is empty —

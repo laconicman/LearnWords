@@ -73,38 +73,33 @@ struct ProgressResetTests {
     @Test func aResetSendsTheMeaningBackToTheStartOfTheLevel() throws {
         let lexicon = makeLexicon()
         let (set, sense) = try stocked(lexicon)
-        let prefs = LWUserDefaults.standard
-        let saved = prefs.maxKnownLevelPreference
-        defer { prefs.maxKnownLevelPreference = saved }
-        prefs.maxKnownLevelPreference = 4
-
+        // A one-day horizon, so a handful of sittings clears it.
+        let policy = ScoringPolicy(masteryHorizonDays: 1)
         try practise(lexicon, set, times: 4)
         let senses = try lexicon.senses(in: set.id)
-        #expect(try InterimMastery(lexicon: lexicon, senses: senses).isLearned(sense.id),
-                "precondition: it counts as learned")
+        #expect(try ProgressIndex(lexicon: lexicon, senses: senses, policy: policy)[sense.id]
+                    .isLearned, "precondition: it counts as learned")
 
         try lexicon.resetProgress(ofSense: sense.id, in: set.id)
 
-        let after = try InterimMastery(lexicon: lexicon, senses: senses)
-        #expect(!after.isLearned(sense.id))
-        #expect(after.level(of: sense.id) == 0, "the ring goes back to empty")
+        let after = try ProgressIndex(lexicon: lexicon, senses: senses, policy: policy)
+        #expect(!after[sense.id].isLearned)
+        #expect(after[sense.id].mastery == 0, "the ring goes back to empty")
+        #expect(after[sense.id].effort > 0, "but the work is still on the record")
     }
 
     /// Answers *after* the marker count again — the reset is a boundary, not a mute.
     @Test func answersAfterAResetCountNormally() throws {
         let lexicon = makeLexicon()
         let (set, sense) = try stocked(lexicon)
-        let prefs = LWUserDefaults.standard
-        let saved = prefs.maxKnownLevelPreference
-        defer { prefs.maxKnownLevelPreference = saved }
-        prefs.maxKnownLevelPreference = 2
-
+        let policy = ScoringPolicy(masteryHorizonDays: 1)
         try practise(lexicon, set, times: 2)
         try lexicon.resetProgress(ofSense: sense.id, in: set.id)
         try practise(lexicon, set, times: 2)
 
         let senses = try lexicon.senses(in: set.id)
-        #expect(try InterimMastery(lexicon: lexicon, senses: senses).isLearned(sense.id))
+        #expect(try ProgressIndex(lexicon: lexicon, senses: senses, policy: policy)[sense.id]
+                    .isLearned, "answers after the marker count again")
         #expect(try lexicon.history(ofSense: sense.id).count == 5)
     }
 

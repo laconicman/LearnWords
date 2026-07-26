@@ -69,8 +69,8 @@ class ExersizeChooserViewController: UIViewController {
     private func showSetSummary() {
         let library = Library.shared
         let senses = (try? library.selectedSenses()) ?? []
-        let learned = (try? InterimMastery(lexicon: library.lexicon, senses: senses))
-            .map { mastery in senses.filter { mastery.isLearned($0.id) }.count } ?? 0
+        let learned = (try? ProgressIndex(lexicon: library.lexicon, senses: senses))?
+            .learnedCount ?? 0
 
         numberOfWordsInSet.text =
             NSLocalizedString("Total in set: ", comment: "Label total words in current set")
@@ -112,8 +112,8 @@ class ExersizeChooserViewController: UIViewController {
         if includeLeanedWords.isOn {
             studiable = askable.count
         } else {
-            let mastery = try? InterimMastery(lexicon: library.lexicon, senses: askable)
-            studiable = askable.filter { !(mastery?.isLearned($0.id) ?? false) }.count
+            let index = try? ProgressIndex(lexicon: library.lexicon, senses: askable)
+            studiable = askable.count - (index?.learnedCount ?? 0)
         }
         guard studiable == 0 else { return true }
 

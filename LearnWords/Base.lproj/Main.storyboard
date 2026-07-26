@@ -33,7 +33,7 @@
                                         <stackView opaque="NO" contentMode="scaleToFill" spacing="3" translatesAutoresizingMaskIntoConstraints="NO" id="GEF-nW-Bmr">
                                             <rect key="frame" x="10" y="4" width="355" height="44.5"/>
                                             <subviews>
-                                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="01J-fN-Z6r" userLabel="ProgressView" customClass="KDCircularProgress" customModule="LearnWords" customModuleProvider="target">
+                                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="01J-fN-Z6r" userLabel="ProgressView" customClass="ProgressRing" customModule="LearnWords" customModuleProvider="target">
                                                     <rect key="frame" x="0.0" y="0.0" width="44" height="44.5"/>
                                                     <color key="backgroundColor" name="Background"/>
                                                     <constraints>

@@ -271,6 +271,17 @@ final class Lexicon {
         try events(matching: NSPredicate(format: "synset.id == %@", id as CVarArg))
     }
 
+    /// Every meaning's history in **one** fetch, keyed by meaning.
+    ///
+    /// Scoring reads a whole screen's worth at a time, and asking per row turns a list of
+    /// 500 words into 500 round trips. Meanings with no history are absent from the result
+    /// rather than present-and-empty — the caller treats a miss as "never reviewed".
+    func history(ofSenses ids: [UUID]) throws -> [UUID: [ReviewEvent]] {
+        guard !ids.isEmpty else { return [:] }
+        let rows = try events(matching: NSPredicate(format: "synset.id IN %@", ids))
+        return Dictionary(grouping: rows.filter { $0.senseID != nil }, by: { $0.senseID! })
+    }
+
     /// Everything answered in one sitting — the unit `ScoringPolicy` uses to tell a
     /// same-session retry (effort) from fresh long-term evidence.
     func history(ofSession id: UUID) throws -> [ReviewEvent] {
@@ -482,6 +493,7 @@ private extension Sense {
 private extension ReviewEvent {
     init(_ event: CDReviewEvent) {
         self.init(id: event.id,
+                  senseID: event.synset?.id,
                   date: event.date,
                   sessionID: event.sessionID,
                   kind: event.eventKind,

@@ -63,13 +63,12 @@ final class WordSetsTableViewController: UITableViewController, UIDocumentPicker
         return cell
     }
 
-    /// "Total 12 words. Learned 3." — the count comes off the set itself; what counts as
-    /// learned is `InterimMastery`'s stand-in until `ScoringPolicy` lands.
+    /// "Total 12 words. Learned 3." — the count comes off the set itself; "learned" is
+    /// `ScoringPolicy`'s mastery reaching the horizon.
     private func summary(of set: WordSet) -> String {
-        let learned = (try? lexicon.senses(in: set.id)).flatMap { senses in
-            (try? InterimMastery(lexicon: lexicon, senses: senses))
-                .map { mastery in senses.filter { mastery.isLearned($0.id) }.count }
-        } ?? 0
+        let learned = (try? lexicon.senses(in: set.id))
+            .flatMap { try? ProgressIndex(lexicon: lexicon, senses: $0) }?
+            .learnedCount ?? 0
 
         return NSLocalizedString("Total ", comment: "Label total words")
             + pluralizedWordCount(set.senseCount) + ". "

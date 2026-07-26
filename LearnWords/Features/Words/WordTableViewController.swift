@@ -20,7 +20,7 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
     /// fetch: the table must get the same answer from `numberOfRows` and `cellForRow`.
     private var senses: [Sense] = []
     private var filtered: [Sense] = []
-    private var mastery: InterimMastery?
+    private var progress: ProgressIndex?
 
     private var rows: [Sense] { isSearching ? filtered : senses }
 
@@ -89,14 +89,14 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
 
     private func reload() {
         senses = (try? library.selectedSenses()) ?? []
-        mastery = try? InterimMastery(lexicon: lexicon, senses: senses)
+        progress = try? ProgressIndex(lexicon: lexicon, senses: senses)
         if isSearching { filterRows(for: searchController.searchBar.text ?? "") }
         tableView.reloadData()
     }
 
     /// Reads one row's state back without disturbing the rest of the table.
     private func refreshRows(_ indexPaths: [IndexPath]) {
-        mastery = try? InterimMastery(lexicon: lexicon, senses: senses)
+        progress = try? ProgressIndex(lexicon: lexicon, senses: senses)
         if #available(iOS 15.0, *) {
             tableView.reconfigureRows(at: indexPaths)
         } else {
@@ -151,13 +151,19 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "Word", for: indexPath)
                 as? WordTableViewCell else { return UITableViewCell() }
 
+        // A row already on screen is being *updated*, so its ring should spring; a row
+        // being dequeued is being *configured*, so it should simply appear.
+        let animated = tableView.indexPathsForVisibleRows?.contains(indexPath) ?? false
         let sense = rows[indexPath.row]
         let pair = languages
         // Synonyms are one meaning, so they share a row rather than multiplying it.
         cell.leftTextLabel?.text = sense.terms(in: pair.secondary).map(\.text).joined(separator: ", ")
         cell.rightTextLabel?.text = sense.terms(in: pair.primary).map(\.text).joined(separator: ", ")
-        cell.progressView.animate(toAngle: Double(mastery?.level(of: sense.id) ?? 0) * 360,
-                                  duration: 0.4, completion: nil)
+        let state = progress?[sense.id] ?? .unseen
+        // Not animated on dequeue: the ring would travel from the recycled row's value.
+        // `refreshRows` re-runs this after an answer, and *that* is where it springs.
+        cell.progressView.setProgress(mastery: state.mastery, effort: state.effort,
+                                      retention: state.retention, animated: animated)
 
         // Remove any existing gesture recognizers to avoid duplicates when cells are reused
         cell.gestureRecognizers?

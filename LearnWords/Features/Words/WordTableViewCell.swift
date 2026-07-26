@@ -12,7 +12,7 @@ class WordTableViewCell: UITableViewCell {
 
     @IBOutlet weak var leftTextLabel: UILabel!
     @IBOutlet weak var rightTextLabel: UILabel!
-    @IBOutlet weak var progressView: KDCircularProgress!
+    @IBOutlet weak var progressView: ProgressRing!
     
     
     override func awakeFromNib() {

@@ -257,17 +257,16 @@ struct PracticeSessionTests {
     // MARK: - Learned filtering
 
     @Test func learnedMeaningsAreLeftOutUnlessAskedFor() throws {
-        try withKnownLevel(3) {
+        // The preference is now a *stability horizon in days*, so 2 means "counts as
+        // learned once it should survive two days" — which one correct answer achieves.
+        try withKnownLevel(2) {
             let lexicon = makeLexicon()
             let set = try stock(lexicon, count: 2)
 
-            // Drive one meaning past the interim "learned" bar, leaving the other alone.
             let target = try #require(try lexicon.senses(in: set.id).first)
-            for _ in 0..<3 {
-                let session = try start(lexicon, set)
-                while let question = session.nextQuestion() {
-                    try session.record(question.sense.id == target.id ? .correctVerbatim : .skipped)
-                }
+            let session = try start(lexicon, set)
+            while let question = session.nextQuestion() {
+                try session.record(question.sense.id == target.id ? .correctVerbatim : .skipped)
             }
 
             #expect(try !asked(in: start(lexicon, set, includingLearned: false)).contains(target.id),
@@ -278,15 +277,15 @@ struct PracticeSessionTests {
     }
 
     @Test func aMistakeSendsALearnedMeaningBackIntoRotation() throws {
-        try withKnownLevel(3) {
+        // Five days: enough that one confident answer clears it and a lapse does not.
+        try withKnownLevel(5) {
             let lexicon = makeLexicon()
             let set = try stock(lexicon, count: 1)
 
-            for _ in 0..<3 {
-                let session = try start(lexicon, set)
-                _ = session.nextQuestion()
-                try session.record(.correctVerbatim)
-            }
+            let first = try start(lexicon, set)
+            _ = first.nextQuestion()
+            try first.record(.correctVerbatim)
+
             let learned = try start(lexicon, set, includingLearned: false)
             #expect(learned.nextQuestion() == nil, "precondition: it counts as learned")
 
@@ -298,6 +297,7 @@ struct PracticeSessionTests {
             #expect(again.nextQuestion() != nil, "a mistake puts it back in the queue")
         }
     }
+
 
     /// Drains a sitting, reporting which meanings it put up.
     private func asked(in session: PracticeSession) throws -> Set<UUID> {
