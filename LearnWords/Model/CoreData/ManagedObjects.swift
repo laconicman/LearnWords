@@ -407,6 +407,9 @@ final class CDReviewEvent: NSManagedObject {
     @NSManaged var id: UUID
     @NSManaged var date: Date
     @NSManaged var sessionID: UUID
+    /// Answer or manual reset — see `ReviewEventKind`. The answer-shaped fields below are
+    /// empty on a reset row, which is what their `""` defaults are for.
+    @NSManaged var kind: String
     @NSManaged var task: String
     @NSManaged var direction: String
     @NSManaged var outcome: String
@@ -444,6 +447,7 @@ final class CDReviewEvent: NSManagedObject {
         super.awakeFromInsert()
         id = UUID()
         date = Date()
+        kind = ReviewEventKind.answer.rawValue
         schemaVersion = Self.currentSchemaVersion
     }
 }
@@ -468,6 +472,10 @@ extension CDReviewEvent {
     /// Returns `nil` for a value this build does not know — the log outlives the code,
     /// so decoding **skips** unknown cases rather than crashing (ProgressModel's rule).
     var reviewOutcome: ReviewOutcome? { ReviewOutcome(rawValue: outcome) }
+
+    /// Defaults to `.answer` for a value this build does not know: an unrecognised kind
+    /// must not silently become a reset and truncate the learner's history.
+    var eventKind: ReviewEventKind { ReviewEventKind(rawValue: kind) ?? .answer }
 
     var exercise: Exercise? { Exercise(rawValue: task) }
 

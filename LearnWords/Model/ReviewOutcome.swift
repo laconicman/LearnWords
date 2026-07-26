@@ -61,6 +61,26 @@ enum ReviewOutcome: String {
     }
 }
 
+/// What kind of row this is. The log holds more than answers.
+///
+/// Anki's `revlog.type` and swift-fsrs' `Rating.manual` are the same idea, and both
+/// establish the rule this app follows: a manual "reset progress" is **appended as a
+/// non-answer row**, never a deletion of what came before. Replay then treats the marker
+/// as a truncation point — everything earlier is ignored — while the pre-reset rows stay
+/// in the log as the record of work actually done.
+///
+/// It is a separate axis from `ReviewOutcome` on purpose: a reset carries no grade, and
+/// putting it in the outcome taxonomy would make every `isPositive` switch answer a
+/// question about something that was never answered.
+/// (Verified against open-spaced-repetition/swift-fsrs and ankitects/anki, 2026-07-26.)
+enum ReviewEventKind: String {
+    /// A question was asked and graded. Every field of the row is meaningful.
+    case answer
+    /// The learner declared a fresh start on this meaning. Carries no outcome, no
+    /// exercise and no prompt — there was no question.
+    case progressReset
+}
+
 /// Which way the question ran — Nation's receptive/productive split
 /// (docs/ProgressResearch.md §1.4). Unrecoverable if not logged, which is why it is
 /// written from the first event onward.

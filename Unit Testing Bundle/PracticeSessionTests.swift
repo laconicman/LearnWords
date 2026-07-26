@@ -319,8 +319,11 @@ struct PracticeSessionTests {
         try lexicon.addSense(to: set.id, terms: [Term.Draft("Bär", in: "de"),
                                                  Term.Draft("медведь", in: "ru")])
 
+        // Compared by subtag: the side the set covers keeps the *preference's* tag
+        // ("ru-RU"), because a voice has a region even though a word does not.
         let resolved = LanguagePair.forSet(set)
-        #expect(Set([resolved.primary, resolved.secondary]) == ["de", "ru"])
+        #expect(Set([resolved.primary, resolved.secondary].map(LanguageCode.canonical))
+                == ["de", "ru"])
 
         let session = try PracticeSession.start(.dictation, in: set.id, languages: resolved,
                                                 lexicon: lexicon, includingLearned: true)

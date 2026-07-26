@@ -166,8 +166,10 @@ final class PracticeSession {
             outcome: outcome,
             prompt: question.prompt,
             expected: question.expected,
-            promptLanguage: languages.promptLanguage,
-            answerLanguage: languages.answerLanguage,
+            // Canonical in the log too: a scoring pass must not see "en" and "en-US" as
+            // two languages a year from now.
+            promptLanguage: LanguageCode.canonical(languages.promptLanguage),
+            answerLanguage: LanguageCode.canonical(languages.answerLanguage),
             response: response,
             latencyMS: elapsedMS()))
 
@@ -204,26 +206,44 @@ final class PracticeSession {
 /// scoring model — and so replacing it is a deletion, not an excavation.
 struct InterimMastery {
 
-    private let learned: Set<UUID>
+    /// Consecutive positive answers per meaning, as of now.
+    private let streaks: [UUID: Int]
+    private let threshold: Int
 
     init(lexicon: Lexicon, senses: [Sense]) throws {
-        let threshold = LWUserDefaults.standard.maxKnownLevelPreference
-        var learned: Set<UUID> = []
+        var streaks: [UUID: Int] = [:]
         for sense in senses {
-            let history = try lexicon.history(ofSense: sense.id)
-            var positives = 0
-            for event in history {
-                guard let outcome = event.outcome else { continue }
-                if outcome.isPositive {
-                    positives += 1
-                } else if outcome != .skipped {
-                    positives = 0   // a mistake sends it back to the queue
-                }
-            }
-            if positives >= threshold { learned.insert(sense.id) }
+            streaks[sense.id] = Self.streak(in: try lexicon.history(ofSense: sense.id))
         }
-        self.learned = learned
+        self.streaks = streaks
+        self.threshold = max(1, LWUserDefaults.standard.maxKnownLevelPreference)
     }
 
-    func isLearned(_ senseID: UUID) -> Bool { learned.contains(senseID) }
+    /// Positives since the last thing that broke the run — a mistake, or a manual reset.
+    ///
+    /// A `.progressReset` row truncates rather than deletes: the earlier answers stay in
+    /// the log as the record of work done, they simply stop counting toward this level.
+    private static func streak(in history: [ReviewEvent]) -> Int {
+        var positives = 0
+        for event in history {
+            guard event.kind == .answer else {
+                positives = 0       // a reset starts the meaning over
+                continue
+            }
+            guard let outcome = event.outcome else { continue }
+            if outcome.isPositive {
+                positives += 1
+            } else if outcome != .skipped {
+                positives = 0       // a mistake sends it back to the queue
+            }
+        }
+        return positives
+    }
+
+    func isLearned(_ senseID: UUID) -> Bool { level(of: senseID) >= 1 }
+
+    /// How far along a meaning is, 0...1 — what the progress ring shows.
+    func level(of senseID: UUID) -> Float {
+        min(Float(streaks[senseID] ?? 0) / Float(threshold), 1)
+    }
 }

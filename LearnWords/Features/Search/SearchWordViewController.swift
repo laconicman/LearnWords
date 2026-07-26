@@ -472,9 +472,6 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
                 performSegue(withIdentifier: "Add Translation", sender: searchBar)
             case .translation(orig_lang: let ol, orig_word: let ow, dest_lang: let dl, translations: let tls):
                 searchedObject = .translation(orig_lang: ol, orig_word: ow, dest_lang: dl, translations: (tls + [term]))
-                //check duplicates
-                //TODO: deal with array of terms, store languages, init as unlearned
-                //_ = Storage.insertFlashcard(first: term, second: ow)
                 performSegue(withIdentifier: "Add Word Pair", sender: searchBar)
             }
 
@@ -567,9 +564,7 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
                     return
                 case .translation(orig_lang: let ol, orig_word: let ow, dest_lang: let dl, translations: let tls):
                     searchedObject = .translation(orig_lang: ol, orig_word: ow, dest_lang: dl, translations: (tls + [term]))
-                    //check duplicates
-                    //TODO: deal with array of terms, store languages, init as unlearned
-                    _ = Storage.insertFlashcard(foreign: ow, native: term)
+                    addWord(ow, in: ol, meaning: term, in: dl)
             }
             // if let wordTest = segue.destination as? WordTestViewController {
                 // Do someting to scroll to new word definition and flash-highlight it
@@ -579,6 +574,27 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
     }
 
     
+
+    // MARK: - Adding to the lexicon
+
+    /// Stores the word and its translation as one meaning in the selected set.
+    ///
+    /// Both languages come from the search itself, not from settings, so looking up a
+    /// German word files it as German. `Lexicon.addSense` links an existing word rather
+    /// than making a twin, which is how a word looked up twice stays one row (TD-18).
+    private func addWord(_ word: String, in wordLanguage: String,
+                         meaning: String, in meaningLanguage: String) {
+        let library = Library.shared
+        guard let set = library.selectedSet else { return }
+        do {
+            try library.lexicon.addSense(to: set.id,
+                                         terms: [Term.Draft(word, in: wordLanguage),
+                                                 Term.Draft(meaning, in: meaningLanguage)])
+        } catch {
+            debugLog("Could not add \(word): \(error)")
+        }
+    }
+
 }
 
 //extension SearchWordViewController: UISearchResultsUpdating {

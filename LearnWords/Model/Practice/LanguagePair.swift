@@ -50,18 +50,22 @@ struct LanguagePair: Hashable {
     /// covers it and falling back to the set's own languages where it does not — a set
     /// of German words is practised in German even if settings still say Spanish.
     static func forSet(_ set: WordSet) -> LanguagePair {
+        // Compare on the language subtag: the preference is "en-US", the set stores "en".
         let chosen = current
+        let covered = Set(set.languages.map(LanguageCode.canonical))
+        let wanted = (primary: LanguageCode.canonical(chosen.primary),
+                      secondary: LanguageCode.canonical(chosen.secondary))
         guard set.languages.count >= 2,
-              !set.languages.contains(chosen.secondary) || !set.languages.contains(chosen.primary)
+              !covered.contains(wanted.secondary) || !covered.contains(wanted.primary)
         else { return chosen }
 
         // Keep whichever side the set does cover; take the other from the set.
-        let secondary = set.languages.contains(chosen.secondary)
+        let secondary = covered.contains(wanted.secondary)
             ? chosen.secondary
-            : (set.languages.first { $0 != chosen.primary } ?? chosen.secondary)
-        let primary = set.languages.contains(chosen.primary)
+            : (set.languages.first { LanguageCode.canonical($0) != wanted.primary } ?? chosen.secondary)
+        let primary = covered.contains(wanted.primary)
             ? chosen.primary
-            : (set.languages.first { $0 != secondary } ?? chosen.primary)
+            : (set.languages.first { LanguageCode.canonical($0) != LanguageCode.canonical(secondary) } ?? chosen.primary)
         return LanguagePair(primary: primary, secondary: secondary,
                             showsSecondaryAsPrompt: chosen.showsSecondaryAsPrompt)
     }

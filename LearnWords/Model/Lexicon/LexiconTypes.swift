@@ -21,6 +21,31 @@
 
 import Foundation
 
+// MARK: - Language codes
+
+/// How a language is spelled in the store.
+///
+/// Settings hold full BCP-47 tags ("en-US") because a *voice* has a region; the lexicon
+/// holds the language subtag ("en") because a *word* does not — "bear" is English whether
+/// it is read aloud in a US or a British voice. Without this, one launch's preference
+/// would create `en-US` rows beside the `en` rows another one made, and "every word in
+/// English" would quietly return half of them: the same duplicate-row problem normalising
+/// tags and error tags into their own tables was meant to end.
+///
+/// Region survives where it matters — `SpeechManager` still gets the full preference tag.
+enum LanguageCode {
+
+    /// The language subtag of a BCP-47 tag: "en-US" → "en", "ru_RU" → "ru", "EN" → "en".
+    ///
+    /// Script is dropped along with region ("zh-Hans" → "zh"). Written down because it is
+    /// a real limitation, not an oversight: distinguishing scripts needs a decision about
+    /// what counts as one language, and nothing in the app asks for one yet.
+    static func canonical(_ tag: String) -> String {
+        let subtag = tag.prefix { $0 != "-" && $0 != "_" }
+        return subtag.isEmpty ? tag.lowercased() : subtag.lowercased()
+    }
+}
+
 // MARK: - Term
 
 /// One word, in one language. The atom of the model: it exists once and is shared by
@@ -70,8 +95,11 @@ struct Sense: Hashable, Identifiable {
     var tags: [String]
 
     /// Every way this meaning is written in one language. Any of them answers correctly.
+    ///
+    /// Matches on the language subtag, so asking for "en-US" finds words stored as "en".
     func terms(in language: String) -> [Term] {
-        terms.filter { $0.language == language }
+        let code = LanguageCode.canonical(language)
+        return terms.filter { LanguageCode.canonical($0.language) == code }
     }
 
     /// The languages this meaning covers.
@@ -102,11 +130,14 @@ struct WordSet: Hashable, Identifiable {
 
 // MARK: - Review log
 
-/// One answer, as recorded. Immutable by construction — the log is append-only.
+/// One row of the log, as recorded. Immutable by construction — the log is append-only.
 struct ReviewEvent: Hashable, Identifiable {
     let id: UUID
     var date: Date
     var sessionID: UUID
+    /// Answer or manual reset. On a reset every answer-shaped field below is empty —
+    /// there was no question.
+    var kind: ReviewEventKind
     var outcome: ReviewOutcome?
     var task: Exercise?
     var direction: ReviewDirection?

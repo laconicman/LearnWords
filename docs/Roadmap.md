@@ -109,26 +109,38 @@ Priority-ordered. Rationale lives in [Design](Design.md); debt items in [TechDeb
 
 ## Next
 
-- The big rock, in order: **TD-18** (word **and word-set** identity — see the language-pair
-  decision in [Design](Design.md)) → **TD-13** (Core Data + CloudKit implementing the
-  ProgressModel schema, carrying set languages) → screens append events → indexes →
-  **TD-17** ring. The research audit that gated this is **applied** (see
-  [ProgressModel](ProgressModel.md) § "Research audit — applied").
-  *Open question:* whether TD-18 is worth doing on `UserDefaults` first or should be folded
-  into the TD-13 schema — progress starts fresh at TD-13, so identity has no consumer until
-  the event log exists.
-- **`docs/ProgressResearch.md` is untracked** — the document gating TD-13 is not in git yet.
+- **TD-13 iteration 4 — CloudKit.** The model is authored to CloudKit's rules already
+  (every attribute optional *or* defaulted, every relationship optional with an inverse, no
+  unique constraints), so the change is `NSPersistentContainer` →
+  `NSPersistentCloudKitContainer` behind an iOS 13 check, plus the container entitlement.
+  Verify with two devices on one account; the production schema is immutable once pushed.
+- **TD-13 iteration 5 — `ScoringPolicy` and the TD-17 ring.** Replace `InterimMastery`
+  (a deliberately crude consecutive-positives count) with FSRS-shaped scoring over the
+  event log: stability/retrievability, outcome weights, latency, the same-`sessionID`
+  effort-vs-evidence split, and `.progressReset` as a truncation point. The ring then shows
+  a real index instead of a streak. `open-spaced-repetition/swift-fsrs` is the reference
+  implementation — consult it before inventing anything.
+- **`CSSearchableItemActionType`** — words are indexed in Spotlight, but tapping a result
+  does not yet route into the app.
+- **A screen for synonyms.** A meaning's words can be edited two-at-a-time in an alert;
+  adding or removing a synonym has no UI, and neither does reviewing import duplicates.
 - Storyboard split (TD-5) is **likely YAGNI** at this size — prefer creator-injection on the
   existing storyboard where a screen needs a dependency; revisit only if the one storyboard
   actually hurts.
 
-## Big rock — Core Data + CloudKit sync (TD-13)
+## Big rock — Core Data (TD-13) — **iterations 1–3 done (2026-07-26)**
 
-Replace `UserDefaultsWordStore` with `CoreDataWordStore: WordStore` backed by
-`NSPersistentCloudKitContainer`, so word sets + progress sync across a user's devices. The
-`WordStore` seam is already in place; this migration also finishes the DI deferred in TD-12
-(inject the store/context at the composition root, drop the `Storage` facade). Use
-`core-data-expert` / `axiom-data`.
+1. **Schema.** `WordSet`/`Synset`/`Term`/`WordForm`/`Comment`/`Illustration`/`Tag`/
+   `Language`/`ErrorTag`/`ReviewEvent`, normalised (tags and languages are rows, not
+   `[String]`), indexed, Spotlight-indexed, authored to CloudKit's rules.
+2. **`Lexicon`.** The only Core Data consumer; value types in and out, no managed object
+   escapes. `WordStore`/`UserDefaultsWordStore`/`Storage`/`WordAndStat` deleted, and with
+   them TD-18.
+3. **The app on the store.** `PracticeSession` records real `ReviewEvent`s; every screen
+   and both widget targets read `Lexicon`; plain-text import/export; a manual reset appends
+   a marker rather than deleting history.
+
+Remaining: CloudKit (iteration 4) and scoring (iteration 5), above.
 
 ## Later
 

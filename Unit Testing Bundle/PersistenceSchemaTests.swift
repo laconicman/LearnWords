@@ -31,7 +31,7 @@ struct PersistenceSchemaTests {
 
     // MARK: - Builders
 
-    /// One `Language` row per code, as `CoreDataWordStore` will do (dedup is store
+    /// One `Language` row per code, as `Lexicon` does (dedup is store
     /// logic — CloudKit forbids unique constraints).
     @discardableResult
     private func language(_ context: NSManagedObjectContext, _ code: String) -> CDLanguage {

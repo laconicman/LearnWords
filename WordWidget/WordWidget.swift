@@ -5,27 +5,38 @@
 //  Created by Paul Buktab on 7/18/26.
 //  Copyright © 2026 Paul. All rights reserved.
 //
-//  WidgetKit home-screen widget (iOS 14+): shows words from the current set, read from the
-//  shared App-Group store via `Storage`. iOS 12–13 are served by the legacy Today extension
-//  (`Widget` target) instead — see docs/Design.md (TD-4).
+//  WidgetKit home-screen widget (iOS 14+): shows words from the selected set, read from
+//  the shared App-Group Core Data store via `Lexicon`. iOS 12–13 are served by the legacy
+//  Today extension (`Widget` target) instead — see docs/Design.md (TD-4).
+//
+//  The widget **reads only**. It never seeds and never writes: an extension that created
+//  data would race the app for the same store to no purpose.
 //
 
 import WidgetKit
 import SwiftUI
 
 struct WordsEntry: TimelineEntry {
+
+    /// One line of the widget. Flattened here rather than carrying a `Sense`: the widget
+    /// shows text, and a snapshot type keeps the store out of the SwiftUI views.
+    struct Row: Hashable {
+        let word: String
+        let meaning: String
+    }
+
     let date: Date
     let setName: String
-    let words: [WordAndStat]
+    let words: [Row]
 
     static let sample = WordsEntry(
         date: Date(),
         setName: "Sample Set",
         words: [
-            WordAndStat(firstWord: "bear", secondWord: "медведь", correct: [:], incorrect: [:], skiped: 0),
-            WordAndStat(firstWord: "fox", secondWord: "лиса", correct: [:], incorrect: [:], skiped: 0),
-            WordAndStat(firstWord: "sheep", secondWord: "овца", correct: [:], incorrect: [:], skiped: 0),
-            WordAndStat(firstWord: "rabbit", secondWord: "кролик", correct: [:], incorrect: [:], skiped: 0),
+            Row(word: "bear", meaning: "медведь"),
+            Row(word: "fox", meaning: "лиса, лисица"),
+            Row(word: "sheep", meaning: "овца"),
+            Row(word: "rabbit", meaning: "кролик"),
         ]
     )
 }
@@ -48,12 +59,26 @@ struct Provider: TimelineProvider {
         completion(Timeline(entries: [entry], policy: .after(next)))
     }
 
-    /// Reads the current word set from the shared App-Group store (same data the app
-    /// and the legacy Today extension use), shuffled so each refresh shows new words.
+    /// Reads the selected set from the shared App-Group store (the same data the app and
+    /// the legacy Today extension use), shuffled so each refresh shows new words.
+    ///
+    /// Synonyms are joined rather than given a row each — four rows of screen are better
+    /// spent on four meanings.
     private func loadEntry() -> WordsEntry {
-        let setName = Storage.currentWordSet
-        let words = Storage.getWordSet(name: setName)
-        return WordsEntry(date: Date(), setName: setName, words: words.shuffled())
+        let library = Library.shared
+        guard let set = library.selectedSet,
+              let senses = try? library.lexicon.senses(in: set.id) else {
+            return WordsEntry(date: Date(), setName: "", words: [])
+        }
+        let pair = LanguagePair.forSet(set)
+        let rows = senses.compactMap { sense -> WordsEntry.Row? in
+            let words = sense.terms(in: pair.secondary).map(\.text)
+            let meanings = sense.terms(in: pair.primary).map(\.text)
+            guard !words.isEmpty, !meanings.isEmpty else { return nil }
+            return WordsEntry.Row(word: words.joined(separator: ", "),
+                                  meaning: meanings.joined(separator: ", "))
+        }
+        return WordsEntry(date: Date(), setName: set.name, words: rows.shuffled())
     }
 }
 
@@ -78,12 +103,12 @@ struct WordWidgetEntryView: View {
                     .foregroundColor(.secondary)
                 Spacer(minLength: 0)
             } else {
-                ForEach(entry.words.prefix(maxRows), id: \.firstWord) { word in
+                ForEach(entry.words.prefix(maxRows), id: \.self) { row in
                     HStack(alignment: .firstTextBaseline) {
-                        Text(word.firstWord)
+                        Text(row.word)
                             .font(.footnote.weight(.medium))
                         Spacer(minLength: 8)
-                        Text(word.secondWord)
+                        Text(row.meaning)
                             .font(.footnote)
                             .foregroundColor(.secondary)
                     }

@@ -84,23 +84,32 @@ place is DRY and dependency-inversion in practice, and it is where shared contro
 injected as the app grows. `AppDelegate` stays thin: appearance in `didFinishLaunching`,
 the `@available`-gated `configurationForConnecting`, and the iOS 12 URL fallback.
 
-## Decision: persistence behind a `WordStore` seam
+## Decision: persistence is `Lexicon`, and there is no protocol — **superseded (2026-07-26)**
 
-**Decision.** The app depends on a `WordStore` protocol, not on a concrete store.
-`UserDefaultsWordStore` is today's implementation (App-Group `UserDefaults` + Codable);
-`Storage` is a thin static facade forwarding to a swappable `Storage.backend: WordStore`.
+**Was.** The app depended on a `WordStore` protocol so a Core Data conformer could be
+swapped in; `Storage` was a static facade over `Storage.backend: WordStore`, and
+`UserDefaultsWordStore` was the implementation.
 
-**Why.** A move to Core Data + `NSPersistentCloudKitContainer` (cross-device sync of word
-sets and progress) is planned. With the seam, that migration is a new conformer
-(`CoreDataWordStore: WordStore`) plus a one-line `backend` swap and composition-root
-injection — not an app-wide rewrite. The abstraction isn't speculative (YAGNI-safe): the
-swap is a concrete near-term goal. The injected `UserDefaults` + save executor also make the
-current store unit-testable.
+**Now.** `Lexicon` *is* the store, and there is no protocol. `WordStore`,
+`UserDefaultsWordStore`, `Storage` and `WordAndStat` are deleted (TD-13 iteration 3).
 
-**Rejected.** *Full per-VC dependency injection now.* The 73 `Storage.…` call sites run
-through storyboard-instantiated view controllers, so proper injection needs the storyboard-DI
-work — and it would be thrown away when Core Data replaces this layer. The facade is the
-interim; full injection lands with the Core Data migration (TD-13).
+**Why the seam went instead of being used.** The protocol was shaped around a flat
+`[WordAndStat]` array mutated by index. Mapping senses onto it would have collapsed
+synonyms and multilingual tuples back into single pairs — destroying precisely what the
+schema redesign was for. A seam whose shape contradicts the new model is not a seam; it is
+a second model to keep in sync. So the swap that justified the abstraction never happened:
+the abstraction was removed along with the thing behind it.
+
+**Why no protocol now.** There is one implementation and no second in sight, and it is
+already testable because `LWPersistence(inMemory:)` injects a throwaway stack. A protocol
+here would be speculative generality. Extract one when a real second conformer appears
+(Rule of Three).
+
+**Injection.** `Lexicon` takes its `LWPersistence` by initialiser. Above it, `Library`
+holds the app's one instance and the selected set. `Library.shared` is a shared instance,
+not because a singleton is right but because the screens are still storyboard-instantiated
+— TD-5. Every screen reads `Library.shared`, so when TD-5 lands there is exactly one place
+to inject from.
 
 ## Decision: no migration into Core Data — start fresh
 
@@ -122,16 +131,17 @@ rule TD-12 and ProgressModel state: don't polish a layer being replaced.
 **Cost (accepted).** Existing users lose their word sets and all progress on upgrade. The
 owner has accepted this explicitly, for themselves as well.
 
-## Decision: `WordStore` stays synchronous
+## Decision: the store stays synchronous
 
-**Decision.** The persistence protocol does **not** go async — the open question in
+**Decision.** Persistence does **not** go async — the open question in
 `TASK-TD13-schema.md` §Decisions 2.
 
 **Why.** Not a preference: Swift Concurrency back-deploys only to **iOS 13**
 ([Xcode 13.2 release notes](https://developer.apple.com/documentation/xcode-release-notes/xcode-13_2-release-notes)),
 so at the 12.1 floor `async`/`await` cannot be used at all. Core Data's
-`performAndWait` is the pre-concurrency way to stay on the right queue, and it keeps the
-existing synchronous call sites working unchanged. Revisit only if Legacy drops iOS 12.
+`performAndWait` is the pre-concurrency way to stay on the right queue, and it lets every
+call site read and write without an `await` the floor cannot express. Revisit only if
+Legacy drops iOS 12.
 
 ## Decision: the lexical model — terms, synsets, multilingual sets
 
@@ -246,6 +256,55 @@ is being replaced. The seam costs nothing and makes the eventual swap one place.
 **Note.** Word sets are keyed by their name string (`wordSets: [String]`), so they have the
 same string-identity problem as words (TD-18): renaming a set orphans its contents. Set
 identity and set languages are one piece of work, sequenced with TD-18/TD-13.
+
+## Decision: a language is stored by its subtag; region lives in settings
+
+**Decision (2026-07-26).** `Language.code` holds a BCP-47 **language subtag** — `en`, not
+`en-US`. `LanguageCode.canonical` normalises every code entering or querying the store.
+The full regioned tag survives in preferences, where `SpeechManager` reads it.
+
+**Why.** A voice has a region; a word does not. "bear" is English whether it is read in a
+US or a British voice. Settings ship defaults of `en-US`/`ru-RU`, while the seed and every
+import write `en`/`ru` — so without normalising, one launch would create `en-US` rows
+beside another launch's `en` rows, and "every word in English" would quietly return half
+of them. That is the same duplicate-row problem that normalising tags and error tags into
+their own tables was meant to end (Codd's information rule: if it will ever appear in a
+`WHERE` clause, it is a row — and one row per thing).
+
+**Cost (accepted).** Script is dropped along with region: `zh-Hans` → `zh`. Distinguishing
+scripts needs a decision about what counts as one language, and nothing in the app asks
+for one yet. Written down in `LanguageCode` so it reads as a choice, not an oversight.
+
+## Decision: a manual reset appends a marker; it never deletes history
+
+**Decision (2026-07-26).** "Reset progress" on a word appends a `ReviewEvent` of kind
+`.progressReset` carrying no outcome, no exercise and no prompt. The answers already given
+stay in the log. Scoring reads the marker as a **truncation point**: only what came after
+counts toward the current level.
+
+**Why.** Checked against the two implementations that have solved this
+([DeepWiki consult](https://deepwiki.com/search/two-questions-about-the-review_0078717c-965c-47c8-b307-38e32d1c1b53?mode=deep),
+2026-07-26), and they agree:
+
+- **swift-fsrs** — `FSRS.forget()` appends a `ReviewLog` with `rating: .manual` (0, the
+  non-answer sentinel). Replay either skips manual entries or, with `skipManual: false`,
+  treats one as a reset to a fresh card. `rollback()` refuses to undo one.
+- **Anki** — `revlog.type = Manual` with `ease_factor == 0`; `reviews_for_fsrs()` scans
+  backwards and **drops all history before that point**. Test:
+  `card_reset_drops_all_previous_history`.
+
+Both keep the pre-reset rows permanently, for audit and analytics. That matches this
+project's own rule that negative evidence never erases positive
+([ProgressModel](ProgressModel.md) R1) and the owner's point that an effort index must not
+fall because the learner chose to revisit a word.
+
+**Why a separate axis, not a `ReviewOutcome` case.** A reset carries no grade. Putting it
+in the outcome taxonomy would make every `isPositive` switch answer a question about
+something that was never asked. `ReviewEventKind` is the column; `ReviewOutcome` stays the
+grade — the same split Anki draws between `type` and `ease`.
+
+**Rejected.** *Deleting the events.* It is the obvious implementation and it is wrong:
+history is the only record of work done, and the log is append-only by design.
 
 ## Path to the optimal non-dual modern structure
 

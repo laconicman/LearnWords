@@ -35,6 +35,7 @@
         <attribute name="id" attributeType="UUID" defaultValueString="00000000-0000-0000-0000-000000000000" usesScalarValueType="NO"/>
         <attribute name="judgedAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="judgeID" optional="YES" attributeType="String"/>
+        <attribute name="kind" attributeType="String" defaultValueString="answer"/>
         <attribute name="judgmentVerdict" optional="YES" attributeType="Double" usesScalarValueType="NO"/>
         <attribute name="latencyMS" optional="YES" attributeType="Integer 64" usesScalarValueType="NO"/>
         <attribute name="outcome" attributeType="String" defaultValueString=""/>

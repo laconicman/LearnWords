@@ -19,11 +19,17 @@ settings and/or need the `Main.storyboard` split first (TD-5). Move them once TD
 
 These files are compiled into the **Widget** and/or **ImportAsDictAction** targets via
 `membershipExceptions` (paths relative to the synchronized root `LearnWords/`), now at
-their post-reorg paths: `Model/WordsModel.swift`, `Model/Storage.swift`,
-`Model/Settings.swift`, `Shared/AppConstants.swift`, `Shared/Debug.swift`,
-`Shared/Extensions/String+.swift`, `Shared/Extensions/UserDefaults+Codable.swift`
-(Widget); `Shared/AppConstants.swift` (ImportAsDictAction); plus the `Settings.bundle`
-resource (Widget). **Cost:** moving any of them silently drops them from those targets
+their post-reorg paths. Since TD-13 iteration 3 the widget list is the store rather than
+the old model: `Controllers/Library.swift`, `Model/CoreData/LearnWords.xcdatamodeld`,
+`Model/CoreData/LWPersistence.swift`, `Model/CoreData/ManagedObjects.swift`,
+`Model/Lexicon/Lexicon.swift`, `Model/Lexicon/LexiconSeed.swift`,
+`Model/Lexicon/LexiconTypes.swift`, `Model/Practice/Exercise.swift`,
+`Model/Practice/LanguagePair.swift`, `Model/ReviewOutcome.swift`, `Model/Settings.swift`,
+`Shared/AppConstants.swift`, `Shared/Debug.swift`, `Shared/Extensions/String+.swift`,
+`Shared/Extensions/UserDefaults+Codable.swift` (both widget targets);
+`Shared/AppConstants.swift` (ImportAsDictAction). Note `PlainText.swift` is deliberately
+**not** in that list — it needs `Shared/General.swift`, and the widgets neither import nor
+export. **Cost:** moving any of them silently drops them from those targets
 unless the exception path is updated — the TD-1 reorg had to update all of these in
 lockstep. **Discharge:** when relocating a shared file, update its `membershipExceptions`
 entry and build all three targets. Longer term, extract the shared core into a local
@@ -452,14 +458,21 @@ there. When implemented, apply the R6 layout rule: ring size =
 autoshrink), rows stay self-sizing — the indicator must never drive row height against the
 font. The fixed-44 constraint is interim.
 
-## TD-18 — Words have no stable identity
+## TD-18 — Words have no stable identity — **resolved (2026-07-26)**
 
-Words are identified by their `firstWord` string (dedup on import, history keying, cell
-lookup). Renaming a word orphans its history; duplicates across sets collide; CloudKit
-(TD-13) requires stable record identity. **Cost:** blocks the ProgressModel event log and
-TD-13. **Discharge:** give `Word` a `UUID` (assigned on creation/first migration), key
-`ReviewEvent.wordID` and set membership by it; `firstWord` becomes display/search data.
-Sequenced as the first step of TD-13 — see [ProgressModel](ProgressModel.md).
+Words were identified by their `firstWord` string (dedup on import, history keying, cell
+lookup). Renaming a word orphaned its history; duplicates across sets collided; CloudKit
+(TD-13) requires stable record identity.
+
+**Discharged by the TD-13 redesign rather than by a migration.** There is no `Word` any
+more: `Term` is an atomic row with a `UUID`, shared by every sense and set that uses it,
+so editing it edits it everywhere and the rename survives. History keys on the *sense*
+(`CDReviewEvent.synset`) and carries the `promptTermID` plus text snapshots, so an event
+stays interpretable after the word is edited or the meaning deleted. Set membership is a
+relationship, not a string match.
+
+No identity migration was written, per the owner's "start fresh" call
+([Design](Design.md)) — identity is born with the model.
 
 ## TD-19 — Buttons frozen in 2017 — **resolved (2026-07-20)**
 

@@ -5,18 +5,18 @@
 //  The Core Data stack (TD-13).
 //
 //  Deliberately **synchronous**. Swift Concurrency back-deploys only to iOS 13, so at this
-//  app's 12.1 floor `async`/`await` cannot be used at all — which settles the "does
-//  `WordStore` go async" question in docs/TASK-TD13-schema.md: it cannot, while Legacy
-//  exists. Reads happen on the view context; writes go through `performAndWait` on a
-//  background context so the UI never blocks on disk.
+//  app's 12.1 floor `async`/`await` cannot be used at all — which settles the "does the
+//  store go async" question in docs/TASK-TD13-schema.md: it cannot, while Legacy exists.
+//  Reads happen on the view context; writes go through `performAndWait` on a background
+//  context so the UI never blocks on disk.
 //
 //  No migration from `UserDefaults` (owner, 2026-07-20): the model is designed for the new
 //  requirements rather than bent to fit the old one, and users re-import their dictionary.
 //  See docs/Design.md.
 //
-//  CloudKit is *not* enabled yet — the model is authored to CloudKit's rules (all
-//  attributes optional, every relationship optional with an inverse, no unique
-//  constraints) so switching the container type later is a one-line change, not a
+//  CloudKit is *not* enabled yet — the model is authored to CloudKit's rules (every
+//  attribute optional *or* defaulted, every relationship optional with an inverse, no
+//  unique constraints) so switching the container type later is a one-line change, not a
 //  redesign.
 //
 
@@ -136,8 +136,8 @@ final class LWPersistence {
     /// Runs `work` on a private-queue context and saves if it made changes.
     ///
     /// Synchronous by necessity (see the note at the top) — `performAndWait` is the
-    /// pre-concurrency way to stay on the right queue, and it is what lets the existing
-    /// synchronous `WordStore` call sites keep working unchanged.
+    /// pre-concurrency way to stay on the right queue, and what lets every call site read
+    /// and write without an `await` the 12.1 floor cannot express.
     func write(_ work: (NSManagedObjectContext) throws -> Void) throws {
         let context = container.newBackgroundContext()
         context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy

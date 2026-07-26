@@ -51,11 +51,19 @@ class TodayViewController: UIViewController, NCWidgetProviding, UITableViewDataS
          }
          */
         
-        if let savedWords: [WordAndStat] = userDefaultsGroup.decodeAndLoad(Storage.currentWordSet) {
-            words = savedWords.map{ $0.firstWord + "::" + $0.secondWord }
-        } else {
-            Storage.saveInitialValues()
-            words = Storage.wordsAndStat.map{ $0.firstWord + "::" + $0.secondWord }
+        // Read-only: an extension that seeded the store would race the app for it.
+        let library = Library.shared
+        guard let set = library.selectedSet,
+              let senses = try? library.lexicon.senses(in: set.id) else {
+            words = []
+            return
+        }
+        let pair = LanguagePair.forSet(set)
+        words = senses.compactMap { sense in
+            let word = sense.terms(in: pair.secondary).map(\.text).joined(separator: ", ")
+            let meaning = sense.terms(in: pair.primary).map(\.text).joined(separator: ", ")
+            guard !word.isEmpty, !meaning.isEmpty else { return nil }
+            return word + "::" + meaning
         }
     }
     

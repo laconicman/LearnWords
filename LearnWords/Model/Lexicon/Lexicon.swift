@@ -14,10 +14,10 @@
 //  would be speculative generality — a second name to keep in sync for no gain. Extract
 //  one when a real second conformer appears (Rule of Three).
 //
-//  **Not a `WordStore`.** That protocol is shaped around a flat `[WordAndStat]` array
-//  mutated by index. Mapping senses onto it would collapse synonyms and multilingual
-//  tuples back into single pairs — destroying exactly what the schema redesign was for.
-//  The old store stays untouched until the screens move over; then it goes.
+//  **It replaced a `WordStore` protocol over a flat `[WordAndStat]` array mutated by
+//  index.** Mapping senses onto that shape would have collapsed synonyms and multilingual
+//  tuples back into single pairs — destroying exactly what the schema redesign was for —
+//  so the old store was deleted rather than adapted.
 //
 //  **Threading.** Reads run on the view context (main queue); writes run on a
 //  private-queue context via `LWPersistence.write`, which the view context merges
@@ -109,20 +109,52 @@ final class Lexicon {
                   tags: [String] = []) throws -> Sense {
         try write { context in
             let set = try Self.set(setID, in: context)
-            let sense = CDSynset(context: context)
-            sense.note = note
-
             var languages = LanguageCache()
-            for draft in drafts {
-                sense.addTerm(try Self.findOrCreateTerm(draft, languages: &languages, in: context))
-                set.addLanguage(try languages.language(draft.language, in: context))
-            }
-            for name in tags {
-                sense.addTag(try Self.findOrCreate(CDTag.self, named: name, in: context))
-            }
-            set.addSense(sense)
+            let sense = try Self.insertSense(drafts, note: note, tags: tags,
+                                             into: set, languages: &languages, in: context)
             return Sense(sense)
         }
+    }
+
+    /// Adds many meanings in **one** transaction — an imported file of a few thousand
+    /// lines is one save, not a few thousand.
+    ///
+    /// Sharing the write block is not just speed: one `LanguageCache` spans the whole
+    /// import, so a thousand English words find the same language row. Per-sense writes
+    /// would each start a fresh cache and each pay a fetch.
+    @discardableResult
+    func addSenses(to setID: UUID, terms drafts: [[Term.Draft]]) throws -> Int {
+        guard !drafts.isEmpty else { return 0 }
+        return try write { context in
+            let set = try Self.set(setID, in: context)
+            var languages = LanguageCache()
+            var added = 0
+            for terms in drafts where !terms.isEmpty {
+                _ = try Self.insertSense(terms, note: nil, tags: [],
+                                         into: set, languages: &languages, in: context)
+                added += 1
+            }
+            return added
+        }
+    }
+
+    private static func insertSense(_ drafts: [Term.Draft],
+                                    note: String?,
+                                    tags: [String],
+                                    into set: CDWordSet,
+                                    languages: inout LanguageCache,
+                                    in context: NSManagedObjectContext) throws -> CDSynset {
+        let sense = CDSynset(context: context)
+        sense.note = note
+        for draft in drafts {
+            sense.addTerm(try findOrCreateTerm(draft, languages: &languages, in: context))
+            set.addLanguage(try languages.language(draft.language, in: context))
+        }
+        for name in tags {
+            sense.addTag(try findOrCreate(CDTag.self, named: name, in: context))
+        }
+        set.addSense(sense)
+        return sense
     }
 
     /// Adds a word to an existing meaning — a synonym, or the same meaning in one more
@@ -189,8 +221,29 @@ final class Lexicon {
 
     // MARK: - Review log
 
-    /// Appends one answer. The only way into the log, which is otherwise append-only:
-    /// nothing here updates or deletes a row.
+    /// Records a manual "start this meaning over".
+    ///
+    /// **Appends, never deletes.** The rows before the marker stay in the log: they are
+    /// the record of work actually done, and the effort index must not fall because the
+    /// learner chose to revisit a word. `ScoringPolicy` reads the marker as a truncation
+    /// point and scores only what came after — the pattern Anki's `revlog` and
+    /// swift-fsrs' `Rating.manual` both settled on.
+    ///
+    /// The answer-shaped fields are left empty on purpose. Nothing was asked, so there is
+    /// no prompt, no exercise and no outcome to invent.
+    func resetProgress(ofSense senseID: UUID, in wordSetID: UUID) throws {
+        try write { context in
+            let event = CDReviewEvent(context: context)
+            event.kind = ReviewEventKind.progressReset.rawValue
+            event.synset = try Self.sense(senseID, in: context)
+            event.sessionID = UUID()
+            event.wordSetID = wordSetID
+            event.promptTermID = UUID()
+        }
+    }
+
+    /// Appends one answer. The only way an *answer* enters the log, which is otherwise
+    /// append-only: nothing here updates or deletes a row.
     func record(_ draft: ReviewEvent.Draft) throws {
         try write { context in
             let event = CDReviewEvent(context: context)
@@ -365,8 +418,10 @@ extension CDErrorTag: NamedRow {
 private struct LanguageCache {
     private var known: [String: CDLanguage] = [:]
 
-    mutating func language(_ code: String,
+    /// Canonicalises before looking up, so `en-US` and `en` are one row (`LanguageCode`).
+    mutating func language(_ tag: String,
                           in context: NSManagedObjectContext) throws -> CDLanguage {
+        let code = LanguageCode.canonical(tag)
         if let cached = known[code] { return cached }
         let request = CDLanguage.fetchRequest()
         request.predicate = NSPredicate(format: "code ==[c] %@", code)
@@ -429,6 +484,7 @@ private extension ReviewEvent {
         self.init(id: event.id,
                   date: event.date,
                   sessionID: event.sessionID,
+                  kind: event.eventKind,
                   outcome: event.reviewOutcome,
                   task: event.exercise,
                   direction: event.promptDirection,
