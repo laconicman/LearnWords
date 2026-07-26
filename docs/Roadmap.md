@@ -109,49 +109,62 @@ Priority-ordered. Rationale lives in [Design](Design.md); debt items in [TechDeb
 
 ## Next
 
-- **TD-13 iteration 4 — CloudKit.** The model is authored to CloudKit's rules already
-  (every attribute optional *or* defaulted, every relationship optional with an inverse, no
-  unique constraints), so the change is `NSPersistentContainer` →
-  `NSPersistentCloudKitContainer` behind an iOS 13 check, plus the container entitlement.
-  Verify with two devices on one account; the production schema is immutable once pushed.
-- **TD-13 iteration 5 — `ScoringPolicy` and the TD-17 ring.** Replace `InterimMastery`
-  (a deliberately crude consecutive-positives count) with FSRS-shaped scoring over the
-  event log: stability/retrievability, outcome weights, latency, the same-`sessionID`
-  effort-vs-evidence split, and `.progressReset` as a truncation point. The ring then shows
-  a real index instead of a streak. `open-spaced-repetition/swift-fsrs` is the reference
-  implementation — consult it before inventing anything.
+- **Two-device CloudKit verification.** Everything about sync is proven against
+  constructed duplicates, not a real merge. Needs the `iCloud.club.laconic.LearnWords`
+  container in team `WEJF495R4D`, and two devices on one iCloud account. Until then the
+  app degrades to a local store and logs why. **The production schema is immutable once
+  pushed — initialise it from a development build first.**
+- **Push Notifications capability**, for timely sync rather than launch/foreground/
+  CloudKit-schedule. `aps-environment` needs the capability on the App ID, so it belongs
+  in Xcode's Signing & Capabilities where the App ID updates in the same step — not in a
+  hand-edited plist.
+- **Spaced repetition and local reminders.** `ScoringPolicy` now yields a due date per
+  meaning, but `PracticeSession` still queues the whole set shuffled. Making practice
+  due-driven, plus a rolling-window local notification (64-pending cap; a countless daily
+  reminder at the 12.1 floor, `BGAppRefreshTask` as the iOS 13+ upgrade).
+- **Close the store/UI gap.** `addTerm`, `deleteSense`, `renameWordSet`, `findTerms` and
+  `deleteOrphanedSenses` are called from no screen — most visibly, **a user cannot create
+  a synonym**; the seed is the only source of one. `PlainText` round-trips synonyms
+  lossily too (`render` writes `fox : лиса, лисица`, `parse` reads that as one term).
+- **Anki interchange format** — alongside `PlainText`, the shape Anki's file importer
+  reads. Reference:
+  [Word-Hoarder's flashcard export](https://github.com/itincknell/Word-Hoarder#creating-a-flashcard-file).
+  Anki's TTS tag takes an **underscored full locale** (`{{tts en_US:Front}}`) matched by
+  exact string equality, so an export must emit the learner's locale preference, not our
+  bare `Language.code`, or the card gets no voice.
+- **`Variety` rows** — see [Design](Design.md). Its first consumer is either the near-miss
+  coefficient in `ScoringPolicy` or enrichment (TD-22).
 - **`CSSearchableItemActionType`** — words are indexed in Spotlight, but tapping a result
-  does not yet route into the app.
-- **A screen for synonyms.** A meaning's words can be edited two-at-a-time in an alert;
-  adding or removing a synonym has no UI, and neither does reviewing import duplicates.
-- **Anki interchange format** (owner, 2026-07-26) — alongside `PlainText`, export in the
-  shape Anki's file importer reads: a separator character plus permitted HTML per field.
-  Worth having because it makes a word set usable in the tool most learners already run,
-  and because `PlainText.render` is one function away from it.
-  Reference: [Word-Hoarder's flashcard export](https://github.com/itincknell/Word-Hoarder#creating-a-flashcard-file),
-  and [Anki](https://apps.ankiweb.net/) itself. Note from the language research that Anki's
-  TTS tag takes an **underscored full locale** (`{{tts en_US:Front}}`) matched by exact
-  string equality — so an export must emit the learner's locale preference, not our bare
-  `Language.code`, or the card gets no voice.
-- **`Variety` rows** — see [Design](Design.md). Waits for its first consumer: the near-miss
-  coefficient in `ScoringPolicy`, or enrichment.
+  does not route into the app.
+- **TD-8 device verification** — iOS 12–14 behaviour is unverified since the store change.
 - Storyboard split (TD-5) is **likely YAGNI** at this size — prefer creator-injection on the
   existing storyboard where a screen needs a dependency; revisit only if the one storyboard
   actually hurts.
 
-## Big rock — Core Data (TD-13) — **iterations 1–3 done (2026-07-26)**
+## Big rock — Core Data (TD-13) — **iterations 1–5 done (2026-07-26)**
 
 1. **Schema.** `WordSet`/`Synset`/`Term`/`WordForm`/`Comment`/`Illustration`/`Tag`/
    `Language`/`ErrorTag`/`ReviewEvent`, normalised (tags and languages are rows, not
-   `[String]`), indexed, Spotlight-indexed, authored to CloudKit's rules.
+   `[String]`), indexed, Spotlight-indexed.
 2. **`Lexicon`.** The only Core Data consumer; value types in and out, no managed object
    escapes. `WordStore`/`UserDefaultsWordStore`/`Storage`/`WordAndStat` deleted, and with
    them TD-18.
 3. **The app on the store.** `PracticeSession` records real `ReviewEvent`s; every screen
    and both widget targets read `Lexicon`; plain-text import/export; a manual reset appends
    a marker rather than deleting history.
-
-Remaining: CloudKit (iteration 4) and scoring (iteration 5), above.
+4. **CloudKit.** `NSPersistentCloudKitContainer` for the host app on iOS 13+; extensions
+   and iOS 12 keep a plain container. **The claim that the model was already authored to
+   CloudKit's rules was wrong** — every UUID was non-optional with a `defaultValueString`
+   Core Data ignores, so the store refused to open. UUIDs are optional now, and
+   `StoreDeduplicator` repairs the duplicate rows sync creates (uniqueness lives in
+   `Lexicon` because CloudKit forbids constraints, and that cannot hold across two offline
+   devices). See Next for what remains before this ships.
+5. **Scoring.** `ScoringPolicy` derives mastery, retention and effort by replaying the log
+   with a port of FSRS-6 (ported rather than adopted: `swift-fsrs` declares `.iOS(.v14)`
+   and this floor is 12.1; checked against that library's own test oracles). Nothing is
+   stored — weights live in code, so revising them re-derives history instead of migrating
+   it, and CloudKit devices reach the same answer from the merged log. The ring is
+   `ProgressRing`, retiring 556 vendored lines.
 
 ## Later
 

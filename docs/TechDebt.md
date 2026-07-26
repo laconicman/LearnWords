@@ -173,7 +173,13 @@ tests (73 total green). Original iteration-1 notes below for the parts that surv
   the classic "failed to find a unique match for an NSEntityDescription" crash), App-Group
   store URL, an in-memory initialiser for tests, and a `write` that saves on a background
   context and rolls back on error.
-- **Authored to CloudKit's rules from the start** — all attributes optional or defaulted,
+- **Authored to CloudKit's rules from the start** — *mostly true, and the gap was
+  expensive*: every UUID was non-optional carrying a `defaultValueString` that Core Data
+  ignores, so `defaultValue` was nil and `NSPersistentCloudKitContainer` refused to open
+  the store (TD-13 iteration 4). `momc` accepts the string; CloudKit reads the runtime
+  default. The schema test carried this as a documented *exemption*, which is why nothing
+  caught it — an exemption is a hole with a comment in it. The rule now runs verbatim.
+  Original intent, otherwise upheld: all attributes optional or defaulted,
   every relationship optional with an inverse, no unique constraints (CloudKit rejects
   them). A test enforces this, so enabling `NSPersistentCloudKitContainer` later is a
   container swap rather than a redesign.
@@ -422,7 +428,7 @@ shrink-fade-out + `askQuestion()` completion), and the app had no feedback/delig
 effects on each exercise screen, on a device for feel); Spray's haptic burst is not ported
 yet (KaPow TD-4).
 
-## TD-17 — Word-cell progress ring: modernize/replace KDCircularProgress
+## TD-17 — Word-cell progress ring: modernize/replace KDCircularProgress — **resolved (2026-07-26)**
 
 Context (2026-07-20): the words list logged an unsatisfiable-constraint break per row —
 the cell's stack was pinned top = 4 **and** bottom = 4 **and** centerY while the 44-pt
@@ -430,10 +436,13 @@ the cell's stack was pinned top = 4 **and** bottom = 4 **and** centerY while the
 over-constrained. **Fixed**: both pins relaxed to ≥ 4 (centerY positions; the ring stays
 square). Verified: zero constraint messages in the app console; cells render unchanged.
 
-The remaining debt is the ring itself — a 556-line vendored 2015-era control
-(`Shared/DesignSystem/KDCircularProgress.swift`; note the name matches
-[kaandedeoglu/KDCircularProgress](https://github.com/kaandedeoglu/KDCircularProgress),
-MIT — worth confirming provenance/attribution), used only by `WordTableViewCell`.
+**Discharged with TD-13 iteration 5.** The 556-line vendored 2015-era control
+(`Shared/DesignSystem/KDCircularProgress.swift`, matching
+[kaandedeoglu/KDCircularProgress](https://github.com/kaandedeoglu/KDCircularProgress), MIT)
+is deleted, replaced by `ProgressRing`: two arcs — outer mastery, inner effort — tinted by
+retention and sized from `UIFontMetrics` per ProgressModel R6. Two arcs because a word
+fought with for a month reads differently from one never touched, and one arc cannot say
+that. Attribution question closed by removal.
 
 **Research (2026-07-20) — the UIKit ring-library shelf is EOL, like the animation shelf:**
 - [UICircularProgressRing](https://github.com/luispadron/UICircularProgressRing) — explicit
@@ -803,3 +812,41 @@ LearnWords/
 
 Slice order (build green after each): **App/ → Model/ → Shared/ → Controllers/ → Features/**.
 Move the ⚠ shared files last and in isolation, updating their pbxproj exception paths first.
+
+## TD-23 — Dead KDCircularProgress attributes left in the storyboard
+
+The word cell's ring view changed `customClass` to `ProgressRing` (TD-13 iteration 5), but
+its eight `userDefinedRuntimeAttribute` entries still name KDCircularProgress's
+IBInspectables — `angle`, `startAngle`, `progressThickness`, `trackThickness`,
+`gradientRotateSpeed`, `glowAmount`, `trackColor`, `IBColor2`. Each one raises
+`setValue:forUndefinedKey:` **per cell, on every creation**. **Cost:** eight console lines
+per row on every scroll, and the noise hides real messages — the constraint break that
+opened TD-17 was found by reading exactly this console. Non-fatal. **Discharge:** delete
+the eight entries from `Main.storyboard` (lines 43–68). Belongs to whoever next owns the
+storyboard, so it does not race a concurrent edit.
+
+## TD-24 — Extension bundle versions drift from the app's
+
+`CFBundleVersion` is `1` on the app extensions and `7` on the host app, which
+`ValidateEmbeddedBinary` warns about on every build and **App Store Connect rejects at
+submission**. **Cost:** invisible until the first upload, then a blocked release.
+**Discharge:** drive all four targets' `CURRENT_PROJECT_VERSION` from one place — a shared
+`.xcconfig`, or `$(inherited)` from the project level — rather than per-target literals.
+
+## TD-25 — A nil UUID from a peer would trap on read
+
+`@NSManaged var id: UUID` is non-optional Swift over an attribute the model now marks
+optional (CloudKit's price, TD-13 iteration 4). Locally that is safe: `awakeFromInsert`
+assigns every `id`. But the value can now also arrive **from another device**, and reading
+a nil through a non-optional `@NSManaged` accessor traps rather than returning nil.
+`StoreDeduplicator` also sorts by `id` to pick a convergent winner, so a nil would break
+the ordering that stops two devices deleting each other's survivor.
+
+This is the same species of reasoning as the exemption iteration 4 removed — "the code
+keeps the promise the schema cannot" — and the difference is only that no external checker
+can falsify it. **Cost:** low likelihood, crash-grade impact, and it defeats dedup
+convergence. **Discharge (cheap):** have the deduplication pass, which already runs after
+every remote merge, repair rows with a nil `id` before it sorts. That turns a potential
+trap into self-healing, in the file that already owns post-merge repair. **Alternative
+(thorough):** make the managed-object accessors optional and unwrap in `Lexicon`'s snapshot
+initialisers, which is where "optionality at the boundary" actually puts the seam.
