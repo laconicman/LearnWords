@@ -60,6 +60,16 @@
 			</array>
 		</dict>
 	</dict>
+	<!-- CloudKit mirroring subscribes to database changes and expects the resulting
+	     silent pushes; without this key it logs "BUG IN CLIENT OF CLOUDKIT" on every
+	     launch and sync falls back to launch/foreground/schedule polling. Delivery also
+	     needs the Push Notifications capability (aps-environment), which lives in
+	     Signing & Capabilities because it changes the App ID — see docs/CloudKitSetup.md.
+	     No app code is required: NSPersistentCloudKitContainer owns the subscription. -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
 		<string>arm64</string>

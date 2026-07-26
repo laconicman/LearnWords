@@ -14,11 +14,17 @@
 //  requirements rather than bent to fit the old one, and users re-import their dictionary.
 //  See docs/Design.md.
 //
-//  **CloudKit (iOS 13+, host app only).** The model was authored to CloudKit's rules from
-//  the start — every attribute optional *or* defaulted, every relationship optional with an
-//  inverse, no unique constraints — so enabling mirroring is a container swap rather than a
-//  redesign. iOS 12 keeps a purely local store, which is the correct degradation and not a
-//  bug: Legacy keeps working, sync is a modern-OS feature.
+//  **CloudKit (iOS 13+, host app only).** Every attribute must be optional *or* have a
+//  runtime default, every relationship optional with an inverse, and no unique constraints.
+//  The model was believed to satisfy that from the start; it did not — every UUID was
+//  non-optional with a `defaultValueString` Core Data ignores, and the store refused to
+//  open. `PersistenceSchemaTests.modelObeysCloudKitRules` now runs the rule verbatim, with
+//  no exemptions, because an exemption is a hole with a comment in it.
+//
+//  iOS 12 keeps a purely local store, which is the correct degradation and not a bug:
+//  Legacy keeps working, sync is a modern-OS feature. So does a device whose iCloud
+//  container is missing or unprovisioned — see docs/CloudKitSetup.md for the account-side
+//  steps, which no amount of code can substitute for.
 //
 //  The **extensions do not sync**. A widget reads what the app has already pulled down;
 //  giving an extension its own mirroring engine would have it compete with the app for the
@@ -76,6 +82,7 @@ final class LWPersistence {
                 Self.finishConfiguring(container)
                 startSpotlightIndexing()
                 observeRemoteChanges()
+                Self.initializeCloudKitSchemaIfRequested(cloud)
                 return
             } catch {
                 // Logged in full rather than swallowed: "no iCloud container in this
@@ -89,6 +96,31 @@ final class LWPersistence {
         container.persistentStoreDescriptions = [Self.localDescription()]
         Self.configure(container)
         startSpotlightIndexing()
+    }
+
+    /// Uploads the record types the model implies, so the CloudKit schema exists.
+    ///
+    /// CloudKit will not accept records of a type it has never heard of, and the types are
+    /// not created by syncing — they are created by this call, which writes one temporary
+    /// instance of each and deletes it again. Until it runs against the Development
+    /// environment, a fresh container has no schema and sync does nothing.
+    ///
+    /// **Deliberate, not automatic.** DEBUG-only *and* behind a launch argument, for two
+    /// reasons: it is slow and uploads on every launch it runs, and it must never touch
+    /// Production, where record types are immutable once deployed. Run it from Xcode with
+    /// `-LWInitializeCloudKitSchema 1` in the scheme's arguments after any model change,
+    /// then deploy the schema in the CloudKit Console. See docs/CloudKitSetup.md.
+    @available(iOS 13.0, *)
+    private static func initializeCloudKitSchemaIfRequested(_ container: NSPersistentCloudKitContainer) {
+        #if DEBUG
+        guard UserDefaults.standard.bool(forKey: "LWInitializeCloudKitSchema") else { return }
+        do {
+            try container.initializeCloudKitSchema(options: [])
+            debugLog("CloudKit schema initialized. Deploy it to Production in the CloudKit Console.")
+        } catch {
+            debugLog("CloudKit schema initialization failed: \(error)")
+        }
+        #endif
     }
 
     /// Sync belongs to the host app. `.appex` is how a bundle says it is an extension.

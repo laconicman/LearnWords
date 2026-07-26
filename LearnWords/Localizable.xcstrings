@@ -4,6 +4,12 @@
     "\n Probably there is no internet connection. \n Recognition happens on Apple servers for most of devices. " : {
       "comment" : "Speech recognition error detail"
     },
+    "%d%% learned" : {
+      "comment" : "progress ring"
+    },
+    "A meaning needs at least one word. Delete the meaning itself if you no longer want it." : {
+      "comment" : "Alert message"
+    },
     "Add" : {
       "comment" : "AlertAction title",
       "localizations" : {
@@ -14,6 +20,9 @@
           }
         }
       }
+    },
+    "Add a note" : {
+      "comment" : "Meaning editor row"
     },
     "Add new word" : {
       "comment" : "AlertController title",
@@ -49,6 +58,9 @@
           }
         }
       }
+    },
+    "Add word" : {
+      "comment" : "Alert title\nMeaning editor row"
     },
     "Add Word" : {
       "comment" : "AlertAction title",
@@ -117,6 +129,9 @@
           }
         }
       }
+    },
+    "Animals" : {
+      "comment" : "Name of the starter word set"
     },
     "Cancel" : {
       "comment" : "AlertAction title",
@@ -277,6 +292,9 @@
         }
       }
     },
+    "Edit meaning" : {
+      "comment" : "Meaning editor screen title"
+    },
     "Edit word" : {
       "comment" : "AlertController title",
       "localizations" : {
@@ -309,6 +327,9 @@
           }
         }
       }
+    },
+    "Every meaning and set using this word sees the change." : {
+      "comment" : "Alert message explaining that terms are shared"
     },
     "EXPORT_WORDS_MESSAGE" : {
       "comment" : "Count of words to be exported",
@@ -626,6 +647,9 @@
         }
       }
     },
+    "Leave empty to remove the note." : {
+      "comment" : "Alert message"
+    },
     "Listen" : {
       "comment" : "Exercise button",
       "extractionState" : "stale",
@@ -785,6 +809,9 @@
           }
         }
       }
+    },
+    "Note" : {
+      "comment" : "Alert title\nMeaning editor section header"
     },
     "OK" : {
       "comment" : "Action for alert for empty set",
@@ -954,6 +981,15 @@
         }
       }
     },
+    "Rename" : {
+      "comment" : "swipe action"
+    },
+    "Rename set" : {
+      "comment" : "AlertController title"
+    },
+    "Reset" : {
+      "comment" : "swipe action"
+    },
     "Russian" : {
       "comment" : "language",
       "localizations" : {
@@ -1009,6 +1045,9 @@
           }
         }
       }
+    },
+    "Shown during practice when the word alone is ambiguous." : {
+      "comment" : "Meaning editor note footer"
     },
     "Spanish" : {
       "comment" : "language",
@@ -1137,6 +1176,9 @@
           }
         }
       }
+    },
+    "This is the only word" : {
+      "comment" : "Alert title"
     },
     "Total " : {
       "comment" : "Label total words",

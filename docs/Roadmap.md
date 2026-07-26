@@ -109,6 +109,9 @@ Priority-ordered. Rationale lives in [Design](Design.md); debt items in [TechDeb
 
 ## Next
 
+- **CloudKit account setup — [step-by-step](CloudKitSetup.md).** The container does not
+  exist server-side yet (`BadContainer` on device), so the app is running local-only. The
+  capability, the container and the development-schema upload are all account-side work.
 - **Two-device CloudKit verification.** Everything about sync is proven against
   constructed duplicates, not a real merge. Needs the `iCloud.club.laconic.LearnWords`
   container in team `WEJF495R4D`, and two devices on one iCloud account. Until then the
@@ -117,7 +120,8 @@ Priority-ordered. Rationale lives in [Design](Design.md); debt items in [TechDeb
 - **Push Notifications capability**, for timely sync rather than launch/foreground/
   CloudKit-schedule. `aps-environment` needs the capability on the App ID, so it belongs
   in Xcode's Signing & Capabilities where the App ID updates in the same step — not in a
-  hand-edited plist.
+  hand-edited plist. (The `remote-notification` background mode, the other half, is now in
+  `Info.plist`.)
 - **Spaced repetition and local reminders.** `ScoringPolicy` now yields a due date per
   meaning, but `PracticeSession` still queues the whole set shuffled. Making practice
   due-driven, plus a rolling-window local notification (64-pending cap; a countless daily
