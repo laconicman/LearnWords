@@ -469,7 +469,7 @@ extension CDReviewEvent {
     /// so decoding **skips** unknown cases rather than crashing (ProgressModel's rule).
     var reviewOutcome: ReviewOutcome? { ReviewOutcome(rawValue: outcome) }
 
-    var exercise: ExerciseSession.Exercise? { ExerciseSession.Exercise(rawValue: task) }
+    var exercise: Exercise? { Exercise(rawValue: task) }
 
     var promptDirection: ReviewDirection? { ReviewDirection(rawValue: direction) }
 

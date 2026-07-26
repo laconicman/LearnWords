@@ -436,7 +436,7 @@ struct PersistenceSchemaTests {
         let event = CDReviewEvent(context: context)
         event.date = Date(timeIntervalSince1970: 1_000_000)
         event.sessionID = session
-        event.task = ExerciseSession.Exercise.dictation.rawValue
+        event.task = Exercise.dictation.rawValue
         event.direction = ReviewDirection.productive.rawValue
         event.outcome = ReviewOutcome.correctJudged.rawValue
         event.response = "медветь"

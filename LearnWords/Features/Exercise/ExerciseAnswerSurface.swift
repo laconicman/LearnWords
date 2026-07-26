@@ -13,28 +13,36 @@
 //  subclass never was.
 //
 //  (A protocol with default implementations cannot replace the screen itself: protocol
-//  extensions have no stored properties, and the screen owns real state — session,
-//  languages, the container, the buttons. Composition is what fits here.)
+//  extensions have no stored properties, and the screen owns real state — the session,
+//  the container, the buttons. Composition is what fits here.)
 //
 
 import UIKit
 
 /// What a surface may ask of the screen hosting it. Deliberately narrow — a surface can
-/// read the current question and submit an answer; it cannot drive the round.
+/// read the question in flight and submit an answer; it cannot drive the sitting.
 protocol ExerciseScreen: AnyObject {
 
-    /// The word being asked, or `nil` once the round is over.
-    var currentWord: WordAndStat? { get }
+    /// The question on screen, or `nil` between questions and once the sitting is over.
+    var question: PracticeSession.Question? { get }
 
-    /// The languages and direction this round runs in.
+    /// The languages this sitting runs in.
     var languages: LanguagePair { get }
 
-    /// Submit an answer for the current word. The screen scores it, reveals the answer
-    /// and moves on.
-    func answer(_ outcome: ReviewOutcome)
+    /// Submit an answer for the current question. The screen records it, reveals the
+    /// answer and moves on.
+    ///
+    /// - Parameter response: what the learner actually typed or said. `nil` for
+    ///   self-assessed answers, where there is nothing to record — and *not* `""`,
+    ///   which would claim they answered with silence.
+    func answer(_ outcome: ReviewOutcome, response: String?)
 
     /// Show an alert from the screen (permissions, recognition errors).
     func presentAlert(_ alert: UIAlertController)
+}
+
+extension ExerciseScreen {
+    func answer(_ outcome: ReviewOutcome) { answer(outcome, response: nil) }
 }
 
 /// How one exercise takes and displays an answer.
@@ -56,9 +64,9 @@ protocol ExerciseAnswerSurface: AnyObject {
     /// Reveal `text` as the answer that was being sought.
     func showAnswer(_ text: String, isPositive: Bool)
 
-    /// Called before the screen leaves the current word, by answer or by skip.
+    /// Called before the screen leaves the current question, by answer or by skip.
     /// Phonetics hands the audio session back to playback here. Default: nothing.
-    func willLeaveCurrentWord()
+    func willLeaveCurrentQuestion()
 }
 
 // Optional parts of the contract. These are protocol *requirements* with defaults, so a
@@ -66,5 +74,5 @@ protocol ExerciseAnswerSurface: AnyObject {
 // dispatched statically and silently ignored.
 extension ExerciseAnswerSurface {
     var accessoryButton: LWButton? { nil }
-    func willLeaveCurrentWord() {}
+    func willLeaveCurrentQuestion() {}
 }

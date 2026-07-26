@@ -25,6 +25,11 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         UINavigationBar.appearance().tintColor = .orange
         UITabBar.appearance().tintColor = .orange
         window?.tintColor = .orange
+
+        // Opens the store and seeds it on a fresh install, so no screen has to cope with
+        // an empty library. Runs for both lifecycles — `SceneDelegate` builds the UI
+        // after this, on iOS 13+.
+        Library.shared.prepareForLaunch()
         return true
     }
 

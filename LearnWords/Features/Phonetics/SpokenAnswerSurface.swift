@@ -5,7 +5,7 @@
 //  The Phonetics exercise: say the translation.
 //
 //  The only surface that owns the audio session, which is why it is the only one that
-//  implements `willLeaveCurrentWord()` — recording holds `.playAndRecord`, and anything
+//  implements `willLeaveCurrentQuestion()` — recording holds `.playAndRecord`, and anything
 //  that speaks or advances needs playback back first.
 //
 //  A recognised utterance is `.correctJudged`: `match3` decides whether the transcription
@@ -63,7 +63,7 @@ final class SpokenAnswerSurface: NSObject, ExerciseAnswerSurface, SFSpeechRecogn
 
     /// Recording holds `.playAndRecord`; give playback back before anything speaks or the
     /// screen moves on.
-    func willLeaveCurrentWord() {
+    func willLeaveCurrentQuestion() {
         if audioEngine.isRunning {
             recordButtonTapped()
         }
@@ -181,14 +181,15 @@ final class SpokenAnswerSurface: NSObject, ExerciseAnswerSurface, SFSpeechRecogn
                 self.recognizedLabel.text = heard
                 isFinal = result.isFinal
 
-                if let screen = self.screen, let word = screen.currentWord,
-                   match3(pattern: screen.languages.answer(for: word),
-                          answer: heard,
-                          language: screen.languages.answerLanguage,
-                          delimiters: ",; ") /* && isFinal */ {
+                // Checked against every synonym: saying any accepted word is correct.
+                if let screen = self.screen, let question = screen.question,
+                   question.answers.contains(where: {
+                       match3(pattern: $0.text, answer: heard,
+                              language: screen.languages.answerLanguage, delimiters: ",; ")
+                   }) /* && isFinal */ {
                     self.recordButtonTapped() // stop the audio
                     // A matcher said it was close enough — judged, not verbatim.
-                    screen.answer(.correctJudged)
+                    screen.answer(.correctJudged, response: heard)
                 }
             }
 

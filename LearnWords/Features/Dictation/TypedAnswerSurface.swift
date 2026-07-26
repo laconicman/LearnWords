@@ -50,36 +50,43 @@ final class TypedAnswerSurface: NSObject, ExerciseAnswerSurface, UITextFieldDele
     // MARK: - UITextFieldDelegate
 
     /// Exact match as the learner types — the strongest evidence the app can collect.
+    ///
+    /// Checked against **every** synonym: with the lexical model a meaning may have
+    /// several words in the answer language, and typing any of them is verbatim-correct.
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange,
                    replacementString string: String) -> Bool {
-        guard let screen, let word = screen.currentWord,
+        guard let screen, let question = screen.question,
               let current = textField.text, let replaced = Range(range, in: current) else { return true }
 
         let typed = current.replacingCharacters(in: replaced, with: string)
-            .lowercased().trimmingCharacters(in: .whitespaces)
+            .trimmingCharacters(in: .whitespaces)
+        let isExact = question.answers.contains {
+            $0.text.compare(typed, options: [.caseInsensitive, .diacriticInsensitive]) == .orderedSame
+        }
 
-        if typed == screen.languages.answer(for: word) {
+        if isExact {
             textField.isUserInteractionEnabled = false
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak screen] in
-                screen?.answer(.correctVerbatim)
+                screen?.answer(.correctVerbatim, response: typed)
             }
         }
         return true
     }
 
-    /// Submitting runs the near-miss matcher, so a close attempt is judged, not verbatim.
+    /// Submitting runs the near-miss matcher against each accepted answer, so a close
+    /// attempt is judged rather than simply wrong.
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         guard let screen else { return true }
         guard let typed = textField.text?.trimmingCharacters(in: .whitespaces),
-              let word = screen.currentWord else {
-            screen.answer(.incorrect)
+              !typed.isEmpty, let question = screen.question else {
+            screen.answer(.incorrect, response: textField.text)
             return true
         }
 
-        let matched = match3(pattern: screen.languages.answer(for: word),
-                             answer: typed,
-                             language: screen.languages.answerLanguage)
-        screen.answer(matched ? .correctJudged : .incorrect)
+        let matched = question.answers.contains {
+            match3(pattern: $0.text, answer: typed, language: screen.languages.answerLanguage)
+        }
+        screen.answer(matched ? .correctJudged : .incorrect, response: typed)
         return true
     }
 }

@@ -16,25 +16,27 @@ import Testing
 import UIKit
 @testable import LearnWords
 
-// Serialized: each case drives a real appearance cycle in its own `UIWindow` and shares
-// `Storage.wordsAndStat`; running those concurrently is asking for trouble.
+// Serialized: each case drives a real appearance cycle in its own `UIWindow` and pins the
+// speech preference; running those concurrently is asking for trouble.
 @Suite(.serialized)
 @MainActor
 struct ExerciseScreenAppearanceTests {
 
-    @Test(arguments: [ExerciseSession.Exercise.learning, .dictation, .phonetics])
-    func exerciseScreenBecomesVisibleAfterAppearing(_ exercise: ExerciseSession.Exercise) async throws {
+    @Test(arguments: [Exercise.learning, .dictation, .phonetics])
+    func exerciseScreenBecomesVisibleAfterAppearing(_ exercise: Exercise) async throws {
         let prefs = LWUserDefaults.standard
         let pronounce = prefs.pronounceQuestionsPreference
         prefs.pronounceQuestionsPreference = false  // keep the test silent
         defer { prefs.pronounceQuestionsPreference = pronounce }
 
-        if Storage.wordsAndStat.isEmpty {  // askQuestion leaves (skips show) on an empty set
-            Storage.wordsAndStat = [WordAndStat(firstWord: "bear", secondWord: "медведь",
-                                                correct: [:], incorrect: [:], skiped: 0)]
-        }
+        // A throwaway lexicon with one meaning: `askQuestion` leaves immediately — and so
+        // never springs the screen in — when the sitting has nothing to ask.
+        let lexicon = Lexicon(persistence: LWPersistence(inMemory: true))
+        let set = try lexicon.addWordSet(named: "Animals", languages: ["en", "ru"])
+        try lexicon.addSense(to: set.id, terms: [Term.Draft("bear", in: "en"),
+                                                 Term.Draft("медведь", in: "ru")])
 
-        let vc = ExerciseViewController.make(exercise)
+        let vc = try ExerciseViewController.make(exercise, in: set, lexicon: lexicon)
         let window = UIWindow(frame: UIScreen.main.bounds)
         window.rootViewController = UINavigationController(rootViewController: vc)
         window.isHidden = false  // drives the full appearance cycle incl. viewDidAppear
@@ -43,7 +45,6 @@ struct ExerciseScreenAppearanceTests {
 
         #expect(vc.isViewLoaded, "precondition: the screen loaded")
         #expect(vc.contentStack.alpha == 0, "precondition: the screen starts hidden")
-        #expect(Storage.wordsAndStat.isEmpty == false, "precondition: the round has words")
         try await Task.sleep(nanoseconds: 1_500_000_000)  // viewDidAppear + 0.5 s spring
         #expect(vc.contentStack.alpha == 1,
                 "\(exercise) must spring in on appearance — askQuestion must end in ExerciseTransition.show")

@@ -108,7 +108,7 @@ struct ReviewEvent: Hashable, Identifiable {
     var date: Date
     var sessionID: UUID
     var outcome: ReviewOutcome?
-    var task: ExerciseSession.Exercise?
+    var task: Exercise?
     var direction: ReviewDirection?
     /// Text snapshots, so the row stays interpretable after the words are edited or the
     /// sense is deleted.
@@ -131,7 +131,7 @@ extension ReviewEvent {
         var wordSetID: UUID
         /// Which synonym cued the question — the prompt *text* can be edited later.
         var promptTermID: UUID
-        var task: ExerciseSession.Exercise
+        var task: Exercise
         var direction: ReviewDirection
         var outcome: ReviewOutcome
         var prompt: String

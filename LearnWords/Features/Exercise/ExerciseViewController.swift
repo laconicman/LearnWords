@@ -13,6 +13,10 @@
 //  — so this type is `final`, there is nothing abstract to instantiate by mistake, and the
 //  compiler (not a `fatalError`) enforces that every exercise supplies what it must.
 //
+//  The sitting itself is a `PracticeSession`: it owns the queue, measures latency and
+//  appends every answer to the review log. This screen only shows what it is told and
+//  reports what the learner did.
+//
 
 import UIKit
 
@@ -20,67 +24,71 @@ final class ExerciseViewController: UIViewController, ExerciseScreen {
 
     // MARK: - Construction
 
-    private let kind: ExerciseSession.Exercise
     private let surface: ExerciseAnswerSurface
+    private let session: PracticeSession
 
-    init(exercise: ExerciseSession.Exercise, answerSurface: ExerciseAnswerSurface, title: String) {
-        self.kind = exercise
+    init(session: PracticeSession, answerSurface: ExerciseAnswerSurface, title: String) {
+        self.session = session
         self.surface = answerSurface
         super.init(nibName: nil, bundle: nil)
         self.title = title
     }
 
-    /// Unavailable by design: a screen without an answer surface is not a valid screen,
-    /// which is why this is never storyboard-instantiated.
+    /// Unavailable by design: a screen without a sitting and an answer surface is not a
+    /// valid screen, which is why this is never storyboard-instantiated.
     @available(*, unavailable)
     required init?(coder: NSCoder) {
-        fatalError("use init(exercise:answerSurface:title:)")
+        fatalError("use init(session:answerSurface:title:)")
     }
 
-    /// The three exercises the app offers. The only place that knows which surface goes
-    /// with which exercise.
-    static func make(_ exercise: ExerciseSession.Exercise) -> ExerciseViewController {
+    /// Builds the screen for one exercise over one set. The only place that knows which
+    /// surface goes with which exercise.
+    static func make(_ exercise: Exercise,
+                     in wordSet: WordSet,
+                     lexicon: Lexicon) throws -> ExerciseViewController {
+        let session = try PracticeSession.start(
+            exercise,
+            in: wordSet.id,
+            languages: .forSet(wordSet),
+            lexicon: lexicon,
+            includingLearned: LWUserDefaults.standard.includeLearnedWords)
+
+        let surface: ExerciseAnswerSurface
+        let title: String
         switch exercise {
         case .learning:
-            return ExerciseViewController(
-                exercise: .learning, answerSurface: SelfAssessedAnswerSurface(),
-                title: NSLocalizedString("Learning", comment: "Exercise screen title"))
+            surface = SelfAssessedAnswerSurface()
+            title = NSLocalizedString("Learning", comment: "Exercise screen title")
         case .dictation:
-            return ExerciseViewController(
-                exercise: .dictation, answerSurface: TypedAnswerSurface(),
-                title: NSLocalizedString("Dictation", comment: "Exercise screen title"))
+            surface = TypedAnswerSurface()
+            title = NSLocalizedString("Dictation", comment: "Exercise screen title")
         case .phonetics:
-            return ExerciseViewController(
-                exercise: .phonetics, answerSurface: SpokenAnswerSurface(),
-                title: NSLocalizedString("Phonetic", comment: "Exercise screen title"))
+            surface = SpokenAnswerSurface()
+            title = NSLocalizedString("Phonetic", comment: "Exercise screen title")
         }
+        return ExerciseViewController(session: session, answerSurface: surface, title: title)
     }
 
     // MARK: - Views
 
     private(set) var progressView = UIProgressView(progressViewStyle: .default)
     private(set) var promptLabel = LWWordLabel()
+    private(set) var noteLabel = UILabel()
     private(set) var lookUpButton = LWButton(type: .system)
     private(set) var listenButton = LWButton(type: .system)
     private(set) var forgotButton = LWButton(type: .system)
     private(set) var knowButton = LWButton(type: .system)
 
     /// The animated container. `ExerciseTransition` drives this, never a child.
-    /// `let`, so it is the same object before and after the view loads — reassigning it
-    /// in `buildLayout()` meant anything holding a reference early got a different stack.
+    /// `let`, so it is the same object before and after the view loads.
     let contentStack = UIStackView()
 
     private let underKeyboardLayoutConstraint = UnderKeyboardLayoutConstraint()
 
-    // MARK: - Round
+    // MARK: - ExerciseScreen
 
-    private(set) var session = ExerciseSession(exercise: .learning, words: [])
-
-    /// Resolved once per question, so a mid-round settings change cannot split a word's
-    /// prompt from its answer.
-    private(set) var languages = LanguagePair.current
-
-    var currentWord: WordAndStat? { session.currentWord }
+    var question: PracticeSession.Question? { session.current }
+    var languages: LanguagePair { session.languages }
 
     // MARK: - Lifecycle
 
@@ -92,12 +100,10 @@ final class ExerciseViewController: UIViewController, ExerciseScreen {
         surface.attach(to: self)
 
         navigationItem.rightBarButtonItem = UIBarButtonItem(
-            barButtonSystemItem: .fastForward, target: self, action: #selector(nextTapped))
+            barButtonSystemItem: .fastForward, target: self, action: #selector(skipTapped))
         if #available(iOS 11.0, *) {
             navigationItem.largeTitleDisplayMode = .never
         }
-
-        startRound()
 
         // The entry state ExerciseTransition.show springs out of.
         contentStack.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)
@@ -107,10 +113,7 @@ final class ExerciseViewController: UIViewController, ExerciseScreen {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         navigationController?.hidesBarsOnTap = false
-        if session.isFinished {
-            startRound()
-        }
-        askQuestion()
+        if question == nil { askQuestion() }
     }
 
     override func viewDidDisappear(_ animated: Bool) {
@@ -128,6 +131,12 @@ final class ExerciseViewController: UIViewController, ExerciseScreen {
         progressView.progressTintColor = .lwAccent
         promptLabel.font = .systemFont(ofSize: 80)
 
+        noteLabel.font = .preferredFont(forTextStyle: .subheadline)
+        noteLabel.textColor = .lwTextSecondary
+        noteLabel.textAlignment = .center
+        noteLabel.numberOfLines = 0
+        noteLabel.adjustsFontForContentSizeCategory = true
+
         configure(lookUpButton, title: "Look Up", purpose: .utility, action: #selector(lookUpTapped))
         configure(listenButton, title: "Listen", purpose: .utility, action: #selector(listenTapped))
         configure(forgotButton, title: "Forgot", purpose: .negative, action: #selector(forgotTapped))
@@ -136,6 +145,7 @@ final class ExerciseViewController: UIViewController, ExerciseScreen {
         var rows: [UIView] = [
             progressView,
             promptLabel,
+            noteLabel,
             surface.answerView,
             row(lookUpButton, listenButton),
             row(forgotButton, knowButton),
@@ -172,62 +182,57 @@ final class ExerciseViewController: UIViewController, ExerciseScreen {
         return row
     }
 
-    // MARK: - The round
+    // MARK: - The sitting
 
-    private func startRound() {
-        session = .start(kind)
-    }
-
-    @objc private func nextTapped() {
-        guard !session.isFinished else { return }
-        surface.willLeaveCurrentWord()
-        session.skip()
-        progressView.progress = session.progress
-        askQuestion()
-    }
-
-    /// Presents the next word, or ends the round.
+    /// Puts the next question up, or leaves when the sitting is done.
     private func askQuestion() {
-        guard let word = session.currentWord else {
-            session.commit()
+        guard let question = session.nextQuestion() else {
             navigationController?.popViewController(animated: true)
             return
         }
-        if session.skipsCurrentWord(includingLearned: LWUserDefaults.standard.includeLearnedWords) {
-            nextTapped()
-            return
-        }
 
-        languages = .current
-        promptLabel.attributedText = NSAttributedString(string: languages.prompt(for: word))
+        promptLabel.attributedText = NSAttributedString(string: question.prompt)
+        // Only shown when the word alone is ambiguous — an empty label would otherwise
+        // hold a gap on every screen.
+        noteLabel.text = question.note
+        noteLabel.isHidden = question.note == nil
+
         if LWUserDefaults.standard.pronounceQuestionsPreference {
-            SpeechManager.shared.speak(promptLabel.attributedText!, language: languages.promptLanguage)
+            SpeechManager.shared.speak(promptLabel.attributedText!,
+                                       language: languages.promptLanguage)
         }
         surface.prepareForQuestion()
         ExerciseTransition.show(contentStack)
     }
 
-    // MARK: - ExerciseScreen
+    @objc private func skipTapped() {
+        guard question != nil else { return }
+        surface.willLeaveCurrentQuestion()
+        try? session.skip()
+        progressView.progress = session.progress
+        askQuestion()
+    }
 
-    func answer(_ outcome: ReviewOutcome) {
-        surface.willLeaveCurrentWord()
-        guard let result = session.answer(outcome) else { // this never happens for now
+    /// Records the answer, gives feedback, reveals what was wanted, and moves on.
+    func answer(_ outcome: ReviewOutcome, response: String?) {
+        surface.willLeaveCurrentQuestion()
+        // `record` returns nil when there was no question in flight, and throws if the
+        // meaning vanished under us (edited away on another device) — either way the
+        // sitting cannot continue.
+        guard let answered = ((try? session.record(outcome, response: response)) ?? nil) else {
             navigationController?.popViewController(animated: true)
             return
         }
 
         // Feedback on the child view; the container transition stays separate (TD-16).
-        if result.isPositive {
+        if outcome.isPositive {
             surface.answerView.kapow.shine()
-            if result.reachedKnownLevel {
-                ExerciseFeedback.levelUp(on: view)
-            }
         } else {
             surface.answerView.kapow.shake()
         }
 
         progressView.progress = session.progress
-        reveal(result)
+        reveal(answered, isPositive: outcome.isPositive)
     }
 
     func presentAlert(_ alert: UIAlertController) {
@@ -236,9 +241,8 @@ final class ExerciseViewController: UIViewController, ExerciseScreen {
 
     // MARK: - Revealing
 
-    private func reveal(_ result: ExerciseSession.Answer) {
-        let text = languages.answer(for: result.word)
-        let isPositive = result.isPositive
+    private func reveal(_ question: PracticeSession.Question, isPositive: Bool) {
+        let text = question.expected
 
         UIView.transition(with: surface.answerView,
                           duration: isPositive ? 0.75 : 1.0,
@@ -273,11 +277,11 @@ final class ExerciseViewController: UIViewController, ExerciseScreen {
 
     // MARK: - Actions
 
-    @objc private func knowTapped() { answer(.selfAssessedKnown) }
+    @objc private func knowTapped() { answer(.selfAssessedKnown, response: nil) }
 
     @objc private func forgotTapped() {
         haptic(feedback: .warning)
-        answer(.selfAssessedForgot)
+        answer(.selfAssessedForgot, response: nil)
     }
 
     @objc private func lookUpTapped() {
@@ -285,7 +289,7 @@ final class ExerciseViewController: UIViewController, ExerciseScreen {
     }
 
     @objc private func listenTapped() {
-        surface.willLeaveCurrentWord()
+        surface.willLeaveCurrentQuestion()
         guard let text = promptLabel.attributedText else { return }
         SpeechManager.shared.speak(text, language: languages.promptLanguage)
     }

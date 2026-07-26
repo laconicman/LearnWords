@@ -42,16 +42,14 @@ class ExersizeChooserViewController: UIViewController {
     /// the text to near-illegible. Showing one direction at a time gives the names
     /// the full width whatever languages are chosen.
     private func showDirection() {
-        guard let native = Locale.current.localizedString(
-                forLanguageCode: LWUserDefaults.standard.nativeLanguagePreference!)?.capitalized,
-              let foreign = Locale.current.localizedString(
-                forLanguageCode: LWUserDefaults.standard.languageToStudyPreference!)?.capitalized
-        else { return }
-
-        let reversed = LWUserDefaults.standard.foreignToNative
-        let from = reversed ? foreign : native
-        let to = reversed ? native : foreign
-        directionOfExercises.setTitle("\(from) → \(to)", for: .normal)
+        // Read from the set actually being practised, so a German set shows German even
+        // if the global preference still says Spanish (`LanguagePair.forSet`).
+        let pair = Library.shared.selectedSet.map(LanguagePair.forSet) ?? .current
+        let name = { (code: String) in
+            Locale.current.localizedString(forLanguageCode: code)?.capitalized ?? code
+        }
+        directionOfExercises.setTitle(
+            "\(name(pair.promptLanguage)) → \(name(pair.answerLanguage))", for: .normal)
     }
 
     @IBAction func directionChanged(_ sender: LWButton) {
@@ -65,9 +63,20 @@ class ExersizeChooserViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        numberOfWordsInSet.text = NSLocalizedString("Total in set: ", comment: "Label total words in current set") + pluralizedWordCount(Storage.wordsAndStat.count) + ". " + NSLocalizedString("Learned: ", comment: "Label learned words") + pluralizedWordCount(Storage.wordsAndStat.reduce(0, { result, wAs in
-            if wAs.known == WordAndStat.maxKnownLevel { return result + 1 } else { return result }
-        })) + "."
+        showSetSummary()
+    }
+
+    private func showSetSummary() {
+        let library = Library.shared
+        let senses = (try? library.selectedSenses()) ?? []
+        let learned = (try? InterimMastery(lexicon: library.lexicon, senses: senses))
+            .map { mastery in senses.filter { mastery.isLearned($0.id) }.count } ?? 0
+
+        numberOfWordsInSet.text =
+            NSLocalizedString("Total in set: ", comment: "Label total words in current set")
+            + pluralizedWordCount(senses.count) + ". "
+            + NSLocalizedString("Learned: ", comment: "Label learned words")
+            + pluralizedWordCount(learned) + "."
     }
 
     // MARK: - Starting an exercise
@@ -82,19 +91,33 @@ class ExersizeChooserViewController: UIViewController {
     /// alert appeared and the empty exercise was pushed underneath it anyway. Building the
     /// screen here instead of segueing makes refusing it a plain early return, and lets the
     /// exercise screen take its answer surface through an initializer.
-    private func start(_ exercise: ExerciseSession.Exercise) {
-        guard hasWordsToStudy() else { return }
-        navigationController?.pushViewController(ExerciseViewController.make(exercise), animated: true)
+    private func start(_ exercise: Exercise) {
+        guard let set = Library.shared.selectedSet, hasWordsToStudy(in: set) else { return }
+        do {
+            let screen = try ExerciseViewController.make(exercise, in: set,
+                                                        lexicon: Library.shared.lexicon)
+            navigationController?.pushViewController(screen, animated: true)
+        } catch {
+            debugLog("Could not start \(exercise): \(error)")
+        }
     }
 
-    private func hasWordsToStudy() -> Bool {
-        let words = Storage.wordsAndStat
-        let studiable = includeLeanedWords.isOn
-            ? words.count
-            : words.filter { $0.known < WordAndStat.maxKnownLevel }.count
+    private func hasWordsToStudy(in set: WordSet) -> Bool {
+        let library = Library.shared
+        let pair = LanguagePair.forSet(set)
+        let askable = (try? library.lexicon.senses(in: set.id,
+                                                   from: pair.promptLanguage,
+                                                   to: pair.answerLanguage)) ?? []
+        let studiable: Int
+        if includeLeanedWords.isOn {
+            studiable = askable.count
+        } else {
+            let mastery = try? InterimMastery(lexicon: library.lexicon, senses: askable)
+            studiable = askable.filter { !(mastery?.isLearned($0.id) ?? false) }.count
+        }
         guard studiable == 0 else { return true }
 
-        let message = words.isEmpty
+        let message = askable.isEmpty
             ? NSLocalizedString("Current set is empty. Add some words to learn.",
                                 comment: "Message for alert for empty set to display")
             : NSLocalizedString("You may opt to include learned words if you'd like to continue exercises.",
