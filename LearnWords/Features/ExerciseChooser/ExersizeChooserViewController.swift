@@ -45,11 +45,9 @@ class ExersizeChooserViewController: UIViewController {
         // Read from the set actually being practised, so a German set shows German even
         // if the global preference still says Spanish (`LanguagePair.forSet`).
         let pair = Library.shared.selectedSet.map(LanguagePair.forSet) ?? .current
-        let name = { (code: String) in
-            Locale.current.localizedString(forLanguageCode: code)?.capitalized ?? code
-        }
         directionOfExercises.setTitle(
-            "\(name(pair.promptLanguage)) → \(name(pair.answerLanguage))", for: .normal)
+            "\(LanguageCode.displayName(pair.promptLanguage)) → "
+            + LanguageCode.displayName(pair.answerLanguage), for: .normal)
     }
 
     @IBAction func directionChanged(_ sender: LWButton) {

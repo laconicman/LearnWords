@@ -267,6 +267,26 @@ final class LWPersistence {
     func write(_ work: (NSManagedObjectContext) throws -> Void) throws {
         let context = container.newBackgroundContext()
         context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy
+
+        // Captured here and merged below, **synchronously**, so that when this method
+        // returns the view context already sees the change.
+        //
+        // `automaticallyMergesChangesFromParent` alone is not enough: it merges when the
+        // did-save notification is delivered, which for a main-queue view context means
+        // the next turn of the run loop. A caller that writes and immediately re-reads —
+        // every editor screen does, and so does every test — got the *stale* values back,
+        // because a fetch returns already-registered objects without refreshing them
+        // (`shouldRefreshRefetchedObjects` is false by default). Setting an attribute
+        // twice in a row appeared to do nothing the second time.
+        //
+        // Merged after `performAndWait` returns rather than inside the notification, which
+        // fires on the background queue: hopping to the main queue from there while the
+        // main thread is blocked waiting on that same `performAndWait` would deadlock.
+        var saved: Notification?
+        let token = NotificationCenter.default.addObserver(
+            forName: .NSManagedObjectContextDidSave, object: context, queue: nil) { saved = $0 }
+        defer { NotificationCenter.default.removeObserver(token) }
+
         var thrown: Error?
         context.performAndWait {
             do {
@@ -280,5 +300,11 @@ final class LWPersistence {
             }
         }
         if let thrown { throw thrown }
+
+        if let saved {
+            // Re-entrant when already on the main queue, so this is safe from either side.
+            let viewContext = container.viewContext
+            viewContext.performAndWait { viewContext.mergeChanges(fromContextDidSave: saved) }
+        }
     }
 }

@@ -20,13 +20,21 @@ import Foundation
 
 enum PlainText {
 
-    /// One line of the format: two words for one meaning.
+    /// The synonym separator *within* one side of a line. Commas, because that is what
+    /// `render` writes — parse and render must be inverses or a round trip loses words.
+    private static let synonymSeparator: Character = ","
+
+    /// One line of the format: the words for one meaning, on each side.
+    ///
+    /// Arrays rather than strings because a meaning may have synonyms — that is the whole
+    /// point of the lexical model, and a format that could not carry them would quietly
+    /// flatten "fox / лиса, лисица" into a term literally named "лиса, лисица".
     struct Line: Equatable {
-        var first: String
-        var second: String
+        var first: [String]
+        var second: [String]
     }
 
-    /// Splits text into pairs. Lines that do not yield exactly two non-empty parts are
+    /// Splits text into meanings. Lines that do not yield exactly two non-empty sides are
     /// skipped — a heading or a blank line should not become a word.
     ///
     /// Values are whitespace-trimmed but otherwise kept verbatim: an import records what
@@ -37,19 +45,27 @@ enum PlainText {
     static func parse(_ text: String) -> [Line] {
         split(text, by: "\n" + "\u{2028}", union: .newlines).compactMap { entry in
             let parts = split(entry, by: "|:-–")
-            guard parts.count == 2,
-                  let first = parts.first?.trimmingCharacters(in: .whitespaces), !first.isEmpty,
-                  let second = parts.last?.trimmingCharacters(in: .whitespaces), !second.isEmpty
-            else { return nil }
+            guard parts.count == 2 else { return nil }
+            let first = synonyms(in: parts[0])
+            let second = synonyms(in: parts[1])
+            guard !first.isEmpty, !second.isEmpty else { return nil }
             return Line(first: first, second: second)
         }
     }
 
+    /// One side of a line, split into its synonyms. Empty entries are dropped, so a
+    /// trailing comma is a typo rather than a blank word.
+    private static func synonyms(in side: String) -> [String] {
+        side.split(separator: synonymSeparator)
+            .map { $0.trimmingCharacters(in: .whitespaces) }
+            .filter { !$0.isEmpty }
+    }
+
     /// Renders meanings back out, one line each.
     ///
-    /// Synonyms are joined with commas on their own side, so a round trip through the
-    /// format does not silently drop them — it flattens them, which is the most the
-    /// format can carry and is visible to anyone reading the file.
+    /// Synonyms are joined with commas on their own side, and `parse` splits them back —
+    /// a round trip is lossless, which is what makes export/import a real answer to
+    /// "the user can always import the dictionary" (docs/Design.md).
     static func render(_ senses: [Sense], from: String, to: String) -> String {
         senses.compactMap { sense in
             let left = sense.terms(in: from).map(\.text)
@@ -67,10 +83,11 @@ extension Lexicon {
 
     /// Reads plain text into a set and reports how many meanings it added.
     ///
-    /// A line whose first word is already in the set is skipped rather than merged: the
-    /// two might be different meanings of the same word, and guessing wrong would fuse
-    /// them permanently. Reviewing and merging duplicates is a screen this app does not
-    /// have yet — the TODO the old importer carried, now stated where it belongs.
+    /// A line is skipped when **any** of its first-side words is already in the set,
+    /// rather than merged: the two might be different meanings of the same word, and
+    /// guessing wrong would fuse them permanently. Reviewing and merging duplicates is a
+    /// screen this app does not have yet — the TODO the old importer carried, now stated
+    /// where it belongs.
     @discardableResult
     func importPlainText(_ text: String,
                          into setID: UUID,
@@ -85,8 +102,11 @@ extension Lexicon {
             .map { $0.text.lowercased() })
 
         let drafts = lines.compactMap { line -> [Term.Draft]? in
-            guard seen.insert(line.first.lowercased()).inserted else { return nil }
-            return [Term.Draft(line.first, in: first), Term.Draft(line.second, in: second)]
+            let words = line.first.map { $0.lowercased() }
+            guard words.allSatisfy({ !seen.contains($0) }) else { return nil }
+            seen.formUnion(words)
+            return line.first.map { Term.Draft($0, in: first) }
+                 + line.second.map { Term.Draft($0, in: second) }
         }
 
         return try addSenses(to: setID, terms: drafts)

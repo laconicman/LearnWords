@@ -84,6 +84,41 @@ final class WordSetsTableViewController: UITableViewController, UIDocumentPicker
         tabBarController?.selectedIndex = 0
     }
 
+    /// Rename on swipe. `Lexicon.renameWordSet` existed from the start and no screen
+    /// called it — a set's name was fixed at creation.
+    override func tableView(_ tableView: UITableView,
+                            trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath)
+    -> UISwipeActionsConfiguration? {
+        let set = sets[indexPath.row]
+        let rename = UIContextualAction(
+            style: .normal,
+            title: NSLocalizedString("Rename", comment: "swipe action")) { [weak self] _, _, done in
+                self?.promptForRename(of: set)
+                done(true)
+            }
+        rename.backgroundColor = .systemTeal
+        return UISwipeActionsConfiguration(actions: [rename])
+    }
+
+    private func promptForRename(of set: WordSet) {
+        let ac = UIAlertController(
+            title: NSLocalizedString("Rename set", comment: "AlertController title"),
+            message: nil, preferredStyle: .alert)
+        ac.addTextField { $0.text = set.name; $0.clearButtonMode = .whileEditing }
+        ac.addAction(UIAlertAction(title: NSLocalizedString("Save", comment: "AlertAction title"),
+                                   style: .default) { [weak self, weak ac] _ in
+            guard let self,
+                  let name = ac?.textFields?.first?.text?
+                      .trimmingCharacters(in: .whitespacesAndNewlines), !name.isEmpty
+            else { return }
+            try? self.lexicon.renameWordSet(set.id, to: name)
+            self.reload()
+        })
+        ac.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: "AlertAction title"),
+                                   style: .cancel))
+        present(ac, animated: true)
+    }
+
     override func tableView(_ tableView: UITableView,
                             commit editingStyle: UITableViewCell.EditingStyle,
                             forRowAt indexPath: IndexPath) {

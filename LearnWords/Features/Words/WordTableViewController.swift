@@ -118,8 +118,12 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         if text.aproxWordCount > 1 {
             guard let set = library.selectedSet else { return }
             let pair = LanguagePair.forSet(set)
-            try? lexicon.importPlainText(text, into: set.id,
-                                         first: pair.secondary, second: pair.primary)
+            do {
+                try lexicon.importPlainText(text, into: set.id,
+                                            first: pair.secondary, second: pair.primary)
+            } catch {
+                debugLog("Shared-text import failed: \(error)")
+            }
             reload()
         } else {
             importedWord = lemmas(from: text).first ?? text
@@ -226,7 +230,8 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         let edit = UIContextualAction(
             style: .normal,
             title: NSLocalizedString("Edit", comment: "swipe action")) { [weak self] _, _, done in
-                self?.presentEditor(for: sense, at: indexPath, completion: done)
+                self?.editMeaning(sense)
+                done(true)
             }
         edit.backgroundColor = .systemTeal
         edit.image = editImage
@@ -256,41 +261,18 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         return UISwipeActionsConfiguration(actions: [reset])
     }
 
-    /// Edits the words on both sides of a meaning.
+    /// Opens the meaning editor.
     ///
-    /// Two fields, as before — which means that for a meaning with synonyms it edits the
-    /// *first* word on each side and leaves the rest alone. Adding and removing synonyms
-    /// needs a screen of its own, not two text fields in an alert.
-    private func presentEditor(for sense: Sense,
-                               at indexPath: IndexPath,
-                               completion: @escaping (Bool) -> Void) {
-        let pair = languages
-        guard let left = sense.terms(in: pair.secondary).first,
-              let right = sense.terms(in: pair.primary).first else { return completion(false) }
-
-        let ac = UIAlertController(title: NSLocalizedString("Edit word", comment: "AlertController title"),
-                                   message: nil, preferredStyle: .alert)
-        ac.addTextField { $0.text = left.text }
-        ac.addTextField { $0.text = right.text }
-
-        let save = UIAlertAction(title: NSLocalizedString("Save", comment: "AlertAction title"),
-                                 style: .default) { [weak self, weak ac] _ in
-            guard let self, let fields = ac?.textFields else { return completion(false) }
-            // Every set and meaning using these words sees the change — the point of an
-            // atomic word — and their history survives the rename (TD-18).
-            try? self.lexicon.updateTerm(left.id, text: fields[0].text ?? left.text)
-            try? self.lexicon.updateTerm(right.id, text: fields[1].text ?? right.text)
-            self.reload()
-            completion(true)
+    /// Replaces an alert with two text fields, which could only edit the *first* word on
+    /// each side and had no way to add or remove a synonym at all — so the model's
+    /// headline feature was reachable only from the seed.
+    private func editMeaning(_ sense: Sense) {
+        let editor = MeaningEditorViewController(sense: sense,
+                                                 languages: languages,
+                                                 lexicon: lexicon) { [weak self] in
+            self?.reload()
         }
-        ac.addAction(save)
-        ac.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: "AlertAction title"),
-                                   style: .cancel) { _ in completion(true) })
-        ac.popoverPresentationController?.sourceView = tableView
-
-        present(ac, animated: true) {
-            self.tableView.selectRow(at: indexPath, animated: true, scrollPosition: .middle)
-        }
+        navigationController?.pushViewController(editor, animated: true)
     }
 
     // MARK: - Search
@@ -315,12 +297,17 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         navigationItem.hidesSearchBarWhenScrolling = hideWhenAppear
     }
 
-    /// Filters in memory over the loaded set — the store's `findTerms` searches every set
-    /// and matches inflected forms, which is the *other* screen's job (Search).
+    /// Filters the loaded set, matching **inflected forms** through the store — typing
+    /// "made" finds "make", which is why `WordForm` rows exist and what an in-memory
+    /// `contains` could never do.
+    ///
+    /// Still scoped to the selected set: this screen is that set's list. `findTerms`
+    /// searches every set, so its results are intersected with what is on screen.
     func filterRows(for searchText: String) {
         let needle = searchText.lowercased()
+        let matched = Set((try? lexicon.findTerms(matching: searchText))?.map(\.id) ?? [])
         filtered = senses.filter { sense in
-            sense.terms.contains { $0.text.lowercased().contains(needle) }
+            sense.terms.contains { $0.text.lowercased().contains(needle) || matched.contains($0.id) }
         }
         tableView.reloadData()
     }

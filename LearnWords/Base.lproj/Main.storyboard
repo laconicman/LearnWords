@@ -40,32 +40,6 @@
                                                         <constraint firstAttribute="width" constant="44" id="cAv-4i-Dw8"/>
                                                         <constraint firstAttribute="width" secondItem="01J-fN-Z6r" secondAttribute="height" multiplier="1:1" id="wkE-bX-xzX"/>
                                                     </constraints>
-                                                    <userDefinedRuntimeAttributes>
-                                                        <userDefinedRuntimeAttribute type="number" keyPath="angle">
-                                                            <real key="value" value="90"/>
-                                                        </userDefinedRuntimeAttribute>
-                                                        <userDefinedRuntimeAttribute type="number" keyPath="startAngle">
-                                                            <real key="value" value="-90"/>
-                                                        </userDefinedRuntimeAttribute>
-                                                        <userDefinedRuntimeAttribute type="number" keyPath="progressThickness">
-                                                            <real key="value" value="0.5"/>
-                                                        </userDefinedRuntimeAttribute>
-                                                        <userDefinedRuntimeAttribute type="number" keyPath="trackThickness">
-                                                            <real key="value" value="0.5"/>
-                                                        </userDefinedRuntimeAttribute>
-                                                        <userDefinedRuntimeAttribute type="number" keyPath="gradientRotateSpeed">
-                                                            <real key="value" value="0.0"/>
-                                                        </userDefinedRuntimeAttribute>
-                                                        <userDefinedRuntimeAttribute type="number" keyPath="glowAmount">
-                                                            <real key="value" value="14"/>
-                                                        </userDefinedRuntimeAttribute>
-                                                        <userDefinedRuntimeAttribute type="color" keyPath="trackColor">
-                                                            <color key="value" name="Gray4"/>
-                                                        </userDefinedRuntimeAttribute>
-                                                        <userDefinedRuntimeAttribute type="color" keyPath="IBColor2">
-                                                            <color key="value" systemColor="systemOrangeColor"/>
-                                                        </userDefinedRuntimeAttribute>
-                                                    </userDefinedRuntimeAttributes>
                                                 </view>
                                                 <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="3" translatesAutoresizingMaskIntoConstraints="NO" id="Mtj-5O-rhc">
                                                     <rect key="frame" x="47" y="0.0" width="308" height="44.5"/>

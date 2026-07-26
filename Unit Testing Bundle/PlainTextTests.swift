@@ -24,18 +24,33 @@ struct PlainTextTests {
 
     @Test func parsesPipeSeparatedLines() {
         let lines = PlainText.parse("bear|медведь\nfox|лиса")
-        #expect(lines.map(\.first) == ["bear", "fox"])
-        #expect(lines.map(\.second) == ["медведь", "лиса"])
+        #expect(lines.map(\.first) == [["bear"], ["fox"]])
+        #expect(lines.map(\.second) == [["медведь"], ["лиса"]])
+    }
+
+    /// The defect this closes: `render` writes "fox : лиса, лисица" and `parse` used to
+    /// read the whole right side as one term, so a round trip produced a word literally
+    /// named "лиса, лисица".
+    @Test func commasSeparateSynonymsWithinASide() {
+        let lines = PlainText.parse("fox, reynard | лиса, лисица")
+        #expect(lines == [PlainText.Line(first: ["fox", "reynard"],
+                                         second: ["лиса", "лисица"])])
+    }
+
+    @Test func emptySynonymEntriesAreDropped() {
+        // A trailing comma is a typo, not a blank word.
+        #expect(PlainText.parse("fox, | лиса,,") == [PlainText.Line(first: ["fox"],
+                                                                    second: ["лиса"])])
     }
 
     @Test(arguments: ["bear : медведь", "bear-медведь", "bear – медведь"])
     func supportsColonDashAndEnDashSeparators(line: String) {
-        #expect(PlainText.parse(line) == [PlainText.Line(first: "bear", second: "медведь")])
+        #expect(PlainText.parse(line) == [PlainText.Line(first: ["bear"], second: ["медведь"])])
     }
 
     @Test func trimsWhitespaceAroundParts() {
         #expect(PlainText.parse("  bear  |  медведь  ")
-                == [PlainText.Line(first: "bear", second: "медведь")])
+                == [PlainText.Line(first: ["bear"], second: ["медведь"])])
     }
 
     @Test func acceptsUnicodeLineSeparator() {
@@ -50,17 +65,18 @@ struct PlainTextTests {
         missing second|
         bear|медведь
         """
-        #expect(PlainText.parse(text).map(\.first) == ["bear"])
+        #expect(PlainText.parse(text).map(\.first) == [["bear"]])
     }
 
     @Test func preservesCase() {
         // Import intentionally does NOT canonicalise (unlike manual flashcard entry).
-        #expect(PlainText.parse("Bear|Медведь").first?.first == "Bear")
+        #expect(PlainText.parse("Bear|Медведь").first?.first == ["Bear"])
     }
 
     @Test func multiWordPhrasesSurvive() {
+        // Spaces are not synonym separators — only commas are.
         #expect(PlainText.parse("polar bear|полярный медведь")
-                == [PlainText.Line(first: "polar bear", second: "полярный медведь")])
+                == [PlainText.Line(first: ["polar bear"], second: ["полярный медведь"])])
     }
 
     @Test func hyphenatedWordIsSkippedKnownLimitation() {
@@ -83,6 +99,29 @@ struct PlainTextTests {
         #expect(senses.count == 2)
         #expect(Set(senses.flatMap { $0.terms(in: "en") }.map(\.text)) == ["bear", "fox"])
         #expect(Set(senses.flatMap { $0.terms(in: "ru") }.map(\.text)) == ["медведь", "лиса"])
+    }
+
+    @Test func importCreatesSynonyms() throws {
+        let lexicon = makeLexicon()
+        let set = try lexicon.addWordSet(named: "Animals", languages: ["en", "ru"])
+
+        #expect(try lexicon.importPlainText("fox, reynard | лиса, лисица",
+                                            into: set.id, first: "en", second: "ru") == 1)
+
+        let sense = try #require(try lexicon.senses(in: set.id).first)
+        #expect(Set(sense.terms(in: "en").map(\.text)) == ["fox", "reynard"])
+        #expect(Set(sense.terms(in: "ru").map(\.text)) == ["лиса", "лисица"])
+    }
+
+    @Test func importSkipsALineWhenAnyOfItsWordsIsAlreadyPresent() throws {
+        let lexicon = makeLexicon()
+        let set = try lexicon.addWordSet(named: "Animals", languages: ["en", "ru"])
+        try lexicon.addSense(to: set.id, terms: [Term.Draft("reynard", in: "en"),
+                                                 Term.Draft("лис", in: "ru")])
+
+        // "fox" is new but "reynard" is not — merging would be a guess.
+        #expect(try lexicon.importPlainText("fox, reynard | лиса, лисица",
+                                            into: set.id, first: "en", second: "ru") == 0)
     }
 
     @Test func importSkipsWordsTheSetAlreadyHas() throws {
@@ -165,5 +204,27 @@ struct PlainTextTests {
         let text = PlainText.render(try lexicon.senses(in: set.id), from: "en", to: "ru")
         #expect(try lexicon.importPlainText(text, into: set.id, first: "en", second: "ru") == 0)
         #expect(try lexicon.senses(in: set.id).count == 2)
+    }
+
+    /// The real round trip, into an **empty** set — where the old dedup could not mask
+    /// the loss. This is the case that was broken: it produced one term named
+    /// "лиса, лисица" instead of two synonyms.
+    @Test func synonymsSurviveExportAndReimportIntoAnEmptySet() throws {
+        let source = makeLexicon()
+        let set = try source.addWordSet(named: "Animals", languages: ["en", "ru"])
+        try source.addSense(to: set.id, terms: [Term.Draft("fox", in: "en"),
+                                                Term.Draft("лиса", in: "ru"),
+                                                Term.Draft("лисица", in: "ru")])
+        let text = PlainText.render(try source.senses(in: set.id), from: "en", to: "ru")
+
+        let destination = makeLexicon()
+        let copy = try destination.addWordSet(named: "Animals", languages: ["en", "ru"])
+        #expect(try destination.importPlainText(text, into: copy.id,
+                                                first: "en", second: "ru") == 1)
+
+        let sense = try #require(try destination.senses(in: copy.id).first)
+        #expect(sense.terms(in: "en").map(\.text) == ["fox"])
+        #expect(Set(sense.terms(in: "ru").map(\.text)) == ["лиса", "лисица"],
+                "two synonyms, not one term named \"лиса, лисица\"")
     }
 }

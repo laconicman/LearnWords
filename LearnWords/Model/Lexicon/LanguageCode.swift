@@ -91,6 +91,17 @@ enum LanguageCode {
         parse(tag).language
     }
 
+    /// The language's name in the reader's own language: "en" → "English", "ru" →
+    /// "Russian" (or "Английский"/"Русский" for a Russian reader).
+    ///
+    /// This is the half of the job `Locale` *should* do — display, not identity (see the
+    /// note above). Falls back to the code itself, which is a poor label but an honest
+    /// one, for a language the system does not know.
+    static func displayName(_ tag: String) -> String {
+        let code = canonical(tag)
+        return Locale.current.localizedString(forLanguageCode: code)?.capitalized ?? code
+    }
+
     /// BCP-47 casing, so the same variety spelled two ways compares equal: script is
     /// title case (`Hans`), region upper (`US`, `001`), variant lower (`valencia`).
     private static func normalized(_ subtag: Substring) -> String {

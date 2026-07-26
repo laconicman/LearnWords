@@ -94,6 +94,15 @@ final class Lexicon {
         try senses(in: setID).filter { $0.canPractise(from: from, to: to) }
     }
 
+    /// One meaning, re-read. A screen editing a meaning needs to see its own change, and
+    /// a `Sense` snapshot is stale the moment anything touches the words it holds.
+    func sense(_ id: UUID) throws -> Sense? {
+        let request = CDSynset.fetchRequest()
+        request.predicate = NSPredicate(format: "id == %@", id as CVarArg)
+        request.fetchLimit = 1
+        return try viewContext.fetch(request).first.map(Sense.init)
+    }
+
     /// Adds one meaning to a set: the words that express it, in any languages.
     ///
     /// Words are **deduplicated by (text, language)** — adding "bear/медведь" when "bear"
@@ -170,6 +179,37 @@ final class Lexicon {
                 set.addLanguage(try languages.language(draft.language, in: context))
             }
             return Sense(sense)
+        }
+    }
+
+    /// Takes a word off a meaning — a synonym the learner no longer wants listed.
+    ///
+    /// **Unlinks, never deletes.** The `Term` row survives because other meanings and
+    /// sets may use it; that is what makes a word atomic (TD-18). A term left on no
+    /// meaning at all is collected by `deleteOrphanedTerms`, deliberately and separately.
+    ///
+    /// Refuses to remove the last word: a meaning expressed by nothing is not a meaning,
+    /// and silently deleting the sense instead would be a surprise. Delete the meaning if
+    /// that is what is wanted.
+    @discardableResult
+    func removeTerm(_ termID: UUID, from senseID: UUID) throws -> Sense {
+        try write { context in
+            let sense = try Self.sense(senseID, in: context)
+            guard sense.terms.count > 1 else { throw LexiconError.lastTerm }
+            guard let term = sense.terms.first(where: { $0.id == termID }) else {
+                throw LexiconError.notFound
+            }
+            sense.removeTerm(term)
+            return Sense(sense)
+        }
+    }
+
+    /// Sets or clears the disambiguation shown at practice ("bear — the animal").
+    /// Empty text clears it: a note of "" would claim there is one.
+    func updateSense(_ id: UUID, note: String?) throws {
+        try write { context in
+            let trimmed = note?.trimmingCharacters(in: .whitespacesAndNewlines)
+            try Self.sense(id, in: context).note = (trimmed?.isEmpty == false) ? trimmed : nil
         }
     }
 
@@ -318,6 +358,23 @@ final class Lexicon {
         }
     }
 
+    /// Deletes words that belong to no meaning at all.
+    ///
+    /// Same policy as `deleteOrphanedSenses`, and separate from it for the same reason:
+    /// explicit, never automatic. A word is cheap to keep and its `id` is referenced by
+    /// `ReviewEvent.promptTermID`, so collecting one is a decision, not a side effect of
+    /// editing.
+    @discardableResult
+    func deleteOrphanedTerms() throws -> Int {
+        try write { context in
+            let request = CDTerm.fetchRequest()
+            request.predicate = NSPredicate(format: "synsets.@count == 0")
+            let orphans = try context.fetch(request)
+            orphans.forEach(context.delete)
+            return orphans.count
+        }
+    }
+
     var isEmpty: Bool {
         ((try? viewContext.count(for: CDWordSet.fetchRequest())) ?? 0) == 0
     }
@@ -452,6 +509,8 @@ private struct LanguageCache {
 enum LexiconError: Error {
     /// No set, sense or word with that identity.
     case notFound
+    /// Refused to remove a meaning's only word. Delete the meaning instead.
+    case lastTerm
 }
 
 // MARK: - Snapshots
