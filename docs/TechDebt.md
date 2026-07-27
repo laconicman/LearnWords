@@ -903,3 +903,26 @@ keystroke. **Discharge:** the `uikit-app-structure` split — suggestions into a
 object, dictionary lookup into the shared helper it already half-lives in, store writes
 behind `Library`, leaving the view controller to structure navigation and interpret user
 action. A fork, not a drive-by.
+
+## TD-29 — A `UISwitch` cannot be driven by the simulator harness
+
+Synthetic taps and drags from the agent's simulator tooling do not operate a `UISwitch`:
+the touches reach the window (`shouldSend: 0; systemGestureStateChange: 1` in the UIKit
+event log), a drag is claimed by the back gesture, and a switch that predates the change —
+"Pronounce answers" — is equally unresponsive. `simctl privacy` has no notifications
+service either, so notification permission cannot be granted headlessly.
+
+**Cost:** any feature gated behind a switch is unverifiable end-to-end without a human,
+which is how fork G shipped its reminder path proven only to the derivation boundary.
+**Discharge:** drive these through a UI test with `XCUIElement.switches[...].tap()`, which
+uses a different event path, or expose a launch argument that presets the preference for a
+screenshot pass. Until then, say plainly which half of such a feature is verified.
+
+## TD-30 — The ring's Dynamic-Type size is overridden by the cell
+
+`ProgressRing` reports a Dynamic-Type-scaled `intrinsicContentSize`, but the word cell's
+fixed 44×44 constraints win, so the ring does not grow with the text (ProgressModel R6,
+half-done). **Cost:** an accessibility-size user gets large text beside a fixed-size ring.
+**Discharge:** relax the cell's constraints to `greaterThanOrEqual` and let the ring size
+itself — belongs with the next rebuild of the words screen, since that is the file that
+owns the constraints.

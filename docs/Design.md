@@ -454,6 +454,58 @@ changed.
 the answer came from printing what was actually stored across three successive writes.
 Worth remembering as the faster route when a Core Data result contradicts the code.
 
+## Decision: reminders are scheduled, not fired
+
+**Decision (2026-07-27).** Local reminders are a **rolling 14-day window of dated
+requests, one per day the schedule predicts work**, rebuilt whenever the app can see fresh
+state — on backgrounding, on foregrounding, and on `storeDidChangeRemotely`. Days with
+nothing due get no request. There is no repeating daily trigger.
+
+**Why, and why not AnkiDroid's design.** AnkiDroid sets a plain daily alarm and computes
+the due count *at fire time*: a `BroadcastReceiver` wakes, opens the collection, and only
+then decides whether to post — staying silent when the count is under a threshold, or when
+the learner already studied today. **iOS cannot do this.** A `UNNotificationRequest` has
+its content baked in at schedule time and runs no code at delivery; only a *remote* push
+can be rewritten in flight by a service extension. So both suppression paths have to move
+to schedule time, and that is the whole design.
+([DeepWiki consult](https://deepwiki.com/search/how-does-ankidroid-remind-user_8f0745fe-717a-4d87-a999-f41dacfa7ff3?mode=deep),
+`ankidroid/Anki-Android`, 2026-07-27.)
+
+**Rejected: one repeating daily trigger.** It is what the consult recommended for iOS, and
+it is simpler — one pending request, immune to the 64-request cap. It also fires whether or
+not anything is due, which is exactly the nagging AnkiDroid added a threshold and an
+"only if no reviews today" switch to prevent. Scheduling per-day lets us keep both.
+
+**Rejected: scheduling from the next due date alone.** FSRS intervals grow exponentially, so
+a single next-due reminder can go quiet for a month while other words come due tomorrow.
+
+**The count is a prediction, bounded three ways.** A meaning's `dueAt` is fixed by its last
+answer, so between rebuilds a date can only *arrive*, never retreat — the count can only
+under-state. Practising happens with the app open, which rebuilds. The one case that can
+over-state is another device doing the work, which is why a remote change rebuilds too.
+
+**Cost (accepted).** After a fortnight of silence the window runs out and reminders stop.
+Deliberate: once a day is missed everything stays overdue, so a lapsed learner is reminded
+daily for two weeks and then left alone. An app that nags forever gets deleted.
+
+## Decision: practice is due-driven, with studying ahead as a deliberate choice
+
+**Decision (2026-07-27).** `PracticeSession.Scope` splits `.due` from `.everything`. The
+exercise buttons use `.due`; when nothing is due the chooser offers **"Practise anyway"**
+rather than refusing. Answers are recorded identically either way.
+
+**Why.** It is Anki's own split — `StudyOptionsState.Congrats` turns the Study button into
+*Custom Study*, whose "Review ahead" builds a filtered deck of not-yet-due cards that the
+scheduler then reschedules through the normal path. No separate recording path, there or
+here: practising early is worth less, and the model already expresses that through FSRS
+stability rather than through a second kind of event.
+
+**Ordering within a sitting** is most-overdue-first, never-seen last, with an explicit
+random tiebreak. The tiebreak is a field rather than `shuffled().sorted()` because Swift's
+sort is not stable, so relying on it to carry a prior shuffle through ties would be relying
+on unspecified behaviour — and without it a fresh set, where everything ties at "never
+seen", would be asked in insertion order every single time.
+
 ## Decision: a manual reset appends a marker; it never deletes history
 
 **Decision (2026-07-26).** "Reset progress" on a word appends a `ReviewEvent` of kind

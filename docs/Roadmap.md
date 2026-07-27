@@ -122,24 +122,57 @@ Priority-ordered. Rationale lives in [Design](Design.md); debt items in [TechDeb
   in Xcode's Signing & Capabilities where the App ID updates in the same step — not in a
   hand-edited plist. (The `remote-notification` background mode, the other half, is now in
   `Info.plist`.)
-- **Spaced repetition and local reminders.** `ScoringPolicy` now yields a due date per
-  meaning, but `PracticeSession` still queues the whole set shuffled. Making practice
-  due-driven, plus a rolling-window local notification (64-pending cap; a countless daily
-  reminder at the 12.1 floor, `BGAppRefreshTask` as the iOS 13+ upgrade).
-- **Anki interchange format** — alongside `PlainText`, the shape Anki's file importer
-  reads. Reference:
-  [Word-Hoarder's flashcard export](https://github.com/itincknell/Word-Hoarder#creating-a-flashcard-file).
-  Anki's TTS tag takes an **underscored full locale** (`{{tts en_US:Front}}`) matched by
-  exact string equality, so an export must emit the learner's locale preference, not our
-  bare `Language.code`, or the card gets no voice.
-- **`Variety` rows** — see [Design](Design.md). Its first consumer is either the near-miss
-  coefficient in `ScoringPolicy` or enrichment (TD-22).
+- **The reminder switch needs a human.** Practice is due-driven and the reminder window is
+  derived and tested, but the path permission → schedule → deliver → tap → route is
+  **unverified**: neither synthetic taps nor a drag operate a `UISwitch` in the simulator
+  harness, and `simctl privacy` cannot grant notification permission. Turn the switch on,
+  on a device, and confirm a reminder actually arrives.
+- **Enrichment (TD-22) implementation** — [Enrichment](Enrichment.md) designs it. First
+  measurement any implementing fork must take is the reduction ratio on one real kaikki
+  file; every size estimate downstream is a guess until then. Whether FTS5 exists in the
+  system SQLite at the 12.1 floor needs an old device (TD-8 territory).
+- **`Variety`, `Pronunciation` and `Tag.category`** — the three schema additions
+  [Enrichment](Enrichment.md) implies. **Cheapest before the CloudKit production deploy
+  and permanent after it:** CloudKit allows adding record types and fields to production
+  but never removing or retyping them, so `Term.transcription` would stay vestigial
+  forever. Decide deliberately alongside the deploy, not after.
+- **`SearchWordViewController` (TD-28)** — ~600 lines doing search, suggestions, dictionary
+  lookup, segue routing and store writes. Every bug in the add-word flow so far has been a
+  coordination bug hiding in its size.
 - **`CSSearchableItemActionType`** — words are indexed in Spotlight, but tapping a result
   does not route into the app.
 - **TD-8 device verification** — iOS 12–14 behaviour is unverified since the store change.
+- **TD-26** — orphan collection still has no way to run; **TD-24** — extension bundle
+  versions drift from the app's, which App Store Connect rejects at submission.
 - Storyboard split (TD-5) is **likely YAGNI** at this size — prefer creator-injection on the
   existing storyboard where a screen needs a dependency; revisit only if the one storyboard
   actually hurts.
+
+## Done (2026-07-27) — spaced repetition and reminders
+
+Practice is **due-driven**: `PracticeSession.Scope` distinguishes studying from studying
+ahead, and when nothing is due the chooser offers "Practise anyway" rather than refusing.
+`ReviewSchedule` derives what is waiting across the library; `ReminderScheduler` turns that
+into a rolling 14-day window of dated local notifications, one per day that has predicted
+work. The "Known level" slider is now "Remembered for (days)", the meaning it took on when
+scoring moved to FSRS.
+
+The design is AnkiDroid's inverted: it computes the due count *when the alarm fires* and
+stays silent if nothing is due, which iOS cannot do — a local notification's content is
+baked in at schedule time. Both of its suppression paths therefore moved to schedule time.
+See [Design](Design.md) § *reminders are scheduled, not fired*.
+
+## Done (2026-07-27) — Anki interchange format
+
+`AnkiText` renders a set as an Anki-importable tab-separated file with a `Sense.id` GUID
+column, so re-exporting updates the same notes instead of duplicating them, and two
+meanings of one word never collide. Export is a format choice; `PlainText` is unchanged.
+
+**Correction to this document's earlier claim:** it said an export must emit the learner's
+locale for TTS. A text import cannot carry a notetype or template at all — `#notetype:`
+only *selects* an existing one — so the exporter has no influence on TTS. A learner who
+builds a speaking notetype points the file at it by editing that line. Verified against
+`ankitects/anki` source.
 
 ## Done (2026-07-27) — the store/UI gap
 
