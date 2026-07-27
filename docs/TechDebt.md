@@ -964,3 +964,22 @@ into a dead session — TD-15's symptom, reintroduced by the extraction meant to
 worry is also gone: `AudioSessionHandoffTests` pins the contract, and both of the cases
 that matter were **checked to fail against the old code** before being kept — a regression
 test that has never been red is only a hope.
+
+## TD-32 — Reminders cannot be tested without waiting for a due date
+
+A correct schedule is often an *empty* one: after a practice round nothing comes due for a
+day or two, so no request is created and nothing arrives. Combined with a bug that
+suppressed foreground delivery, this made the first device test read as total failure when
+half of it was working as designed.
+
+Settings now names the next reminder, which turns silence into information. What is still
+missing is a way to see one *arrive* without waiting.
+
+**The manual procedure, using only real features:** reset one word's progress (swipe right
+on it in the word list) so something is due now, then set the reminder time a couple of
+minutes ahead. A request for today is then created and delivers.
+
+**Cost:** the whole feature is unverifiable in a single sitting without that trick, which
+nobody would guess. **Discharge:** a UI test that pins the clock and asserts the pending
+requests, which also closes TD-29's inability to drive the switch. Not a debug button —
+the app should not grow a control that exists only to prove itself.

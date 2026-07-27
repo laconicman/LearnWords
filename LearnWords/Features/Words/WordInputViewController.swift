@@ -41,7 +41,21 @@ final class WordInputViewController: UITableViewController {
         }
     }
 
+    /// The word already chosen, shown above the field while choosing its translation.
+    ///
+    /// **Restored after being deleted (owner, 2026-07-28).** The old search screen carried
+    /// a section holding the term being defined, and it was removed along with the bug that
+    /// section had — its row was tappable, so tapping the word filed it as its own
+    /// translation. The row should never have been tappable; the *section* was doing real
+    /// work. Two steps of the same screen otherwise look identical, and there is nothing
+    /// else on screen to say which one you are on. It will not fit in the navigation bar.
+    struct Context {
+        let caption: String
+        let term: String
+    }
+
     private let purpose: Purpose
+    private let context: Context?
     private let suggestions: WordSuggestions?
     private let onCommit: (String) -> Void
 
@@ -56,8 +70,12 @@ final class WordInputViewController: UITableViewController {
         didSet { updateDictationButton() }
     }
 
-    init(_ purpose: Purpose, initialText: String = "", onCommit: @escaping (String) -> Void) {
+    init(_ purpose: Purpose,
+         initialText: String = "",
+         context: Context? = nil,
+         onCommit: @escaping (String) -> Void) {
         self.purpose = purpose
+        self.context = context
         self.suggestions = purpose.language.map { WordSuggestions(language: $0) }
         self.onCommit = onCommit
         super.init(style: .grouped)
@@ -121,17 +139,83 @@ final class WordInputViewController: UITableViewController {
         field.rightView = dictationButton
         field.rightViewMode = .always
 
+        let stack = UIStackView(arrangedSubviews: contextViews() + [field])
+        stack.axis = .vertical
+        stack.spacing = 12
+        stack.translatesAutoresizingMaskIntoConstraints = false
+
         let header = UIView()
-        field.translatesAutoresizingMaskIntoConstraints = false
-        header.addSubview(field)
+        header.addSubview(stack)
         NSLayoutConstraint.activate([
-            field.leadingAnchor.constraint(equalTo: header.layoutMarginsGuide.leadingAnchor),
-            field.trailingAnchor.constraint(equalTo: header.layoutMarginsGuide.trailingAnchor),
-            field.topAnchor.constraint(equalTo: header.topAnchor, constant: 12),
-            field.bottomAnchor.constraint(equalTo: header.bottomAnchor, constant: -12),
+            stack.leadingAnchor.constraint(equalTo: header.layoutMarginsGuide.leadingAnchor),
+            stack.trailingAnchor.constraint(equalTo: header.layoutMarginsGuide.trailingAnchor),
+            stack.topAnchor.constraint(equalTo: header.topAnchor, constant: 12),
+            stack.bottomAnchor.constraint(equalTo: header.bottomAnchor, constant: -12),
         ])
-        header.frame.size.height = field.intrinsicContentSize.height + 24
+        // A table header view is laid out by frame, so its height has to be measured once
+        // the content is in place — and again when Dynamic Type changes it.
         tableView.tableHeaderView = header
+        sizeHeaderToFit()
+    }
+
+    /// The pinned term: a caption and the word, in a tinted slab so it reads as *context*
+    /// rather than as another thing to fill in. Deliberately not a table row — nothing
+    /// here is selectable, and a row invites a tap.
+    private func contextViews() -> [UIView] {
+        guard let context else { return [] }
+
+        let caption = UILabel()
+        caption.text = context.caption
+        caption.font = .preferredFont(forTextStyle: .caption1)
+        caption.adjustsFontForContentSizeCategory = true
+        caption.textColor = .lwTextSecondary
+
+        let term = UILabel()
+        term.text = context.term
+        term.font = .preferredFont(forTextStyle: .title2)
+        term.adjustsFontForContentSizeCategory = true
+        term.textColor = .lwTextPrimary
+        term.numberOfLines = 0
+
+        let inner = UIStackView(arrangedSubviews: [caption, term])
+        inner.axis = .vertical
+        inner.spacing = 2
+        inner.translatesAutoresizingMaskIntoConstraints = false
+
+        // A plain view behind the stack rather than the stack's own `backgroundColor`,
+        // which `UIStackView` ignores below iOS 14 — at the 12.1 floor the slab would
+        // simply not be there, and the whole point of it is being visible.
+        let slab = UIView()
+        slab.backgroundColor = UIColor.lwAccent.withAlphaComponent(0.12)
+        slab.layer.cornerRadius = 10
+        slab.addSubview(inner)
+        NSLayoutConstraint.activate([
+            inner.leadingAnchor.constraint(equalTo: slab.leadingAnchor, constant: 12),
+            inner.trailingAnchor.constraint(equalTo: slab.trailingAnchor, constant: -12),
+            inner.topAnchor.constraint(equalTo: slab.topAnchor, constant: 10),
+            inner.bottomAnchor.constraint(equalTo: slab.bottomAnchor, constant: -10),
+        ])
+        slab.isAccessibilityElement = true
+        slab.accessibilityLabel = "\(context.caption): \(context.term)"
+        return [slab]
+    }
+
+    /// Table header views size by frame, not by constraints.
+    private func sizeHeaderToFit() {
+        guard let header = tableView.tableHeaderView else { return }
+        header.frame.size.width = tableView.bounds.width
+        let height = header.systemLayoutSizeFitting(
+            CGSize(width: tableView.bounds.width, height: 0),
+            withHorizontalFittingPriority: .required,
+            verticalFittingPriority: .fittingSizeLevel).height
+        guard header.frame.height != height else { return }
+        header.frame.size.height = height
+        tableView.tableHeaderView = header
+    }
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        sizeHeaderToFit()
     }
 
     @objc private func textChanged() {

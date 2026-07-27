@@ -106,7 +106,15 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
     /// returns to the word list — going back to "which word?" after answering it is a
     /// question nobody asked.
     private func askMeaning(of word: String, in set: WordSet, pair: LanguagePair) {
-        let screen = WordInputViewController(.add(language: pair.primary)) { [weak self] meaning in
+        // The word stays on screen while its meaning is typed. Without it the two steps are
+        // visually identical and there is nothing to say which one you are on — the job the
+        // old search screen's first section was doing (owner).
+        let context = WordInputViewController.Context(
+            caption: String(format: NSLocalizedString("Word in %@", comment: "Caption; a language"),
+                            LanguageCode.displayName(pair.secondary)),
+            term: word)
+        let screen = WordInputViewController(.add(language: pair.primary),
+                                             context: context) { [weak self] meaning in
             guard let self else { return }
             do {
                 try self.lexicon.addSense(to: set.id,

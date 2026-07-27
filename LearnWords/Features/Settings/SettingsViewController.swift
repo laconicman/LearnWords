@@ -344,6 +344,7 @@ private final class SliderCell: UITableViewCell {
 private final class TimeCell: UITableViewCell {
 
     private let picker = UIDatePicker()
+    private let titleLabel = UILabel()
     private let onChange: (Int, Int) -> Void
 
     init(title: String, hour: Int, minute: Int, onChange: @escaping (Int, Int) -> Void) {
@@ -359,8 +360,33 @@ private final class TimeCell: UITableViewCell {
         components.minute = minute
         picker.date = Calendar.current.date(from: components) ?? Date()
         picker.addTarget(self, action: #selector(changed), for: .valueChanged)
-        accessoryView = picker
-        picker.sizeToFit()
+
+        // Laid out rather than parked in `accessoryView`. As an accessory the compact
+        // picker takes its intrinsic width first and the title gets whatever is left —
+        // which on a real device was four characters: "R…". A stack with the picker
+        // resisting compression and the label free to shrink last puts the space where the
+        // words are, and matches how `SliderCell` is built.
+        titleLabel.text = title
+        titleLabel.font = .preferredFont(forTextStyle: .body)
+        titleLabel.adjustsFontForContentSizeCategory = true
+        titleLabel.numberOfLines = 0
+        textLabel?.text = nil
+
+        picker.setContentCompressionResistancePriority(.required, for: .horizontal)
+        picker.setContentHuggingPriority(.required, for: .horizontal)
+        titleLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+
+        let stack = UIStackView(arrangedSubviews: [titleLabel, picker])
+        stack.alignment = .center
+        stack.spacing = 8
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(stack)
+        NSLayoutConstraint.activate([
+            stack.leadingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.leadingAnchor),
+            stack.trailingAnchor.constraint(equalTo: contentView.layoutMarginsGuide.trailingAnchor),
+            stack.topAnchor.constraint(equalTo: contentView.layoutMarginsGuide.topAnchor),
+            stack.bottomAnchor.constraint(equalTo: contentView.layoutMarginsGuide.bottomAnchor),
+        ])
     }
 
     @available(*, unavailable) required init?(coder: NSCoder) { fatalError() }
@@ -370,7 +396,7 @@ private final class TimeCell: UITableViewCell {
         get { picker.isEnabled }
         set {
             picker.isEnabled = newValue
-            textLabel?.textColor = newValue ? .lwTextPrimary : .lwTextSecondary
+            titleLabel.textColor = newValue ? .lwTextPrimary : .lwTextSecondary
         }
     }
 

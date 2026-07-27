@@ -97,13 +97,22 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         AppRoot.handle(url, on: keyWindow)
     }
 
-    /// Nothing is shown while the app is open: the learner is already here, and a banner
-    /// telling them to come and practise over the top of them practising is noise.
+    /// Reminders are shown even while the app is open.
+    ///
+    /// This used to return `[]` — "you are already here, a banner would be noise". That was
+    /// second-guessing a request the learner had explicitly made, and it made the whole
+    /// feature unfalsifiable: set a reminder for a minute from now, stay in the app to
+    /// watch for it, and nothing happens. Silently dropping a notification is never the
+    /// friendlier reading of "remind me".
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 willPresent notification: UNNotification,
                                 withCompletionHandler completionHandler:
                                     @escaping (UNNotificationPresentationOptions) -> Void) {
-        completionHandler([])
+        if #available(iOS 14.0, *) {
+            completionHandler([.banner, .list, .sound])
+        } else {
+            completionHandler([.alert, .sound])
+        }
     }
 
     private var keyWindow: UIWindow? {

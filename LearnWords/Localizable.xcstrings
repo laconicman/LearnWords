@@ -830,6 +830,9 @@
         }
       }
     },
+    "Next reminder: %@." : {
+      "comment" : "Settings footer; placeholder is a date and time"
+    },
     "No words to study" : {
       "comment" : "Title for alert",
       "localizations" : {
@@ -858,6 +861,9 @@
     },
     "Nothing is due" : {
       "comment" : "Title for alert"
+    },
+    "Nothing is scheduled: no words come due in the next two weeks." : {
+      "comment" : "Settings footer when no reminder is pending"
     },
     "Notifications are off" : {
       "comment" : "Alert title"
@@ -1349,6 +1355,7 @@
     },
     "Word" : {
       "comment" : "backButtonTitle",
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1470,6 +1477,9 @@
         }
       }
     },
+    "You are reminded on days when words are due, and not on days when none are." : {
+      "comment" : "Settings footer when reminders are on"
+    },
     "You may add Keyboards from system General Settings pane." : {
       "localizations" : {
         "ru" : {
@@ -1491,9 +1501,6 @@
           }
         }
       }
-    },
-    "You will be reminded on days when words are due — and not on days when none are." : {
-      "comment" : "Settings footer when reminders are on"
     }
   },
   "version" : "1.0"
