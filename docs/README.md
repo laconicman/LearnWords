@@ -14,3 +14,4 @@ Model · Controller · Root · View). Design principles applied throughout: sepa
 of concerns, single source of truth, low coupling / high cohesion, dependency
 inversion, KISS, YAGNI (`software-development-principles`).
 - [Handoff](Handoff.md) — state of play after forks A/B/C: what is proven, what is not, and what the next fork should take.
+- [Enrichment](Enrichment.md) — TD-22 design: mapping kaikki/Wiktionary onto the lexicon, how the data reaches the device, and the licence obligations.
