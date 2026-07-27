@@ -21,6 +21,9 @@ final class WordSetsTableViewController: UITableViewController, UIDocumentPicker
     /// `cellForRow`, which is how a background merge turns into an index crash.
     private var sets: [WordSet] = []
 
+    private let renameImage = UIImage.systemImage("pencil")
+    private let deleteImage = UIImage.systemImage("trash")
+
     // MARK: - Lifecycle
 
     override func viewDidLoad() {
@@ -91,12 +94,27 @@ final class WordSetsTableViewController: UITableViewController, UIDocumentPicker
         tabBarController?.selectedIndex = 0
     }
 
-    /// Rename on swipe. `Lexicon.renameWordSet` existed from the start and no screen
-    /// called it — a set's name was fixed at creation.
+    /// Delete and rename on swipe.
+    ///
+    /// **Both, because providing this method replaces the default swipe-to-delete** that
+    /// `commit editingStyle:` gives for free. Adding rename alone removed delete — and
+    /// this screen has no Edit button, so there was no other way to reach it.
+    ///
+    /// `Lexicon.renameWordSet` existed from the start and no screen called it; a set's
+    /// name was fixed at creation until now.
     override func tableView(_ tableView: UITableView,
                             trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath)
     -> UISwipeActionsConfiguration? {
         let set = sets[indexPath.row]
+
+        let delete = UIContextualAction(
+            style: .destructive,
+            title: NSLocalizedString("Delete", comment: "swipe action")) { [weak self] _, _, done in
+                self?.deleteSet(at: indexPath)
+                done(true)
+            }
+        delete.image = deleteImage
+
         let rename = UIContextualAction(
             style: .normal,
             title: NSLocalizedString("Rename", comment: "swipe action")) { [weak self] _, _, done in
@@ -104,7 +122,13 @@ final class WordSetsTableViewController: UITableViewController, UIDocumentPicker
                 done(true)
             }
         rename.backgroundColor = .systemTeal
-        return UISwipeActionsConfiguration(actions: [rename])
+        rename.image = renameImage
+
+        let config = UISwipeActionsConfiguration(actions: [delete, rename])
+        // Unlike a single meaning, a whole set is not something to lose to an overshot
+        // swipe — the gesture has to land on the button.
+        config.performsFirstActionWithFullSwipe = false
+        return config
     }
 
     private func promptForRename(of set: WordSet) {
@@ -130,8 +154,12 @@ final class WordSetsTableViewController: UITableViewController, UIDocumentPicker
                             commit editingStyle: UITableViewCell.EditingStyle,
                             forRowAt indexPath: IndexPath) {
         guard editingStyle == .delete else { return }
-        // The meanings survive: they may live in other sets, and their history is
-        // evidence of work done. `Lexicon.deleteOrphanedSenses` collects the rest.
+        deleteSet(at: indexPath)
+    }
+
+    /// The meanings survive: they may live in other sets, and their history is evidence of
+    /// work done. `Lexicon.deleteOrphanedSenses` collects the rest, deliberately (TD-26).
+    private func deleteSet(at indexPath: IndexPath) {
         try? lexicon.deleteWordSet(sets[indexPath.row].id)
         sets.remove(at: indexPath.row)
         tableView.deleteRows(at: [indexPath], with: .automatic)
