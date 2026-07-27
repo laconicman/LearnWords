@@ -506,6 +506,40 @@ sort is not stable, so relying on it to carry a prior shuffle through ties would
 on unspecified behaviour — and without it a fresh set, where everything ties at "never
 seen", would be asked in insertion order every single time.
 
+## Decision: a permission is read, never remembered
+
+**Decision (owner, 2026-07-27).** The app never stores its own copy of whether a system
+permission was granted. Every feature that needs one re-reads the live status at the point
+of use *and* whenever the screen showing it appears, and says what still works without it.
+
+**Why.** Apple's guidance is explicit, and the app was breaking it:
+*"Always check your app's authorization status before scheduling local notifications.
+People can change your app's authorization settings at any time."*
+([Asking permission to use notifications](https://developer.apple.com/documentation/usernotifications/asking-permission-to-use-notifications).)
+The reminder switch had stored its own answer, so revoking notifications in Settings left
+the preference reading "on", the switch drawing "on", and nothing ever arriving.
+
+**A preference and a permission are different things, and both are kept.** The preference
+records what the learner *wants*; the permission records what the system currently
+*allows*. When the two disagree the UI follows the permission — but the preference is not
+overwritten, because re-allowing notifications in Settings should restore the reminders
+they asked for rather than requiring them to ask twice.
+
+**Authorized is not the same as visible.** A notification can be authorized while alert,
+sound and Notification Center are all disabled: scheduling succeeds and nothing is ever
+seen. `UNNotificationSettings` exposes those separately and they must be read separately —
+`ReminderScheduler.Standing.silenced` is that case, and a bare `authorizationStatus` check
+misses it.
+
+**Not every refusal is a trip to Settings.** A first decline can simply be asked again next
+time; only a *revoked* grant needs the Settings app. Sending someone to Settings for a
+decision they have not been asked to reconsider is a dead end dressed as help, so
+`DictationController.Failure` distinguishes the two and only one offers the button.
+
+**Applies to all three permissions the app uses** — notifications, speech recognition,
+microphone. `DictationController` re-reads the latter two on every start for the same
+reason.
+
 ## Decision: a manual reset appends a marker; it never deletes history
 
 **Decision (2026-07-26).** "Reset progress" on a word appends a `ReviewEvent` of kind

@@ -122,11 +122,15 @@ Priority-ordered. Rationale lives in [Design](Design.md); debt items in [TechDeb
   in Xcode's Signing & Capabilities where the App ID updates in the same step — not in a
   hand-edited plist. (The `remote-notification` background mode, the other half, is now in
   `Info.plist`.)
-- **The reminder switch needs a human.** Practice is due-driven and the reminder window is
-  derived and tested, but the path permission → schedule → deliver → tap → route is
-  **unverified**: neither synthetic taps nor a drag operate a `UISwitch` in the simulator
-  harness, and `simctl privacy` cannot grant notification permission. Turn the switch on,
-  on a device, and confirm a reminder actually arrives.
+- **Confirm a reminder actually arrives.** The switch is owner-confirmed to request
+  permission, so the first half of the path is proven. What is still unwitnessed is the
+  second: schedule → deliver → tap → land on Exercises. No automated pass can do it
+  (TD-29), so it wants one evening on a device.
+- **`SearchWordViewController`, the rest of TD-28.** Two of its four responsibilities are
+  out. Rewriting it onto `WordInputViewController` — two pushes of one reusable screen —
+  is now cheaper than cutting more out of it.
+- **TD-31** — `SpokenAnswerSurface` still owns a second copy of the audio-session
+  lifecycle that `DictationController` now expresses. Same condition that produced TD-15.
 - **Enrichment (TD-22) implementation** — [Enrichment](Enrichment.md) designs it. First
   measurement any implementing fork must take is the reduction ratio on one real kaikki
   file; every size estimate downstream is a guess until then. Whether FTS5 exists in the
@@ -147,6 +151,23 @@ Priority-ordered. Rationale lives in [Design](Design.md); debt items in [TechDeb
 - Storyboard split (TD-5) is **likely YAGNI** at this size — prefer creator-injection on the
   existing storyboard where a screen needs a dependency; revisit only if the one storyboard
   actually hurts.
+
+## Done (2026-07-27) — word entry, dictation, and permissions that tell the truth
+
+Adding a synonym is a screen rather than an alert: `WordInputViewController`, with
+completions, a dictionary lookup, recents, and a **visible dictation button** — the
+keyboard's microphone key is easy to miss and absent with a hardware keyboard. The meaning
+editor and, next, the add-word flow use the same screen, so the two entry paths cannot
+drift apart again.
+
+Two extractions from the massive controllers made it possible and discharge half of TD-28:
+`WordSuggestions` (completions and per-language recents, now testable) and
+`DictationController` (the recogniser, ~150 lines that had lived inside Phonetics).
+
+Permissions are now **read, never remembered** — see [Design](Design.md). The reminder
+switch had stored its own answer, so revoking notifications in Settings left the app
+asserting a capability it no longer had. Four states, four different things said, and every
+message names what still works without the permission.
 
 ## Done (2026-07-27) — spaced repetition and reminders
 

@@ -902,7 +902,18 @@ its size — no `didSelectRowAt`, the dictionary presented twice, three `debugLo
 keystroke. **Discharge:** the `uikit-app-structure` split — suggestions into a data-source
 object, dictionary lookup into the shared helper it already half-lives in, store writes
 behind `Library`, leaving the view controller to structure navigation and interpret user
-action. A fork, not a drive-by.
+action.
+
+**Partially discharged (2026-07-27).** Two of the four responsibilities are out and are now
+shared rather than duplicated:
+
+* `WordSuggestions` — completions and per-language recents, as a testable value.
+* `WordInputViewController` — the entry screen itself, reused by the meaning editor.
+
+**Remaining:** the controller still owns segue routing, the `SearchedObject` two-mode enum
+and store writes, plus roughly 120 lines of commented-out predecessors. The cheaper order
+now is to rewrite it *onto* `WordInputViewController` — two pushes of one reusable screen,
+one for each half of a pair — rather than cutting more out of it.
 
 ## TD-29 — A `UISwitch` cannot be driven by the simulator harness
 
@@ -926,3 +937,16 @@ half-done). **Cost:** an accessibility-size user gets large text beside a fixed-
 **Discharge:** relax the cell's constraints to `greaterThanOrEqual` and let the ring size
 itself — belongs with the next rebuild of the words screen, since that is the file that
 owns the constraints.
+
+## TD-31 — Speech recognition still leaves its own audio-session cleanup to callers
+
+`DictationController` extracted the recogniser, but `SpokenAnswerSurface` retains its own
+copy of the start/stop button logic and its own `AVAudioSession` handling around playback
+(TD-15's fix). The two now express the same lifecycle in two places, which is exactly the
+condition that produced TD-15 — speech silently dead after a recognition round.
+
+**Cost:** a change to session handling has to be made twice, and the second site is the one
+with the history of getting it wrong. **Discharge:** move `SpokenAnswerSurface` onto
+`DictationController` too, so the audio session has a single owner. Small, but it wants the
+Phonetics screen exercised on a device afterwards — the failure mode is silence, which no
+test asserts.

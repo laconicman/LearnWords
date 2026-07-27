@@ -1,4 +1,4 @@
-# Handoff — forks A through G are merged
+# Handoff — forks A through G, plus word entry and permissions
 
 Where the project stands as of 2026-07-27, what is proven, what is assumed, and what the
 next forks should pick up. Read [Roadmap](Roadmap.md) for priority and
@@ -18,8 +18,9 @@ the schedule says is due, and can remind the learner when work is waiting.
 | **D — Anki format** | `AnkiText` exports an Anki-importable file keyed by `Sense.id`, so re-export updates rather than duplicates. |
 | **E — enrichment** | [Enrichment](Enrichment.md): kaikki ingestion designed, three schema additions identified. |
 | **G — spaced repetition** | `PracticeSession.Scope`, `ReviewSchedule`, `ReminderScheduler`; "Known level" becomes "Remembered for (days)". |
+| *(integration)* | `WordInputViewController` with dictation replaces the add-synonym alert; `WordSuggestions` and `DictationController` extracted; permissions re-read rather than stored. |
 
-`201 tests pass, none fail.` Verified on the simulator and, for A–C, on two physical
+`212 tests pass, none fail.` Verified on the simulator and, for A–C, on two physical
 devices (iOS 26 + iOS 15) syncing through iCloud.
 
 ## What is proven, and what is not
@@ -36,16 +37,20 @@ column as the first.
 | Anki export is importable | ✅ bytes read back out of the app container |
 | Practice is due-driven; study-ahead offered when nothing is due | ✅ exercised on the simulator |
 | Reminder *derivation* — which days, what count, what identifier | ✅ 9 tests, pinned clock |
-| **Reminders actually arrive** (permission → schedule → deliver → tap) | ❌ **unverified** — see TD-29 |
+| The reminder switch requests permission | ✅ owner-confirmed on device |
+| **A reminder actually arrives** (schedule → deliver → tap → route) | ❌ **unverified** — see TD-29 |
+| Word entry: suggestions, recents, commit | ✅ 10 tests + built |
+| **Dictation actually transcribes** | ❌ **unverified** — needs a microphone and a human |
 | Deferred seeding stops the second device seeding | ⚠️ not verified — needs a clean install on device 2 |
 | Live UI refresh on incoming changes | ⚠️ not verified on two devices |
 | iOS 12–14 behaviour since the store change | ❌ unverified (TD-8; owner has devices) |
 
 ## Before shipping anything
 
-1. **Turn the reminder switch on, on a device**, and confirm one arrives and lands on
-   Exercises. The agent harness cannot operate a `UISwitch` (TD-29), so this is the one
-   feature whose wiring no automated pass has touched.
+1. **Confirm a reminder arrives and lands on Exercises**, and **try the dictation button**
+   in the word editor. Both need a device and a human: the harness cannot operate a
+   `UISwitch` (TD-29), and no simulator has a microphone worth testing against. Everything
+   up to the system boundary is covered; nothing past it is.
 2. **Decide the three schema additions** — `Variety`, `Pronunciation`, `Tag.category` from
    [Enrichment](Enrichment.md) — **before** the production deploy. CloudKit can add record
    types and fields to production but never remove or retype them, so deferring means
