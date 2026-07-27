@@ -331,6 +331,23 @@
     "Every meaning and set using this word sees the change." : {
       "comment" : "Alert message explaining that terms are shared"
     },
+    "Export as" : {
+      "comment" : "Action sheet title, export format",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Exportar como"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Экспортировать как"
+          }
+        }
+      }
+    },
     "EXPORT_WORDS_MESSAGE" : {
       "comment" : "Count of words to be exported",
       "extractionState" : "manual",
@@ -854,6 +871,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Высота голоса"
+          }
+        }
+      }
+    },
+    "Plain text" : {
+      "comment" : "Export format",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Texto sin formato"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Простой текст"
           }
         }
       }

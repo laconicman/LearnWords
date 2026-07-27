@@ -485,6 +485,62 @@ grade — the same split Anki draws between `type` and `ease`.
 **Rejected.** *Deleting the events.* It is the obvious implementation and it is wrong:
 history is the only record of work done, and the log is append-only by design.
 
+## Decision: two export formats, and only one of them comes back
+
+**Decision (2026-07-27).** `PlainText` stays the app's own format and is **symmetric** —
+`parse` and `render` are inverses, which is what makes "the user can always import the
+dictionary" a real answer to dropping migration. `AnkiText` is **export only**: it
+implements a foreign application's contract, and nothing reads it back. The export button
+asks which, because neither is the obvious default and a single button would have to
+silently pick one.
+
+**Why the contract was read from source rather than the manual.** The Anki manual documents
+the import *dialog*; what matters is what the parser does. Checked against `ankitects/anki`
+([DeepWiki consult](https://deepwiki.com/search/i-want-to-generate-a-text-file_0d3f96ff-c839-45e0-a6ab-4d09401cba0c),
+2026-07-27), which settled four things guesswork would have got wrong:
+
+- **`#` is the record reader's comment character**, not just a header marker. An unquoted
+  row beginning with `#` is dropped in silence, so a word like "#hashtag" must be quoted.
+- **Metadata columns are excluded from field mapping.** `#tags column:` / `#guid column:`
+  are removed before fields are assigned, so a four-column row still fills the two-field
+  `Basic` notetype correctly. Without that guarantee the layout below would put a UUID on
+  the front of every card.
+- **`#html:false` makes Anki do the escaping** — it escapes `<`, `>`, `&` and turns each
+  newline into `<br>`. So this exporter writes **no markup at all**: there is no escaping
+  of ours to get wrong, and no way for a word to inject markup into a card.
+- **A text import cannot carry a notetype or its card templates.** `#notetype:` only
+  selects an existing one, and silently falls back to the user's last-used notetype when
+  the name is unknown.
+
+**Correction.** An earlier roadmap note said the exporter had to emit the learner's locale
+so `{{tts en_US:Front}}` would work. That was wrong: templates live in the notetype, a text
+file cannot carry one, and there is nothing the exporter can do about TTS. A user who
+builds a speaking notetype can point the file at it by editing one header line.
+
+**Column order is a compatibility decision.** `front, back, tags, guid` — metadata last.
+The `#` directives only exist in Anki 2.1.54 (Nov 2022) and later; older versions drop
+every `#` line. With metadata trailing, an old importer that ignores columns beyond the
+notetype's field count still gets front and back in the right places.
+
+**Why a GUID column.** It makes the export *re-importable*. Anki otherwise identifies a
+note by its first field, so a second export after an edit would either duplicate or
+overwrite by accident — and two meanings of one word ("bear" the animal, "bear" the verb)
+would collide into a single note. A GUID bypasses first-field matching entirely, and Anki
+accepts any non-empty string. `Sense.id` is already a stable UUID that survives edits and
+the deletion of the words themselves (TD-18), so it is exactly the right key. Paired with
+`#if matches:update current`, not `keep both` — under `keep both` a GUID match is *skipped*
+rather than duplicated, because a GUID match is an identity match, not a content collision.
+
+**The disambiguation note goes on the front**, where the app itself shows it: a question
+that does not say which "bear" it means cannot be answered.
+
+**Not attempted: `.apkg`.** A real Anki package is a zipped SQLite collection, and writing
+one would mean implementing Anki's schema, its media database and its compression — for a
+format the owner's own reference
+([Word-Hoarder](https://github.com/itincknell/Word-Hoarder#creating-a-flashcard-file))
+does not use either. Text is what the file importer reads, and it is what a vocabulary
+list needs.
+
 ## Path to the optimal non-dual modern structure
 
 The dual lifecycle is a deliberate, *reversible* compromise for Legacy. The target

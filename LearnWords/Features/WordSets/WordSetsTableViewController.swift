@@ -194,13 +194,43 @@ final class WordSetsTableViewController: UITableViewController, UIDocumentPicker
 
     // MARK: - Export
 
+    /// Two formats: ours, which imports back losslessly, and Anki's, which does not come
+    /// back at all. Asking is the honest way to present that — a single button would have
+    /// to pick one, and neither is the obvious default.
     @IBAction func exportToFile(_ sender: UIBarButtonItem) {
         guard let set = library.selectedSet,
               let senses = try? lexicon.senses(in: set.id), !senses.isEmpty else { return }
-
         let pair = LanguagePair.forSet(set)
-        let text = PlainText.render(senses, from: pair.secondary, to: pair.primary)
-        let url = URL(fileURLWithPath: NSTemporaryDirectory() + "\(set.name).txt")
+
+        let sheet = UIAlertController(
+            title: NSLocalizedString("Export as", comment: "Action sheet title, export format"),
+            message: nil, preferredStyle: .actionSheet)
+
+        sheet.addAction(UIAlertAction(
+            title: NSLocalizedString("Plain text", comment: "Export format"),
+            style: .default) { [weak self] _ in
+                self?.share(PlainText.render(senses, from: pair.secondary, to: pair.primary),
+                            named: set.name, from: sender)
+            })
+
+        // Not localised: Anki is a product name.
+        sheet.addAction(UIAlertAction(title: "Anki", style: .default) { [weak self] _ in
+            self?.share(AnkiText.render(senses, from: pair.secondary, to: pair.primary,
+                                        deck: set.name),
+                        named: set.name, from: sender)
+        })
+
+        sheet.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: "AlertAction title"),
+                                      style: .cancel))
+        sheet.popoverPresentationController?.barButtonItem = sender
+        present(sheet, animated: true)
+    }
+
+    private func share(_ text: String, named name: String, from sender: UIBarButtonItem) {
+        // A set named "Travel/Food" would otherwise build a path into a directory that
+        // does not exist, and the write would fail silently.
+        let fileName = name.replacingOccurrences(of: "/", with: "-")
+        let url = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("\(fileName).txt")
         guard let data = text.data(using: .utf8), (try? data.write(to: url)) != nil else { return }
 
         let shareSheet = UIActivityViewController(activityItems: [url], applicationActivities: nil)
