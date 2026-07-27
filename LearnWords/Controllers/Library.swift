@@ -28,8 +28,12 @@ final class Library {
     private let defaults: UserDefaults
     private static let selectedSetKey = "selectedWordSetID"
 
-    init(lexicon: Lexicon = Lexicon(), defaults: UserDefaults = userDefaultsGroup) {
-        self.lexicon = lexicon
+    private let persistence: LWPersistence
+
+    init(persistence: LWPersistence = .shared,
+         defaults: UserDefaults = userDefaultsGroup) {
+        self.persistence = persistence
+        self.lexicon = Lexicon(persistence: persistence)
         self.defaults = defaults
     }
 
@@ -67,15 +71,39 @@ final class Library {
     // MARK: - Launch
 
     /// Gives a fresh install something to open on. Safe on every launch.
+    ///
+    /// **Seeding waits for CloudKit's first import.** A new *device* is not a new *user*:
+    /// on the first two-device run both devices found an empty store, both seeded, and the
+    /// learner ended up with two "Animals" sets holding the same words. `StoreDeduplicator`
+    /// could not repair that — a word set has no natural key, and merging two sets by name
+    /// would fuse sets a user deliberately named alike. The fix is not to create the second
+    /// one.
+    ///
+    /// Nothing blocks: the app opens on whatever is already local, and the set appears when
+    /// it arrives. That is what syncing is supposed to look like.
     func prepareForLaunch() {
+        if selectExistingSet() { return }
+        persistence.whenInitialSyncSettled { [weak self] in
+            guard let self, !self.selectExistingSet() else { return }
+            self.seed()
+        }
+    }
+
+    /// Points at a set if there is one. `false` means the library is genuinely empty.
+    @discardableResult
+    private func selectExistingSet() -> Bool {
+        guard let first = try? lexicon.wordSets().first else { return false }
+        if selectedSet == nil { select(first) }
+        return true
+    }
+
+    private func seed() {
         do {
             if let seeded = try LexiconSeed.populateIfEmpty(lexicon) {
                 select(seeded)
-            } else if selectedSet == nil, let first = try lexicon.wordSets().first {
-                select(first)
             }
         } catch {
-            debugLog("Library could not prepare the lexicon: \(error)")
+            debugLog("Library could not seed the lexicon: \(error)")
         }
     }
 }

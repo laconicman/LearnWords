@@ -123,6 +123,55 @@ final class LWPersistence {
         #endif
     }
 
+    /// Calls `settled` once CloudKit has had its first chance to deliver existing data —
+    /// or straight away when there is no sync to wait for.
+    ///
+    /// **Why anything has to wait.** A second device installs the app, finds an empty
+    /// store, and seeds — and a minute later the first device's word set arrives on top.
+    /// The learner ends up with two "Animals" sets holding the same words, which is
+    /// exactly what happened on the first two-device run. Seeding is a decision about a
+    /// *new user*; a new *device* is not one.
+    ///
+    /// The signal is `NSPersistentCloudKitContainer.eventChangedNotification` (iOS 14+),
+    /// which reports when an import finishes. The timeout is not a fallback for slow
+    /// networks but for the cases where that event never comes at all — no iCloud account,
+    /// airplane mode, iOS 13 — where waiting forever would leave a genuinely new user
+    /// staring at an empty app.
+    func whenInitialSyncSettled(_ settled: @escaping () -> Void) {
+        guard isSyncing else { return DispatchQueue.main.async(execute: settled) }
+
+        var hasRun = false
+        let runOnce = { [weak self] in
+            guard !hasRun else { return }
+            hasRun = true
+            if let token = self?.importObserver {
+                NotificationCenter.default.removeObserver(token)
+                self?.importObserver = nil
+            }
+            settled()
+        }
+
+        if #available(iOS 14.0, *) {
+            importObserver = NotificationCenter.default.addObserver(
+                forName: NSPersistentCloudKitContainer.eventChangedNotification,
+                object: container, queue: .main
+            ) { note in
+                let key = NSPersistentCloudKitContainer.eventNotificationUserInfoKey
+                guard let event = note.userInfo?[key]
+                        as? NSPersistentCloudKitContainer.Event,
+                      event.type == .import, event.endDate != nil else { return }
+                runOnce()
+            }
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + Self.initialSyncTimeout, execute: runOnce)
+    }
+
+    /// Long enough for a first import over a slow connection, short enough that a user
+    /// with no iCloud account is not left looking at nothing.
+    private static let initialSyncTimeout: TimeInterval = 8
+
+    private var importObserver: NSObjectProtocol?
+
     /// Sync belongs to the host app. `.appex` is how a bundle says it is an extension.
     private static var shouldSync: Bool {
         !Bundle.main.bundlePath.hasSuffix(".appex")
@@ -172,6 +221,9 @@ final class LWPersistence {
     deinit {
         if let remoteChangeObserver {
             NotificationCenter.default.removeObserver(remoteChangeObserver)
+        }
+        if let importObserver {
+            NotificationCenter.default.removeObserver(importObserver)
         }
     }
 

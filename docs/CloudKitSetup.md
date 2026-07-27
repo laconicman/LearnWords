@@ -77,11 +77,29 @@ Production, where record types are immutable forever.
 Re-run it after **any** model change, and reset the Development environment in the CloudKit
 Console first if the change was not purely additive.
 
+> **The schema is not created by syncing.** CloudKit auto-creates a record type in the
+> *Development* environment the first time a record of that type is written — so a schema
+> built by ordinary use only contains the entities that happen to have rows, with only the
+> fields that happen to be non-nil. On the first two-device run this produced five record
+> types out of ten, and `CD_Synset` had no `CD_note` because no meaning had one yet.
+> Production has no such auto-creation: deploying a partial schema means the first review
+> event, tag or transcription a user creates **fails to export, permanently**. Run step 4
+> before step 7, every time.
+
 ### 5. Verify in the CloudKit Console
 
 [icloud.developer.apple.com](https://icloud.developer.apple.com) → your container →
-**Schema → Record Types**. You should see `CD_WordSet`, `CD_Synset`, `CD_Term`,
-`CD_Language`, `CD_Tag`, `CD_ErrorTag`, `CD_ReviewEvent` and the rest. The `CD_` prefix is
+**Schema → Record Types**, or **Export Schema…** for a diffable text version.
+
+**All ten entities must be present**, plus `CDMR` (the many-to-many join records Core Data
+synthesises) and the built-in `Users`:
+
+```
+CD_WordSet  CD_Synset  CD_Term  CD_Language  CD_Tag  CD_ErrorTag
+CD_ReviewEvent  CD_Comment  CD_Illustration  CD_WordForm      + CDMR
+```
+
+Anything missing means step 4 has not run since that entity was added. The `CD_` prefix is
 Core Data's mirroring convention.
 
 ### 6. Two devices
