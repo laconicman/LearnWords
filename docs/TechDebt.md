@@ -862,3 +862,30 @@ Rows accumulate — a meaning removed from its last set, a synonym unlinked in t
 and only a test has ever collected them. **Cost:** slow growth of dead rows, which sync
 then copies to every device. **Discharge:** one row in Settings ("Clean up unused words"),
 reporting how many it removed, so the user chooses rather than the app guessing.
+
+## TD-27 — `ButtonBarButtonVisualProvider` constraint break on device
+
+Under iOS 26 UIKit logs, repeatedly:
+
+```
+"…ButtonBarButtonVisualProvider…Button.width <= 61.6667 (active)",
+"…'fittingSizeHTarget' …Button.width == 117 (active)"
+```
+
+A navigation-bar button whose fitting width (117–123 pt) exceeds the width iOS 26's
+floating bar allots it (61–68 pt). UIKit breaks the weaker constraint and truncates, so it
+is cosmetic — but it repeats on every layout pass and drowns the console, which is where
+TD-17's constraint break was found.
+
+**Not reproduced.** Attempted on the simulator at default and accessibility text sizes, in
+English and in Russian, across the words → add-word → translation flow: zero occurrences.
+It is specific to the owner's physical device. The screens it appears around
+(`Add word to study`, `Translation`) declare **no bar button items of their own**, so the
+subject is UIKit's own back button, whose title comes from the previous screen.
+
+**Next step is measurement, not a guess:** capture it with
+`log stream --predicate 'process == "LearnWords"'` on the device, then read the
+`UIViewAlertForUnsatisfiableConstraints` breakpoint's `po` of the offending view to learn
+which item it is. Likely remedies once known: a short `navigationItem.backButtonTitle` on
+the pushing screen, or `backButtonDisplayMode = .minimal`.
+

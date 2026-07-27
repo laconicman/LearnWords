@@ -70,7 +70,6 @@ class LWLocalizedSearchBar: UISearchBar {
     // or
     var forcedPrimaryLanguage = LWUserDefaults.standard.languageToStudyPreference { //or computed var
         didSet {
-            debugLog("forcedPrimaryLanguage \(forcedPrimaryLanguage ?? "Undefined")")
             for inputMode in UITextInputMode.activeInputModes{
                 if (inputMode.primaryLanguage?.hasPrefix(forcedPrimaryLanguage ?? "")) ?? false {
                     _textInputMode = inputMode
@@ -144,7 +143,6 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
         case .original(lang: let lang, word: _):
             return lang
         case .translation(orig_lang: _, orig_word: _, dest_lang: let lang, translations: _):
-            debugLog(" - " + lang)
             return lang
         }
         }
@@ -216,7 +214,6 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
     }
     
     @objc func AddWordOrDefinition() {
-        debugLog()
         switch searchedObject { //Add emoji flags
         case .original:
             break
@@ -389,7 +386,6 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
     }
 
     override func tableView(_ tableView: UITableView , accessoryButtonTappedForRowWith: IndexPath) {
-        debugLog("accessoryButtonTappedForRowWith \(accessoryButtonTappedForRowWith)")
         lookUp(term: tableView.cellForRow(at: accessoryButtonTappedForRowWith)?.textLabel?.text ?? "", sender: self)
     }
     
@@ -401,7 +397,6 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
         if let term = searchBar.text {
             filterRowsForSearchedText(term)
         }
-        debugLog()
     }
     
 //    func setupSearchController() {
@@ -466,9 +461,6 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
         } else { // for all languages except English
             suggestions = unfilteredSuggestions
         }
-        debugLog(suggestions.description)
-        debugLog("searchText " + (searchText as NSString).substring(with: searchText.fullNSRange()) + " " + NSStringFromRange(searchText.fullNSRange()))
-        
         tableView.reloadData()
     }
     // MARK: - UISearchBarDelegate
@@ -476,7 +468,6 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
     // This is called when the user touches the Search button on the Keyboard
     //------------------------------------------------------------------------------
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        debugLog()
         if let term = searchBar.text {
             // addToRecentSearches(term)
             // TODO: check for term to exist

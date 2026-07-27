@@ -164,7 +164,6 @@ func match3(pattern: String, answer: String, language: String, delimiters: Strin
                                        scheme: NSLinguisticTagScheme.nameTypeOrLexicalClass.rawValue,
                                        orthography: NSOrthography.defaultOrthography(forLanguage: lang),
                                        invoking: { (tag, tokenRange, QRange, stop) in
-            debugLog("Tag for word \(String(phrase[tokenRange])) is \(tag)")
             if !classes.contains(tag) {
                 
                 let word = String(phrase[tokenRange])
@@ -195,9 +194,6 @@ func match3(pattern: String, answer: String, language: String, delimiters: Strin
 //        }
 //        return true
 //    }
-    
-    debugLog(filterLexicalClasses(phrase: answer,  lang: language).debugDescription)
-    debugLog(filterLexicalClasses(phrase: pattern, lang: language).debugDescription)
     
     let answerFiltered = filterLexicalClasses(phrase: answer, lang: language)
     let patternFiltered = filterLexicalClasses(phrase: pattern, lang: language)
