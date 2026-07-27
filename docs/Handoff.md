@@ -20,7 +20,7 @@ the schedule says is due, and can remind the learner when work is waiting.
 | **G — spaced repetition** | `PracticeSession.Scope`, `ReviewSchedule`, `ReminderScheduler`; "Known level" becomes "Remembered for (days)". |
 | *(integration)* | `WordInputViewController` with dictation replaces the add-synonym alert; `WordSuggestions` and `DictationController` extracted; permissions re-read rather than stored. |
 
-`212 tests pass, none fail.` Verified on the simulator and, for A–C, on two physical
+`217 tests pass, none fail.` Verified on the simulator and, for A–C, on two physical
 devices (iOS 26 + iOS 15) syncing through iCloud.
 
 ## What is proven, and what is not
@@ -41,6 +41,8 @@ column as the first.
 | **A reminder actually arrives** (schedule → deliver → tap → route) | ❌ **unverified** — see TD-29 |
 | Word entry: suggestions, recents, commit | ✅ 10 tests + built |
 | **Dictation actually transcribes** | ❌ **unverified** — needs a microphone and a human |
+| Audio session returns to playback after recognition (TD-15's bug) | ✅ 5 tests, two proven to fail against the old code |
+| **Speech still audible after a Phonetics round, on a device** | ⚠️ tests pin the session state; the sound itself needs an ear |
 | Deferred seeding stops the second device seeding | ⚠️ not verified — needs a clean install on device 2 |
 | Live UI refresh on incoming changes | ⚠️ not verified on two devices |
 | iOS 12–14 behaviour since the store change | ❌ unverified (TD-8; owner has devices) |

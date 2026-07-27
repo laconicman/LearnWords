@@ -938,7 +938,7 @@ half-done). **Cost:** an accessibility-size user gets large text beside a fixed-
 itself — belongs with the next rebuild of the words screen, since that is the file that
 owns the constraints.
 
-## TD-31 — Speech recognition still leaves its own audio-session cleanup to callers
+## TD-31 — Speech recognition left its own audio-session cleanup to callers — **resolved (2026-07-27)**
 
 `DictationController` extracted the recogniser, but `SpokenAnswerSurface` retains its own
 copy of the start/stop button logic and its own `AVAudioSession` handling around playback
@@ -946,7 +946,21 @@ copy of the start/stop button logic and its own `AVAudioSession` handling around
 condition that produced TD-15 — speech silently dead after a recognition round.
 
 **Cost:** a change to session handling has to be made twice, and the second site is the one
-with the history of getting it wrong. **Discharge:** move `SpokenAnswerSurface` onto
-`DictationController` too, so the audio session has a single owner. Small, but it wants the
-Phonetics screen exercised on a device afterwards — the failure mode is silence, which no
-test asserts.
+with the history of getting it wrong.
+
+**Closed the same day it was filed, and it had already recurred.** `DictationController.stop`
+deactivated the session while leaving the category at `.playAndRecord`. That is exactly the
+state `SpeechManager.ensureAudioSession` declines to touch:
+
+```swift
+guard session.category != .playback && session.category != .playAndRecord else { return }
+```
+
+So nothing would have reactivated it, and the synthesiser would have rendered empty buffers
+into a dead session — TD-15's symptom, reintroduced by the extraction meant to prevent it.
+
+`SpokenAnswerSurface` is now 122 lines from 250 and owns no audio state;
+`releaseSessionToPlayback` is the single copy of the handoff. The "no test asserts it"
+worry is also gone: `AudioSessionHandoffTests` pins the contract, and both of the cases
+that matter were **checked to fail against the old code** before being kept — a regression
+test that has never been red is only a hope.

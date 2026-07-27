@@ -83,18 +83,40 @@ final class DictationController {
         }
     }
 
-    /// Ends the session. Safe to call when nothing is running, which is what lets a caller
-    /// stop unconditionally on the way off screen.
+    /// Ends the session and hands audio back to playback. Safe to call when nothing is
+    /// running, which is what lets a caller stop unconditionally on the way off screen.
     func stop() {
-        guard audioEngine.isRunning else { return }
-        audioEngine.stop()
-        audioEngine.inputNode.removeTap(onBus: 0)
+        if audioEngine.isRunning {
+            audioEngine.stop()
+            audioEngine.inputNode.removeTap(onBus: 0)
+        }
         request?.endAudio()
         request = nil
         task?.cancel()
         task = nil
-        // Hand the session back so playback elsewhere is not left muted (TD-15's lesson).
-        try? audioSession.setActive(false, options: [.notifyOthersOnDeactivation])
+        releaseSessionToPlayback()
+    }
+
+    /// Returns the audio session to `.playback`, **active**.
+    ///
+    /// **Not `setActive(false)`, which is TD-15 waiting to happen again.** `SpeechManager`
+    /// runs the synthesiser on the app's shared session and only configures it when the
+    /// category is neither `.playback` nor `.playAndRecord`:
+    ///
+    /// ```swift
+    /// guard session.category != .playback && session.category != .playAndRecord else { return }
+    /// ```
+    ///
+    /// Deactivating while leaving the category at `.playAndRecord` therefore passes that
+    /// guard untouched — synthesis renders into a deactivated session and produces empty
+    /// buffers. That is precisely the original TD-15 symptom: speech silent, no error.
+    /// Restoring the category *and* reactivating is what the Phonetics screen always did,
+    /// and it is now the only copy of that knowledge.
+    ///
+    /// Idempotent, so a caller may release unconditionally.
+    func releaseSessionToPlayback() {
+        try? audioSession.setCategory(.playback, mode: .default, options: [])
+        try? audioSession.setActive(true, options: .notifyOthersOnDeactivation)
     }
 
     // MARK: - Permission
