@@ -192,74 +192,49 @@ final class MeaningEditorViewController: UITableViewController {
 
     // MARK: - Editing
 
+    /// Every edit here pushes `WordInputViewController` rather than raising an alert.
+    ///
+    /// The alert it replaces could hold a text field and nothing else, so the completions,
+    /// the dictionary lookup and the dictation button — all of which belong exactly here,
+    /// where a learner is reaching for a word they half-remember — had nowhere to go. It is
+    /// the same screen the add-word flow uses, so the two entry paths cannot drift.
     private func addWord(in language: String) {
-        presentTextPrompt(
-            title: NSLocalizedString("Add word", comment: "Alert title"),
-            message: LanguageCode.displayName(language),
-            text: "") { [weak self] entered in
-                guard let self else { return }
-                do {
-                    // Links an existing word when the spelling already exists, rather than
-                    // making a twin — the point of an atomic term (TD-18).
-                    self.sense = try self.lexicon.addTerm(Term.Draft(entered, in: language),
-                                                          to: self.sense.id)
-                    self.reload()
-                } catch {
-                    debugLog("Could not add \(entered): \(error)")
-                }
+        push(.add(language: language)) { [weak self] entered in
+            guard let self else { return }
+            do {
+                // Links an existing word when the spelling already exists, rather than
+                // making a twin — the point of an atomic term (TD-18).
+                self.sense = try self.lexicon.addTerm(Term.Draft(entered, in: language),
+                                                      to: self.sense.id)
+                self.reload()
+            } catch {
+                debugLog("Could not add \(entered): \(error)")
             }
+        }
     }
 
     private func editWord(_ term: Term) {
-        presentTextPrompt(
-            title: NSLocalizedString("Edit word", comment: "AlertController title"),
-            message: NSLocalizedString(
-                "Every meaning and set using this word sees the change.",
-                comment: "Alert message explaining that terms are shared"),
-            text: term.text) { [weak self] entered in
-                guard let self else { return }
-                try? self.lexicon.updateTerm(term.id, text: entered)
-                self.reload()
-            }
+        push(.rename(term), initialText: term.text) { [weak self] entered in
+            guard let self else { return }
+            // Every meaning and set using this word sees the change — an atomic term.
+            try? self.lexicon.updateTerm(term.id, text: entered)
+            self.reload()
+        }
     }
 
     private func editNote() {
-        presentTextPrompt(
-            title: NSLocalizedString("Note", comment: "Alert title"),
-            message: NSLocalizedString("Leave empty to remove the note.", comment: "Alert message"),
-            text: sense.note ?? "",
-            allowsEmpty: true) { [weak self] entered in
-                guard let self else { return }
-                try? self.lexicon.updateSense(self.sense.id, note: entered)
-                self.reload()
-            }
+        push(.note, initialText: sense.note ?? "") { [weak self] entered in
+            guard let self else { return }
+            try? self.lexicon.updateSense(self.sense.id, note: entered)
+            self.reload()
+        }
     }
 
-    // MARK: - Prompts
-
-    /// One text field, one Save. Deliberately an alert rather than an inline editable
-    /// cell: every other prompt in the app is one, and a word is a single short string.
-    private func presentTextPrompt(title: String,
-                                   message: String?,
-                                   text: String,
-                                   allowsEmpty: Bool = false,
-                                   onSave: @escaping (String) -> Void) {
-        let ac = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        ac.addTextField {
-            $0.text = text
-            $0.autocapitalizationType = .none
-            $0.clearButtonMode = .whileEditing
-        }
-        ac.addAction(UIAlertAction(title: NSLocalizedString("Save", comment: "AlertAction title"),
-                                   style: .default) { [weak ac] _ in
-            let entered = (ac?.textFields?.first?.text ?? "")
-                .trimmingCharacters(in: .whitespacesAndNewlines)
-            guard allowsEmpty || !entered.isEmpty else { return }
-            onSave(entered)
-        })
-        ac.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: "AlertAction title"),
-                                   style: .cancel))
-        present(ac, animated: true)
+    private func push(_ purpose: WordInputViewController.Purpose,
+                      initialText: String = "",
+                      onCommit: @escaping (String) -> Void) {
+        let screen = WordInputViewController(purpose, initialText: initialText, onCommit: onCommit)
+        navigationController?.pushViewController(screen, animated: true)
     }
 
     private func presentNotice(title: String, message: String) {

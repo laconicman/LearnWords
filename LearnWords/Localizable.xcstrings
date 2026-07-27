@@ -4,6 +4,12 @@
     "\n Probably there is no internet connection. \n Recognition happens on Apple servers for most of devices. " : {
       "comment" : "Speech recognition error detail"
     },
+    "%@ due now." : {
+      "comment" : "Label words due now"
+    },
+    "%@ waiting for you." : {
+      "comment" : "Reminder body; placeholder is a word count"
+    },
     "%d%% learned" : {
       "comment" : "progress ring"
     },
@@ -183,6 +189,9 @@
           }
         }
       }
+    },
+    "Daily reminder" : {
+      "comment" : "setting"
     },
     "Delete" : {
       "comment" : "swipe action",
@@ -582,6 +591,7 @@
     },
     "Known level" : {
       "comment" : "setting",
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -830,6 +840,18 @@
     "Note" : {
       "comment" : "Alert title\nMeaning editor section header"
     },
+    "Nothing due until %@." : {
+      "comment" : "Label; placeholder is a date"
+    },
+    "Nothing due." : {
+      "comment" : "Label when nothing is scheduled"
+    },
+    "Nothing is due" : {
+      "comment" : "Title for alert"
+    },
+    "Notifications are off" : {
+      "comment" : "Alert title"
+    },
     "OK" : {
       "comment" : "Action for alert for empty set",
       "localizations" : {
@@ -913,6 +935,12 @@
           }
         }
       }
+    },
+    "Practise anyway" : {
+      "comment" : "AlertAction title"
+    },
+    "Practising ahead of schedule still counts, it just teaches less." : {
+      "comment" : "Message when nothing is due"
     },
     "Pronounce answers" : {
       "comment" : "setting",
@@ -1014,6 +1042,15 @@
           }
         }
       }
+    },
+    "Remembered for (days)" : {
+      "comment" : "setting"
+    },
+    "Remind me at" : {
+      "comment" : "setting"
+    },
+    "Reminders" : {
+      "comment" : "settings section"
     },
     "Rename" : {
       "comment" : "swipe action"
@@ -1214,6 +1251,9 @@
     "This is the only word" : {
       "comment" : "Alert title"
     },
+    "Time to practise" : {
+      "comment" : "Reminder title"
+    },
     "Total " : {
       "comment" : "Label total words",
       "localizations" : {
@@ -1247,6 +1287,9 @@
           }
         }
       }
+    },
+    "Turn them on for LearnWords in the Settings app to be reminded." : {
+      "comment" : "Alert message when notification permission was refused"
     },
     "type in the translation" : {
       "comment" : "Placeholder promt",
@@ -1400,6 +1443,7 @@
     },
     "You may opt to include learned words if you'd like to continue exercises." : {
       "comment" : "Message for alert for empty set to display",
+      "extractionState" : "stale",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
