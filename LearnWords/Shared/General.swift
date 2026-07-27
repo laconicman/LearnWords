@@ -14,8 +14,17 @@ func haptic(feedback: UINotificationFeedbackGenerator.FeedbackType) {
     generator.notificationOccurred(feedback)
 }
 
+/// Presents the system dictionary for `term`.
+///
+/// Called from three screens — the word list's long press, the exercise screen's Look Up
+/// button, and the add-word suggestions' ⓘ — so the guard against double presentation
+/// lives here rather than being repeated at each of them.
 func lookUp(term: String, sender: UIViewController, location: CGPoint? = nil) {
     guard !term.isEmpty else { return }
+    // Two taps in quick succession used to present two dictionaries: UIKit refuses the
+    // second ("which is already presenting…") and the caller never hears about it. The
+    // sheet takes a moment to appear, so the window is wide enough to hit by accident.
+    guard sender.presentedViewController == nil else { return }
     guard let term = split(term, by: ",;").first?.trimmingCharacters(in: .whitespacesAndNewlines) else { return }
     // self.searchingIndicator.startAnimating()
     let dictionaryViewController = UIReferenceLibraryViewController(term: term)

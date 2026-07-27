@@ -863,29 +863,43 @@ and only a test has ever collected them. **Cost:** slow growth of dead rows, whi
 then copies to every device. **Discharge:** one row in Settings ("Clean up unused words"),
 reporting how many it removed, so the user chooses rather than the app guessing.
 
-## TD-27 — `ButtonBarButtonVisualProvider` constraint break on device
+## TD-27 — Constraint break from the system dictionary's own navigation bar
 
-Under iOS 26 UIKit logs, repeatedly:
+Under iOS 26, opening the system dictionary logs, two or three times per presentation:
 
 ```
-"…ButtonBarButtonVisualProvider…Button.width <= 61.6667 (active)",
-"…'fittingSizeHTarget' …Button.width == 117 (active)"
+"…ButtonBarButtonVisualProvider…Button.width <= 67.6667 (active)",
+"…'fittingSizeHTarget' …Button.width == 123 (active)"
 ```
 
-A navigation-bar button whose fitting width (117–123 pt) exceeds the width iOS 26's
-floating bar allots it (61–68 pt). UIKit breaks the weaker constraint and truncates, so it
-is cosmetic — but it repeats on every layout pass and drowns the console, which is where
-TD-17's constraint break was found.
+**It is `UIReferenceLibraryViewController`'s own chrome, not ours.** The evidence:
 
-**Not reproduced.** Attempted on the simulator at default and accessibility text sizes, in
-English and in Russian, across the words → add-word → translation flow: zero occurrences.
-It is specific to the owner's physical device. The screens it appears around
-(`Add word to study`, `Translation`) declare **no bar button items of their own**, so the
-subject is UIKit's own back button, whose title comes from the previous screen.
+* The break brackets the presentation of `UIReferenceLibraryViewController` in the owner's
+  log, and appears nowhere else in the app.
+* The screens involved (`Add word to study`, `Translation`) declare **no bar button items**
+  — only titles — so no button of ours is being measured.
+* It does **not** reproduce on the simulator at any text size in either language, because
+  the simulator has no dictionaries installed: `UIReferenceLibraryViewController` shows the
+  "Add Dictionaries" prompt instead of the real view, whose bar carries the long "Manage"
+  and dictionary-name buttons that overflow iOS 26's floating bar allowance (~62–68 pt
+  against a 117–123 pt fitting width).
 
-**Next step is measurement, not a guess:** capture it with
-`log stream --predicate 'process == "LearnWords"'` on the device, then read the
-`UIViewAlertForUnsatisfiableConstraints` breakpoint's `po` of the offending view to learn
-which item it is. Likely remedies once known: a short `navigationItem.backButtonTitle` on
-the pushing screen, or `backButtonDisplayMode = .minimal`.
+UIKit breaks the weaker constraint and truncates, so it is cosmetic and self-healing. There
+is no API to size another process's bar buttons. **Discharge:** nothing to fix in this app;
+if it becomes intolerable, file it with Apple (include that a dictionary must be installed
+to reproduce). Halved in practice by fixing the double presentation that logged it twice —
+see below.
 
+## TD-28 — `SearchWordViewController` is a massive view controller
+
+~600 lines doing search, suggestion generation, dictionary lookup, language switching,
+segue routing and store writes. It is the one screen the TD-13 redesign never reached, and
+it shows: the add-word flow's only commit path was the keyboard's Return key until
+2026-07-27, because nothing about the screen makes its entry points visible.
+
+**Cost:** every bug found in the add-word flow so far has been a coordination bug hiding in
+its size — no `didSelectRowAt`, the dictionary presented twice, three `debugLog` lines per
+keystroke. **Discharge:** the `uikit-app-structure` split — suggestions into a data-source
+object, dictionary lookup into the shared helper it already half-lives in, store writes
+behind `Library`, leaving the view controller to structure navigation and interpret user
+action. A fork, not a drive-by.

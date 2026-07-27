@@ -13,3 +13,4 @@ Architecture follows the `uikit-app-structure` skill (Manferdini's four-layer MV
 Model · Controller · Root · View). Design principles applied throughout: separation
 of concerns, single source of truth, low coupling / high cohesion, dependency
 inversion, KISS, YAGNI (`software-development-principles`).
+- [Handoff](Handoff.md) — state of play after forks A/B/C: what is proven, what is not, and what the next fork should take.
