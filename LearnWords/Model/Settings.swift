@@ -32,6 +32,10 @@ final class LWUserDefaults {
         "pronounceAnswersPreference": true,
         "pronounceQuestionsPreference": true,
         "maxKnownLevelPreference": 20.0,
+        // 19:00 — after the working day, before the evening is over. Reminders are off
+        // until the learner asks for them; the time only matters once they do.
+        "reminderHour": 19.0,
+        "reminderMinute": 0.0,
     ]
 
     private init() {
@@ -145,6 +149,23 @@ userDefaultsGroup.set(newValue, forKey: "pronounceQuestionsPreference")
         }
     }
     
+    /// Whether the learner wants to be reminded. Off until they say otherwise — the
+    /// permission sheet is asked for at the switch, not at launch.
+    var remindersEnabled: Bool {
+        get { userDefaultsGroup.bool(forKey: "remindersEnabled") }
+        set { userDefaultsGroup.set(newValue, forKey: "remindersEnabled") }
+    }
+
+    var reminderHour: Int {
+        get { Int(userDefaultsGroup.double(forKey: "reminderHour").rounded()) }
+        set { userDefaultsGroup.set(Double(newValue), forKey: "reminderHour") }
+    }
+
+    var reminderMinute: Int {
+        get { Int(userDefaultsGroup.double(forKey: "reminderMinute").rounded()) }
+        set { userDefaultsGroup.set(Double(newValue), forKey: "reminderMinute") }
+    }
+
     private let directionOfExersisesKey = "directionOfExersises"
     var foreignToNative: Bool {
         get {

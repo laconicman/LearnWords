@@ -71,17 +71,48 @@ class ExersizeChooserViewController: UIViewController {
         showSetSummary()
     }
 
+    /// Words in the set, how many are learned, and how many the schedule says are waiting.
+    ///
+    /// The due count is the headline: it is what the exercise buttons will actually ask,
+    /// and what a reminder would have told them.
     private func showSetSummary() {
         let library = Library.shared
         let senses = (try? library.selectedSenses()) ?? []
         let learned = (try? ProgressIndex(lexicon: library.lexicon, senses: senses))?
             .learnedCount ?? 0
 
-        numberOfWordsInSet.text =
+        var summary =
             NSLocalizedString("Total in set: ", comment: "Label total words in current set")
             + pluralizedWordCount(senses.count) + ". "
             + NSLocalizedString("Learned: ", comment: "Label learned words")
             + pluralizedWordCount(learned) + "."
+
+        if let digest = setDigest() {
+            summary += " " + (digest.dueCount > 0
+                ? String(format: NSLocalizedString("%@ due now.", comment: "Label words due now"),
+                         pluralizedWordCount(digest.dueCount))
+                : nextDueDescription(digest))
+        }
+        numberOfWordsInSet.text = summary
+    }
+
+    /// "Nothing due — next on Thursday", or just "Nothing due" when the schedule is empty.
+    private func nextDueDescription(_ digest: ReviewSchedule.SetDigest) -> String {
+        guard let next = digest.nextDueAt else {
+            return NSLocalizedString("Nothing due.", comment: "Label when nothing is scheduled")
+        }
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .none
+        formatter.doesRelativeDateFormatting = true
+        return String(format: NSLocalizedString("Nothing due until %@.",
+                                                comment: "Label; placeholder is a date"),
+                      formatter.string(from: next))
+    }
+
+    private func setDigest() -> ReviewSchedule.SetDigest? {
+        guard let set = Library.shared.selectedSet else { return nil }
+        return try? ReviewSchedule(sets: [set], lexicon: Library.shared.lexicon).sets.first
     }
 
     // MARK: - Starting an exercise
@@ -96,43 +127,62 @@ class ExersizeChooserViewController: UIViewController {
     /// alert appeared and the empty exercise was pushed underneath it anyway. Building the
     /// screen here instead of segueing makes refusing it a plain early return, and lets the
     /// exercise screen take its answer surface through an initializer.
+    /// Practises what is due. When nothing is, offers to practise anyway rather than
+    /// refusing — Anki's split between studying and studying *ahead*, where the second is a
+    /// deliberate choice and answers are recorded the same either way.
     private func start(_ exercise: Exercise) {
-        guard let set = Library.shared.selectedSet, hasWordsToStudy(in: set) else { return }
+        guard let set = Library.shared.selectedSet else { return }
+        guard let digest = setDigest(), digest.askableCount > 0 else {
+            showEmptySetAlert()
+            return
+        }
+        if digest.dueCount > 0 {
+            push(exercise, in: set, scope: .due)
+        } else {
+            offerToPractiseAhead(exercise, in: set, digest: digest)
+        }
+    }
+
+    private func push(_ exercise: Exercise, in set: WordSet, scope: PracticeSession.Scope) {
         do {
             let screen = try ExerciseViewController.make(exercise, in: set,
-                                                        lexicon: Library.shared.lexicon)
+                                                        lexicon: Library.shared.lexicon,
+                                                        scope: scope)
             navigationController?.pushViewController(screen, animated: true)
         } catch {
             debugLog("Could not start \(exercise): \(error)")
         }
     }
 
-    private func hasWordsToStudy(in set: WordSet) -> Bool {
-        let library = Library.shared
-        let pair = LanguagePair.forSet(set)
-        let askable = (try? library.lexicon.senses(in: set.id,
-                                                   from: pair.promptLanguage,
-                                                   to: pair.answerLanguage)) ?? []
-        let studiable: Int
-        if includeLeanedWords.isOn {
-            studiable = askable.count
-        } else {
-            let index = try? ProgressIndex(lexicon: library.lexicon, senses: askable)
-            studiable = askable.count - (index?.learnedCount ?? 0)
-        }
-        guard studiable == 0 else { return true }
+    private func offerToPractiseAhead(_ exercise: Exercise,
+                                      in set: WordSet,
+                                      digest: ReviewSchedule.SetDigest) {
+        let alert = UIAlertController(
+            title: NSLocalizedString("Nothing is due", comment: "Title for alert"),
+            message: nextDueDescription(digest) + " "
+                + NSLocalizedString("Practising ahead of schedule still counts, it just teaches less.",
+                                    comment: "Message when nothing is due"),
+            preferredStyle: .alert)
+        alert.addAction(UIAlertAction(
+            title: NSLocalizedString("Practise anyway", comment: "AlertAction title"),
+            style: .default) { [weak self] _ in
+                self?.push(exercise, in: set,
+                           scope: .everything(
+                               includingLearned: LWUserDefaults.standard.includeLearnedWords))
+            })
+        alert.addAction(UIAlertAction(
+            title: NSLocalizedString("Cancel", comment: "AlertAction title"), style: .cancel))
+        present(alert, animated: true)
+    }
 
-        let message = askable.isEmpty
-            ? NSLocalizedString("Current set is empty. Add some words to learn.",
-                                comment: "Message for alert for empty set to display")
-            : NSLocalizedString("You may opt to include learned words if you'd like to continue exercises.",
-                                comment: "Message for alert for empty set to display")
+    private func showEmptySetAlert() {
         let alert = UIAlertController(
             title: NSLocalizedString("No words to study", comment: "Title for alert"),
-            message: message, preferredStyle: .alert)
+            message: NSLocalizedString("Current set is empty. Add some words to learn.",
+                                       comment: "Message for alert for empty set to display"),
+            preferredStyle: .alert)
         alert.addAction(UIAlertAction(
             title: NSLocalizedString("OK", comment: "Action for alert for empty set"), style: .default))
         present(alert, animated: true)
-        return false
     }
 }

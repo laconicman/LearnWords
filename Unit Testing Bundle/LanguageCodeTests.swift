@@ -95,7 +95,7 @@ struct LanguageCodeTests {
             .dictation, in: set.id,
             languages: LanguagePair(primary: "ru-RU", secondary: "en-US",
                                     showsSecondaryAsPrompt: true),
-            lexicon: lexicon, includingLearned: true)
+            lexicon: lexicon, scope: .everything(includingLearned: true))
 
         #expect(session.nextQuestion() != nil)
     }

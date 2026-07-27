@@ -284,7 +284,7 @@ struct ScoringPolicyTests {
             .dictation, in: set.id,
             languages: LanguagePair(primary: "ru", secondary: "en",
                                     showsSecondaryAsPrompt: true),
-            lexicon: lexicon, includingLearned: true)
+            lexicon: lexicon, scope: .everything(includingLearned: true))
         while let question = session.nextQuestion() {
             try session.record(question.sense.id == target.id ? .correctVerbatim : .skipped)
         }

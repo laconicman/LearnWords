@@ -45,13 +45,14 @@ final class ExerciseViewController: UIViewController, ExerciseScreen {
     /// surface goes with which exercise.
     static func make(_ exercise: Exercise,
                      in wordSet: WordSet,
-                     lexicon: Lexicon) throws -> ExerciseViewController {
+                     lexicon: Lexicon,
+                     scope: PracticeSession.Scope = .due) throws -> ExerciseViewController {
         let session = try PracticeSession.start(
             exercise,
             in: wordSet.id,
             languages: .forSet(wordSet),
             lexicon: lexicon,
-            includingLearned: LWUserDefaults.standard.includeLearnedWords)
+            scope: scope)
 
         let surface: ExerciseAnswerSurface
         let title: String

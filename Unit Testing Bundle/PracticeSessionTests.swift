@@ -58,11 +58,13 @@ struct PracticeSessionTests {
     private func start(_ lexicon: Lexicon, _ set: WordSet,
                        _ exercise: Exercise = .dictation,
                        reversed: Bool = false,
-                       includingLearned: Bool = true) throws -> PracticeSession {
+                       scope: PracticeSession.Scope = .everything(includingLearned: true),
+                       now: Date = Date()) throws -> PracticeSession {
         try PracticeSession.start(exercise, in: set.id,
                                   languages: pair(!reversed),
                                   lexicon: lexicon,
-                                  includingLearned: includingLearned)
+                                  scope: scope,
+                                  now: now)
     }
 
     // MARK: - Asking
@@ -269,9 +271,9 @@ struct PracticeSessionTests {
                 try session.record(question.sense.id == target.id ? .correctVerbatim : .skipped)
             }
 
-            #expect(try !asked(in: start(lexicon, set, includingLearned: false)).contains(target.id),
+            #expect(try !asked(in: start(lexicon, set, scope: .everything(includingLearned: false))).contains(target.id),
                     "a learned meaning is not asked again")
-            #expect(try asked(in: start(lexicon, set, includingLearned: true)).contains(target.id),
+            #expect(try asked(in: start(lexicon, set, scope: .everything(includingLearned: true))).contains(target.id),
                     "unless the learner asks for it")
         }
     }
@@ -286,14 +288,14 @@ struct PracticeSessionTests {
             _ = first.nextQuestion()
             try first.record(.correctVerbatim)
 
-            let learned = try start(lexicon, set, includingLearned: false)
+            let learned = try start(lexicon, set, scope: .everything(includingLearned: false))
             #expect(learned.nextQuestion() == nil, "precondition: it counts as learned")
 
             let slip = try start(lexicon, set)
             _ = slip.nextQuestion()
             try slip.record(.incorrect, response: "no")
 
-            let again = try start(lexicon, set, includingLearned: false)
+            let again = try start(lexicon, set, scope: .everything(includingLearned: false))
             #expect(again.nextQuestion() != nil, "a mistake puts it back in the queue")
         }
     }
@@ -301,6 +303,71 @@ struct PracticeSessionTests {
 
     /// Drains a sitting, reporting which meanings it put up.
     private func asked(in session: PracticeSession) throws -> Set<UUID> {
+        var asked: Set<UUID> = []
+        while let question = session.nextQuestion() {
+            asked.insert(question.sense.id)
+            try session.record(.skipped)
+        }
+        return asked
+    }
+
+    // MARK: - Scope and ordering
+
+    /// The default for the three exercise buttons: practise what the schedule says.
+    @Test func dueScopeAsksOnlyWhatIsWaiting() throws {
+        let lexicon = makeLexicon()
+        let set = try stock(lexicon, count: 2)
+        let now = Date()
+
+        // Answer one of the two, so it has a future due date and the other does not.
+        let first = try start(lexicon, set, now: now)
+        let answered = try #require(first.nextQuestion())
+        try first.record(.correctVerbatim)
+
+        let due = try start(lexicon, set, scope: .due, now: now)
+        let asked = try askedIDs(in: due)
+        #expect(!asked.contains(answered.sense.id), "just answered, so not due")
+        #expect(asked.count == 1, "the untouched meaning is still waiting")
+    }
+
+    /// "Practise anyway" — Anki's study-ahead. It ignores the schedule but still honours
+    /// the learner's own switch.
+    @Test func everythingScopeIgnoresTheScheduleButNotTheSwitch() throws {
+        let lexicon = makeLexicon()
+        let set = try stock(lexicon, count: 2)
+        let now = Date()
+        let first = try start(lexicon, set, now: now)
+        _ = first.nextQuestion()
+        try first.record(.correctVerbatim)
+
+        #expect(try askedIDs(in: start(lexicon, set,
+                                       scope: .everything(includingLearned: true),
+                                       now: now)).count == 2,
+                "the schedule is ignored")
+    }
+
+    /// A brand-new set must not be asked alphabetically every single time. Ties are broken
+    /// randomly rather than by relying on Swift's sort being stable, which it is not.
+    @Test func aFreshSetIsNotAlwaysAskedInTheSameOrder() throws {
+        let lexicon = makeLexicon()
+        let set = try stock(lexicon, count: 3)
+
+        var orders: Set<[String]> = []
+        for _ in 0..<40 {
+            let session = try start(lexicon, set, scope: .due)
+            var prompts: [String] = []
+            // Drained without recording: an answer would change what is due next round,
+            // and the question under test is the order, not the schedule.
+            while let question = session.nextQuestion() {
+                prompts.append(question.prompt)
+            }
+            orders.insert(prompts)
+        }
+        #expect(orders.count > 1, "three meanings, forty sittings — one fixed order is a bug")
+    }
+
+    /// Drains a sitting, reporting which meanings it put up.
+    private func askedIDs(in session: PracticeSession) throws -> Set<UUID> {
         var asked: Set<UUID> = []
         while let question = session.nextQuestion() {
             asked.insert(question.sense.id)
@@ -326,7 +393,7 @@ struct PracticeSessionTests {
                 == ["de", "ru"])
 
         let session = try PracticeSession.start(.dictation, in: set.id, languages: resolved,
-                                                lexicon: lexicon, includingLearned: true)
+                                                lexicon: lexicon, scope: .everything(includingLearned: true))
         #expect(session.nextQuestion() != nil, "the sitting has something to ask")
     }
 }

@@ -29,15 +29,38 @@ enum AppRoot {
     /// already-visible screen consume the pending import (no appearance event fires then).
     static let shareActionReceived = Notification.Name("AppRoot.shareActionReceived")
 
-    /// Handles the share-extension hand-off (`learnWords://shareaction`) by landing on the
-    /// Word Set tab; `WordTableViewController` consumes the pending `ImportedText` on
-    /// appearance/foreground/this notification (TD-3). No root rebuild — UI state survives.
+    /// Tab indexes in `Main.storyboard`, named so a routing decision reads as one.
+    private enum Tab {
+        static let words = 0
+        static let exercises = 2
+    }
+
+    /// Interprets a `learnWords://` URL by selecting a tab. Two arrive today:
+    ///
+    /// * `shareaction` — the share extension's hand-off. Lands on the Word Set tab;
+    ///   `WordTableViewController` consumes the pending `ImportedText` on
+    ///   appearance/foreground/this notification (TD-3).
+    /// * `practice` — a tapped reminder. Lands on Exercises, where the due count is shown.
+    ///
+    /// No root rebuild in either case, so UI state survives.
     @discardableResult
     static func handle(_ url: URL, on window: UIWindow?) -> Bool {
         debugLog(url.absoluteString)
-        guard url.absoluteString.contains("shareaction") else { return false }
-        (window?.rootViewController as? UITabBarController)?.selectedIndex = 0
-        NotificationCenter.default.post(name: shareActionReceived, object: nil)
-        return true
+        let tabs = window?.rootViewController as? UITabBarController
+
+        if url.absoluteString.contains("shareaction") {
+            tabs?.selectedIndex = Tab.words
+            NotificationCenter.default.post(name: shareActionReceived, object: nil)
+            return true
+        }
+        if url.absoluteString.contains("practice") {
+            // Pop back to the chooser: a reminder tapped while an old exercise is still on
+            // the stack should start a new sitting, not resume a stale one.
+            tabs?.selectedIndex = Tab.exercises
+            (tabs?.selectedViewController as? UINavigationController)?
+                .popToRootViewController(animated: false)
+            return true
+        }
+        return false
     }
 }

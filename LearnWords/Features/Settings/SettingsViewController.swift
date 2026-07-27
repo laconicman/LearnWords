@@ -55,11 +55,30 @@ final class SettingsViewController: UITableViewController {
         isOn: prefs.pronounceQuestionsPreference
     ) { [weak self] in self?.prefs.pronounceQuestionsPreference = $0 }
 
-    private lazy var maxKnownLevelCell = SliderCell(
-        title: NSLocalizedString("Known level", comment: "setting"),
+    /// Renamed from "Known level" when scoring moved to FSRS: the number used to mean
+    /// "correct answers in a row" and now means "days it should stay remembered" — the
+    /// stability at which `ScoringPolicy` calls a meaning learned. Same preference key,
+    /// same 1…100 range, which reads sensibly as days.
+    private lazy var masteryHorizonCell = SliderCell(
+        title: NSLocalizedString("Remembered for (days)", comment: "setting"),
         minimum: 1, maximum: 100, format: "%.0f",
         value: Float(prefs.maxKnownLevelPreference)
     ) { [weak self] in self?.prefs.maxKnownLevelPreference = Int($0.rounded()) }
+
+    private lazy var remindersCell = SwitchCell(
+        title: NSLocalizedString("Daily reminder", comment: "setting"),
+        isOn: prefs.remindersEnabled
+    ) { [weak self] isOn in self?.setRemindersEnabled(isOn) }
+
+    private lazy var reminderTimeCell = TimeCell(
+        title: NSLocalizedString("Remind me at", comment: "setting"),
+        hour: prefs.reminderHour, minute: prefs.reminderMinute
+    ) { [weak self] hour, minute in
+        guard let self else { return }
+        self.prefs.reminderHour = hour
+        self.prefs.reminderMinute = minute
+        ReminderScheduler.shared.rebuild(from: Library.shared.lexicon)
+    }
 
     private var sections: [(title: String, cells: [UITableViewCell])] {
         [
@@ -68,8 +87,47 @@ final class SettingsViewController: UITableViewController {
             (NSLocalizedString("Speech", comment: "settings section"),
              [pitchCell, rateCell, pronounceAnswersCell, pronounceQuestionsCell]),
             (NSLocalizedString("Study", comment: "settings section"),
-             [maxKnownLevelCell]),
+             [masteryHorizonCell]),
+            // The time row only appears once reminders are on — a disabled picker for a
+            // switched-off feature is a question the learner has not asked yet.
+            (NSLocalizedString("Reminders", comment: "settings section"),
+             prefs.remindersEnabled ? [remindersCell, reminderTimeCell] : [remindersCell]),
         ]
+    }
+
+    /// Turning reminders on asks for permission first, and turns the switch back off if it
+    /// is refused — a switch that stays on while nothing can be delivered is a lie.
+    private func setRemindersEnabled(_ isOn: Bool) {
+        guard isOn else {
+            prefs.remindersEnabled = false
+            ReminderScheduler.shared.clear()
+            tableView.reloadData()
+            return
+        }
+        ReminderScheduler.shared.requestAuthorization { [weak self] granted in
+            guard let self else { return }
+            self.prefs.remindersEnabled = granted
+            if granted {
+                ReminderScheduler.shared.rebuild(from: Library.shared.lexicon)
+            } else {
+                self.showNotificationsRefused()
+            }
+            self.tableView.reloadData()
+        }
+    }
+
+    private func showNotificationsRefused() {
+        let alert = UIAlertController(
+            title: NSLocalizedString("Notifications are off", comment: "Alert title"),
+            message: NSLocalizedString(
+                "Turn them on for LearnWords in the Settings app to be reminded.",
+                comment: "Alert message when notification permission was refused"),
+            preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: NSLocalizedString("Settings", comment: ""),
+                                      style: .default) { _ in gotoAppSettings() })
+        alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: "AlertAction title"),
+                                      style: .cancel))
+        present(alert, animated: true)
     }
 
     // MARK: - Lifecycle
@@ -191,6 +249,38 @@ private final class SliderCell: UITableViewCell {
 
     private func updateValueLabel() {
         valueLabel.text = String(format: format, slider.value)
+    }
+}
+
+/// A time of day. `UIDatePicker`'s compact style keeps it to one row on iOS 14+; below
+/// that the wheel is inline, which is what iOS 12 and 13 have always looked like.
+private final class TimeCell: UITableViewCell {
+
+    private let picker = UIDatePicker()
+    private let onChange: (Int, Int) -> Void
+
+    init(title: String, hour: Int, minute: Int, onChange: @escaping (Int, Int) -> Void) {
+        self.onChange = onChange
+        super.init(style: .default, reuseIdentifier: nil)
+        selectionStyle = .none
+        textLabel?.text = title
+
+        picker.datePickerMode = .time
+        if #available(iOS 13.4, *) { picker.preferredDatePickerStyle = .compact }
+        var components = DateComponents()
+        components.hour = hour
+        components.minute = minute
+        picker.date = Calendar.current.date(from: components) ?? Date()
+        picker.addTarget(self, action: #selector(changed), for: .valueChanged)
+        accessoryView = picker
+        picker.sizeToFit()
+    }
+
+    @available(*, unavailable) required init?(coder: NSCoder) { fatalError() }
+
+    @objc private func changed() {
+        let parts = Calendar.current.dateComponents([.hour, .minute], from: picker.date)
+        onChange(parts.hour ?? 0, parts.minute ?? 0)
     }
 }
 

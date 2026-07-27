@@ -29,14 +29,36 @@ struct LWUserDefaultsTests {
 @MainActor
 struct SettingsViewControllerTests {
 
-    @Test func screenHasLanguagesSpeechAndStudySections() {
+    @Test func screenHasLanguagesSpeechStudyAndReminderSections() {
+        let prefs = LWUserDefaults.standard
+        let saved = prefs.remindersEnabled
+        defer { prefs.remindersEnabled = saved }
+        prefs.remindersEnabled = false
+
         let vc = SettingsViewController()
         vc.loadViewIfNeeded()
         let table = vc.tableView!
-        #expect(vc.numberOfSections(in: table) == 3)
+        #expect(vc.numberOfSections(in: table) == 4)
         #expect(vc.tableView(table, numberOfRowsInSection: 0) == 2)  // languages
         #expect(vc.tableView(table, numberOfRowsInSection: 1) == 4)  // pitch, rate, 2 toggles
-        #expect(vc.tableView(table, numberOfRowsInSection: 2) == 1)  // known level
+        #expect(vc.tableView(table, numberOfRowsInSection: 2) == 1)  // mastery horizon
+        #expect(vc.tableView(table, numberOfRowsInSection: 3) == 1)  // the switch alone
+    }
+
+    /// The time row is only worth showing once reminders are on.
+    @Test func theReminderTimeAppearsOnlyWhenRemindersAreOn() {
+        let prefs = LWUserDefaults.standard
+        let saved = prefs.remindersEnabled
+        defer { prefs.remindersEnabled = saved }
+
+        let vc = SettingsViewController()
+        vc.loadViewIfNeeded()
+        let table = vc.tableView!
+
+        prefs.remindersEnabled = true
+        #expect(vc.tableView(table, numberOfRowsInSection: 3) == 2)
+        prefs.remindersEnabled = false
+        #expect(vc.tableView(table, numberOfRowsInSection: 3) == 1)
     }
 
     @Test func languageNameResolvesCodesAndFallsBack() {

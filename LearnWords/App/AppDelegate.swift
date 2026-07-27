@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import UserNotifications
 
 @main
 final class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -30,7 +31,29 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         // an empty library. Runs for both lifecycles — `SceneDelegate` builds the UI
         // after this, on iOS 13+.
         Library.shared.prepareForLaunch()
+
+        // Must be set before launch finishes, or a notification that *started* the app is
+        // delivered before anything is listening and the tap goes nowhere.
+        UNUserNotificationCenter.current().delegate = self
+
+        // Reminders are rebuilt whenever the app can see fresh state: on the way to the
+        // background (the freshest moment before the learner is away), on return, and when
+        // another device's changes land — that last one is the only case where a predicted
+        // count can be an over-estimate.
+        let rebuild = #selector(rebuildReminders)
+        let notifications = NotificationCenter.default
+        notifications.addObserver(self, selector: rebuild,
+                                  name: UIApplication.didEnterBackgroundNotification, object: nil)
+        notifications.addObserver(self, selector: rebuild,
+                                  name: UIApplication.willEnterForegroundNotification, object: nil)
+        notifications.addObserver(self, selector: rebuild,
+                                  name: LWPersistence.storeDidChangeRemotely, object: nil)
+        rebuildReminders()
         return true
+    }
+
+    @objc private func rebuildReminders() {
+        ReminderScheduler.shared.rebuild(from: Library.shared.lexicon)
     }
 
     // MARK: UIScene life cycle (iOS 13+)
@@ -54,5 +77,41 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         options: [UIApplication.OpenURLOptionsKey: Any] = [:]
     ) -> Bool {
         AppRoot.handle(url, on: window)
+    }
+}
+
+// MARK: - Reminders
+
+extension AppDelegate: UNUserNotificationCenterDelegate {
+
+    /// A tapped reminder lands on the Exercises tab.
+    ///
+    /// The window is found from the connected scene on iOS 13+, and from `window` on 12 —
+    /// the same dual-lifecycle split as everywhere else, kept to this one expression.
+    func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                didReceive response: UNNotificationResponse,
+                                withCompletionHandler completionHandler: @escaping () -> Void) {
+        defer { completionHandler() }
+        guard let string = response.notification.request.content.userInfo["url"] as? String,
+              let url = URL(string: string) else { return }
+        AppRoot.handle(url, on: keyWindow)
+    }
+
+    /// Nothing is shown while the app is open: the learner is already here, and a banner
+    /// telling them to come and practise over the top of them practising is noise.
+    func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                willPresent notification: UNNotification,
+                                withCompletionHandler completionHandler:
+                                    @escaping (UNNotificationPresentationOptions) -> Void) {
+        completionHandler([])
+    }
+
+    private var keyWindow: UIWindow? {
+        if #available(iOS 13.0, *) {
+            return UIApplication.shared.connectedScenes
+                .compactMap { ($0 as? UIWindowScene)?.windows.first { $0.isKeyWindow } }
+                .first
+        }
+        return window
     }
 }

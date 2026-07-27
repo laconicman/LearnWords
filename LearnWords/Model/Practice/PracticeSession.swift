@@ -73,35 +73,74 @@ final class PracticeSession {
         self.languages = languages
         self.wordSetID = wordSetID
         self.lexicon = lexicon
-        self.queue = senses.shuffled()
+        // Already ordered by `start`: most overdue first, shuffled within a tie. Shuffling
+        // again here would throw the schedule away.
+        self.queue = senses
         self.total = senses.count
+    }
+
+    /// Which meanings a sitting draws on.
+    ///
+    /// The split Anki draws between studying and *studying ahead*: normal practice is
+    /// whatever the schedule says is due, and drilling the rest is a deliberate second
+    /// choice rather than the default. Answers are recorded identically either way —
+    /// AnkiDroid's "review ahead" reschedules through the same path, and so does this.
+    enum Scope {
+        /// What `ScoringPolicy` says is worth practising now. Includes meanings never
+        /// answered: a new word is not "not yet due", it is waiting.
+        case due
+        /// Everything askable, schedule ignored — the "practise anyway" path. Honours the
+        /// learner's *include learned words* switch, which is the only thing that still
+        /// narrows it.
+        case everything(includingLearned: Bool)
     }
 
     /// Opens a sitting over one set.
     ///
     /// Only meanings that can actually be asked in this direction are queued — a sense
-    /// with no word on the answer side is not a question. `includingLearned` is the user's
-    /// switch; "learned" means `ScoringPolicy` puts its mastery at the horizon.
+    /// with no word on the answer side is not a question.
     static func start(_ exercise: Exercise,
                       in wordSetID: UUID,
                       languages: LanguagePair,
                       lexicon: Lexicon,
-                      includingLearned: Bool) throws -> PracticeSession {
+                      scope: Scope,
+                      now: Date = Date()) throws -> PracticeSession {
         let askable = try lexicon.senses(in: wordSetID,
                                          from: languages.promptLanguage,
                                          to: languages.answerLanguage)
-        let senses: [Sense]
-        if includingLearned {
-            senses = askable
-        } else {
-            let index = try ProgressIndex(lexicon: lexicon, senses: askable)
-            senses = index.senses(askable) { !$0.isLearned }
+        let index = try ProgressIndex(lexicon: lexicon, senses: askable, now: now)
+
+        let chosen: [Sense]
+        switch scope {
+        case .due:
+            chosen = index.senses(askable) { $0.isDue }
+        case .everything(let includingLearned):
+            chosen = includingLearned ? askable : index.senses(askable) { !$0.isLearned }
         }
+
         return PracticeSession(exercise: exercise,
                                languages: languages,
                                wordSetID: wordSetID,
-                               senses: senses,
+                               senses: order(chosen, by: index),
                                lexicon: lexicon)
+    }
+
+    /// Most overdue first, never-seen last, shuffled within a tie.
+    ///
+    /// Overdue before new because a meaning you are about to forget is worth more than one
+    /// you have never met — recalling it is what buys stability. The random tiebreak is
+    /// explicit rather than a `shuffled().sorted()`: Swift's sort is not stable, so relying
+    /// on it to carry a prior shuffle through ties would be relying on unspecified
+    /// behaviour. Without it a fresh set, where every meaning ties at "never seen", would
+    /// be asked in insertion order every single time.
+    private static func order(_ senses: [Sense], by index: ProgressIndex) -> [Sense] {
+        senses
+            .map { sense -> (sense: Sense, due: TimeInterval, tiebreak: Double) in
+                let dueAt = index[sense.id].dueAt?.timeIntervalSinceReferenceDate
+                return (sense, dueAt ?? .greatestFiniteMagnitude, .random(in: 0..<1))
+            }
+            .sorted { ($0.due, $0.tiebreak) < ($1.due, $1.tiebreak) }
+            .map(\.sense)
     }
 
     // MARK: - State
