@@ -31,7 +31,7 @@
 //  two weeks and then left alone. That is deliberate: an app that nags forever gets deleted.
 //
 
-import Foundation
+import UIKit
 import UserNotifications
 
 final class ReminderScheduler {
@@ -72,14 +72,67 @@ final class ReminderScheduler {
         }
     }
 
-    /// Whether reminders can actually be delivered — the switch being on is not enough if
-    /// permission was later revoked in Settings.
-    func isAuthorized(completion: @escaping (Bool) -> Void) {
+    /// What the system currently allows. Four states, because they need four different
+    /// things said about them.
+    enum Standing: Equatable {
+        /// Reminders will be delivered.
+        case allowed
+        /// Never asked. The switch may ask.
+        case notAsked
+        /// Refused, or later turned off in Settings. Only Settings can undo it, so the
+        /// switch must not pretend otherwise.
+        case blocked
+        /// Authorized, but every way of showing a reminder is off — no alert, no sound, no
+        /// Notification Center. Scheduling would succeed and nothing would ever appear,
+        /// which is the most confusing outcome of the four and the one a bare
+        /// `authorizationStatus` check misses.
+        case silenced
+    }
+
+    /// Reads the live setting. **Never cached.**
+    ///
+    /// Apple's rule, verbatim: *"Always check your app's authorization status before
+    /// scheduling local notifications. People can change your app's authorization settings
+    /// at any time."*
+    /// ([Asking permission to use notifications](https://developer.apple.com/documentation/usernotifications/asking-permission-to-use-notifications))
+    /// A status read once at launch is a guess by the time anything uses it — the learner
+    /// may have been in Settings since.
+    func standing(completion: @escaping (Standing) -> Void) {
         center.getNotificationSettings { settings in
-            let authorized = settings.authorizationStatus == .authorized
-                || settings.authorizationStatus == .provisional
-            DispatchQueue.main.async { completion(authorized) }
+            let standing: Standing
+            switch settings.authorizationStatus {
+            case .notDetermined:
+                standing = .notAsked
+            case .authorized, .provisional, .ephemeral:
+                // Authorized is not the same as visible. A reminder with every presentation
+                // channel disabled is scheduled, delivered, and seen by nobody.
+                standing = [settings.alertSetting,
+                            settings.soundSetting,
+                            settings.notificationCenterSetting].contains(.enabled)
+                    ? .allowed : .silenced
+            default:
+                standing = .blocked
+            }
+            DispatchQueue.main.async { completion(standing) }
         }
+    }
+
+    /// Whether reminders can actually be delivered. The switch being on is not enough.
+    func isAuthorized(completion: @escaping (Bool) -> Void) {
+        standing { completion($0 == .allowed || $0 == .silenced) }
+    }
+
+    /// Where to send someone whose reminders are blocked.
+    ///
+    /// `openNotificationSettingsURLString` lands on the app's *notification* settings
+    /// rather than its general page — one fewer tap, and no hunting for the row. It is
+    /// **iOS 16+** despite being documented alongside 15.4 API, so the floor keeps the
+    /// general page and simply arrives one screen earlier.
+    static var settingsURL: URL? {
+        if #available(iOS 16.0, *) {
+            return URL(string: UIApplication.openNotificationSettingsURLString)
+        }
+        return URL(string: UIApplication.openSettingsURLString)
     }
 
     // MARK: - Rebuilding the window

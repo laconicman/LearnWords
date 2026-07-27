@@ -70,6 +70,10 @@ final class SettingsViewController: UITableViewController {
         isOn: prefs.remindersEnabled
     ) { [weak self] isOn in self?.setRemindersEnabled(isOn) }
 
+    /// What the system currently allows, re-read every time this screen appears. `nil`
+    /// until the first read comes back.
+    private var reminderStanding: ReminderScheduler.Standing?
+
     private lazy var reminderTimeCell = TimeCell(
         title: NSLocalizedString("Remind me at", comment: "setting"),
         hour: prefs.reminderHour, minute: prefs.reminderMinute
@@ -91,8 +95,36 @@ final class SettingsViewController: UITableViewController {
             // The time row only appears once reminders are on — a disabled picker for a
             // switched-off feature is a question the learner has not asked yet.
             (NSLocalizedString("Reminders", comment: "settings section"),
-             prefs.remindersEnabled ? [remindersCell, reminderTimeCell] : [remindersCell]),
+             showsReminderTime ? [remindersCell, reminderTimeCell] : [remindersCell]),
         ]
+    }
+
+    /// The time row is pointless unless reminders are both wanted and deliverable.
+    private var showsReminderTime: Bool {
+        prefs.remindersEnabled && reminderStanding != .blocked
+    }
+
+    /// Re-reads the live notification setting and reconciles the switch with it.
+    ///
+    /// **This is the rule the feature was missing.** The preference said "on" and the
+    /// switch drew "on", but the learner could have turned notifications off in Settings
+    /// at any point since — and nothing would ever have arrived, with the app still
+    /// claiming otherwise. Apple's guidance is to check the status rather than remember
+    /// it; this is where that check happens for the UI, as `rebuild` is for the schedule.
+    private func refreshReminderStanding() {
+        ReminderScheduler.shared.standing { [weak self] standing in
+            guard let self else { return }
+            self.reminderStanding = standing
+            if standing == .blocked && self.prefs.remindersEnabled {
+                // Not "turn the preference off": the learner did ask for reminders, and if
+                // they re-allow them in Settings that wish should still stand. Only the
+                // switch is corrected, and the footer says why.
+                self.remindersCell.setOn(false)
+            } else {
+                self.remindersCell.setOn(self.prefs.remindersEnabled)
+            }
+            self.tableView.reloadData()
+        }
     }
 
     /// Turning reminders on asks for permission first, and turns the switch back off if it
@@ -120,11 +152,14 @@ final class SettingsViewController: UITableViewController {
         let alert = UIAlertController(
             title: NSLocalizedString("Notifications are off", comment: "Alert title"),
             message: NSLocalizedString(
-                "Turn them on for LearnWords in the Settings app to be reminded.",
+                "Turn them on for LearnWords in Settings to be reminded. Practice works either way — the Exercises screen always shows what is due.",
                 comment: "Alert message when notification permission was refused"),
             preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: NSLocalizedString("Settings", comment: ""),
-                                      style: .default) { _ in gotoAppSettings() })
+                                      style: .default) { _ in
+            // The notification page directly, not the app's general one (iOS 15.4+).
+            if let url = ReminderScheduler.settingsURL { UIApplication.shared.open(url) }
+        })
         alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: "AlertAction title"),
                                       style: .cancel))
         present(alert, animated: true)
@@ -154,6 +189,9 @@ final class SettingsViewController: UITableViewController {
         super.viewWillAppear(animated)
         studyLanguageCell.detailTextLabel?.text = Self.languageName(for: prefs.languageToStudyPreference)
         nativeLanguageCell.detailTextLabel?.text = Self.languageName(for: prefs.nativeLanguagePreference)
+        // Every appearance, not just the first: returning from Settings is exactly when
+        // the answer is most likely to have changed.
+        refreshReminderStanding()
     }
 
     // MARK: - Table
@@ -162,6 +200,33 @@ final class SettingsViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         sections[section].title
+    }
+
+    /// Says what the app can and cannot do, and what still works either way.
+    ///
+    /// Silence is the failure mode here: a switch drawn "off" with no explanation reads as
+    /// a bug, and one drawn "on" that delivers nothing reads as a broken app. Neither
+    /// wording asks for anything — practice never depended on notifications.
+    override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
+        guard sections[section].title == NSLocalizedString("Reminders", comment: "settings section")
+        else { return nil }
+
+        switch reminderStanding {
+        case .blocked:
+            return NSLocalizedString(
+                "Notifications are turned off for LearnWords in Settings. The Exercises screen still shows what is due.",
+                comment: "Settings footer when notifications are blocked")
+        case .silenced:
+            return NSLocalizedString(
+                "Reminders are allowed but every alert style is off, so they will arrive silently in Notification Center.",
+                comment: "Settings footer when notifications are allowed but invisible")
+        case .allowed where prefs.remindersEnabled:
+            return NSLocalizedString(
+                "You will be reminded on days when words are due — and not on days when none are.",
+                comment: "Settings footer when reminders are on")
+        default:
+            return nil
+        }
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -300,6 +365,13 @@ private final class SwitchCell: UITableViewCell {
     }
 
     @available(*, unavailable) required init?(coder: NSCoder) { fatalError() }
+
+    /// Moves the switch without reporting it as a change — for correcting the UI to match
+    /// the world, which is not the learner doing something.
+    func setOn(_ isOn: Bool) {
+        guard toggle.isOn != isOn else { return }
+        toggle.setOn(isOn, animated: true)
+    }
 
     @objc private func toggled() {
         onChange(toggle.isOn)
