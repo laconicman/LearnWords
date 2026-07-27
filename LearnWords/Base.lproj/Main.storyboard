@@ -95,7 +95,7 @@
                         </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="xjF-U8-td1">
                             <connections>
-                                <segue destination="Bgt-6g-kOE" kind="show" identifier="AddWord" id="S09-2G-whQ"/>
+                                <action selector="addWordTapped:" destination="Jy4-wo-DD5" id="S09-2G-whQ"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>

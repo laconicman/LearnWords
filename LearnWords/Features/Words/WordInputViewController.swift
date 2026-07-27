@@ -154,7 +154,12 @@ final class WordInputViewController: UITableViewController {
         guard purpose.allowsEmpty || !entered.isEmpty else { return }
         suggestions?.remember(entered)
         onCommit(entered)
-        navigationController?.popViewController(animated: true)
+        // Only dismiss if the callback did not navigate onwards. The add-word flow pushes a
+        // second step from here; popping unconditionally would tear that step straight back
+        // off the stack.
+        if navigationController?.topViewController === self {
+            navigationController?.popViewController(animated: true)
+        }
     }
 
     // MARK: - Dictation

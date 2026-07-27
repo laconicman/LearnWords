@@ -35,9 +35,6 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         searchController.isActive && (searchController.searchBar.text?.isEmpty != true)
     }
 
-    /// Set aside by the single-word import path for the "AddWord" segue to pick up.
-    private var importedWord = ""
-
     // TODO: refactor to a factory func `uiImage(systemName: String)`
     private let resetProgressActionImage = UIImage.systemImage(["memories.badge.xmark", "memories"])
     private let editImage = UIImage.systemImage("pencil")
@@ -81,6 +78,50 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         // Build this heavy object while the screen is already up, so the first
         // tap-to-speak has no delay.
         _ = SpeechManager.shared
+    }
+
+    /// Adds a word and its meaning, as two steps of the **same** screen the meaning editor
+    /// uses.
+    ///
+    /// It used to be a storyboard segue to `SearchWordViewController`, which meant the two
+    /// ways into the app's vocabulary looked and behaved differently: a different accent
+    /// colour, no dictation button, and a first section listing the original word that
+    /// committed it *as its own translation* when tapped. One screen, so none of that can
+    /// diverge again (TD-28).
+    @IBAction func addWordTapped(_ sender: Any) {
+        beginAddWord(prefilled: "")
+    }
+
+    private func beginAddWord(prefilled: String) {
+        guard let set = library.selectedSet else { return }
+        let pair = LanguagePair.forSet(set)
+        let screen = WordInputViewController(.add(language: pair.secondary),
+                                             initialText: prefilled) { [weak self] word in
+            self?.askMeaning(of: word, in: set, pair: pair)
+        }
+        navigationController?.pushViewController(screen, animated: true)
+    }
+
+    /// Step two. Replaces step one on the stack rather than sitting on top of it, so Back
+    /// returns to the word list — going back to "which word?" after answering it is a
+    /// question nobody asked.
+    private func askMeaning(of word: String, in set: WordSet, pair: LanguagePair) {
+        let screen = WordInputViewController(.add(language: pair.primary)) { [weak self] meaning in
+            guard let self else { return }
+            do {
+                try self.lexicon.addSense(to: set.id,
+                                          terms: [Term.Draft(word, in: pair.secondary),
+                                                  Term.Draft(meaning, in: pair.primary)])
+                self.reload()
+            } catch {
+                debugLog("Could not add \(word): \(error)")
+            }
+        }
+        guard let navigation = navigationController else { return }
+        var stack = navigation.viewControllers
+        if stack.last is WordInputViewController { stack.removeLast() }
+        stack.append(screen)
+        navigation.setViewControllers(stack, animated: true)
     }
 
     @IBAction func goToSettings(_ sender: UIBarButtonItem) {
@@ -130,10 +171,10 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
             }
             reload()
         } else {
-            importedWord = lemmas(from: text).first ?? text
-            // Async: performSegue mid-appearance-transition is unreliable.
+            // Async: navigating mid-appearance-transition is unreliable.
+            let word = lemmas(from: text).first ?? text
             DispatchQueue.main.async { [weak self] in
-                self?.performSegue(withIdentifier: "AddWord", sender: self)
+                self?.beginAddWord(prefilled: word)
             }
         }
     }
@@ -327,19 +368,6 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
     }
 
     // MARK: - Navigation
-
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        switch segue.identifier {
-        case "AddWord":
-            if let searchWordVC = segue.destination as? SearchWordViewController {
-                searchWordVC.searchedObject = .original(lang: languages.secondary, word: importedWord)
-                searchWordVC.filterRowsForSearchedText(importedWord)
-                searchWordVC.navigationItem.backButtonTitle = NSLocalizedString("Word", comment: "backButtonTitle")
-            }
-        default:
-            break
-        }
-    }
 
     // MARK: - Keyboards
 

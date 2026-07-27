@@ -176,6 +176,22 @@ final class ReminderScheduler {
         }
     }
 
+    /// When the next reminder will fire, and how many are queued behind it.
+    ///
+    /// Exists because the feature was otherwise unfalsifiable: nothing arrived on the first
+    /// device test, and there was no way to tell whether that was a bug or the correct
+    /// answer — after a practice round nothing is due for a couple of days, so a correct
+    /// schedule is an *empty* one. "No reminders scheduled" is information; silence is not.
+    func pending(completion: @escaping (_ next: Date?, _ count: Int) -> Void) {
+        center.getPendingNotificationRequests { requests in
+            let mine = requests.filter { $0.identifier.hasPrefix(Self.identifierPrefix) }
+            let next = mine
+                .compactMap { ($0.trigger as? UNCalendarNotificationTrigger)?.nextTriggerDate() }
+                .min()
+            DispatchQueue.main.async { completion(next, mine.count) }
+        }
+    }
+
     /// Removes every pending reminder. Called when the switch goes off, and before each
     /// rebuild.
     func clear() {

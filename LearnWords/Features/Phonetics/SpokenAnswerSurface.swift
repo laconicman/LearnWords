@@ -26,6 +26,13 @@ final class SpokenAnswerSurface: NSObject, ExerciseAnswerSurface {
 
     private var isRecording = false { didSet { updateRecordButton() } }
 
+    /// Whether this question has already been answered by voice.
+    ///
+    /// Recognition reports **partial** results, so a matching utterance arrives several
+    /// times in a row. Answering on each one called `record` again with no question in
+    /// flight, and the screen popped — a correct answer ending the whole exercise.
+    private var hasAnswered = false
+
     var answerView: UIView { recognizedLabel }
     var accessoryButton: LWButton? { recordButton }
 
@@ -41,6 +48,7 @@ final class SpokenAnswerSurface: NSObject, ExerciseAnswerSurface {
     }
 
     func prepareForQuestion() {
+        hasAnswered = false
         recognizedLabel.attributedText = NSAttributedString(
             string: NSLocalizedString("pronounce the translation", comment: "label prompt"),
             attributes: [.foregroundColor: UIColor.lwAnswerPending])
@@ -85,12 +93,13 @@ final class SpokenAnswerSurface: NSObject, ExerciseAnswerSurface {
     /// "лиса" and "лисица" is right, which is the whole point of a meaning holding both.
     private func consider(_ heard: String) {
         recognizedLabel.text = heard
-        guard let screen, let question = screen.question else { return }
+        guard !hasAnswered, let screen, let question = screen.question else { return }
         guard question.answers.contains(where: {
             match3(pattern: $0.text, answer: heard,
                    language: screen.languages.answerLanguage, delimiters: ",; ")
         }) else { return }
 
+        hasAnswered = true
         DictationController.shared.stop()
         isRecording = false
         // A matcher said it was close enough — judged, not verbatim.

@@ -42,11 +42,16 @@ struct SettingsViewControllerTests {
         #expect(vc.tableView(table, numberOfRowsInSection: 0) == 2)  // languages
         #expect(vc.tableView(table, numberOfRowsInSection: 1) == 4)  // pitch, rate, 2 toggles
         #expect(vc.tableView(table, numberOfRowsInSection: 2) == 1)  // mastery horizon
-        #expect(vc.tableView(table, numberOfRowsInSection: 3) == 1)  // the switch alone
+        #expect(vc.tableView(table, numberOfRowsInSection: 3) == 2)  // switch + time
     }
 
-    /// The time row is only worth showing once reminders are on.
-    @Test func theReminderTimeAppearsOnlyWhenRemindersAreOn() {
+    /// The row count must not depend on the preference.
+    ///
+    /// It used to: the time row was added and removed as reminders were switched on and
+    /// off, while the same cell *instances* were handed back each time. UIKit was left
+    /// holding a hidden cell with no index path — "Unable to obtain index path for
+    /// accessory: <UISwitch…>" on a real device. The row is disabled now, not removed.
+    @Test func theReminderSectionKeepsBothRowsWhicheverWayTheSwitchIsSet() {
         let prefs = LWUserDefaults.standard
         let saved = prefs.remindersEnabled
         defer { prefs.remindersEnabled = saved }
@@ -58,7 +63,7 @@ struct SettingsViewControllerTests {
         prefs.remindersEnabled = true
         #expect(vc.tableView(table, numberOfRowsInSection: 3) == 2)
         prefs.remindersEnabled = false
-        #expect(vc.tableView(table, numberOfRowsInSection: 3) == 1)
+        #expect(vc.tableView(table, numberOfRowsInSection: 3) == 2)
     }
 
     @Test func languageNameResolvesCodesAndFallsBack() {

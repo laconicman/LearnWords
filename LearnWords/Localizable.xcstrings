@@ -1,9 +1,6 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
-    "\n Probably there is no internet connection. \n Recognition happens on Apple servers for most of devices. " : {
-      "comment" : "Speech recognition error detail"
-    },
     "%@ due now." : {
       "comment" : "Label words due now"
     },
@@ -66,7 +63,7 @@
       }
     },
     "Add word" : {
-      "comment" : "Alert title\nMeaning editor row"
+      "comment" : "Meaning editor row\nScreen title"
     },
     "Add Word" : {
       "comment" : "AlertAction title",
@@ -104,6 +101,7 @@
     },
     "Allow microphone usage" : {
       "comment" : "Alert title",
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -121,6 +119,7 @@
     },
     "Allow speech recognition" : {
       "comment" : "Alert title\nfor phonetic exercises",
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -204,6 +203,9 @@
         }
       }
     },
+    "Dictate" : {
+      "comment" : "Button label"
+    },
     "Dictation" : {
       "comment" : "Exercise screen title",
       "localizations" : {
@@ -220,6 +222,12 @@
           }
         }
       }
+    },
+    "Dictation is unavailable" : {
+      "comment" : "Alert title"
+    },
+    "Dictation needs permission" : {
+      "comment" : "Alert title"
     },
     "DICTIONARY_ACTION" : {
       "comment" : "Action for dictionary prompt",
@@ -305,7 +313,7 @@
       "comment" : "Meaning editor screen title"
     },
     "Edit word" : {
-      "comment" : "AlertController title",
+      "comment" : "Screen title",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -336,9 +344,6 @@
           }
         }
       }
-    },
-    "Every meaning and set using this word sees the change." : {
-      "comment" : "Alert message explaining that terms are shared"
     },
     "Export as" : {
       "comment" : "Action sheet title, export format",
@@ -383,6 +388,7 @@
     },
     "for phonetic exercises" : {
       "comment" : "Alert message",
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -674,8 +680,8 @@
         }
       }
     },
-    "Leave empty to remove the note." : {
-      "comment" : "Alert message"
+    "LearnWords needs speech recognition and the microphone to take dictation. You can still type the word." : {
+      "comment" : "Alert message when dictation permission was declined"
     },
     "Listen" : {
       "comment" : "Exercise button",
@@ -749,6 +755,7 @@
     },
     "Microphone access denied." : {
       "comment" : "Button title",
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -774,6 +781,9 @@
           }
         }
       }
+    },
+    "Most devices recognise speech on Apple's servers, so this usually means there is no internet connection." : {
+      "comment" : "Speech recognition error detail"
     },
     "Name of set" : {
       "localizations" : {
@@ -838,7 +848,7 @@
       }
     },
     "Note" : {
-      "comment" : "Alert title\nMeaning editor section header"
+      "comment" : "Meaning editor section header\nScreen title"
     },
     "Nothing due until %@." : {
       "comment" : "Label; placeholder is a date"
@@ -851,6 +861,9 @@
     },
     "Notifications are off" : {
       "comment" : "Alert title"
+    },
+    "Notifications are turned off for LearnWords in Settings. The Exercises screen still shows what is due." : {
+      "comment" : "Settings footer when notifications are blocked"
     },
     "OK" : {
       "comment" : "Action for alert for empty set",
@@ -992,8 +1005,12 @@
         }
       }
     },
+    "Recent" : {
+      "comment" : "Section header"
+    },
     "Recognition not allowed" : {
       "comment" : "Button title",
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1011,6 +1028,7 @@
     },
     "Recognition Not Available" : {
       "comment" : "Button title",
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1028,6 +1046,7 @@
     },
     "Recognition permission needed" : {
       "comment" : "Button title",
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1052,6 +1071,9 @@
     "Reminders" : {
       "comment" : "settings section"
     },
+    "Reminders are allowed but every alert style is off, so they will arrive silently in Notification Center." : {
+      "comment" : "Settings footer when notifications are allowed but invisible"
+    },
     "Rename" : {
       "comment" : "swipe action"
     },
@@ -1073,7 +1095,7 @@
       }
     },
     "Save" : {
-      "comment" : "AlertAction title",
+      "comment" : "AlertAction title\nBar button",
       "localizations" : {
         "ru" : {
           "stringUnit" : {
@@ -1120,6 +1142,9 @@
     "Shown during practice when the word alone is ambiguous." : {
       "comment" : "Meaning editor note footer"
     },
+    "Shown when the word alone is ambiguous" : {
+      "comment" : "Placeholder"
+    },
     "Spanish" : {
       "comment" : "language",
       "localizations" : {
@@ -1143,6 +1168,7 @@
       }
     },
     "Speech recognition error" : {
+      "comment" : "Alert title",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1157,6 +1183,9 @@
           }
         }
       }
+    },
+    "Speech recognition or the microphone is turned off for LearnWords. Turn it on in Settings, or type the word instead." : {
+      "comment" : "Alert message when dictation permission was revoked"
     },
     "Speech Recognition Required" : {
       "comment" : "PermissionManager - `onDenied`",
@@ -1203,6 +1232,9 @@
         }
       }
     },
+    "Stop dictating" : {
+      "comment" : "Button label"
+    },
     "Stop recognition" : {
       "comment" : "Button title",
       "localizations" : {
@@ -1222,6 +1254,7 @@
     },
     "Stopping" : {
       "comment" : "Button title",
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1247,6 +1280,12 @@
           }
         }
       }
+    },
+    "Suggestions" : {
+      "comment" : "Section header"
+    },
+    "This device has no speech recognition for %@. You can still type the word." : {
+      "comment" : "Alert message; placeholder is a language name"
     },
     "This is the only word" : {
       "comment" : "Alert title"
@@ -1288,7 +1327,7 @@
         }
       }
     },
-    "Turn them on for LearnWords in the Settings app to be reminded." : {
+    "Turn them on for LearnWords in Settings to be reminded. Practice works either way — the Exercises screen always shows what is due." : {
       "comment" : "Alert message when notification permission was refused"
     },
     "type in the translation" : {
@@ -1452,6 +1491,9 @@
           }
         }
       }
+    },
+    "You will be reminded on days when words are due — and not on days when none are." : {
+      "comment" : "Settings footer when reminders are on"
     }
   },
   "version" : "1.0"

@@ -51,6 +51,15 @@ final class DictationController {
     private var request: SFSpeechAudioBufferRecognitionRequest?
     private var task: SFSpeechRecognitionTask?
 
+    /// Set while `stop` is tearing the session down.
+    ///
+    /// Cancelling a recognition task makes it call back **with an error** — often
+    /// `kAFAssistantErrorDomain 1110`, "no speech detected". A caller that stops *because
+    /// it got the answer it wanted* would then be told the recognition failed, which is
+    /// how a correct answer came to raise "No speech" and interrupt the exercise. A
+    /// deliberate stop is not a failure, and this is how the callback knows the difference.
+    private var isStopping = false
+
     var isRecording: Bool { audioEngine.isRunning }
 
     // MARK: - Starting
@@ -86,10 +95,13 @@ final class DictationController {
     /// Ends the session and hands audio back to playback. Safe to call when nothing is
     /// running, which is what lets a caller stop unconditionally on the way off screen.
     func stop() {
+        isStopping = true
         if audioEngine.isRunning {
             audioEngine.stop()
             audioEngine.inputNode.removeTap(onBus: 0)
         }
+        // `endAudio` first, so the recogniser finishes what it already has instead of
+        // being aborted mid-utterance.
         request?.endAudio()
         request = nil
         task?.cancel()
@@ -159,6 +171,7 @@ final class DictationController {
                                 onFailure: @escaping (Failure) -> Void) throws {
         task?.cancel()
         task = nil
+        isStopping = false
 
         try audioSession.setCategory(.playAndRecord, mode: .default, options: [])
         // `.notifyOthersOnDeactivation` may only be passed when deactivating.
@@ -179,12 +192,16 @@ final class DictationController {
             }
 
             guard error != nil || isFinal else { return }
+            let wasStopping = self.isStopping
             self.stop()
 
-            // 203 is "no speech detected" — routine silence, not a fault worth reporting.
-            if let error, (error as NSError).code != 203 {
-                onFailure(.recognition(error, isOffline: (error as NSError).code == 4))
-            }
+            // Silence in every sense: a stop we asked for, and the codes the recogniser
+            // uses for "nothing was said" (203, 1110) or "you cancelled me" (216, 301).
+            // None is a fault worth putting an alert in front of someone.
+            let code = (error as NSError?)?.code
+            let routine = [203, 216, 301, 1110]
+            guard let error, !wasStopping, !routine.contains(code ?? 0) else { return }
+            onFailure(.recognition(error, isOffline: code == 4))
         }
 
         inputNode.installTap(onBus: 0, bufferSize: 1024,

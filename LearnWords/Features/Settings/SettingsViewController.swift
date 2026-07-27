@@ -92,17 +92,22 @@ final class SettingsViewController: UITableViewController {
              [pitchCell, rateCell, pronounceAnswersCell, pronounceQuestionsCell]),
             (NSLocalizedString("Study", comment: "settings section"),
              [masteryHorizonCell]),
-            // The time row only appears once reminders are on — a disabled picker for a
-            // switched-off feature is a question the learner has not asked yet.
+            // Both rows, always. Adding and removing a row while handing out the *same*
+            // cell instances left UIKit holding a hidden cell with no index path
+            // ("Unable to obtain index path for accessory"), which is noise at best and a
+            // dead control at worst. The time row is disabled instead of removed.
             (NSLocalizedString("Reminders", comment: "settings section"),
-             showsReminderTime ? [remindersCell, reminderTimeCell] : [remindersCell]),
+             [remindersCell, reminderTimeCell]),
         ]
     }
 
     /// The time row is pointless unless reminders are both wanted and deliverable.
-    private var showsReminderTime: Bool {
+    private var canBeReminded: Bool {
         prefs.remindersEnabled && reminderStanding != .blocked
     }
+
+    /// When the next reminder is due to fire, as last read.
+    private var nextReminderAt: Date?
 
     /// Re-reads the live notification setting and reconciles the switch with it.
     ///
@@ -123,7 +128,12 @@ final class SettingsViewController: UITableViewController {
             } else {
                 self.remindersCell.setOn(self.prefs.remindersEnabled)
             }
+            self.reminderTimeCell.isEnabled = self.canBeReminded
             self.tableView.reloadData()
+        }
+        ReminderScheduler.shared.pending { [weak self] next, _ in
+            self?.nextReminderAt = next
+            self?.tableView.reloadData()
         }
     }
 
@@ -221,9 +231,21 @@ final class SettingsViewController: UITableViewController {
                 "Reminders are allowed but every alert style is off, so they will arrive silently in Notification Center.",
                 comment: "Settings footer when notifications are allowed but invisible")
         case .allowed where prefs.remindersEnabled:
-            return NSLocalizedString(
-                "You will be reminded on days when words are due — and not on days when none are.",
+            let rule = NSLocalizedString(
+                "You are reminded on days when words are due, and not on days when none are.",
                 comment: "Settings footer when reminders are on")
+            guard let next = nextReminderAt else {
+                return rule + " " + NSLocalizedString(
+                    "Nothing is scheduled: no words come due in the next two weeks.",
+                    comment: "Settings footer when no reminder is pending")
+            }
+            let formatter = DateFormatter()
+            formatter.dateStyle = .full
+            formatter.timeStyle = .short
+            formatter.doesRelativeDateFormatting = true
+            return rule + " " + String(format: NSLocalizedString(
+                "Next reminder: %@.", comment: "Settings footer; placeholder is a date and time"),
+                                       formatter.string(from: next))
         default:
             return nil
         }
@@ -342,6 +364,15 @@ private final class TimeCell: UITableViewCell {
     }
 
     @available(*, unavailable) required init?(coder: NSCoder) { fatalError() }
+
+    /// Greyed rather than hidden when reminders are off, so the chosen time stays visible.
+    var isEnabled: Bool {
+        get { picker.isEnabled }
+        set {
+            picker.isEnabled = newValue
+            textLabel?.textColor = newValue ? .lwTextPrimary : .lwTextSecondary
+        }
+    }
 
     @objc private func changed() {
         let parts = Calendar.current.dateComponents([.hour, .minute], from: picker.date)
