@@ -152,6 +152,24 @@ AVAudioBuffer.mm:281 mBuffers[0].mDataByteSize (0) should be non-zero
 Speech synthesis, unrelated to any of this. Both are AVFoundation internals and both are
 harmless — don't chase them.
 
+## "It synced, but the other device still shows the old words"
+
+Two different causes, and the log looks healthy in both.
+
+**The screen never re-read.** Screens hold snapshots — `Lexicon` returns value types, so
+nothing tells a table its array is stale. Fixed: `LWPersistence.storeDidChangeRemotely` is
+posted after an import is merged and deduplicated, and the word list, the sets list and the
+exercise chooser reload on it while they are on screen.
+
+**The two devices are looking at different sets.** Which set is selected is *device-local*
+state, deliberately ([Design](Design.md)) — you may want a different set open on iPad than
+on iPhone. But if the devices ended up with **two sets of the same name** (the double-seed
+bug, fixed), each device selects its own, and a word added to one is invisible on the
+other. It is working exactly as designed on data that should not exist.
+
+The repair is to delete the duplicate set on either device: the other device's selection
+then points at nothing and falls back to the surviving set on its own.
+
 ## Debugging sync itself
 
 Raise Core Data's own logging — **Edit Scheme → Run → Arguments**:

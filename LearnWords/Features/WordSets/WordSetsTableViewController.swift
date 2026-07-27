@@ -26,6 +26,13 @@ final class WordSetsTableViewController: UITableViewController, UIDocumentPicker
     override func viewDidLoad() {
         super.viewDidLoad()
         clearsSelectionOnViewWillAppear = false
+        // A set created on another device should appear here without leaving the tab.
+        NotificationCenter.default.addObserver(self, selector: #selector(storeChangedRemotely),
+                                               name: LWPersistence.storeDidChangeRemotely, object: nil)
+    }
+
+    @objc private func storeChangedRemotely() {
+        if viewIfLoaded?.window != nil { reload() }
     }
 
     override func viewDidAppear(_ animated: Bool) {

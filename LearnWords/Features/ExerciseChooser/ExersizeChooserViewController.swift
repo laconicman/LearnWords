@@ -20,6 +20,13 @@ class ExersizeChooserViewController: UIViewController {
         ScrollableContent.wrap(contentStack,
                                insets: UIEdgeInsets(top: 20, left: 16, bottom: 20, right: 16),
                                fillsScreen: false)
+        // The counts on this screen are read from the store, so they go stale too.
+        NotificationCenter.default.addObserver(self, selector: #selector(storeChangedRemotely),
+                                               name: LWPersistence.storeDidChangeRemotely, object: nil)
+    }
+
+    @objc private func storeChangedRemotely() {
+        if viewIfLoaded?.window != nil { showSetSummary() }
     }
 
     override func viewDidAppear(_ animated: Bool) {

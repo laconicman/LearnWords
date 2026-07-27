@@ -59,6 +59,10 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         NotificationCenter.default.addObserver(self, selector: #selector(pendingImportMayHaveArrived),
                                                name: AppRoot.shareActionReceived, object: nil)
 
+        // Words arriving from another device change the store, not this screen's snapshot.
+        NotificationCenter.default.addObserver(self, selector: #selector(storeChangedRemotely),
+                                               name: LWPersistence.storeDidChangeRemotely, object: nil)
+
         navigationItem.rightBarButtonItems?.insert(editButtonItem, at: 0)
         checkInstalledLocales()
     }
@@ -132,6 +136,12 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
                 self?.performSegue(withIdentifier: "AddWord", sender: self)
             }
         }
+    }
+
+    /// Re-reads when another device's changes land. Only while on screen — `viewDidAppear`
+    /// covers every other case, and reloading a table nobody is looking at is wasted work.
+    @objc private func storeChangedRemotely() {
+        if viewIfLoaded?.window != nil { reload() }
     }
 
     /// Foreground / deep-link trigger. Only when visible: the single-word path segues,

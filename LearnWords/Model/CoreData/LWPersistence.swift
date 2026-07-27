@@ -227,6 +227,19 @@ final class LWPersistence {
         }
     }
 
+    /// Posted on the main queue after changes from another device have landed **and been
+    /// deduplicated** — the point at which the store is worth re-reading.
+    ///
+    /// Screens need this because they hold snapshots, not live results: `Lexicon` returns
+    /// value types by design, so nothing tells a table its array is stale. Before this
+    /// existed, a word added on one device reached the other's *store* but not its
+    /// *screen* until the tab was left and re-entered, which looks exactly like sync being
+    /// broken.
+    ///
+    /// Posted after deduplication rather than on the raw store notification, so the UI
+    /// never renders the duplicate rows that are about to be merged away.
+    static let storeDidChangeRemotely = Notification.Name("LWPersistenceStoreDidChangeRemotely")
+
     /// Repairs duplicate rows after each batch of changes arriving from another device.
     ///
     /// Uniqueness is enforced in `Lexicon`, in code, because CloudKit forbids constraints.
@@ -259,6 +272,11 @@ final class LWPersistence {
                     if removed > 0 { debugLog("Merged \(removed) duplicate rows after sync.") }
                 } catch {
                     debugLog("Deduplication failed: \(error)")
+                }
+                // Whether or not anything was merged, the store changed — that is what the
+                // screens are waiting to hear.
+                DispatchQueue.main.async {
+                    NotificationCenter.default.post(name: Self.storeDidChangeRemotely, object: self)
                 }
             }
             self.pendingDedup = work
