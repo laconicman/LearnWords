@@ -170,6 +170,30 @@ other. It is working exactly as designed on data that should not exist.
 The repair is to delete the duplicate set on either device: the other device's selection
 then points at nothing and falls back to the surviving set on its own.
 
+## Noise that is not a permission problem
+
+CloudKit's private database needs no permission beyond the user being signed into iCloud —
+there is no prompt to present and nothing to request. A device log full of red herrings
+does not change that. From a real iOS 26 run, all harmless:
+
+| Line | What it is |
+|---|---|
+| `RBSServiceErrorDomain Code=1 "Client not entitled"`, `elapsedCPUTimeForFrontBoard couldn't generate a task port` | RunningBoard chatter while the debugger is attached |
+| `personaAttributesForPersonaType … connection … invalidated` | `usermanagerd` XPC teardown |
+| `RTIInputSystemClient … requires a valid sessionID`, `variant selector cell index could not be found`, `Could not find cached accumulator` | keyboard internals |
+| `CFPrefsPlistSource … kCFPreferencesAnyUser` | reading an App Group's `UserDefaults` |
+| `IPCAUClient: bundle display name is nil`, `AVAudioBuffer … mDataByteSize (0)` | speech synthesis internals |
+
+Two are worth a second look but were still not the cause of anything so far:
+
+- `updateTaskRequest failed … BGSystemTaskSchedulerErrorDomain Code=3` — CloudKit failing to
+  register its background export activity. Seen on every iOS 26 launch, and that device
+  still exported successfully (the other device imported its seed), so it is not fatal.
+  Worth revisiting only if background sync stops happening while the app is backgrounded.
+- `Unable to simultaneously satisfy constraints … ButtonBarButtonVisualProvider` — a
+  navigation-bar button being squeezed under iOS 26's floating bar. Cosmetic, self-healing
+  (UIKit breaks the weaker constraint), and ours rather than the system's.
+
 ## Debugging sync itself
 
 Raise Core Data's own logging — **Edit Scheme → Run → Arguments**:

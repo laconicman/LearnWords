@@ -369,6 +369,25 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
         46.0
     }
     
+    /// Tapping a suggestion commits it — the same thing the keyboard's Return key does.
+    ///
+    /// Until this existed, tapping a row did **nothing at all**: the only way to add a
+    /// word was to finish typing and press Return, while the obvious gesture — tap the
+    /// word you were looking for — silently did nothing and made sync look broken.
+    /// The accessory button is a dictionary lookup, not a commit, which made it worse.
+    ///
+    /// Routed through `searchBarSearchButtonClicked` rather than duplicating the segue
+    /// logic, so the two entry points cannot drift: the choice between "Add Translation"
+    /// and "Add Word Pair" is made in exactly one place.
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        guard let picked = tableView.cellForRow(at: indexPath)?.textLabel?.text,
+              !picked.isEmpty else { return }
+        searchBar.text = picked
+        searchBar.resignFirstResponder()
+        searchBarSearchButtonClicked(searchBar)
+    }
+
     override func tableView(_ tableView: UITableView , accessoryButtonTappedForRowWith: IndexPath) {
         debugLog("accessoryButtonTappedForRowWith \(accessoryButtonTappedForRowWith)")
         lookUp(term: tableView.cellForRow(at: accessoryButtonTappedForRowWith)?.textLabel?.text ?? "", sender: self)
@@ -585,11 +604,17 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
     private func addWord(_ word: String, in wordLanguage: String,
                          meaning: String, in meaningLanguage: String) {
         let library = Library.shared
-        guard let set = library.selectedSet else { return }
+        guard let set = library.selectedSet else {
+            // Reachable: every set deleted, or the selection pointing at one another
+            // device removed. Silence here reads as "the app lost my word".
+            debugLog("No word set selected — \(word)/\(meaning) was not added.")
+            return
+        }
         do {
             try library.lexicon.addSense(to: set.id,
                                          terms: [Term.Draft(word, in: wordLanguage),
                                                  Term.Draft(meaning, in: meaningLanguage)])
+            debugLog("Added \(word) [\(wordLanguage)] / \(meaning) [\(meaningLanguage)] to \(set.name).")
         } catch {
             debugLog("Could not add \(word): \(error)")
         }
