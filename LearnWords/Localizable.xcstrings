@@ -16,6 +16,12 @@
     "Add" : {
       "comment" : "AlertAction title",
       "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Agregar"
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -195,6 +201,12 @@
     "Delete" : {
       "comment" : "swipe action",
       "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Eliminar"
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -301,6 +313,12 @@
     "Edit" : {
       "comment" : "swipe action",
       "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Editar"
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -315,6 +333,12 @@
     "Edit word" : {
       "comment" : "Screen title",
       "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Editar palabra"
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -326,6 +350,12 @@
     "English (GB)" : {
       "comment" : "language",
       "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Inglés (Reino Unido)"
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -337,6 +367,12 @@
     "English (US)" : {
       "comment" : "language",
       "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Inglés (EE. UU.)"
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -425,6 +461,12 @@
     "French" : {
       "comment" : "language",
       "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Francés"
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -436,6 +478,12 @@
     "German" : {
       "comment" : "language",
       "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Alemán"
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -535,6 +583,12 @@
     "Italian" : {
       "comment" : "language",
       "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Italiano"
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -599,6 +653,12 @@
       "comment" : "setting",
       "extractionState" : "stale",
       "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nivel de conocimiento"
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -610,6 +670,12 @@
     "Language to study" : {
       "comment" : "setting",
       "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Idioma para aprender"
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -621,6 +687,12 @@
     "Languages" : {
       "comment" : "settings section",
       "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Idiomas"
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -826,6 +898,12 @@
     "Microphone Access Required" : {
       "comment" : "PermissionManager - `onDenied`",
       "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Se requiere acceso al micrófono"
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -856,6 +934,12 @@
     "Native language" : {
       "comment" : "setting",
       "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Idioma nativo"
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -958,8 +1042,14 @@
       }
     },
     "Pitch" : {
-      "comment" : "setting",
+      "comment" : "Speech setting: voice pitch for text-to-speech",
       "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Tono"
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -988,6 +1078,12 @@
     "Please enable Microphone access in Settings to use voice features." : {
       "comment" : "PermissionManager - `onDenied`",
       "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Permite el acceso al micrófono en Ajustes para usar las funciones de voz."
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -999,6 +1095,12 @@
     "Please enable Speech Recognition in Settings to use voice features." : {
       "comment" : "PermissionManager - `onDenied`",
       "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Permite el reconocimiento de voz en Ajustes para usar las funciones de voz."
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1016,6 +1118,12 @@
     "Pronounce answers" : {
       "comment" : "setting",
       "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pronunciar respuestas"
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1027,6 +1135,12 @@
     "Pronounce questions" : {
       "comment" : "setting",
       "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Pronunciar preguntas"
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1053,8 +1167,14 @@
       }
     },
     "Rate" : {
-      "comment" : "setting",
+      "comment" : "Speech setting: speaking rate (speed) for text-to-speech",
       "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Velocidad"
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1161,6 +1281,12 @@
     "Russian" : {
       "comment" : "language",
       "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ruso"
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1172,6 +1298,12 @@
     "Save" : {
       "comment" : "AlertAction title\nBar button",
       "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Guardar"
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1223,6 +1355,12 @@
     "Spanish" : {
       "comment" : "language",
       "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Español"
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1232,8 +1370,14 @@
       }
     },
     "Speech" : {
-      "comment" : "settings section",
+      "comment" : "Settings section: text-to-speech options",
       "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Voz"
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1265,6 +1409,12 @@
     "Speech Recognition Required" : {
       "comment" : "PermissionManager - `onDenied`",
       "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Se requiere reconocimiento de voz"
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1347,8 +1497,14 @@
       }
     },
     "Study" : {
-      "comment" : "settings section",
+      "comment" : "Settings section: study/learning options",
       "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Estudio"
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1555,7 +1711,14 @@
       "comment" : "Settings footer when reminders are on"
     },
     "You may add Keyboards from system General Settings pane." : {
+      "comment" : "Alert message: how to add a missing keyboard, appended after the sentence above",
       "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Puedes agregar teclados desde el panel General de los Ajustes del sistema."
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
@@ -1568,6 +1731,12 @@
       "comment" : "Message for alert for empty set to display",
       "extractionState" : "stale",
       "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Puedes incluir las palabras ya aprendidas si quieres seguir practicando."
+          }
+        },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",

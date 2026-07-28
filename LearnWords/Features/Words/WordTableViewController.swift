@@ -392,7 +392,7 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
             message = (message ?? "") + String(format: NSLocalizedString("Keyboard for native learner's language (%@) is not installed now. ", comment: "Alert message, langID inside"), pair.primary)
         }
         guard var message else { return }
-        message.append(NSLocalizedString("You may add Keyboards from system General Settings pane.", comment: ""))
+        message.append(NSLocalizedString("You may add Keyboards from system General Settings pane.", comment: "Alert message: how to add a missing keyboard, appended after the sentence above"))
 
         // If the user only has English and Emoji they won't be able to add translations.
         let ac = UIAlertController(

@@ -983,3 +983,30 @@ minutes ahead. A request for today is then created and delivers.
 nobody would guess. **Discharge:** a UI test that pins the clock and asserts the pending
 requests, which also closes TD-29's inability to drive the switch. Not a debug button —
 the app should not grow a control that exists only to prove itself.
+
+## TD-33 — Localization trails features; Spanish shipped English in places — **audited + Spanish backfilled (2026-07-28)**
+
+**Finding** (audit of `Localizable.xcstrings`): the `es` locale was wrong *and* incomplete.
+Eight strings carried the English source verbatim while marked `translated` — so Spanish
+users saw "Dictation", "Forgot", "Learning", "Look Up", "Phonetic", untranslated
+`WordCount` plurals — plus a typo ("ermiso"), a half-Russian value ("Import удался"), stray
+whitespace, and several missing articles / stilted phrasings. A duplicate-of-source marked
+`translated` is worse than an absent one: it defeats every completeness signal and drifts
+silently as the source changes. All fixed.
+
+**Backfill:** `es` was a **partial** locale (~55 strings to `ru`'s ~83). The ~30 `ru`-only
+strings now have Spanish, marked **`needs_review`** (not `translated`) so a reviewer gets an
+exact worklist and the honest state is preserved. Ambiguous source keys gained real
+localizer comments ("Rate" read as *rating*; "Pitch" / "Speech" / "Study"), in both code and
+catalog.
+
+**Open (reviewer):** recognition terminology is not unified — the catalogue mixes
+"reconocimiento de voz" / "del habla" / "de habla", and "Voz" vs "habla" for the Speech
+section. Pick one and sweep.
+
+**The debt itself:** TD-14 and TD-19 both shipped with "RU translations to be added" —
+localization is deferred every feature and paid later in a batch, so strings reach users
+untranslated (or, worse, as English marked `translated`) in between. **Discharge:** treat the
+string catalogue as part of a feature's definition of done — add `es`/`ru` (or an explicit
+`needs_review`) in the same commit as the `NSLocalizedString`, and never mark a
+copy-of-source `translated`.

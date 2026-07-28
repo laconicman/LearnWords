@@ -34,13 +34,13 @@ final class SettingsViewController: UITableViewController {
     private let nativeLanguageCell = UITableViewCell(style: .value1, reuseIdentifier: nil)
 
     private lazy var pitchCell = SliderCell(
-        title: NSLocalizedString("Pitch", comment: "setting"),
+        title: NSLocalizedString("Pitch", comment: "Speech setting: voice pitch for text-to-speech"),
         minimum: 0.7, maximum: 1.9, format: "%.1f",
         value: Float(prefs.pitchMultiplierPreference)
     ) { [weak self] in self?.prefs.pitchMultiplierPreference = Double($0) }
 
     private lazy var rateCell = SliderCell(
-        title: NSLocalizedString("Rate", comment: "setting"),
+        title: NSLocalizedString("Rate", comment: "Speech setting: speaking rate (speed) for text-to-speech"),
         minimum: 0.2, maximum: 0.8, format: "%.2f",
         value: Float(prefs.utteranceRatePreference)
     ) { [weak self] in self?.prefs.utteranceRatePreference = Double($0) }
@@ -88,9 +88,9 @@ final class SettingsViewController: UITableViewController {
         [
             (NSLocalizedString("Languages", comment: "settings section"),
              [studyLanguageCell, nativeLanguageCell]),
-            (NSLocalizedString("Speech", comment: "settings section"),
+            (NSLocalizedString("Speech", comment: "Settings section: text-to-speech options"),
              [pitchCell, rateCell, pronounceAnswersCell, pronounceQuestionsCell]),
-            (NSLocalizedString("Study", comment: "settings section"),
+            (NSLocalizedString("Study", comment: "Settings section: study/learning options"),
              [masteryHorizonCell]),
             // Both rows, always. Adding and removing a row while handing out the *same*
             // cell instances left UIKit holding a hidden cell with no index path
