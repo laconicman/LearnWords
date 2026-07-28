@@ -50,6 +50,23 @@ final class ReminderScheduler {
     /// deep-link paths (share extension, reminder) stay in one place.
     static let practiceURL = URL(string: "learnWords://practice")!
 
+    /// Which rebuild is the current one. Main-queue only.
+    ///
+    /// `rebuild` is four async hops with four triggers (backgrounding, foregrounding, a
+    /// store change, a settings edit), so two can overlap — and they overlap *precisely*
+    /// when the schedule has just changed, which is the case where it matters. Interleaved:
+    /// the newer rebuild reads pending requests, removes and adds the correct set, and then
+    /// the older one's additions land on top and resurrect days it had correctly dropped.
+    ///
+    /// A generation counter is the smallest fix that is actually correct: each rebuild
+    /// claims a number, and abandons itself the moment a newer one exists. Superseded work
+    /// is thrown away rather than serialised, which is right — nobody wants the *previous*
+    /// schedule applied late.
+    ///
+    /// This is the kind of invariant an `actor` enforces structurally; see
+    /// docs/Design.md § "Swift Concurrency, when the floor allows it".
+    private var generation = 0
+
     private let center: UNUserNotificationCenter
     private let calendar: Calendar
 
@@ -156,6 +173,11 @@ final class ReminderScheduler {
         // especially a CloudKit push that wakes the app for a moment — can suspend us
         // between them, leaving the reminders half-rebuilt until the next launch. A task
         // assertion buys the few hundred milliseconds needed to finish.
+        generation += 1
+        let mine = generation
+        /// Whether this rebuild is still the newest one asked for.
+        func isCurrent() -> Bool { mine == generation }
+
         var assertion: UIBackgroundTaskIdentifier = .invalid
         assertion = UIApplication.shared.beginBackgroundTask(withName: "Rebuild reminders") {
             UIApplication.shared.endBackgroundTask(assertion)
@@ -168,7 +190,7 @@ final class ReminderScheduler {
         }
 
         isAuthorized { [weak self] authorized in
-            guard let self else { return done() }
+            guard let self, isCurrent() else { return done() }
             guard authorized else { self.clear(); return done() }
             guard let schedule = try? ReviewSchedule(lexicon: lexicon, now: now) else { return done() }
 
@@ -176,6 +198,9 @@ final class ReminderScheduler {
             let keep = Set(wanted.map(\.identifier))
 
             self.center.getPendingNotificationRequests { pending in
+              // Back to the main queue before touching `generation`, which is confined to it.
+              DispatchQueue.main.async {
+                guard isCurrent() else { return done() }
                 // Days that no longer have work, and yesterday's requests.
                 let stale = pending.map(\.identifier)
                     .filter { $0.hasPrefix(Self.identifierPrefix) && !keep.contains($0) }
@@ -191,6 +216,7 @@ final class ReminderScheduler {
                     }
                 }
                 group.notify(queue: .main, execute: done)
+              }
             }
         }
     }

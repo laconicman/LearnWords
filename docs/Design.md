@@ -540,6 +540,67 @@ decision they have not been asked to reconsider is a dead end dressed as help, s
 microphone. `DictationController` re-reads the latter two on every start for the same
 reason.
 
+## Decision: repair and derivation are two debounces, chained not merged
+
+**Decision (2026-07-28).** The store has two coalescing layers and they stay separate:
+
+| | Deduplication | Schedule rebuild |
+|---|---|---|
+| Trigger | `NSPersistentStoreRemoteChange` only | any write, local or remote |
+| Work | **repairs** rows sync duplicated | **derives** an index from rows |
+| Window | 2s — an initial sync posts many notifications | short; nothing is visibly wrong meanwhile |
+| If skipped | duplicate rows persist | reminders are stale until the next trigger |
+
+Merging them into one debouncer would be DRY at the level of *mechanism* and wrong at the
+level of *policy*: one is triggered by a subset of the other's triggers, they have different
+windows, and one must complete before the other starts.
+
+**Ordering is the part that matters.** A derivation must never read the store mid-repair.
+Today's arrangement gets this right only by accident — dedup posts `storeDidChange` when it
+finishes, but a *local* write posts immediately, so a rebuild can overlap a repair in
+flight. The intended reading of `storeDidChange` is **"the store is quiescent"**, not "a
+save happened"; when the rebuild debounce lands (TD-34) it should be subordinate to the
+repair rather than parallel to it. Recorded here because the current code does not yet say
+this out loud.
+
+**What is protected today, and what is not.** Core Data's own confinement is sound: writes
+go through `performAndWait` on a private-queue context, reads are main-queue, `pendingDedup`
+is touched only on `dedupQueue`. The *derived* layer was not: `ReminderScheduler.rebuild`
+has four triggers and four async hops, and two overlapping runs would resurrect reminders
+the newer one had correctly dropped — fixed with a generation counter, not by serialising,
+because nobody wants the previous schedule applied late.
+
+## Decision: Swift Concurrency, when the floor allows it
+
+**Not available today.** Swift Concurrency back-deploys only to **iOS 13**, and the floor is
+12.1. This records what changes when that moves, so the current callback code is understood
+as a deferral rather than a preference.
+
+**At iOS 13** — `async`/`await`, actors, `AsyncStream`:
+
+- `ReminderScheduler` becomes an **`actor`**, and the generation counter above stops being
+  necessary: overlapping rebuilds become impossible by construction rather than by a
+  discipline someone has to remember. This is the single largest win, because it converts a
+  class of bug into a compile-time property.
+- The two debouncers become one generic type over an `AsyncStream`, with the difference in
+  *policy* (window, trigger, ordering) expressed as parameters rather than duplicated code —
+  the DRY that merging them today would not achieve.
+- `DictationController`'s two closures become one `AsyncStream<Heard>`; `isStopping` becomes
+  actor state instead of a flag touched from a recogniser callback and the main queue.
+- `Sendable` costs almost nothing here: `Sense`, `Term` and `ReviewEvent` are already value
+  types precisely because managed objects never escape the store. That decision, made for
+  threading discipline, turns out to be the migration's prerequisite.
+
+**At iOS 15** — `NSManagedObjectContext.perform` gains an async form, so `LWPersistence.write`
+becomes `async throws -> T` and drops `performAndWait`; `UNUserNotificationCenter` gains
+`notificationSettings()`, `pendingNotificationRequests()` and `add(_:)`, collapsing
+`rebuild`'s four nested callbacks into straight-line code where the background-task
+assertion is a plain `defer`.
+
+**What does not change.** The synchronous `Lexicon` API is a *floor* constraint, not a
+design one — the read/write boundary and the value types either side of it stay exactly as
+they are. Migration is mechanical, which is the point of having drawn the boundary there.
+
 ## Decision: a manual reset appends a marker; it never deletes history
 
 **Decision (2026-07-26).** "Reset progress" on a word appends a `ReviewEvent` of kind

@@ -1030,5 +1030,9 @@ reminder window on each one. Correct, and wasteful: importing a file of 500 word
 it once per transaction, and each rebuild is a full `ReviewSchedule` over the library.
 
 **Cost:** invisible today (imports are one transaction, edits are rare), real once anything
-writes in a loop. **Discharge:** coalesce — a short debounce before rebuilding, the same
-shape `LWPersistence` already uses for deduplication.
+writes in a loop. **Discharge:** coalesce — a short debounce before rebuilding. **Not the
+same debouncer as deduplication**, though the same shape: different triggers, different
+windows, and the rebuild must be *subordinate* to the repair rather than parallel to it, or
+it derives a schedule from half-merged rows. See [Design](Design.md) § "repair and
+derivation are two debounces". The overlapping-rebuild race this would otherwise expose is
+already closed by a generation counter.
