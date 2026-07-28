@@ -33,6 +33,11 @@ final class SpokenAnswerSurface: NSObject, ExerciseAnswerSurface {
     /// flight, and the screen popped — a correct answer ending the whole exercise.
     private var hasAnswered = false
 
+    /// Set once the screen is gone. Auto mode schedules its listening a second into each
+    /// question, so without this the timer could open the microphone *after* the exercise
+    /// had been dismissed — leaving the recording indicator lit over an unrelated screen.
+    private var isDetached = false
+
     /// Keeps listening across questions instead of waiting for a tap each time.
     ///
     /// Offered as a long-press menu on the record button rather than a second control: the
@@ -65,7 +70,8 @@ final class SpokenAnswerSurface: NSObject, ExerciseAnswerSurface {
         // voice is the first thing recognised.
         if isAutomatic {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { [weak self] in
-                guard let self, self.isAutomatic, !self.hasAnswered, !self.isRecording else { return }
+                guard let self, !self.isDetached, self.isAutomatic,
+                      !self.hasAnswered, !self.isRecording else { return }
                 self.recordButtonTapped()
             }
         }
@@ -84,6 +90,12 @@ final class SpokenAnswerSurface: NSObject, ExerciseAnswerSurface {
     /// Recording holds `.playAndRecord`; give playback back before anything speaks or the
     /// screen moves on. Delegated, so this knowledge exists once.
     func willLeaveCurrentQuestion() {
+        DictationController.shared.stop()
+        isRecording = false
+    }
+
+    func detach() {
+        isDetached = true
         DictationController.shared.stop()
         isRecording = false
     }

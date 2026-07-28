@@ -459,7 +459,7 @@
     },
     "Ieh-AL-JGj.title" : {
       "comment" : "Class = \"UIBarButtonItem\"; title = \"Settings\"; ObjectID = \"Ieh-AL-JGj\";",
-      "extractionState" : "extracted_with_value",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {

@@ -120,6 +120,10 @@ final class ExerciseViewController: UIViewController, ExerciseScreen {
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         navigationController?.hidesBarsOnTap = false
+        // The sitting is over, or the learner walked away. Either way nothing on this
+        // screen may keep running — `willLeaveCurrentQuestion` only fires *between*
+        // questions, so it never runs for the last one.
+        surface.detach()
     }
 
     override var prefersHomeIndicatorAutoHidden: Bool {

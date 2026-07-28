@@ -1036,3 +1036,14 @@ windows, and the rebuild must be *subordinate* to the repair rather than paralle
 it derives a schedule from half-merged rows. See [Design](Design.md) § "repair and
 derivation are two debounces". The overlapping-rebuild race this would otherwise expose is
 already closed by a generation counter.
+
+## TD-35 — The reworded chooser switch needs its translations refreshed
+
+"Include learned words" became "Practise everything, due or not" when the switch stopped
+filtering inside a scope and started choosing between two. The label lives in
+`Main.storyboard`, so the `ru` and `es` entries in `Main.xcstrings` are now stale for that
+object — they still say the old thing, which is worse than saying nothing.
+
+**Cost:** a Russian or Spanish learner reads a label that describes behaviour the switch no
+longer has. **Discharge:** retranslate that one key. Small, but it is the kind of drift the
+2026-07-20 localisation pass was supposed to end, so it should not sit.

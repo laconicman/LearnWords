@@ -67,6 +67,15 @@ protocol ExerciseAnswerSurface: AnyObject {
     /// Called before the screen leaves the current question, by answer or by skip.
     /// Phonetics hands the audio session back to playback here. Default: nothing.
     func willLeaveCurrentQuestion()
+
+    /// Called once when the screen itself goes away — the sitting finished, or the learner
+    /// left. Distinct from `willLeaveCurrentQuestion`, which fires *between* questions and
+    /// therefore says nothing about whether another one is coming.
+    ///
+    /// Anything still running has to stop here. A surface that keeps hardware open past
+    /// this point holds it behind an unrelated screen, which is how the microphone stayed
+    /// live — orange dot and all — after Phonetics was dismissed. Default: nothing.
+    func detach()
 }
 
 // Optional parts of the contract. These are protocol *requirements* with defaults, so a
@@ -75,4 +84,5 @@ protocol ExerciseAnswerSurface: AnyObject {
 extension ExerciseAnswerSurface {
     var accessoryButton: LWButton? { nil }
     func willLeaveCurrentQuestion() {}
+    func detach() {}
 }

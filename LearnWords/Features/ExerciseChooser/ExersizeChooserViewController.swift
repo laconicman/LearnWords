@@ -62,8 +62,23 @@ class ExersizeChooserViewController: UIViewController {
         showDirection()
     }
     
+    /// The switch now *chooses the scope* rather than filtering inside one.
+    ///
+    /// It had become vestigial: under due-driven practice the schedule already decides what
+    /// is asked, and a learned word that is due should be asked — that is review. Its only
+    /// remaining reader was the "Practise anyway" alert, so flipping it appeared to do
+    /// nothing, which is exactly what the owner observed.
+    ///
+    /// The preference *key* keeps its historic name because it is persisted data; only the
+    /// meaning and the label moved on.
     @IBAction func includeLearnedWordsChanged(_ sender: UISwitch) {
         LWUserDefaults.standard.includeLearnedWords = sender.isOn
+        showSetSummary()
+    }
+
+    /// What the three exercise buttons will practise, as the switch currently reads.
+    private var chosenScope: PracticeSession.Scope {
+        includeLeanedWords.isOn ? .everything(includingLearned: true) : .due
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -87,6 +102,11 @@ class ExersizeChooserViewController: UIViewController {
             + NSLocalizedString("Learned: ", comment: "Label learned words")
             + pluralizedWordCount(learned) + "."
 
+        if includeLeanedWords?.isOn == true {
+            return numberOfWordsInSet.text = summary + " " + NSLocalizedString(
+                "Practising everything, due or not.",
+                comment: "Label when the schedule is being bypassed")
+        }
         if let digest = setDigest() {
             summary += " " + (digest.dueCount > 0
                 ? String(format: NSLocalizedString("%@ due now.", comment: "Label words due now"),
@@ -136,8 +156,10 @@ class ExersizeChooserViewController: UIViewController {
             showEmptySetAlert()
             return
         }
-        if digest.dueCount > 0 {
-            push(exercise, in: set, scope: .due)
+        // With the switch on, the schedule is bypassed on purpose and there is nothing to
+        // ask about; with it off, an empty due list is worth a word before drilling ahead.
+        if includeLeanedWords.isOn || digest.dueCount > 0 {
+            push(exercise, in: set, scope: chosenScope)
         } else {
             offerToPractiseAhead(exercise, in: set, digest: digest)
         }
