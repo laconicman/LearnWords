@@ -43,6 +43,20 @@ final class DictationController {
         case recognition(Error, isOffline: Bool)
     }
 
+    /// One reading of what was heard.
+    ///
+    /// `confidence` is the recogniser's own certainty, 0…1 — and it is **0 until
+    /// `isFinal`**, which is a constraint rather than a detail: anything that wants to
+    /// judge *how well* a word was pronounced has to wait for the final result, not accept
+    /// the first partial that matches.
+    /// ([`SFTranscriptionSegment.confidence`](https://developer.apple.com/documentation/speech/sftranscriptionsegment/confidence))
+    struct Heard {
+        let text: String
+        let isFinal: Bool
+        /// Mean segment confidence. `nil` while partial.
+        let confidence: Float?
+    }
+
     static let shared = DictationController()
 
     private let audioEngine = AVAudioEngine()
@@ -72,7 +86,7 @@ final class DictationController {
     ///   - onFailure: called once, and only when something went wrong. Stopping normally
     ///     is not a failure.
     func start(language: String,
-               onTranscription: @escaping (String, Bool) -> Void,
+               onTranscription: @escaping (Heard) -> Void,
                onFailure: @escaping (Failure) -> Void) {
         authorize { [weak self] failure in
             guard let self else { return }
@@ -167,7 +181,7 @@ final class DictationController {
 
     // MARK: - Recording
 
-    private func beginRecording(onTranscription: @escaping (String, Bool) -> Void,
+    private func beginRecording(onTranscription: @escaping (Heard) -> Void,
                                 onFailure: @escaping (Failure) -> Void) throws {
         task?.cancel()
         task = nil
@@ -188,7 +202,15 @@ final class DictationController {
 
             if let result {
                 isFinal = result.isFinal
-                onTranscription(result.bestTranscription.formattedString, isFinal)
+                let segments = result.bestTranscription.segments
+                // Averaged across segments: a two-word answer where one word was clear and
+                // the other mumbled should not read as confident.
+                let confidence: Float? = isFinal && !segments.isEmpty
+                    ? segments.map(\.confidence).reduce(0, +) / Float(segments.count)
+                    : nil
+                onTranscription(Heard(text: result.bestTranscription.formattedString,
+                                      isFinal: isFinal,
+                                      confidence: confidence))
             }
 
             guard error != nil || isFinal else { return }

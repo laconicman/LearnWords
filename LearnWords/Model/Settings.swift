@@ -149,6 +149,12 @@ userDefaultsGroup.set(newValue, forKey: "pronounceQuestionsPreference")
         }
     }
     
+    /// Whether Phonetics keeps listening across questions rather than waiting for a tap.
+    var continuousRecognition: Bool {
+        get { userDefaultsGroup.bool(forKey: "continuousRecognition") }
+        set { userDefaultsGroup.set(newValue, forKey: "continuousRecognition") }
+    }
+
     /// Whether the learner wants to be reminded. Off until they say otherwise — the
     /// permission sheet is asked for at the switch, not at launch.
     var remindersEnabled: Bool {

@@ -122,6 +122,17 @@ Priority-ordered. Rationale lives in [Design](Design.md); debt items in [TechDeb
   in Xcode's Signing & Capabilities where the App ID updates in the same step — not in a
   hand-edited plist. (The `remote-notification` background mode, the other half, is now in
   `Info.plist`.)
+- **Pronunciation scoring beyond the system recogniser.** `SFSpeechRecognizer.confidence`
+  is a proxy for *what* was said, not *how well* — see
+  [ProgressModel](ProgressModel.md) § "Pronunciation quality". `ReviewEvent` already carries
+  `judgmentVerdict`/`judgeID`/`judgedAt` so a better judge can re-score history. Worth
+  evaluating: forced alignment against a phoneme model, on-device Foundation Models
+  (iOS 26+), or a dedicated assessment service.
+- **`BGAppRefreshTaskRequest` for word-set enrichment** (owner's note, not scheduled). A
+  different scope from the CloudKit push that wakes the app for sync: periodic background
+  work to prefill terms from the enrichment corpus (TD-22) rather than to react to a
+  change. Noted so it is not confused with the reminder rebuild, which needs no scheduled
+  task — only a background-task assertion so its async steps survive suspension.
 - **Confirm a reminder actually arrives.** The switch is owner-confirmed to request
   permission, so the first half of the path is proven. What is still unwitnessed is the
   second: schedule → deliver → tap → land on Exercises. No automated pass can do it

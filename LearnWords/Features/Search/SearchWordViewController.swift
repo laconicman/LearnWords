@@ -4,12 +4,13 @@
 //
 //  Created by Paul on 11.11.2018.
 //  Copyright © 2018 Laconic. All rights reserved.
-//
+// MARK: Left just for history documentation. Delete when all TODOs and ideas migrated
 // TODO: Limit search term to one word at least for suggestions, maybe visually
 // This is solved in TableSearch example from Apple
 // TODO: Add tableView Animation
 // TODO: Introduce constants for languages (hint: use system ones)
 
+/*
 import UIKit
 
 //class LocalizedUISearchController: UISearchController{
@@ -620,3 +621,5 @@ class SearchWordViewController: UITableViewController, UISearchBarDelegate {
 //        }
 //    }
 //}
+
+*/

@@ -129,6 +129,12 @@ final class WordInputViewController: UITableViewController {
         field.placeholder = purpose.placeholder
         field.delegate = self
         field.addTarget(self, action: #selector(textChanged), for: .editingChanged)
+        // `.roundedRect` is about 30pt tall, which reads as an afterthought beside 56pt
+        // buttons and 44pt rows. A scaled floor keeps it in the same family and grows with
+        // Dynamic Type; `greaterThanOrEqual` so a larger intrinsic height still wins.
+        field.heightAnchor.constraint(
+            greaterThanOrEqualToConstant:
+                UIFontMetrics.default.scaledValue(for: 44)).isActive = true
 
         dictationButton.setImage(.systemImage("mic.circle.fill"), for: .normal)
         dictationButton.tintColor = .lwAccent
@@ -146,16 +152,24 @@ final class WordInputViewController: UITableViewController {
 
         let header = UIView()
         header.addSubview(stack)
+        let trailing = stack.trailingAnchor.constraint(equalTo: header.layoutMarginsGuide.trailingAnchor)
+        // One of the pair yields rather than conflicts if the header is ever measured
+        // before it has a width. Auto Layout would otherwise break one of them anyway —
+        // this chooses which, and does it silently.
+        trailing.priority = .required - 1
         NSLayoutConstraint.activate([
             stack.leadingAnchor.constraint(equalTo: header.layoutMarginsGuide.leadingAnchor),
-            stack.trailingAnchor.constraint(equalTo: header.layoutMarginsGuide.trailingAnchor),
+            trailing,
             stack.topAnchor.constraint(equalTo: header.topAnchor, constant: 12),
             stack.bottomAnchor.constraint(equalTo: header.bottomAnchor, constant: -12),
         ])
         // A table header view is laid out by frame, so its height has to be measured once
-        // the content is in place — and again when Dynamic Type changes it.
+        // the content is in place. **Not measured here**: at `viewDidLoad` the table has no
+        // width yet, and `systemLayoutSizeFitting` against a zero-width view is what
+        // produced the "Unable to simultaneously satisfy constraints" storm —
+        // `'fittingSizeHTarget' UIView.width == 0` against 8pt margins on both sides
+        // cannot hold. `viewDidLayoutSubviews` measures it once the width is real.
         tableView.tableHeaderView = header
-        sizeHeaderToFit()
     }
 
     /// The pinned term: a caption and the word, in a tinted slab so it reads as *context*
@@ -189,9 +203,11 @@ final class WordInputViewController: UITableViewController {
         slab.backgroundColor = UIColor.lwAccent.withAlphaComponent(0.12)
         slab.layer.cornerRadius = 10
         slab.addSubview(inner)
+        let innerTrailing = inner.trailingAnchor.constraint(equalTo: slab.trailingAnchor, constant: -12)
+        innerTrailing.priority = .required - 1
         NSLayoutConstraint.activate([
             inner.leadingAnchor.constraint(equalTo: slab.leadingAnchor, constant: 12),
-            inner.trailingAnchor.constraint(equalTo: slab.trailingAnchor, constant: -12),
+            innerTrailing,
             inner.topAnchor.constraint(equalTo: slab.topAnchor, constant: 10),
             inner.bottomAnchor.constraint(equalTo: slab.bottomAnchor, constant: -10),
         ])
@@ -201,8 +217,12 @@ final class WordInputViewController: UITableViewController {
     }
 
     /// Table header views size by frame, not by constraints.
+    ///
+    /// Does nothing until there is a width to fit into. Measuring at zero width asks Auto
+    /// Layout to satisfy two 8pt margins inside nothing, which it reports at length and
+    /// then recovers from by breaking one of *our* constraints.
     private func sizeHeaderToFit() {
-        guard let header = tableView.tableHeaderView else { return }
+        guard let header = tableView.tableHeaderView, tableView.bounds.width > 0 else { return }
         header.frame.size.width = tableView.bounds.width
         let height = header.systemLayoutSizeFitting(
             CGSize(width: tableView.bounds.width, height: 0),
@@ -259,13 +279,13 @@ final class WordInputViewController: UITableViewController {
         isDictating = true
         DictationController.shared.start(
             language: language,
-            onTranscription: { [weak self] transcription, isFinal in
+            onTranscription: { [weak self] heard in
                 guard let self else { return }
                 // Replaces rather than appends: each callback carries the whole
                 // transcription so far, not the newest fragment.
-                self.field.text = transcription
+                self.field.text = heard.text
                 self.refreshCandidates()
-                if isFinal { self.isDictating = false }
+                if heard.isFinal { self.isDictating = false }
             },
             onFailure: { [weak self] failure in
                 self?.isDictating = false

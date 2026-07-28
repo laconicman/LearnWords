@@ -33,6 +33,16 @@ final class SpokenAnswerSurface: NSObject, ExerciseAnswerSurface {
     /// flight, and the screen popped — a correct answer ending the whole exercise.
     private var hasAnswered = false
 
+    /// Keeps listening across questions instead of waiting for a tap each time.
+    ///
+    /// Offered as a long-press menu on the record button rather than a second control: the
+    /// exercise screen has one accessory slot, and the choice belongs to the button it
+    /// changes the behaviour of.
+    private var isAutomatic: Bool {
+        get { LWUserDefaults.standard.continuousRecognition }
+        set { LWUserDefaults.standard.continuousRecognition = newValue; updateRecordButton() }
+    }
+
     var answerView: UIView { recognizedLabel }
     var accessoryButton: LWButton? { recordButton }
 
@@ -40,6 +50,7 @@ final class SpokenAnswerSurface: NSObject, ExerciseAnswerSurface {
         self.screen = screen
         recognizedLabel.font = .systemFont(ofSize: 60)
         recordButton.addTarget(self, action: #selector(recordButtonTapped), for: .touchUpInside)
+        installModeMenu()
         updateRecordButton()
         // Deliberately **not** asking for permission here. The button used to sit disabled
         // until two authorization callbacks came back, which meant a permission sheet
@@ -49,6 +60,15 @@ final class SpokenAnswerSurface: NSObject, ExerciseAnswerSurface {
 
     func prepareForQuestion() {
         hasAnswered = false
+        // In automatic mode the next question starts listening on its own. A short delay so
+        // the prompt has been spoken before the microphone opens, or the synthesiser's own
+        // voice is the first thing recognised.
+        if isAutomatic {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { [weak self] in
+                guard let self, self.isAutomatic, !self.hasAnswered, !self.isRecording else { return }
+                self.recordButtonTapped()
+            }
+        }
         recognizedLabel.attributedText = NSAttributedString(
             string: NSLocalizedString("pronounce the translation", comment: "label prompt"),
             attributes: [.foregroundColor: UIColor.lwAnswerPending])
@@ -80,8 +100,8 @@ final class SpokenAnswerSurface: NSObject, ExerciseAnswerSurface {
         isRecording = true
         DictationController.shared.start(
             language: screen?.languages.answerLanguage ?? "en",
-            onTranscription: { [weak self] heard, _ in
-                self?.consider(heard.lowercased())
+            onTranscription: { [weak self] heard in
+                self?.consider(heard)
             },
             onFailure: { [weak self] failure in
                 self?.isRecording = false
@@ -91,26 +111,84 @@ final class SpokenAnswerSurface: NSObject, ExerciseAnswerSurface {
 
     /// Accepts the utterance as soon as it matches **any** synonym — saying either of
     /// "лиса" and "лисица" is right, which is the whole point of a meaning holding both.
-    private func consider(_ heard: String) {
-        recognizedLabel.text = heard
+    /// Accepts the utterance as soon as it matches **any** synonym — saying either of
+    /// "лиса" and "лисица" is right, which is the whole point of a meaning holding both.
+    ///
+    /// The grade uses the recogniser's confidence when it has one. `confidence` is `0`
+    /// until the result is final, so a match on a *partial* is deliberately taken at the
+    /// weaker grade rather than waited on: making the learner hold still for the final
+    /// result to earn a better mark would be a worse exercise than a slightly cautious one.
+    private func consider(_ heard: DictationController.Heard) {
+        recognizedLabel.text = heard.text
         guard !hasAnswered, let screen, let question = screen.question else { return }
         guard question.answers.contains(where: {
-            match3(pattern: $0.text, answer: heard,
+            match3(pattern: $0.text, answer: heard.text,
                    language: screen.languages.answerLanguage, delimiters: ",; ")
         }) else { return }
 
         hasAnswered = true
         DictationController.shared.stop()
         isRecording = false
-        // A matcher said it was close enough — judged, not verbatim.
-        screen.answer(.correctJudged, response: heard)
+
+        // Clearly pronounced *and* an exact match reads as verbatim; anything the
+        // recogniser was unsure of stays judged. The threshold is a first guess, recorded
+        // in docs/ProgressModel.md so it can be revised against real logs rather than taste.
+        let exact = question.answers.contains {
+            $0.text.compare(heard.text, options: [.caseInsensitive, .diacriticInsensitive])
+                == .orderedSame
+        }
+        let confident = (heard.confidence ?? 0) >= Self.confidentPronunciation
+        screen.answer(exact && confident ? .correctVerbatim : .correctJudged,
+                      response: heard.text)
+    }
+
+    /// Mean segment confidence at or above which a spoken answer counts as verbatim.
+    /// Apple's own example calls 0.94 "very high" and 0.72 merely likely, so this sits
+    /// between them.
+    private static let confidentPronunciation: Float = 0.85
+
+    /// The long-press menu that turns continuous listening on and off.
+    private func installModeMenu() {
+        guard #available(iOS 14.0, *) else { return installLegacyModeGesture() }
+        recordButton.menu = UIMenu(title: NSLocalizedString("Recognition",
+                                                            comment: "Menu title"),
+                                   children: [autoAction(on: true), autoAction(on: false)])
+    }
+
+    @available(iOS 14.0, *)
+    private func autoAction(on: Bool) -> UIAction {
+        UIAction(title: on
+                 ? NSLocalizedString("Listen automatically", comment: "Menu item")
+                 : NSLocalizedString("Listen when I tap", comment: "Menu item"),
+                 state: isAutomatic == on ? .on : .off) { [weak self] _ in
+            self?.isAutomatic = on
+            self?.installModeMenu()          // redraw the checkmark
+        }
+    }
+
+    /// iOS 12–13 have no button menu; a long press toggles instead, and the button title
+    /// is the only affordance either way.
+    private func installLegacyModeGesture() {
+        let press = UILongPressGestureRecognizer(target: self, action: #selector(toggleAutomatic))
+        recordButton.addGestureRecognizer(press)
+    }
+
+    @objc private func toggleAutomatic(_ gesture: UILongPressGestureRecognizer) {
+        guard gesture.state == .began else { return }
+        isAutomatic.toggle()
     }
 
     private func updateRecordButton() {
         recordButton.purpose = isRecording ? .negative : .prominent
-        recordButton.setTitle(isRecording
-            ? NSLocalizedString("Stop recognition", comment: "Button title")
-            : NSLocalizedString("Start recognition", comment: "Button title"), for: [])
+        let title: String
+        if isRecording {
+            title = NSLocalizedString("Stop recognition", comment: "Button title")
+        } else if isAutomatic {
+            title = NSLocalizedString("Listening automatically", comment: "Button title")
+        } else {
+            title = NSLocalizedString("Start recognition", comment: "Button title")
+        }
+        recordButton.setTitle(title, for: [])
     }
 
     /// Every failure leaves the exercise usable — "Forgot" and "Know" still work — so the

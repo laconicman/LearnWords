@@ -152,10 +152,25 @@ final class ReminderScheduler {
     func rebuild(from lexicon: Lexicon, now: Date = Date()) {
         guard LWUserDefaults.standard.remindersEnabled else { return clear() }
 
+        // Every step below is an async round trip to another process. Backgrounding — and
+        // especially a CloudKit push that wakes the app for a moment — can suspend us
+        // between them, leaving the reminders half-rebuilt until the next launch. A task
+        // assertion buys the few hundred milliseconds needed to finish.
+        var assertion: UIBackgroundTaskIdentifier = .invalid
+        assertion = UIApplication.shared.beginBackgroundTask(withName: "Rebuild reminders") {
+            UIApplication.shared.endBackgroundTask(assertion)
+            assertion = .invalid
+        }
+        func done() {
+            guard assertion != .invalid else { return }
+            UIApplication.shared.endBackgroundTask(assertion)
+            assertion = .invalid
+        }
+
         isAuthorized { [weak self] authorized in
-            guard let self else { return }
-            guard authorized else { return self.clear() }
-            guard let schedule = try? ReviewSchedule(lexicon: lexicon, now: now) else { return }
+            guard let self else { return done() }
+            guard authorized else { self.clear(); return done() }
+            guard let schedule = try? ReviewSchedule(lexicon: lexicon, now: now) else { return done() }
 
             let wanted = self.requests(for: schedule, now: now)
             let keep = Set(wanted.map(\.identifier))
@@ -167,11 +182,15 @@ final class ReminderScheduler {
                 if !stale.isEmpty {
                     self.center.removePendingNotificationRequests(withIdentifiers: stale)
                 }
+                let group = DispatchGroup()
                 for request in wanted {
+                    group.enter()
                     self.center.add(request) { error in
                         if let error { debugLog("Could not schedule a reminder: \(error)") }
+                        group.leave()
                     }
                 }
+                group.notify(queue: .main, execute: done)
             }
         }
     }

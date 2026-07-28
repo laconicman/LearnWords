@@ -247,3 +247,35 @@ distinguish from a word never touched.
 **Outstanding:** the cell's ring still has fixed 44×44 constraints in the storyboard, so the
 scaled `intrinsicContentSize` is overridden. Relaxing them belongs with the words-screen
 rebuild that owns that storyboard scene.
+
+
+## Pronunciation quality — what the system recogniser offers (2026-07-28)
+
+`SFSpeechRecognizer` is the app's only judge of spoken answers today. What it can actually
+tell us, checked against Apple's documentation rather than assumed:
+
+| Signal | Where | Availability | Notes |
+|---|---|---|---|
+| `confidence` | `SFTranscriptionSegment` | iOS 10+ | 0…1. **`0` until `isFinal`.** Apple's own example calls 0.94 "very high" and 0.72 merely likely. |
+| Alternatives | `SFSpeechRecognitionResult.transcriptions` | iOS 10+ | Ranked; a correct word appearing only as a low-ranked alternative is itself a signal. |
+| `speakingRate`, `averagePauseDuration` | `SFSpeechRecognitionMetadata` | iOS 14+ | Fluency rather than accuracy. |
+| `SFVoiceAnalytics` — `jitter`, `shimmer`, `pitch`, `voicing` | `SFTranscriptionSegment.voiceAnalytics` | iOS 13+ | Per-frame vocal measurements, **final results only**. |
+
+**The binding constraint is `isFinal`.** Confidence and voice analytics are both zero or
+absent on partial results, and the Phonetics exercise accepts a match as soon as a *partial*
+contains it — deliberately, because making the learner hold still to earn a better mark
+would be a worse exercise. So a spoken answer is graded `.correctVerbatim` only when the
+final result both matches exactly and clears a confidence bar (0.85, a first guess recorded
+here so it can be revised against real logs rather than taste); otherwise `.correctJudged`.
+
+**What this does not measure.** Confidence is the recogniser's certainty about *what was
+said*, not about *how well it was said*. A heavy accent that the recogniser nonetheless
+resolves scores high; a clear speaker using an unexpected word scores low. It is a usable
+proxy and not a pronunciation score.
+
+**We are not limited to this engine.** Nothing in the event log ties scoring to
+`SFSpeechRecognizer` — `ReviewEvent` stores the response text and a `judgmentVerdict`,
+`judgeID` and `judgedAt` triple precisely so a better judge can re-score old answers later.
+Candidates worth evaluating when this becomes a priority: forced alignment against a
+phoneme model, on-device Foundation Models (iOS 26+) scoring transcript-versus-target, or a
+purpose-built pronunciation-assessment service. That is a roadmap item, not a decision.

@@ -1388,6 +1388,9 @@
         }
       }
     },
+    "Word in %@" : {
+      "comment" : "Caption; a language"
+    },
     "WordCount" : {
       "comment" : "Count of words available",
       "localizations" : {
