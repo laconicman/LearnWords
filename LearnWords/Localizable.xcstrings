@@ -124,7 +124,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Permitir el reconocimiento del habla "
+            "value" : "Permitir el reconocimiento del habla"
           }
         },
         "ru" : {
@@ -212,7 +212,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dictation"
+            "value" : "Dictado"
           }
         },
         "ru" : {
@@ -264,7 +264,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "¿Has configurado tu iOS diccionario?\n\nToca \"Administrar\" debajo para descargar los diccionarios de idiomas preferidos"
+            "value" : "¿Has configurado tus diccionarios de iOS?\n\nToca \"Administrar\" abajo para descargar los diccionarios de los idiomas que quieras."
           }
         },
         "ru" : {
@@ -287,7 +287,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : " Agregar diccionarios"
+            "value" : "Agregar diccionarios"
           }
         },
         "ru" : {
@@ -411,7 +411,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Forgot"
+            "value" : "No sé"
           }
         },
         "ru" : {
@@ -473,7 +473,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Importación falló"
+            "value" : "La importación falló"
           }
         },
         "ru" : {
@@ -497,7 +497,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "%@ es encontrado en la fuente de la importación.\n%@ es duplicado.\n%@ es agregado."
+            "value" : "%@ encontradas en la fuente de importación.\n%@ duplicadas.\n%@ agregadas."
           }
         },
         "ru" : {
@@ -521,13 +521,13 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Importación se realiza correctamente"
+            "value" : "Importación realizada correctamente"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Import удался"
+            "value" : "Импорт удался"
           }
         }
       }
@@ -584,7 +584,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Know"
+            "value" : "Lo sé"
           }
         },
         "ru" : {
@@ -635,7 +635,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Es aprendido"
+            "value" : "Aprendido "
           }
         },
         "ru" : {
@@ -652,7 +652,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Es aprendido: "
+            "value" : "Aprendido: "
           }
         },
         "ru" : {
@@ -669,7 +669,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Learning"
+            "value" : "Aprendiendo"
           }
         },
         "ru" : {
@@ -690,13 +690,64 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Listen"
+            "value" : "Escuchar"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Слушать"
+          }
+        }
+      }
+    },
+    "Listen automatically" : {
+      "comment" : "Menu item",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escuchar automáticamente"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Слушать автоматически"
+          }
+        }
+      }
+    },
+    "Listen when I tap" : {
+      "comment" : "Menu item",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escuchar al tocar"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Слушать по нажатию"
+          }
+        }
+      }
+    },
+    "Listening automatically" : {
+      "comment" : "Button title",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Escuchando automáticamente"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Слушаю автоматически"
           }
         }
       }
@@ -708,7 +759,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Look Up"
+            "value" : "Buscar"
           }
         },
         "ru" : {
@@ -725,7 +776,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Parece que solo tienes estos teclados:  "
+            "value" : "Parece que solo tienes estos teclados:"
           }
         },
         "ru" : {
@@ -738,6 +789,7 @@
     },
     "Meaning in " : {
       "comment" : "Meaing in native lang",
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -839,7 +891,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "No palabras para aprender"
+            "value" : "No hay palabras para aprender"
           }
         },
         "ru" : {
@@ -894,7 +946,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Phonetic"
+            "value" : "Fonética"
           }
         },
         "ru" : {
@@ -1014,6 +1066,23 @@
     "Recent" : {
       "comment" : "Section header"
     },
+    "Recognition" : {
+      "comment" : "Menu title",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reconocimiento"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Распознавание"
+          }
+        }
+      }
+    },
     "Recognition not allowed" : {
       "comment" : "Button title",
       "extractionState" : "stale",
@@ -1021,7 +1090,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reconocimiento no está permitido"
+            "value" : "El reconocimiento no está permitido"
           }
         },
         "ru" : {
@@ -1039,7 +1108,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Reconocimiento no está disponible"
+            "value" : "El reconocimiento no está disponible"
           }
         },
         "ru" : {
@@ -1057,7 +1126,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Se necesita ermiso de reconocimiento "
+            "value" : "Se necesita permiso de reconocimiento"
           }
         },
         "ru" : {
@@ -1223,6 +1292,7 @@
     },
     "Start typing" : {
       "comment" : "placeholder in a searchbar",
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1247,7 +1317,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Dejar reconocimiento"
+            "value" : "Detener reconocimiento"
           }
         },
         "ru" : {
@@ -1265,7 +1335,7 @@
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Está parando"
+            "value" : "Deteniendo"
           }
         },
         "ru" : {
@@ -1373,6 +1443,7 @@
     },
     "Word in " : {
       "comment" : "Language",
+      "extractionState" : "stale",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -1424,19 +1495,19 @@
               "one" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "%d word"
+                  "value" : "%d palabra"
                 }
               },
               "other" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "%d words"
+                  "value" : "%d palabras"
                 }
               },
               "zero" : {
                 "stringUnit" : {
                   "state" : "translated",
-                  "value" : "no words"
+                  "value" : "sin palabras"
                 }
               }
             }
