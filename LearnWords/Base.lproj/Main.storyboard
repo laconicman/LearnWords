@@ -88,11 +88,6 @@
                     </tableView>
                     <toolbarItems/>
                     <navigationItem key="navigationItem" id="geZ-fh-F0l">
-                        <barButtonItem key="leftBarButtonItem" title="Settings" id="Ieh-AL-JGj">
-                            <connections>
-                                <action selector="goToSettings:" destination="Jy4-wo-DD5" id="kNY-Mq-mFd"/>
-                            </connections>
-                        </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="xjF-U8-td1">
                             <connections>
                                 <action selector="addWordTapped:" destination="Jy4-wo-DD5" id="S09-2G-whQ"/>

@@ -180,6 +180,9 @@ final class SpokenAnswerSurface: NSObject, ExerciseAnswerSurface {
 
     private func updateRecordButton() {
         recordButton.purpose = isRecording ? .negative : .prominent
+        // A chevron says "there is more here" — without it the long-press menu is a secret,
+        // and auto mode looked like the button had silently changed its mind (owner).
+        recordButton.setImage(.systemImage("chevron.down.circle"), for: .normal)
         let title: String
         if isRecording {
             title = NSLocalizedString("Stop recognition", comment: "Button title")

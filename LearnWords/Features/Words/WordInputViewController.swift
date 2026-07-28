@@ -70,6 +70,15 @@ final class WordInputViewController: UITableViewController {
         didSet { updateDictationButton() }
     }
 
+    /// One commit per screen, ever.
+    ///
+    /// `commit` does not dismiss when its callback navigates onwards — that is what lets
+    /// one screen serve both a single edit and a two-step flow. The cost is that the screen
+    /// survives its own commit for the length of the push animation, with the keyboard up
+    /// and the Save button live, so Return or a second tap ran the whole thing again and
+    /// added the word twice. Committing is a one-way door.
+    private var hasCommitted = false
+
     init(_ purpose: Purpose,
          initialText: String = "",
          context: Context? = nil,
@@ -255,7 +264,12 @@ final class WordInputViewController: UITableViewController {
 
     @objc private func commit() {
         let entered = (field.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
-        guard purpose.allowsEmpty || !entered.isEmpty else { return }
+        guard !hasCommitted, purpose.allowsEmpty || !entered.isEmpty else { return }
+        hasCommitted = true
+        // Nothing more can be typed into a screen that has already answered.
+        field.resignFirstResponder()
+        navigationItem.rightBarButtonItem?.isEnabled = false
+        DictationController.shared.stop()
         suggestions?.remember(entered)
         onCommit(entered)
         // Only dismiss if the callback did not navigate onwards. The add-word flow pushes a

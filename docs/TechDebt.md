@@ -1010,3 +1010,25 @@ untranslated (or, worse, as English marked `translated`) in between. **Discharge
 string catalogue as part of a feature's definition of done — add `es`/`ru` (or an explicit
 `needs_review`) in the same commit as the `NSLocalizedString`, and never mark a
 copy-of-source `translated`.
+
+## TD-33 — Pronunciation has no visual feedback
+
+A spoken answer is now graded by recogniser confidence (`.correctVerbatim` above 0.85,
+`.correctJudged` below), but the two look identical on screen: the same shine, the same
+advance. The learner is told they were right and never told they were *clear*.
+
+**Cost:** the one signal the exercise has about pronunciation quality is computed and then
+thrown away at the point it would be most useful. **Discharge:** a KaPow animation keyed to
+confidence — the existing `shine` for a confident match, something visibly weaker for a
+hesitant one — plus a colour or a meter on the recognised text. Wants a device to tune,
+since the confidence range in real speech is not the range in a quiet room.
+
+## TD-34 — Reminder rebuilds now fire on every local save
+
+`storeDidChange` posts after every successful write, and `AppDelegate` rebuilds the whole
+reminder window on each one. Correct, and wasteful: importing a file of 500 words rebuilds
+it once per transaction, and each rebuild is a full `ReviewSchedule` over the library.
+
+**Cost:** invisible today (imports are one transaction, edits are rare), real once anything
+writes in a loop. **Discharge:** coalesce — a short debounce before rebuilding, the same
+shape `LWPersistence` already uses for deduplication.

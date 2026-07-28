@@ -240,6 +240,18 @@ final class LWPersistence {
     /// never renders the duplicate rows that are about to be merged away.
     static let storeDidChangeRemotely = Notification.Name("LWPersistenceStoreDidChangeRemotely")
 
+    /// Posted whenever the library changed, **whichever device changed it**.
+    ///
+    /// `storeDidChangeRemotely` fires only for another device's edits, which made anything
+    /// reacting to it subtly wrong: adding a word here is the same event as receiving one
+    /// from an iPad, and a schedule that rebuilds for the second and not the first is
+    /// rebuilt from stale data half the time. Local saves post this too.
+    ///
+    /// Screens that redraw on a *remote* change deliberately keep using the narrower
+    /// notification — they already reload after their own edits, and reloading twice is
+    /// visible.
+    static let storeDidChange = Notification.Name("LWPersistenceStoreDidChange")
+
     /// Repairs duplicate rows after each batch of changes arriving from another device.
     ///
     /// Uniqueness is enforced in `Lexicon`, in code, because CloudKit forbids constraints.
@@ -277,6 +289,7 @@ final class LWPersistence {
                 // screens are waiting to hear.
                 DispatchQueue.main.async {
                     NotificationCenter.default.post(name: Self.storeDidChangeRemotely, object: self)
+                    NotificationCenter.default.post(name: Self.storeDidChange, object: self)
                 }
             }
             self.pendingDedup = work
@@ -395,6 +408,13 @@ final class LWPersistence {
                 try work(context)
                 if context.hasChanges {
                     try context.save()
+                    // A local edit is the same event as one arriving from another device:
+                    // the library changed. Anything derived from it — the reminder
+                    // schedule above all — has to hear about both or it rebuilds from
+                    // stale data half the time.
+                    DispatchQueue.main.async {
+                        NotificationCenter.default.post(name: Self.storeDidChange, object: self)
+                    }
                 }
             } catch {
                 thrown = error

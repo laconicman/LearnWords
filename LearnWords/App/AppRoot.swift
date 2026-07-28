@@ -16,13 +16,36 @@ import UIKit
 /// keeps calling `makeRoot()` and `handle(_:on:)` unchanged, and this file stays as-is.
 enum AppRoot {
 
-    /// The initial view controller from `Main.storyboard` (the home tab bar).
+    /// The initial view controller from `Main.storyboard` (the home tab bar), with
+    /// Settings appended as its last tab.
+    ///
+    /// **Settings was a `leftBarButtonItem` on the word list**, which took the navigation
+    /// bar slot the system reserves for Edit and put an app-wide destination inside one
+    /// screen's hierarchy — reachable only from that screen, and pushed onto its stack.
+    /// The Human Interface Guidelines put app-level configuration in the tab bar; four tabs
+    /// is well inside the five that fit without a More item.
+    ///
+    /// Added in code rather than in the storyboard because `SettingsViewController` is
+    /// code-built and has no scene to point a relationship segue at — and because a
+    /// hand-edited relationship segue is the kind of storyboard surgery that breaks quietly.
     static func makeRoot() -> UIViewController {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         guard let root = storyboard.instantiateInitialViewController() else {
             preconditionFailure("Main.storyboard has no initial view controller")
         }
+        if let tabs = root as? UITabBarController {
+            tabs.viewControllers = (tabs.viewControllers ?? []) + [makeSettingsTab()]
+        }
         return root
+    }
+
+    private static func makeSettingsTab() -> UIViewController {
+        let settings = UINavigationController(rootViewController: SettingsViewController())
+        settings.tabBarItem = UITabBarItem(
+            title: NSLocalizedString("Settings", comment: "Tab title"),
+            image: .systemImage("gearshape"),
+            selectedImage: .systemImage("gearshape.fill"))
+        return settings
     }
 
     /// Posted by `handle(_:on:)` when the share-extension deep link arrives; lets an
@@ -33,6 +56,7 @@ enum AppRoot {
     private enum Tab {
         static let words = 0
         static let exercises = 2
+        static let settings = 3
     }
 
     /// Interprets a `learnWords://` URL by selecting a tab. Two arrive today:

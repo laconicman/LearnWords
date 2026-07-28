@@ -132,10 +132,6 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         navigation.setViewControllers(stack, animated: true)
     }
 
-    @IBAction func goToSettings(_ sender: UIBarButtonItem) {
-        navigationController?.pushViewController(SettingsViewController(), animated: true)
-    }
-
     @IBAction func unwindSegue(segue: UIStoryboardSegue) {}
 
     // MARK: - Reading the set

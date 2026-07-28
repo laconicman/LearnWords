@@ -46,8 +46,11 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
                                   name: UIApplication.didEnterBackgroundNotification, object: nil)
         notifications.addObserver(self, selector: rebuild,
                                   name: UIApplication.willEnterForegroundNotification, object: nil)
+        // `storeDidChange`, not `…Remotely`: adding a word here changes what is due just
+        // as much as receiving one from another device, and the schedule must not be
+        // rebuilt from stale data in the local case (owner, DRY).
         notifications.addObserver(self, selector: rebuild,
-                                  name: LWPersistence.storeDidChangeRemotely, object: nil)
+                                  name: LWPersistence.storeDidChange, object: nil)
         rebuildReminders()
         return true
     }
