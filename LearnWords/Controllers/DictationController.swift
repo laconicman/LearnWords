@@ -80,6 +80,19 @@ final class DictationController {
 
     var isRecording: Bool { audioEngine.isRunning }
 
+    /// The recogniser for `language`, built once per locale.
+    ///
+    /// **The only place one is constructed.** `start` used to build a fresh
+    /// `SFSpeechRecognizer` on every call, which quietly made `prewarm` pointless — it
+    /// cached an instance that the very next line threw away. Warming something up and then
+    /// discarding it is worse than not warming it: the cost is paid twice and the code
+    /// claims a benefit it does not deliver.
+    private func recognizer(for language: String) -> SFSpeechRecognizer? {
+        if let existing = recognizer, existing.locale.identifier == language { return existing }
+        recognizer = SFSpeechRecognizer(locale: Locale(identifier: language))
+        return recognizer
+    }
+
     // MARK: - Warming up
 
     /// Does the slow parts of `start` ahead of the tap.
@@ -98,9 +111,7 @@ final class DictationController {
               SFSpeechRecognizer.authorizationStatus() == .authorized,
               PermissionManager.shared.isMicrophoneAuthorized else { return }
 
-        if recognizer?.locale.identifier != language {
-            recognizer = SFSpeechRecognizer(locale: Locale(identifier: language))
-        }
+        _ = self.recognizer(for: language)
 
         // **The engine is deliberately left alone.** An earlier version called
         // `audioEngine.prepare()` here, reasoning that allocating the graph early was free
@@ -132,11 +143,9 @@ final class DictationController {
             guard let self else { return }
             if let failure { return onFailure(failure) }
 
-            let recognizer = SFSpeechRecognizer(locale: Locale(identifier: language))
-            guard let recognizer, recognizer.isAvailable else {
+            guard let recognizer = self.recognizer(for: language), recognizer.isAvailable else {
                 return onFailure(.unavailable(language: language))
             }
-            self.recognizer = recognizer
 
             do {
                 try self.beginRecording(onTranscription: onTranscription, onFailure: onFailure)

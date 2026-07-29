@@ -984,7 +984,31 @@ nobody would guess. **Discharge:** a UI test that pins the clock and asserts the
 requests, which also closes TD-29's inability to drive the switch. Not a debug button —
 the app should not grow a control that exists only to prove itself.
 
-## TD-33 — Localization trails features; Spanish shipped English in places — **audited + Spanish backfilled (2026-07-28)**
+## TD-33 — Localization trails features — **recurring; re-opened 2026-07-29**
+
+Absorbs the former TD-35, which described one instance of the same thing. The pattern is
+what matters: features land with `NSLocalizedString` correctly in place, Xcode harvests the
+keys into the catalogues, and the *translations* are never written — so a Russian or Spanish
+learner reads English, or worse, reads a correct translation of a string whose meaning has
+since changed.
+
+**Two open instances (2026-07-29):**
+
+* The chooser switch was relabelled from "Include learned words" to "Practise everything,
+  due or not" when it stopped filtering inside a scope and started choosing between two. It
+  lives in `Main.storyboard`, so `ru` and `es` still describe behaviour the switch no longer
+  has — worse than saying nothing.
+* Every string added since the reminder work — `"Next reminder: %@."`, the four permission
+  footers, `"Add meaning"`, the dictation failures — is in `Localizable.xcstrings` with
+  **zero localizations** and falls back to English. Verified rather than assumed:
+  `"Next reminder: %@."` is present in the catalogue with an empty `localizations` map.
+
+**The mechanism is not at fault.** `NSLocalizedString` is used throughout and the keys are
+being collected; `String(localized:)` and the SwiftUI machinery are unavailable at the 12.1
+floor, and nothing about that floor prevents doing this properly. **Discharge:** translate
+the outstanding keys, and treat "the catalogue has an untranslated key" as part of finishing
+a feature rather than a separate errand — that is the only thing that has ever stopped this
+recurring.
 
 **Finding** (audit of `Localizable.xcstrings`): the `es` locale was wrong *and* incomplete.
 Eight strings carried the English source verbatim while marked `translated` — so Spanish
@@ -1011,18 +1035,6 @@ string catalogue as part of a feature's definition of done — add `es`/`ru` (or
 `needs_review`) in the same commit as the `NSLocalizedString`, and never mark a
 copy-of-source `translated`.
 
-## TD-33 — Pronunciation has no visual feedback
-
-A spoken answer is now graded by recogniser confidence (`.correctVerbatim` above 0.85,
-`.correctJudged` below), but the two look identical on screen: the same shine, the same
-advance. The learner is told they were right and never told they were *clear*.
-
-**Cost:** the one signal the exercise has about pronunciation quality is computed and then
-thrown away at the point it would be most useful. **Discharge:** a KaPow animation keyed to
-confidence — the existing `shine` for a confident match, something visibly weaker for a
-hesitant one — plus a colour or a meter on the recognised text. Wants a device to tune,
-since the confidence range in real speech is not the range in a quiet room.
-
 ## TD-34 — Reminder rebuilds now fire on every local save
 
 `storeDidChange` posts after every successful write, and `AppDelegate` rebuilds the whole
@@ -1036,17 +1048,6 @@ windows, and the rebuild must be *subordinate* to the repair rather than paralle
 it derives a schedule from half-merged rows. See [Design](Design.md) § "repair and
 derivation are two debounces". The overlapping-rebuild race this would otherwise expose is
 already closed by a generation counter.
-
-## TD-35 — The reworded chooser switch needs its translations refreshed
-
-"Include learned words" became "Practise everything, due or not" when the switch stopped
-filtering inside a scope and started choosing between two. The label lives in
-`Main.storyboard`, so the `ru` and `es` entries in `Main.xcstrings` are now stale for that
-object — they still say the old thing, which is worse than saying nothing.
-
-**Cost:** a Russian or Spanish learner reads a label that describes behaviour the switch no
-longer has. **Discharge:** retranslate that one key. Small, but it is the kind of drift the
-2026-07-20 localisation pass was supposed to end, so it should not sit.
 
 ## TD-36 — The exercise screen shows one translation and no transcription
 
@@ -1089,3 +1090,16 @@ exactly the kind of change that feels effective without being so.
 
 **Discharge:** time from tap to the recording indicator, warm and cold, on a device. If the
 gain is small the code should go rather than sit there implying a benefit it does not have.
+
+## TD-38 — Pronunciation has no visual feedback
+
+A spoken answer is now graded by recogniser confidence (`.correctVerbatim` above 0.85,
+`.correctJudged` below), but the two look identical on screen: the same shine, the same
+advance. The learner is told they were right and never told they were *clear*.
+
+**Cost:** the one signal the exercise has about pronunciation quality is computed and then
+thrown away at the point it would be most useful. **Discharge:** a KaPow animation keyed to
+confidence — the existing `pulse` then `spray` for a confident match, something visibly weaker for a
+hesitant one — plus a colour or a meter on the recognised text. Wants a device to tune,
+since the confidence range in real speech is not the range in a quiet room.
+Maybe set logging points ask the operator to execute some phonetic exercises and provide their log.
