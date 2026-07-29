@@ -1060,7 +1060,26 @@ secondary/footnote text style, and — behind a Settings switch — the transcri
 follow the `noteLabel` pattern already on that screen: **absent means the view is not there
 at all**, never an empty row holding a gap.
 
-## TD-37 — Speech warm-up is unmeasured
+## TD-37 — Speech warm-up is unmeasured, and one attempt at it crashed the app
+
+**What it cost before it was caught.** The first version called `AVAudioEngine.prepare()`
+during warm-up, with a comment explaining that *not* activating the audio session was the
+careful choice. It was the opposite: `prepare` pulls the input node, and with the session
+still in `.playback` there is no capture hardware to describe, so the engine cached an
+input format of **0 Hz**. That poisoned format survived into `beginRecording`, where
+`installTap` rejected it with `IsFormatSampleRateAndChannelCountValid` — an Objective-C
+exception, which Swift cannot catch, so the app died on the learner's first dictation.
+
+Two lessons worth keeping:
+
+* **A warm-up must not be able to change behaviour, only timing.** It runs on every
+  appearance of a screen whose feature may never be used, so it gets the strictest budget
+  of any code in the app.
+* **`installTap` is one of the few calls here that can kill the process rather than throw.**
+  Its format is now validated, with one `reset()`-and-retry to recover an engine holding a
+  stale configuration, and a typed failure when there is genuinely no input.
+
+
 
 `DictationController.prewarm` and `SpeechManager.prewarm` do the slow parts of the first
 use — building the recogniser, loading a voice, allocating the engine graph, configuring the

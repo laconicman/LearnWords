@@ -43,6 +43,10 @@ final class DictationController {
         case recognition(Error, isOffline: Bool)
     }
 
+    /// The engine had no usable input format — checked rather than discovered, because
+    /// discovering it means an uncatchable `NSException` from `installTap`.
+    enum DictationError: Error { case noAudioInput }
+
     /// One reading of what was heard.
     ///
     /// `confidence` is the recogniser's own certainty, 0…1 — and it is **0 until
@@ -97,16 +101,19 @@ final class DictationController {
         if recognizer?.locale.identifier != language {
             recognizer = SFSpeechRecognizer(locale: Locale(identifier: language))
         }
-        // `prepare` allocates the graph's resources without starting it, which is the
-        // expensive half. Deliberately *not* activating the audio session: that would take
-        // playback away from the synthesiser for a recording that may never happen.
+
+        // **The engine is deliberately left alone.** An earlier version called
+        // `audioEngine.prepare()` here, reasoning that allocating the graph early was free
+        // and that not activating the audio session was the careful choice. It was the
+        // opposite: `prepare` pulls the input node, and with the session still in
+        // `.playback` there is no capture hardware to describe, so the engine caches an
+        // input format of **0 Hz**. That format survives into `beginRecording`, and
+        // `installTap` with it fails `IsFormatSampleRateAndChannelCountValid` — an
+        // Objective-C exception, which Swift cannot catch, so the app dies.
         //
-        // Guarded on the input actually existing. Touching the engine where there is no
-        // capture hardware — a test host, a Mac with no microphone — brings the process
-        // down, and a warm-up must never be able to do that: it runs on every appearance
-        // of a screen whose feature the learner may never use.
-        guard audioEngine.inputNode.inputFormat(forBus: 0).sampleRate > 0 else { return }
-        audioEngine.prepare()
+        // Building the recogniser is the part worth doing early anyway. The engine cannot
+        // be warmed without first claiming the microphone, and claiming it for a recording
+        // that may never happen is exactly what a warm-up must not do.
     }
 
     // MARK: - Starting
@@ -133,6 +140,8 @@ final class DictationController {
 
             do {
                 try self.beginRecording(onTranscription: onTranscription, onFailure: onFailure)
+            } catch DictationError.noAudioInput {
+                onFailure(.unavailable(language: language))
             } catch {
                 onFailure(.recognition(error, isOffline: false))
             }
@@ -224,7 +233,27 @@ final class DictationController {
         // `.notifyOthersOnDeactivation` may only be passed when deactivating.
         try audioSession.setActive(true)
 
+        // Read **after** the session is active and recording-capable: before that the
+        // input node reports 0 Hz, and a tap installed with that format throws an
+        // Objective-C exception that no Swift `do/catch` can contain.
         let inputNode = audioEngine.inputNode
+        var format = inputNode.outputFormat(forBus: 0)
+        if format.sampleRate == 0 {
+            // The engine is holding a configuration from before the session could describe
+            // the input. `reset` drops it so the node is re-queried against the session
+            // that is active *now* — recovery rather than a refusal, since by this point
+            // the learner has already tapped the microphone.
+            audioEngine.reset()
+            format = inputNode.outputFormat(forBus: 0)
+        }
+        guard format.sampleRate > 0, format.channelCount > 0 else {
+            // Nothing to record from — no microphone, or the session was not granted the
+            // route. Reported, never risked: this is the one place where continuing means
+            // an uncatchable crash rather than a handled failure.
+            releaseSessionToPlayback()
+            throw DictationError.noAudioInput
+        }
+
         let request = SFSpeechAudioBufferRecognitionRequest()
         request.shouldReportPartialResults = true
         self.request = request
@@ -259,8 +288,7 @@ final class DictationController {
             onFailure(.recognition(error, isOffline: code == 4))
         }
 
-        inputNode.installTap(onBus: 0, bufferSize: 1024,
-                             format: inputNode.outputFormat(forBus: 0)) { [weak self] buffer, _ in
+        inputNode.installTap(onBus: 0, bufferSize: 1024, format: format) { [weak self] buffer, _ in
             self?.request?.append(buffer)
         }
         audioEngine.prepare()
