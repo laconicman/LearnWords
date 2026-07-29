@@ -72,6 +72,17 @@ final class SpeechManager /*: NSObject */ {
         }
     }
     
+    /// Readies the synthesiser so the first utterance is not the one that pays for it.
+    ///
+    /// `AVSpeechSynthesizer` loads its voice on first use, which is why the word list
+    /// touches `SpeechManager.shared` in `viewDidAppear` — a habit that worked by accident
+    /// and said nothing about why. This names it, and does the other half: configuring the
+    /// audio session up front, so the first `speak` is not also the first activation.
+    func prewarm(language: String) {
+        ensureAudioSession()
+        _ = AVSpeechSynthesisVoice(language: language)
+    }
+
     func stopSpeaking() {
         synthesizer.stopSpeaking(at: .immediate)
         utteranceQueue.removeAll()

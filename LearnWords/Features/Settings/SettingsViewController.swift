@@ -81,7 +81,11 @@ final class SettingsViewController: UITableViewController {
         guard let self else { return }
         self.prefs.reminderHour = hour
         self.prefs.reminderMinute = minute
-        ReminderScheduler.shared.rebuild(from: Library.shared.lexicon)
+        // Re-read *after* the rebuild lands, or the footer shows the schedule the old time
+        // produced.
+        ReminderScheduler.shared.rebuild(from: Library.shared.lexicon) { [weak self] in
+            self?.refreshReminderStanding()
+        }
     }
 
     private var sections: [(title: String, cells: [UITableViewCell])] {
@@ -150,7 +154,9 @@ final class SettingsViewController: UITableViewController {
             guard let self else { return }
             self.prefs.remindersEnabled = granted
             if granted {
-                ReminderScheduler.shared.rebuild(from: Library.shared.lexicon)
+                ReminderScheduler.shared.rebuild(from: Library.shared.lexicon) { [weak self] in
+                    self?.refreshReminderStanding()
+                }
             } else {
                 self.showNotificationsRefused()
             }

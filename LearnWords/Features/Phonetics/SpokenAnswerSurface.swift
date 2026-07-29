@@ -57,6 +57,7 @@ final class SpokenAnswerSurface: NSObject, ExerciseAnswerSurface {
         recordButton.addTarget(self, action: #selector(recordButtonTapped), for: .touchUpInside)
         installModeMenu()
         updateRecordButton()
+        DictationController.shared.prewarm(language: screen.languages.answerLanguage)
         // Deliberately **not** asking for permission here. The button used to sit disabled
         // until two authorization callbacks came back, which meant a permission sheet
         // before the learner had done anything to ask for one — the request most likely to

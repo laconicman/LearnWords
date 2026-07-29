@@ -824,7 +824,7 @@ per row on every scroll, and the noise hides real messages — the constraint br
 opened TD-17 was found by reading exactly this console. Non-fatal. **Discharged** with the meaning editor: the eight entries are gone from
 `Main.storyboard`, and the console is quiet on scroll again.
 
-## TD-24 — Extension bundle versions drift from the app's
+## TD-24 — Extension bundle versions drift from the app's — **not reproducible (2026-07-29)**
 
 `CFBundleVersion` is `1` on the app extensions and `7` on the host app, which
 `ValidateEmbeddedBinary` warns about on every build and **App Store Connect rejects at
@@ -1047,3 +1047,26 @@ object — they still say the old thing, which is worse than saying nothing.
 **Cost:** a Russian or Spanish learner reads a label that describes behaviour the switch no
 longer has. **Discharge:** retranslate that one key. Small, but it is the kind of drift the
 2026-07-20 localisation pass was supposed to end, so it should not sit.
+
+## TD-36 — The exercise screen shows one translation and no transcription
+
+A meaning may hold several words per language and each `Term` may carry a `transcription`,
+but the exercise screen shows exactly one answer and never a transcription. The learner is
+graded as correct for *any* synonym and then shown only one of them, which is the redesign's
+own feature hidden at the moment it would teach something.
+
+**Discharge (owner, 2026-07-29):** below the revealed answer, the remaining synonyms in a
+secondary/footnote text style, and — behind a Settings switch — the transcription. Both
+follow the `noteLabel` pattern already on that screen: **absent means the view is not there
+at all**, never an empty row holding a gap.
+
+## TD-37 — Speech warm-up is unmeasured
+
+`DictationController.prewarm` and `SpeechManager.prewarm` do the slow parts of the first
+use — building the recogniser, loading a voice, allocating the engine graph, configuring the
+session — while a screen appears. The reasoning is sound and the ~1.5s cold start is the
+owner's measurement, but **the improvement itself has not been measured**, and warm-ups are
+exactly the kind of change that feels effective without being so.
+
+**Discharge:** time from tap to the recording indicator, warm and cold, on a device. If the
+gain is small the code should go rather than sit there implying a benefit it does not have.

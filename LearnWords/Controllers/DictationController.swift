@@ -76,6 +76,39 @@ final class DictationController {
 
     var isRecording: Bool { audioEngine.isRunning }
 
+    // MARK: - Warming up
+
+    /// Does the slow parts of `start` ahead of the tap.
+    ///
+    /// The first dictation of a session takes about a second and a half before the
+    /// recording indicator appears, and almost none of that is recognition: it is building
+    /// an `SFSpeechRecognizer` for the locale, activating the audio session, and letting
+    /// `AVAudioEngine` allocate its render resources. All three can happen while the screen
+    /// is appearing, when nobody is waiting.
+    ///
+    /// **Silent when it cannot help.** It never requests permission — a screen appearing is
+    /// not a request for the microphone, and prompting there is the surest way to be
+    /// refused. Unauthorised, or already recording, it does nothing at all.
+    func prewarm(language: String) {
+        guard !isRecording,
+              SFSpeechRecognizer.authorizationStatus() == .authorized,
+              PermissionManager.shared.isMicrophoneAuthorized else { return }
+
+        if recognizer?.locale.identifier != language {
+            recognizer = SFSpeechRecognizer(locale: Locale(identifier: language))
+        }
+        // `prepare` allocates the graph's resources without starting it, which is the
+        // expensive half. Deliberately *not* activating the audio session: that would take
+        // playback away from the synthesiser for a recording that may never happen.
+        //
+        // Guarded on the input actually existing. Touching the engine where there is no
+        // capture hardware — a test host, a Mac with no microphone — brings the process
+        // down, and a warm-up must never be able to do that: it runs on every appearance
+        // of a screen whose feature the learner may never use.
+        guard audioEngine.inputNode.inputFormat(forBus: 0).sampleRate > 0 else { return }
+        audioEngine.prepare()
+    }
+
     // MARK: - Starting
 
     /// Begins recognising `language`, reporting partial transcriptions as they arrive.

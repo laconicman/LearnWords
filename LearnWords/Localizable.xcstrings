@@ -1115,6 +1115,9 @@
     "Practising ahead of schedule still counts, it just teaches less." : {
       "comment" : "Message when nothing is due"
     },
+    "Practising everything, due or not." : {
+      "comment" : "Label when the schedule is being bypassed"
+    },
     "Pronounce answers" : {
       "comment" : "setting",
       "localizations" : {

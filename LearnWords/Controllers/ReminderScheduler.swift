@@ -166,8 +166,20 @@ final class ReminderScheduler {
     /// Idempotent, which is what removes the whole class of duplicate-notification bugs
     /// AnkiDroid needed a delivery flag and a mutex to close: there is no state to get out
     /// of step, because the pending set is derived, never incremented.
-    func rebuild(from lexicon: Lexicon, now: Date = Date()) {
-        guard LWUserDefaults.standard.remindersEnabled else { return clear() }
+    /// - Parameter completion: run once the pending set matches the schedule, on the main
+    ///   queue. Callers that *display* what is scheduled need it: the notification centre is
+    ///   the single source of truth for that, and re-reading it before the rebuild has
+    ///   landed shows the previous answer. That is why changing the reminder time left
+    ///   "Next reminder" stale — the view asked the authority too early rather than keeping
+    ///   its own copy, so the fix is a completion, not a second cache.
+    func rebuild(from lexicon: Lexicon,
+                 now: Date = Date(),
+                 completion: (() -> Void)? = nil) {
+        guard LWUserDefaults.standard.remindersEnabled else {
+            clear()
+            completion?()
+            return
+        }
 
         // Every step below is an async round trip to another process. Backgrounding — and
         // especially a CloudKit push that wakes the app for a moment — can suspend us
@@ -187,6 +199,7 @@ final class ReminderScheduler {
             guard assertion != .invalid else { return }
             UIApplication.shared.endBackgroundTask(assertion)
             assertion = .invalid
+            completion?()
         }
 
         isAuthorized { [weak self] authorized in

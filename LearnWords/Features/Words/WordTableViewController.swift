@@ -75,9 +75,9 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         reload()
-        // Build this heavy object while the screen is already up, so the first
-        // tap-to-speak has no delay.
-        _ = SpeechManager.shared
+        // Tapping a row speaks it, so ready the synthesiser now rather than making the
+        // first tap pay for loading a voice and activating the session.
+        SpeechManager.shared.prewarm(language: languages.secondary)
     }
 
     /// Adds a word and its meaning, as two steps of the **same** screen the meaning editor
@@ -113,8 +113,10 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
             caption: String(format: NSLocalizedString("Word in %@", comment: "Caption; a language"),
                             LanguageCode.displayName(pair.secondary)),
             term: word)
-        let screen = WordInputViewController(.add(language: pair.primary),
-                                             context: context) { [weak self] meaning in
+        let screen = WordInputViewController(
+            .add(language: pair.primary),
+            context: context,
+            title: NSLocalizedString("Add meaning", comment: "Screen title")) { [weak self] meaning in
             guard let self else { return }
             do {
                 try self.lexicon.addSense(to: set.id,

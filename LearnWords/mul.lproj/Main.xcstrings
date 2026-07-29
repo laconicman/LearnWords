@@ -482,24 +482,24 @@
       }
     },
     "JHd-Ju-sT7.text" : {
-      "comment" : "Class = \"UILabel\"; text = \"Include learned words\"; ObjectID = \"JHd-Ju-sT7\";",
+      "comment" : "Class = \"UILabel\"; text = \"Practise everything, due or not\"; ObjectID = \"JHd-Ju-sT7\";",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Include learned words"
+            "value" : "Practise everything, due or not"
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Include learned words"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Включать выученные слова"
           }
         }

@@ -79,9 +79,14 @@ final class WordInputViewController: UITableViewController {
     /// added the word twice. Committing is a one-way door.
     private var hasCommitted = false
 
+    /// - Parameter title: overrides the title `purpose` would pick. The add-word flow uses
+    ///   `.add` for both of its steps — a word, then its meaning — and "Add word" is only
+    ///   right for the first. The purpose describes what is *stored*; the title describes
+    ///   what is being *asked for*, and they are not the same question.
     init(_ purpose: Purpose,
          initialText: String = "",
          context: Context? = nil,
+         title: String? = nil,
          onCommit: @escaping (String) -> Void) {
         self.purpose = purpose
         self.context = context
@@ -89,7 +94,7 @@ final class WordInputViewController: UITableViewController {
         self.onCommit = onCommit
         super.init(style: .grouped)
         field.text = initialText
-        title = purpose.screenTitle
+        self.title = title ?? purpose.screenTitle
     }
 
     @available(*, unavailable)
@@ -108,6 +113,14 @@ final class WordInputViewController: UITableViewController {
 
         buildInputRow()
         refreshCandidates()
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        // The microphone button is one tap away; do its slow setup while the push animates.
+        if let language = purpose.language {
+            DictationController.shared.prewarm(language: language)
+        }
     }
 
     override func viewDidAppear(_ animated: Bool) {
