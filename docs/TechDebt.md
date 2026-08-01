@@ -1035,6 +1035,15 @@ string catalogue as part of a feature's definition of done — add `es`/`ru` (or
 `needs_review`) in the same commit as the `NSLocalizedString`, and never mark a
 copy-of-source `translated`.
 
+**Backlog cleared (2026-07-28, second pass).** The remaining 45 source-only keys (no `ru`
+and no `es` — reminders/scheduling copy, dictation and meaning-editor strings, the `Animals`
+starter set) are now translated into both, marked `needs_review`. The catalogue is
+**fully populated**: every key has `ru` + `es`, so nothing falls back to English at runtime.
+`needs_review` ships in release exactly like `translated` (the state is editor metadata, not
+a build filter); it stays only as the reviewer's worklist. Four more ambiguous comments
+enriched in code + catalog (`Reset`/`Rename` said *what?*; `Recent`/`Suggestions` are word-picker
+sections). Reviewer scope is now the whole `needs_review` set plus the terminology sweep above.
+
 ## TD-34 — Reminder rebuilds now fire on every local save
 
 `storeDidChange` posts after every successful write, and `AppDelegate` rebuilds the whole

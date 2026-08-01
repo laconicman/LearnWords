@@ -353,8 +353,8 @@ final class WordInputViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
         showingRecents
-            ? NSLocalizedString("Recent", comment: "Section header")
-            : NSLocalizedString("Suggestions", comment: "Section header")
+            ? NSLocalizedString("Recent", comment: "Section header: recently added words (word picker)")
+            : NSLocalizedString("Suggestions", comment: "Section header: word-completion suggestions (word picker)")
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

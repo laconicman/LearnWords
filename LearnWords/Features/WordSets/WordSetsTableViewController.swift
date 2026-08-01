@@ -117,7 +117,7 @@ final class WordSetsTableViewController: UITableViewController, UIDocumentPicker
 
         let rename = UIContextualAction(
             style: .normal,
-            title: NSLocalizedString("Rename", comment: "swipe action")) { [weak self] _, _, done in
+            title: NSLocalizedString("Rename", comment: "Swipe action: rename this word set")) { [weak self] _, _, done in
                 self?.promptForRename(of: set)
                 done(true)
             }

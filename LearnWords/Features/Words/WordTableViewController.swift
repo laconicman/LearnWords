@@ -305,7 +305,7 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
 
         let reset = UIContextualAction(
             style: .normal,
-            title: NSLocalizedString("Reset", comment: "swipe action"),
+            title: NSLocalizedString("Reset", comment: "Swipe action: reset this word's learning progress"),
             backgroundColor: .systemOrange,
             image: resetProgressActionImage) { [weak self] _, _, done in
                 guard let self else { return done(false) }

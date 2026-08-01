@@ -2,16 +2,72 @@
   "sourceLanguage" : "en",
   "strings" : {
     "%@ due now." : {
-      "comment" : "Label words due now"
+      "comment" : "Label words due now",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ para repasar ahora."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ к повторению."
+          }
+        }
+      }
     },
     "%@ waiting for you." : {
-      "comment" : "Reminder body; placeholder is a word count"
+      "comment" : "Reminder body; placeholder is a word count",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ te esperan."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ ждут вас."
+          }
+        }
+      }
     },
     "%d%% learned" : {
-      "comment" : "progress ring"
+      "comment" : "progress ring",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%d%% aprendido"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%d%% выучено"
+          }
+        }
+      }
     },
     "A meaning needs at least one word. Delete the meaning itself if you no longer want it." : {
-      "comment" : "Alert message"
+      "comment" : "Alert message",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Un significado necesita al menos una palabra. Elimina el significado si ya no lo quieres."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "У значения должно быть хотя бы одно слово. Удалите само значение, если оно больше не нужно."
+          }
+        }
+      }
     },
     "Add" : {
       "comment" : "AlertAction title",
@@ -31,10 +87,38 @@
       }
     },
     "Add a note" : {
-      "comment" : "Meaning editor row"
+      "comment" : "Meaning editor row",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Agregar una nota"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Добавить заметку"
+          }
+        }
+      }
     },
     "Add meaning" : {
-      "comment" : "Screen title"
+      "comment" : "Screen title",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Agregar significado"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Добавить значение"
+          }
+        }
+      }
     },
     "Add new word" : {
       "comment" : "AlertController title",
@@ -72,7 +156,21 @@
       }
     },
     "Add word" : {
-      "comment" : "Meaning editor row\nScreen title"
+      "comment" : "Meaning editor row\nScreen title",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Agregar palabra"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Добавить слово"
+          }
+        }
+      }
     },
     "Add Word" : {
       "comment" : "AlertAction title",
@@ -145,7 +243,21 @@
       }
     },
     "Animals" : {
-      "comment" : "Name of the starter word set"
+      "comment" : "Name of the starter word set",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Animales"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Животные"
+          }
+        }
+      }
     },
     "Cancel" : {
       "comment" : "AlertAction title",
@@ -199,7 +311,21 @@
       }
     },
     "Daily reminder" : {
-      "comment" : "setting"
+      "comment" : "setting",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Recordatorio diario"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ежедневное напоминание"
+          }
+        }
+      }
     },
     "Delete" : {
       "comment" : "swipe action",
@@ -219,7 +345,21 @@
       }
     },
     "Dictate" : {
-      "comment" : "Button label"
+      "comment" : "Button label",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dictar"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Диктовать"
+          }
+        }
+      }
     },
     "Dictation" : {
       "comment" : "Exercise screen title",
@@ -239,10 +379,38 @@
       }
     },
     "Dictation is unavailable" : {
-      "comment" : "Alert title"
+      "comment" : "Alert title",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "El dictado no está disponible"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Диктовка недоступна"
+          }
+        }
+      }
     },
     "Dictation needs permission" : {
-      "comment" : "Alert title"
+      "comment" : "Alert title",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "El dictado necesita permiso"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Для диктовки нужно разрешение"
+          }
+        }
+      }
     },
     "DICTIONARY_ACTION" : {
       "comment" : "Action for dictionary prompt",
@@ -331,7 +499,21 @@
       }
     },
     "Edit meaning" : {
-      "comment" : "Meaning editor screen title"
+      "comment" : "Meaning editor screen title",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Editar significado"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Редактировать значение"
+          }
+        }
+      }
     },
     "Edit word" : {
       "comment" : "Screen title",
@@ -756,7 +938,21 @@
       }
     },
     "LearnWords needs speech recognition and the microphone to take dictation. You can still type the word." : {
-      "comment" : "Alert message when dictation permission was declined"
+      "comment" : "Alert message when dictation permission was declined",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "LearnWords necesita reconocimiento de voz y el micrófono para dictar. Igual puedes escribir la palabra."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Для диктовки приложению LearnWords нужны распознавание речи и микрофон. Вы всё равно можете набрать слово."
+          }
+        }
+      }
     },
     "Listen" : {
       "comment" : "Exercise button",
@@ -916,7 +1112,21 @@
       }
     },
     "Most devices recognise speech on Apple's servers, so this usually means there is no internet connection." : {
-      "comment" : "Speech recognition error detail"
+      "comment" : "Speech recognition error detail",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "La mayoría de los dispositivos reconocen el habla en los servidores de Apple, así que esto suele significar que no hay conexión a internet."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Большинство устройств распознают речь на серверах Apple, поэтому обычно это означает отсутствие интернет-соединения."
+          }
+        }
+      }
     },
     "Name of set" : {
       "localizations" : {
@@ -970,7 +1180,21 @@
       }
     },
     "Next reminder: %@." : {
-      "comment" : "Settings footer; placeholder is a date and time"
+      "comment" : "Settings footer; placeholder is a date and time",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Próximo recordatorio: %@."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Следующее напоминание: %@."
+          }
+        }
+      }
     },
     "No words to study" : {
       "comment" : "Title for alert",
@@ -990,25 +1214,123 @@
       }
     },
     "Note" : {
-      "comment" : "Meaning editor section header\nScreen title"
+      "comment" : "Meaning editor section header\nScreen title",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nota"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Заметка"
+          }
+        }
+      }
     },
     "Nothing due until %@." : {
-      "comment" : "Label; placeholder is a date"
+      "comment" : "Label; placeholder is a date",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nada pendiente hasta el %@."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "До %@ ничего нет."
+          }
+        }
+      }
     },
     "Nothing due." : {
-      "comment" : "Label when nothing is scheduled"
+      "comment" : "Label when nothing is scheduled",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Nada pendiente."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ничего нет."
+          }
+        }
+      }
     },
     "Nothing is due" : {
-      "comment" : "Title for alert"
+      "comment" : "Title for alert",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "No hay nada pendiente"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Нет слов к повторению"
+          }
+        }
+      }
     },
     "Nothing is scheduled: no words come due in the next two weeks." : {
-      "comment" : "Settings footer when no reminder is pending"
+      "comment" : "Settings footer when no reminder is pending",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "No hay nada programado: no hay palabras para repasar en las próximas dos semanas."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Ничего не запланировано: в ближайшие две недели нет слов к повторению."
+          }
+        }
+      }
     },
     "Notifications are off" : {
-      "comment" : "Alert title"
+      "comment" : "Alert title",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Las notificaciones están desactivadas"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Уведомления выключены"
+          }
+        }
+      }
     },
     "Notifications are turned off for LearnWords in Settings. The Exercises screen still shows what is due." : {
-      "comment" : "Settings footer when notifications are blocked"
+      "comment" : "Settings footer when notifications are blocked",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Las notificaciones de LearnWords están desactivadas en Ajustes. La pantalla de ejercicios sigue mostrando lo que toca repasar."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Уведомления для LearnWords выключены в Настройках. Экран упражнений всё равно показывает, что пора повторить."
+          }
+        }
+      }
     },
     "OK" : {
       "comment" : "Action for alert for empty set",
@@ -1113,13 +1435,55 @@
       }
     },
     "Practise anyway" : {
-      "comment" : "AlertAction title"
+      "comment" : "AlertAction title",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Practicar de todos modos"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Всё равно тренироваться"
+          }
+        }
+      }
     },
     "Practising ahead of schedule still counts, it just teaches less." : {
-      "comment" : "Message when nothing is due"
+      "comment" : "Message when nothing is due",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Practicar antes de tiempo también cuenta, solo que enseña menos."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Тренировка раньше срока тоже засчитывается, просто пользы меньше."
+          }
+        }
+      }
     },
     "Practising everything, due or not." : {
-      "comment" : "Label when the schedule is being bypassed"
+      "comment" : "Label when the schedule is being bypassed",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Practicando todo, toque o no."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Тренируются все слова, независимо от срока."
+          }
+        }
+      }
     },
     "Pronounce answers" : {
       "comment" : "setting",
@@ -1190,7 +1554,21 @@
       }
     },
     "Recent" : {
-      "comment" : "Section header"
+      "comment" : "Section header: recently added words (word picker)",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Recientes"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Недавние"
+          }
+        }
+      }
     },
     "Recognition" : {
       "comment" : "Menu title",
@@ -1264,25 +1642,123 @@
       }
     },
     "Remembered for (days)" : {
-      "comment" : "setting"
+      "comment" : "setting",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Recordado durante (días)"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Запоминается на (дней)"
+          }
+        }
+      }
     },
     "Remind me at" : {
-      "comment" : "setting"
+      "comment" : "setting",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Recordarme a las"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Напоминать в"
+          }
+        }
+      }
     },
     "Reminders" : {
-      "comment" : "settings section"
+      "comment" : "settings section",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Recordatorios"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Напоминания"
+          }
+        }
+      }
     },
     "Reminders are allowed but every alert style is off, so they will arrive silently in Notification Center." : {
-      "comment" : "Settings footer when notifications are allowed but invisible"
+      "comment" : "Settings footer when notifications are allowed but invisible",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Las notificaciones están permitidas, pero todos los estilos de aviso están desactivados, así que llegarán en silencio al Centro de notificaciones."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Уведомления разрешены, но все стили оповещений выключены, поэтому они будут приходить без звука в Центр уведомлений."
+          }
+        }
+      }
     },
     "Rename" : {
-      "comment" : "swipe action"
+      "comment" : "Swipe action: rename this word set",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Cambiar nombre"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Переименовать"
+          }
+        }
+      }
     },
     "Rename set" : {
-      "comment" : "AlertController title"
+      "comment" : "AlertController title",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Cambiar el nombre del conjunto"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Переименовать набор"
+          }
+        }
+      }
     },
     "Reset" : {
-      "comment" : "swipe action"
+      "comment" : "Swipe action: reset this word's learning progress",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Restablecer"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Сбросить"
+          }
+        }
+      }
     },
     "Russian" : {
       "comment" : "language",
@@ -1353,10 +1829,38 @@
       }
     },
     "Shown during practice when the word alone is ambiguous." : {
-      "comment" : "Meaning editor note footer"
+      "comment" : "Meaning editor note footer",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Se muestra durante la práctica cuando la palabra por sí sola es ambigua."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Показывается во время тренировки, когда одного слова недостаточно для понимания."
+          }
+        }
+      }
     },
     "Shown when the word alone is ambiguous" : {
-      "comment" : "Placeholder"
+      "comment" : "Placeholder",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Se muestra cuando la palabra por sí sola es ambigua"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Показывается, когда одного слова недостаточно"
+          }
+        }
+      }
     },
     "Spanish" : {
       "comment" : "language",
@@ -1410,7 +1914,21 @@
       }
     },
     "Speech recognition or the microphone is turned off for LearnWords. Turn it on in Settings, or type the word instead." : {
-      "comment" : "Alert message when dictation permission was revoked"
+      "comment" : "Alert message when dictation permission was revoked",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "El reconocimiento de voz o el micrófono están desactivados para LearnWords. Actívalos en Ajustes o escribe la palabra."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Распознавание речи или микрофон выключены для LearnWords. Включите их в Настройках или наберите слово вручную."
+          }
+        }
+      }
     },
     "Speech Recognition Required" : {
       "comment" : "PermissionManager - `onDenied`",
@@ -1465,7 +1983,21 @@
       }
     },
     "Stop dictating" : {
-      "comment" : "Button label"
+      "comment" : "Button label",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Dejar de dictar"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Остановить диктовку"
+          }
+        }
+      }
     },
     "Stop recognition" : {
       "comment" : "Button title",
@@ -1520,16 +2052,72 @@
       }
     },
     "Suggestions" : {
-      "comment" : "Section header"
+      "comment" : "Section header: word-completion suggestions (word picker)",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Sugerencias"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Подсказки"
+          }
+        }
+      }
     },
     "This device has no speech recognition for %@. You can still type the word." : {
-      "comment" : "Alert message; placeholder is a language name"
+      "comment" : "Alert message; placeholder is a language name",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Este dispositivo no tiene reconocimiento de voz para %@. Igual puedes escribir la palabra."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "На этом устройстве нет распознавания речи для %@. Вы всё равно можете набрать слово."
+          }
+        }
+      }
     },
     "This is the only word" : {
-      "comment" : "Alert title"
+      "comment" : "Alert title",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Es la única palabra"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Это единственное слово"
+          }
+        }
+      }
     },
     "Time to practise" : {
-      "comment" : "Reminder title"
+      "comment" : "Reminder title",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Hora de practicar"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Пора тренироваться"
+          }
+        }
+      }
     },
     "Total " : {
       "comment" : "Label total words",
@@ -1566,7 +2154,21 @@
       }
     },
     "Turn them on for LearnWords in Settings to be reminded. Practice works either way — the Exercises screen always shows what is due." : {
-      "comment" : "Alert message when notification permission was refused"
+      "comment" : "Alert message when notification permission was refused",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Actívalas para LearnWords en Ajustes para recibir recordatorios. La práctica funciona igual: la pantalla de ejercicios siempre muestra lo que toca repasar."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Включите их для LearnWords в Настройках, чтобы получать напоминания. Тренироваться можно в любом случае — экран упражнений всегда показывает, что пора повторить."
+          }
+        }
+      }
     },
     "type in the translation" : {
       "comment" : "Placeholder promt",
@@ -1622,7 +2224,21 @@
       }
     },
     "Word in %@" : {
-      "comment" : "Caption; a language"
+      "comment" : "Caption; a language",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Palabra en %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Слово на %@"
+          }
+        }
+      }
     },
     "WordCount" : {
       "comment" : "Count of words available",
@@ -1714,7 +2330,21 @@
       }
     },
     "You are reminded on days when words are due, and not on days when none are." : {
-      "comment" : "Settings footer when reminders are on"
+      "comment" : "Settings footer when reminders are on",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Recibes recordatorios los días en que hay palabras para repasar, y no los días en que no hay ninguna."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Напоминания приходят в дни, когда есть слова к повторению, и не приходят, когда их нет."
+          }
+        }
+      }
     },
     "You may add Keyboards from system General Settings pane." : {
       "comment" : "Alert message: how to add a missing keyboard, appended after the sentence above",
