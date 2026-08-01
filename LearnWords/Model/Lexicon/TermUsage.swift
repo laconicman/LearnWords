@@ -16,8 +16,14 @@
 //  worth knowing about while adding it to "Verbs" — arguably more so, since that is the
 //  case where the learner has forgotten they have it.
 //
+//  **The value type lives here; the query lives in `Lexicon`.** It was briefly the other
+//  way round, which forced an `internal fetchTerms` returning `[CDTerm]` — managed objects
+//  escaping the one type allowed to hold them, past a rule its own header states. Swift's
+//  `private` is file-scoped, so an extension in another file cannot reach `viewContext`;
+//  the answer is to put the query where the context is, not to widen the context's reach.
+//
 
-import CoreData
+import Foundation
 
 extension Lexicon {
 
@@ -36,34 +42,4 @@ extension Lexicon {
         }
     }
 
-    /// Every meaning that already holds `text` in `language`, across every set.
-    ///
-    /// Matches the way the store stores words: case-insensitively, on the canonical
-    /// language subtag, so "Bear" typed against an `en-US` preference finds the `en` row.
-    func usages(ofTerm text: String, in language: String) throws -> [TermUsage] {
-        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmed.isEmpty else { return [] }
-
-        let request = CDTerm.fetchRequest()
-        request.predicate = NSPredicate(format: "text ==[c] %@", trimmed)
-        let code = LanguageCode.canonical(language)
-
-        let matching: [CDTerm] = try fetchTerms(request).filter {
-            LanguageCode.canonical($0.language?.code ?? "") == code
-        }
-
-        var usages: [TermUsage] = []
-        for term in matching {
-            for synset in term.synsets {
-                let others: [CDTerm] = synset.terms.filter {
-                    LanguageCode.canonical($0.language?.code ?? "") != code
-                }
-                let names: [String] = synset.sets.map { $0.name }
-                usages.append(TermUsage(senseID: synset.id,
-                                        translations: others.map { $0.text }.sorted(),
-                                        setNames: names.sorted()))
-            }
-        }
-        return usages
-    }
 }

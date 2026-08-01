@@ -563,6 +563,13 @@ save happened"; when the rebuild debounce lands (TD-34) it should be subordinate
 repair rather than parallel to it. Recorded here because the current code does not yet say
 this out loud.
 
+**The boundary is the mechanism, not a convention.** `Lexicon` returns value types and its
+`viewContext` is `private` for one reason: a managed object outside it is a managed object
+whose queue nobody is tracking. That was breached once, by an `internal fetchTerms` returning
+`[CDTerm]` so a query in another file could reach the context — Swift's `private` being
+file-scoped makes that the tempting shortcut. The query moved to where the context is
+instead. **If a read needs the context, the read belongs inside `Lexicon`.**
+
 **What is protected today, and what is not.** Core Data's own confinement is sound: writes
 go through `performAndWait` on a private-queue context, reads are main-queue, `pendingDedup`
 is touched only on `dedupQueue`. The *derived* layer was not: `ReminderScheduler.rebuild`

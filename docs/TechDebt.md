@@ -1120,8 +1120,12 @@ now asks it before committing. Two halves of the owner's request remain:
 
 * **The hint while typing.** The first add-word screen should show a word's existing
   meanings as it is entered — footnote style, with the set name smaller and truncatable when
-  it is a different set. The lookup exists and is tested; only the presentation is missing,
-  and it is the half that prevents the mistake rather than catching it.
+  it is a different set. The lookup exists and is tested; only the presentation is missing.
+
+  **The hint and the alert are layers, not alternatives** (owner, 2026-08-01). The hint
+  prevents the mistake for a learner who is looking; the alert catches the one who is not,
+  or who saw it and meant to continue anyway. Neither makes the other unnecessary, and the
+  earlier wording here implied otherwise.
 * **The meaning editor.** Renaming a word there can still collide with an existing one, and
   it does not ask. It should reuse the same three-answer alert rather than grow its own.
 
@@ -1129,3 +1133,19 @@ now asks it before committing. Two halves of the owner's request remain:
 that reads as inconsistent behaviour. **Discharge:** inject the lookup into
 `WordInputViewController` as a closure — it must stay store-free — and route the editor's
 rename through the same decision the add flow uses.
+
+## TD-40 — Main-queue confinement is checked, not proved
+
+`Lexicon.viewContext` now carries `dispatchPrecondition(condition: .onQueue(.main))`, so a
+read from the wrong queue traps in debug instead of corrupting silently. That is an
+improvement on prose, and still weaker than the guarantee the code deserves: preconditions
+fire only where a test or a session happens to reach.
+
+The real fix arrives with the floor. At iOS 13, `Lexicon` can become an `actor` — or hold an
+isolated context — and the confinement becomes a compile-time property rather than a runtime
+check that has to be *hit* to help. See [Design](Design.md) § "Swift Concurrency, when the
+floor allows it".
+
+**Cost:** low today, because every caller is a main-queue view controller. It rises the
+moment anything reads off the main queue — an import, an enrichment pass, a background
+refresh — which is exactly the work the roadmap is heading towards.

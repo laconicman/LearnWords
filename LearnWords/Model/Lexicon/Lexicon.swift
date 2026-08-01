@@ -35,12 +35,18 @@ final class Lexicon {
         self.persistence = persistence
     }
 
-    private var viewContext: NSManagedObjectContext { persistence.viewContext }
-
-    /// Reads terms on the view context, for the one query that lives in another file.
-    /// Narrower than exposing the context itself, which would let anything read anything.
-    func fetchTerms(_ request: NSFetchRequest<CDTerm>) throws -> [CDTerm] {
-        try viewContext.fetch(request)
+    /// The context every read runs on. **Main queue only**, which this now checks rather
+    /// than merely documents.
+    ///
+    /// Core Data's rule is that a managed object belongs to the queue of its context, and
+    /// the guidance is blunt about the consequence — passing instances between queues "can
+    /// result in corruption of the data and termination of the app"
+    /// ([Using Core Data in the background](https://developer.apple.com/documentation/coredata/using-core-data-in-the-background#Avoiding-problems),
+    /// WWDC 2012 session 214). Nothing in the type system enforces it; a precondition does,
+    /// in debug builds, at the one place every read passes through.
+    private var viewContext: NSManagedObjectContext {
+        dispatchPrecondition(condition: .onQueue(.main))
+        return persistence.viewContext
     }
 
     // MARK: - Word sets
@@ -259,6 +265,37 @@ final class Lexicon {
     }
 
     // MARK: - Terms
+
+    /// Every meaning that already holds `text` in `language`, across every set.
+    ///
+    /// Matches the way the store stores words: case-insensitively, on the canonical
+    /// language subtag, so "Bear" typed against an `en-US` preference finds the `en` row.
+    func usages(ofTerm text: String, in language: String) throws -> [Lexicon.TermUsage] {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return [] }
+
+        let request = CDTerm.fetchRequest()
+        request.predicate = NSPredicate(format: "text ==[c] %@", trimmed)
+        let code = LanguageCode.canonical(language)
+
+        let matching: [CDTerm] = try viewContext.fetch(request).filter {
+            LanguageCode.canonical($0.language?.code ?? "") == code
+        }
+
+        var usages: [TermUsage] = []
+        for term in matching {
+            for synset in term.synsets {
+                let others: [CDTerm] = synset.terms.filter {
+                    LanguageCode.canonical($0.language?.code ?? "") != code
+                }
+                let names: [String] = synset.sets.map { $0.name }
+                usages.append(Lexicon.TermUsage(senseID: synset.id,
+                                        translations: others.map { $0.text }.sorted(),
+                                        setNames: names.sorted()))
+            }
+        }
+        return usages
+    }
 
     /// Edits a word. Every sense and set that uses it sees the change — the point of an
     /// atomic term — and its identity and history survive the rename (TD-18).
