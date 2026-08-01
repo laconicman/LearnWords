@@ -309,10 +309,18 @@ final class Lexicon {
         var usages: [TermUsage] = []
         for term in matching {
             for synset in term.synsets {
+                // **Meanings in no set are skipped.** Deleting a word takes its meaning out
+                // of the set without deleting it — its review history is evidence of work
+                // done — so orphans accumulate until something collects them, which nothing
+                // yet does (TD-26). They are invisible everywhere else in the app, and a
+                // hint that named one would offer to replace a meaning the learner cannot
+                // see, in a set that has no name to show.
+                let names: [String] = synset.sets.map { $0.name }
+                guard !names.isEmpty else { continue }
+
                 let others: [CDTerm] = synset.terms.filter {
                     LanguageCode.canonical($0.language?.code ?? "") != code
                 }
-                let names: [String] = synset.sets.map { $0.name }
                 usages.append(Lexicon.TermUsage(senseID: synset.id,
                                         translations: others.map { $0.text }.sorted(),
                                         setNames: names.sorted()))

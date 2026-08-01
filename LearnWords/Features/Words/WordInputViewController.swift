@@ -66,6 +66,11 @@ final class WordInputViewController: UITableViewController {
     /// store or the flow should decide.
     private let existingUsages: ((String) -> [Lexicon.TermUsage])?
 
+    /// Where the typed word already appears. An *input* to the snapshot below, refreshed on
+    /// its own schedule — see `scheduleUsageLookup`.
+    private var usages: [Lexicon.TermUsage] = []
+    private var pendingUsageLookup: DispatchWorkItem?
+
     /// Everything the table shows, as one value rebuilt in one place.
     ///
     /// It was two arrays — `usages` and `candidates` — read separately by
@@ -161,6 +166,7 @@ final class WordInputViewController: UITableViewController {
         // indicator — alive behind an unrelated screen.
         DictationController.shared.stop()
         isDictating = false
+        cancelUsageLookup()
     }
 
     // MARK: - The input row
@@ -292,13 +298,43 @@ final class WordInputViewController: UITableViewController {
     }
 
     /// Completions once there is something to complete, recently used words before that.
+    /// Waits for the typing to stop before asking the store.
+    ///
+    /// Completions come from `UITextChecker` in memory and stay instant; this is the half
+    /// that touches Core Data, and running it per keystroke made the field stutter on a
+    /// real vocabulary (owner). It is also the half whose answer only means something once
+    /// the word is finished — "bea" matching nothing says nothing about "bear".
+    private func scheduleUsageLookup() {
+        pendingUsageLookup?.cancel()
+        guard existingUsages != nil else { return }
+
+        let work = DispatchWorkItem { [weak self] in
+            guard let self else { return }
+            self.usages = self.existingUsages?(self.field.text ?? "") ?? []
+            self.rebuildSections()
+        }
+        pendingUsageLookup = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + Self.usageLookupDelay, execute: work)
+    }
+
+    /// Long enough to sit out ordinary typing, short enough that a finished word answers
+    /// before the learner reaches for Save.
+    private static let usageLookupDelay: TimeInterval = 0.4
+
     private func refreshCandidates() {
+        // The typed text changed, so anything found for the previous text is now about a
+        // different word. Cleared immediately rather than left showing a stale match.
+        usages = []
+        rebuildSections()
+        scheduleUsageLookup()
+    }
+
+    /// The one place the table's contents are built. Every data-source method reads the
+    /// result and nothing else, which is what keeps the counts and the cells agreeing.
+    private func rebuildSections() {
         let typed = field.text ?? ""
         var rebuilt: [TableSection] = []
 
-        // Asked on every keystroke: one indexed fetch against a vocabulary measured in
-        // thousands, and the answer is worthless a keystroke late.
-        let usages = existingUsages?(typed) ?? []
         if !usages.isEmpty {
             rebuilt.append(TableSection(
                 title: NSLocalizedString("Already in your words", comment: "Section header"),
@@ -321,6 +357,13 @@ final class WordInputViewController: UITableViewController {
         // does not reserve space for a list that is not there.
         sections = rebuilt
         tableView.reloadData()
+    }
+
+    /// Nothing pending may fire after the screen goes: it would touch the store for a word
+    /// nobody is typing any more.
+    private func cancelUsageLookup() {
+        pendingUsageLookup?.cancel()
+        pendingUsageLookup = nil
     }
 
     private func row(at indexPath: IndexPath) -> Row? {

@@ -854,7 +854,14 @@ merge — assigning an id to any row missing one before it sorts. That turns a f
 into self-healing, in the file that already owns post-merge repair. Cheap enough to do
 before the two-device test; not urgent enough to block it.
 
-## TD-26 — Orphan collection has no way to run
+## TD-26 — Orphan collection has no way to run — **surfaced in the UI, 2026-08-01**
+
+Deleting a word from the list calls `removeSense(_:from:)`, which takes the meaning out of
+the set without deleting it — its review history is evidence of work done. Nothing calls
+`deleteOrphanedSenses`, so orphans accumulate silently. The duplicate hint made that
+visible: it listed an orphaned meaning as a translation with **no set name beside it**,
+because there was no set to name. `usages` now skips them, which is right for the hint and
+does nothing about the accumulation.
 
 `deleteOrphanedSenses` and `deleteOrphanedTerms` are "explicit, never automatic" by design
 (docs/Design.md), and nothing in the app is that explicit thing: no screen calls either.

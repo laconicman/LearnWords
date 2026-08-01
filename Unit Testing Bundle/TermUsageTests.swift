@@ -196,4 +196,33 @@ struct TermUsageTests {
                                               inSense: sense.id)
         #expect(Set(updated.terms(in: "en").map(\.text)) == ["fox", "tod"])
     }
+
+    // MARK: - Orphans
+
+    /// Deleting a word takes its meaning out of the set without deleting it, so orphans
+    /// accumulate until something collects them (TD-26). They are invisible everywhere else
+    /// in the app, and the hint showed one as a translation with no set beside it.
+    @Test func aMeaningInNoSetIsNotAUsage() throws {
+        let lexicon = makeLexicon()
+        let set = try makeSet(lexicon, named: "Animals")
+        let sense = try add("bear", "медведь", to: set, in: lexicon)
+
+        try lexicon.removeSense(sense.id, from: set.id)
+
+        #expect(try lexicon.usages(ofTerm: "bear", in: "en").isEmpty,
+                "an orphaned meaning is in none of the learner's words")
+    }
+
+    @Test func orphansDoNotHideTheMeaningsThatRemain() throws {
+        let lexicon = makeLexicon()
+        let animals = try makeSet(lexicon, named: "Animals")
+        let orphaned = try add("bear", "медведь", to: animals, in: lexicon)
+        try add("bear", "нести", to: animals, in: lexicon)
+
+        try lexicon.removeSense(orphaned.id, from: animals.id)
+
+        let usages = try lexicon.usages(ofTerm: "bear", in: "en")
+        #expect(usages.count == 1)
+        #expect(usages.first?.translations == ["нести"])
+    }
 }

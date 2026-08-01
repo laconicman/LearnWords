@@ -248,6 +248,9 @@
         }
       }
     },
+    "Already in your words" : {
+      "comment" : "Section header"
+    },
     "Animals" : {
       "comment" : "Name of the starter word set",
       "localizations" : {
@@ -1560,7 +1563,7 @@
       }
     },
     "Recent" : {
-      "comment" : "Section header: recently added words (word picker)",
+      "comment" : "Section header",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -2061,7 +2064,7 @@
       }
     },
     "Suggestions" : {
-      "comment" : "Section header: word-completion suggestions (word picker)",
+      "comment" : "Section header",
       "localizations" : {
         "es" : {
           "stringUnit" : {
