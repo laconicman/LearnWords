@@ -199,7 +199,11 @@ final class MeaningEditorViewController: UITableViewController {
     /// where a learner is reaching for a word they half-remember — had nowhere to go. It is
     /// the same screen the add-word flow uses, so the two entry paths cannot drift.
     private func addWord(in language: String) {
-        push(.add(language: language)) { [weak self] entered in
+        push(.add(language: language),
+             existingUsages: { [weak self] typed in
+                 ((try? self?.lexicon.usages(ofTerm: typed, in: language)) as? [Lexicon.TermUsage] ?? [])
+                     .filter { $0.senseID != self?.sense.id }
+             }) { [weak self] entered in
             guard let self else { return }
             do {
                 // Links an existing word when the spelling already exists, rather than
@@ -214,11 +218,44 @@ final class MeaningEditorViewController: UITableViewController {
     }
 
     private func editWord(_ term: Term) {
-        push(.rename(term), initialText: term.text) { [weak self] entered in
-            guard let self else { return }
+        push(.rename(term), initialText: term.text,
+             existingUsages: { [weak self] typed in
+                 // The word being renamed is not a clash with itself.
+                 ((try? self?.lexicon.usages(ofTerm: typed, in: term.language)) as? [Lexicon.TermUsage] ?? [])
+                     .filter { $0.senseID != self?.sense.id }
+             }) { [weak self] entered in
+            self?.rename(term, to: entered)
+        }
+    }
+
+    /// Renames, unless the new spelling already exists — in which case the learner decides
+    /// whether the two words are the same word.
+    ///
+    /// `updateTerm` edits the row in place, so renaming "bruin" to "bear" where "bear"
+    /// already exists would leave **two rows spelled the same** — exactly what
+    /// `findOrCreateTerm` prevents everywhere else. Merging is the only sensible resolution
+    /// here: unlike the add flow there is no second meaning to create, just one meaning
+    /// being edited and a question of which word it should use.
+    private func rename(_ term: Term, to entered: String) {
+        let clash = ((try? lexicon.usages(ofTerm: entered, in: term.language)) ?? [])
+            .filter { $0.senseID != sense.id }
+
+        guard let existing = clash.first else {
             // Every meaning and set using this word sees the change — an atomic term.
-            try? self.lexicon.updateTerm(term.id, text: entered)
-            self.reload()
+            try? lexicon.updateTerm(term.id, text: entered)
+            return reload()
+        }
+
+        DuplicateWordPrompt.ask(on: self, word: entered, existing: existing,
+                                offering: [.useExisting]) { [weak self] _ in
+            guard let self else { return }
+            do {
+                self.sense = try self.lexicon.replaceTerm(
+                    term.id, with: Term.Draft(entered, in: term.language), inSense: self.sense.id)
+                self.reload()
+            } catch {
+                debugLog("Could not merge \(entered): \(error)")
+            }
         }
     }
 
@@ -232,8 +269,10 @@ final class MeaningEditorViewController: UITableViewController {
 
     private func push(_ purpose: WordInputViewController.Purpose,
                       initialText: String = "",
+                      existingUsages: ((String) -> [Lexicon.TermUsage])? = nil,
                       onCommit: @escaping (String) -> Void) {
-        let screen = WordInputViewController(purpose, initialText: initialText, onCommit: onCommit)
+        let screen = WordInputViewController(purpose, initialText: initialText,
+                                             existingUsages: existingUsages, onCommit: onCommit)
         navigationController?.pushViewController(screen, animated: true)
     }
 

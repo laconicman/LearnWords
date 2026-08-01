@@ -59,6 +59,14 @@ final class WordInputViewController: UITableViewController {
     private let suggestions: WordSuggestions?
     private let onCommit: (String) -> Void
 
+    /// Where the word being typed already appears, if anywhere.
+    ///
+    /// A closure rather than a `Lexicon`, so this screen stays store-free — it is a view
+    /// controller, and the moment it can query the store it starts deciding things the
+    /// store or the flow should decide.
+    private let existingUsages: ((String) -> [Lexicon.TermUsage])?
+    private var usages: [Lexicon.TermUsage] = []
+
     private let field = UITextField()
     private let dictationButton = UIButton(type: .system)
     private var candidates: [String] = []
@@ -87,9 +95,11 @@ final class WordInputViewController: UITableViewController {
          initialText: String = "",
          context: Context? = nil,
          title: String? = nil,
+         existingUsages: ((String) -> [Lexicon.TermUsage])? = nil,
          onCommit: @escaping (String) -> Void) {
         self.purpose = purpose
         self.context = context
+        self.existingUsages = existingUsages
         self.suggestions = purpose.language.map { WordSuggestions(language: $0) }
         self.onCommit = onCommit
         super.init(style: .grouped)
@@ -266,11 +276,29 @@ final class WordInputViewController: UITableViewController {
 
     /// Completions once there is something to complete, recently used words before that.
     private func refreshCandidates() {
-        guard let suggestions else { return candidates = [] }
         let typed = field.text ?? ""
+        // Asked on every keystroke: the lookup is one indexed fetch against a vocabulary
+        // measured in thousands, and the answer is worthless a keystroke late.
+        usages = existingUsages?(typed) ?? []
+
+        guard let suggestions else {
+            candidates = []
+            return tableView.reloadData()
+        }
         showingRecents = typed.trimmingCharacters(in: .whitespaces).isEmpty
         candidates = showingRecents ? suggestions.recents : suggestions.completions(for: typed)
         tableView.reloadData()
+    }
+
+    /// Sections, in the order they earn their place: what you already have, then what you
+    /// might be typing.
+    private enum Section: Int, CaseIterable { case existing, candidates }
+
+    private func rows(in section: Section) -> Int {
+        switch section {
+        case .existing: return usages.count
+        case .candidates: return candidates.count
+        }
     }
 
     // MARK: - Committing
@@ -358,6 +386,9 @@ final class WordInputViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        if Section(rawValue: indexPath.section) == .existing {
+            return usageCell(usages[indexPath.row])
+        }
         let cell = tableView.dequeueReusableCell(withIdentifier: "candidate", for: indexPath)
         cell.textLabel?.attributedText = highlighted(candidates[indexPath.row])
         cell.textLabel?.font = .preferredFont(forTextStyle: .body)
@@ -377,7 +408,33 @@ final class WordInputViewController: UITableViewController {
         return attributed
     }
 
+    /// The existing-words rows show information and nothing else.
+    ///
+    /// Not selectable, on the lesson from the search screen: a row that looked like a hint
+    /// was tappable, and tapping it filed the word as its own translation. A hint that can
+    /// be acted on by accident is worse than no hint.
+    private func usageCell(_ usage: Lexicon.TermUsage) -> UITableViewCell {
+        let cell = UITableViewCell(style: .subtitle, reuseIdentifier: nil)
+        cell.selectionStyle = .none
+
+        cell.textLabel?.text = usage.translations.joined(separator: ", ")
+        cell.textLabel?.font = .preferredFont(forTextStyle: .footnote)
+        cell.textLabel?.textColor = .lwTextSecondary
+        cell.textLabel?.adjustsFontForContentSizeCategory = true
+        cell.textLabel?.numberOfLines = 0
+
+        // Smaller again, and allowed to truncate: which set it is in is useful context, not
+        // something worth wrapping the row for.
+        cell.detailTextLabel?.text = usage.setNames.joined(separator: ", ")
+        cell.detailTextLabel?.font = .preferredFont(forTextStyle: .caption2)
+        cell.detailTextLabel?.textColor = .lwTextSecondary
+        cell.detailTextLabel?.adjustsFontForContentSizeCategory = true
+        cell.detailTextLabel?.lineBreakMode = .byTruncatingTail
+        return cell
+    }
+
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard Section(rawValue: indexPath.section) == .candidates else { return }
         tableView.deselectRow(at: indexPath, animated: true)
         field.text = candidates[indexPath.row]
         refreshCandidates()
@@ -386,6 +443,7 @@ final class WordInputViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView,
                             accessoryButtonTappedForRowWith indexPath: IndexPath) {
+        guard Section(rawValue: indexPath.section) == .candidates else { return }
         lookUp(term: candidates[indexPath.row], sender: self)
     }
 }

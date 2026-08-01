@@ -249,6 +249,30 @@ final class Lexicon {
         }
     }
 
+    /// Swaps one word of a meaning for another, find-or-creating the replacement.
+    ///
+    /// This is what a rename must go through when the new spelling already exists.
+    /// `updateTerm` edits the row in place and so cannot merge: renaming "bruin" to "bear"
+    /// where "bear" is already a row leaves **two rows spelled the same**, which is the one
+    /// thing `findOrCreateTerm` exists to prevent. Here the meaning drops the old word and
+    /// links the canonical one, so the vocabulary keeps one row per spelling.
+    ///
+    /// The old word survives if anything else uses it; `deleteOrphanedSenses` is the
+    /// deliberate place for collecting what nothing points at.
+    @discardableResult
+    func replaceTerm(_ termID: UUID, with draft: Term.Draft, inSense senseID: UUID) throws -> Sense {
+        try write { context in
+            let sense = try Self.sense(senseID, in: context)
+            var languages = LanguageCache()
+            let replacement = try Self.findOrCreateTerm(draft, languages: &languages, in: context)
+            for term in sense.terms where term.id == termID {
+                sense.removeTerm(term)
+            }
+            sense.addTerm(replacement)
+            return Sense(sense)
+        }
+    }
+
     /// Takes a meaning out of one set without deleting it — it may live in others.
     func removeSense(_ senseID: UUID, from setID: UUID) throws {
         try write { context in

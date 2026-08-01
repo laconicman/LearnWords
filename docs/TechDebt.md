@@ -1113,26 +1113,30 @@ hesitant one — plus a colour or a meter on the recognised text. Wants a device
 since the confidence range in real speech is not the range in a quiet room.
 Maybe set logging points ask the operator to execute some phonetic exercises and provide their log.
 
-## TD-39 — The add-word hint and the meaning editor still allow duplicates
+## TD-39 — Duplicate words — **resolved (2026-08-01)**
 
-`Lexicon.usages(ofTerm:in:)` answers "do I already have this word?", and the add-word flow
-now asks it before committing. Two halves of the owner's request remain:
+Both halves landed, as layers rather than alternatives (owner): the hint prevents the
+mistake for a learner who is looking, the alert catches the one who is not or who meant to
+proceed anyway.
 
-* **The hint while typing.** The first add-word screen should show a word's existing
-  meanings as it is entered — footnote style, with the set name smaller and truncatable when
-  it is a different set. The lookup exists and is tested; only the presentation is missing.
+* **The hint.** `WordInputViewController` shows a typed word's existing meanings as an
+  unselectable section — translations in footnote, set names in caption2 and allowed to
+  truncate. Injected as a closure, so the screen never gains a `Lexicon`. Unselectable on
+  the lesson from the old search screen, where a row that looked like a hint was tappable
+  and filed the word as its own translation.
+* **The add flow** asks *Replace meaning* / *Add as another meaning* / *Cancel*.
+* **The meaning editor** asks *Use the existing word* / *Cancel* on a rename that collides.
+  Renaming is not offered "add another meaning" because there is no second meaning to
+  create — one meaning is being edited, and the only question is which word it should use.
+  Forcing symmetry would have offered a choice that does nothing.
 
-  **The hint and the alert are layers, not alternatives** (owner, 2026-08-01). The hint
-  prevents the mistake for a learner who is looking; the alert catches the one who is not,
-  or who saw it and meant to continue anyway. Neither makes the other unnecessary, and the
-  earlier wording here implied otherwise.
-* **The meaning editor.** Renaming a word there can still collide with an existing one, and
-  it does not ask. It should reuse the same three-answer alert rather than grow its own.
+The wording lives once, in `DuplicateWordPrompt`; each caller passes the answers that apply.
 
-**Cost:** the guard covers the commonest path and not every path, which is the shape of bug
-that reads as inconsistent behaviour. **Discharge:** inject the lookup into
-`WordInputViewController` as a closure — it must stay store-free — and route the editor's
-rename through the same decision the add flow uses.
+**A worse defect surfaced while doing it.** `updateTerm` edits a row in place, so renaming
+"bruin" to "bear" where "bear" already existed produced **two rows spelled the same** — the
+one thing `findOrCreateTerm` prevents everywhere else, and a duplicate at the *term* level
+rather than the meaning level. `replaceTerm(_:with:inSense:)` drops the old word and links
+the canonical one in a single transaction; tested.
 
 ## TD-40 — Main-queue confinement is checked, not proved
 

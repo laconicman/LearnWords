@@ -95,8 +95,12 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
     private func beginAddWord(prefilled: String) {
         guard let set = library.selectedSet else { return }
         let pair = LanguagePair.forSet(set)
-        let screen = WordInputViewController(.add(language: pair.secondary),
-                                             initialText: prefilled) { [weak self] word in
+        let screen = WordInputViewController(
+            .add(language: pair.secondary),
+            initialText: prefilled,
+            existingUsages: { [weak self] typed in
+                (try? self?.lexicon.usages(ofTerm: typed, in: pair.secondary)) as? [Lexicon.TermUsage] ?? []
+            }) { [weak self] word in
             self?.askMeaning(of: word, in: set, pair: pair)
         }
         navigationController?.pushViewController(screen, animated: true)
@@ -155,30 +159,19 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         }
     }
 
-    /// Three answers, because "you already have this" has three sensible resolutions and
-    /// silently picking one is how the duplicates appeared.
+    /// Asked, not decided — nothing below the UI can tell a mistake from a word that
+    /// genuinely means two things. The wording and the answers live in
+    /// `DuplicateWordPrompt`, shared with the meaning editor.
     private func askAboutDuplicate(_ word: String,
                                    meaning: String,
                                    in set: WordSet,
                                    pair: LanguagePair,
                                    existing: Lexicon.TermUsage) {
-        let known = existing.translations.joined(separator: ", ")
-        let alert = UIAlertController(
-            title: String(format: NSLocalizedString("“%@” is already in your words",
-                                                    comment: "Alert title; the word"), word),
-            message: known.isEmpty
-                ? NSLocalizedString("You already have this word.", comment: "Alert message")
-                : String(format: NSLocalizedString("You already have it as “%@”.",
-                                                   comment: "Alert message; existing translations"),
-                         known),
-            preferredStyle: .alert)
-
-        // Replaces what the existing meaning says while keeping its identity — and so its
-        // whole review history, which delete-and-re-add would throw away.
-        alert.addAction(UIAlertAction(
-            title: NSLocalizedString("Replace meaning", comment: "AlertAction title"),
-            style: .default) { [weak self] _ in
-                guard let self else { return }
+        DuplicateWordPrompt.ask(on: self, word: word, existing: existing,
+                                offering: [.replaceExisting, .addAnother]) { [weak self] choice in
+            guard let self else { return }
+            switch choice {
+            case .replaceExisting:
                 do {
                     try self.lexicon.replaceTerms(ofSense: existing.senseID,
                                                   in: pair.primary,
@@ -187,19 +180,12 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
                 } catch {
                     debugLog("Could not replace the meaning of \(word): \(error)")
                 }
-            })
-
-        // A word genuinely can mean two things — the case the store cannot tell from a
-        // mistake, which is exactly why it asks rather than guesses.
-        alert.addAction(UIAlertAction(
-            title: NSLocalizedString("Add as another meaning", comment: "AlertAction title"),
-            style: .default) { [weak self] _ in
-                self?.commitPair(word, meaning: meaning, in: set, pair: pair)
-            })
-
-        alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: "AlertAction title"),
-                                      style: .cancel))
-        present(alert, animated: true)
+            case .addAnother:
+                self.commitPair(word, meaning: meaning, in: set, pair: pair)
+            case .useExisting:
+                break   // not offered here
+            }
+        }
     }
 
     @IBAction func unwindSegue(segue: UIStoryboardSegue) {}
