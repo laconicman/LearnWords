@@ -1153,3 +1153,14 @@ floor allows it".
 **Cost:** low today, because every caller is a main-queue view controller. It rises the
 moment anything reads off the main queue — an import, an enrichment pass, a background
 refresh — which is exactly the work the roadmap is heading towards.
+
+## TD-41 — The dictation button hides the text field's clear button
+
+`WordInputViewController` sets both `clearButtonMode = .whileEditing` and a dictation
+button as the field's `rightView`. They occupy the same place, and the `rightView` wins —
+so there is no way to clear the field except selecting and deleting.
+
+**Cost:** small but constant, on the screen a learner uses most. **Discharge:** move
+dictation to the field's `leftView`, or into an input accessory above the keyboard where it
+is closer to the thumbs anyway. Noticed while verifying the crash fix; not fixed there
+because the two changes have nothing to do with each other.

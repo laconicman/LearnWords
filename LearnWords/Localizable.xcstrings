@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "“%@” is already in your words" : {
+      "comment" : "Alert title; the word"
+    },
     "%@ due now." : {
       "comment" : "Label words due now",
       "localizations" : {
@@ -102,6 +105,9 @@
           }
         }
       }
+    },
+    "Add as another meaning" : {
+      "comment" : "AlertAction title"
     },
     "Add meaning" : {
       "comment" : "Screen title",
@@ -1743,6 +1749,9 @@
         }
       }
     },
+    "Replace meaning" : {
+      "comment" : "AlertAction title"
+    },
     "Reset" : {
       "comment" : "Swipe action: reset this word's learning progress",
       "localizations" : {
@@ -2187,6 +2196,9 @@
         }
       }
     },
+    "Use the existing word" : {
+      "comment" : "AlertAction title"
+    },
     "Word" : {
       "comment" : "backButtonTitle",
       "extractionState" : "stale",
@@ -2328,6 +2340,26 @@
           }
         }
       }
+    },
+    "You already have it as “%@”, in “%@”." : {
+      "comment" : "Alert message; translations, then sets",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "You already have it as “%1$@”, in “%2$@”."
+          }
+        }
+      }
+    },
+    "You already have it as “%@”." : {
+      "comment" : "Alert message; translations"
+    },
+    "You already have it in “%@”." : {
+      "comment" : "Alert message; set names"
+    },
+    "You already have this word." : {
+      "comment" : "Alert message"
     },
     "You are reminded on days when words are due, and not on days when none are." : {
       "comment" : "Settings footer when reminders are on",

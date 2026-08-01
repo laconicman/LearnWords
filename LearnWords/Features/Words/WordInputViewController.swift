@@ -65,12 +65,29 @@ final class WordInputViewController: UITableViewController {
     /// controller, and the moment it can query the store it starts deciding things the
     /// store or the flow should decide.
     private let existingUsages: ((String) -> [Lexicon.TermUsage])?
-    private var usages: [Lexicon.TermUsage] = []
+
+    /// Everything the table shows, as one value rebuilt in one place.
+    ///
+    /// It was two arrays — `usages` and `candidates` — read separately by
+    /// `numberOfRowsInSection` and `cellForRowAt`. UIKit calls those at different moments,
+    /// and anything that refreshed between them left the counts describing one state and
+    /// the cells asking about another: *Index out of range* for section 0, row 0, with the
+    /// array empty. A bounds check would have hidden that; a single snapshot makes the two
+    /// answers incapable of disagreeing.
+    private var sections: [TableSection] = []
+
+    private enum Row {
+        case usage(Lexicon.TermUsage)
+        case candidate(String)
+    }
+
+    private struct TableSection {
+        let title: String
+        let rows: [Row]
+    }
 
     private let field = UITextField()
     private let dictationButton = UIButton(type: .system)
-    private var candidates: [String] = []
-    private var showingRecents = true
 
     /// Set while dictation is running, so a partial transcription can replace the last one
     /// instead of appending to it.
@@ -277,28 +294,39 @@ final class WordInputViewController: UITableViewController {
     /// Completions once there is something to complete, recently used words before that.
     private func refreshCandidates() {
         let typed = field.text ?? ""
-        // Asked on every keystroke: the lookup is one indexed fetch against a vocabulary
-        // measured in thousands, and the answer is worthless a keystroke late.
-        usages = existingUsages?(typed) ?? []
+        var rebuilt: [TableSection] = []
 
-        guard let suggestions else {
-            candidates = []
-            return tableView.reloadData()
+        // Asked on every keystroke: one indexed fetch against a vocabulary measured in
+        // thousands, and the answer is worthless a keystroke late.
+        let usages = existingUsages?(typed) ?? []
+        if !usages.isEmpty {
+            rebuilt.append(TableSection(
+                title: NSLocalizedString("Already in your words", comment: "Section header"),
+                rows: usages.map(Row.usage)))
         }
-        showingRecents = typed.trimmingCharacters(in: .whitespaces).isEmpty
-        candidates = showingRecents ? suggestions.recents : suggestions.completions(for: typed)
+
+        if let suggestions {
+            let isBlank = typed.trimmingCharacters(in: .whitespaces).isEmpty
+            let words = isBlank ? suggestions.recents : suggestions.completions(for: typed)
+            if !words.isEmpty {
+                rebuilt.append(TableSection(
+                    title: isBlank
+                        ? NSLocalizedString("Recent", comment: "Section header")
+                        : NSLocalizedString("Suggestions", comment: "Section header"),
+                    rows: words.map(Row.candidate)))
+            }
+        }
+
+        // Empty sections are dropped rather than shown headerless, so the grouped style
+        // does not reserve space for a list that is not there.
+        sections = rebuilt
         tableView.reloadData()
     }
 
-    /// Sections, in the order they earn their place: what you already have, then what you
-    /// might be typing.
-    private enum Section: Int, CaseIterable { case existing, candidates }
-
-    private func rows(in section: Section) -> Int {
-        switch section {
-        case .existing: return usages.count
-        case .candidates: return candidates.count
-        }
+    private func row(at indexPath: IndexPath) -> Row? {
+        guard indexPath.section < sections.count,
+              indexPath.row < sections[indexPath.section].rows.count else { return nil }
+        return sections[indexPath.section].rows[indexPath.row]
     }
 
     // MARK: - Committing
@@ -373,32 +401,42 @@ final class WordInputViewController: UITableViewController {
 
     // MARK: - Candidates
 
-    override func numberOfSections(in tableView: UITableView) -> Int { candidates.isEmpty ? 0 : 1 }
+    override func numberOfSections(in tableView: UITableView) -> Int { sections.count }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        candidates.count
+        section < sections.count ? sections[section].rows.count : 0
     }
 
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        showingRecents
-            ? NSLocalizedString("Recent", comment: "Section header: recently added words (word picker)")
-            : NSLocalizedString("Suggestions", comment: "Section header: word-completion suggestions (word picker)")
+        section < sections.count ? sections[section].title : nil
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        if Section(rawValue: indexPath.section) == .existing {
-            return usageCell(usages[indexPath.row])
+        switch row(at: indexPath) {
+        case .usage(let usage):
+            return usageCell(usage)
+        case .candidate(let word):
+            let cell = tableView.dequeueReusableCell(withIdentifier: "candidate", for: indexPath)
+            cell.textLabel?.attributedText = highlighted(word)
+            cell.textLabel?.font = .preferredFont(forTextStyle: .body)
+            cell.textLabel?.adjustsFontForContentSizeCategory = true
+            cell.selectionStyle = .default
+            // The accessory looks the word up; selecting the row chooses it. Two different
+            // actions, which is why one is a button and not a second tap target.
+            cell.accessoryType = .detailButton
+            return cell
+        case nil:
+            // Unreachable while the counts come from `sections`, and cheaper than a trap if
+            // that ever stops being true.
+            return UITableViewCell()
         }
-        let cell = tableView.dequeueReusableCell(withIdentifier: "candidate", for: indexPath)
-        cell.textLabel?.attributedText = highlighted(candidates[indexPath.row])
-        cell.textLabel?.font = .preferredFont(forTextStyle: .body)
-        cell.textLabel?.adjustsFontForContentSizeCategory = true
-        // The accessory looks the word up; selecting the row chooses it. Two different
-        // actions, which is why one is a button and not a second tap target on the label.
-        cell.accessoryType = .detailButton
-        return cell
     }
 
+    /// The existing-words rows show information and nothing else.
+    ///
+    /// Not selectable, on the lesson from the search screen: a row that looked like a hint
+    /// was tappable, and tapping it filed the word as its own translation. A hint that can
+    /// be acted on by accident is worse than no hint.
     /// Tints the part already typed, so it is obvious what each candidate adds.
     private func highlighted(_ candidate: String) -> NSAttributedString {
         let attributed = NSMutableAttributedString(string: candidate)
@@ -408,11 +446,6 @@ final class WordInputViewController: UITableViewController {
         return attributed
     }
 
-    /// The existing-words rows show information and nothing else.
-    ///
-    /// Not selectable, on the lesson from the search screen: a row that looked like a hint
-    /// was tappable, and tapping it filed the word as its own translation. A hint that can
-    /// be acted on by accident is worse than no hint.
     private func usageCell(_ usage: Lexicon.TermUsage) -> UITableViewCell {
         let cell = UITableViewCell(style: .subtitle, reuseIdentifier: nil)
         cell.selectionStyle = .none
@@ -434,17 +467,17 @@ final class WordInputViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard Section(rawValue: indexPath.section) == .candidates else { return }
+        guard case .candidate(let word) = row(at: indexPath) else { return }
         tableView.deselectRow(at: indexPath, animated: true)
-        field.text = candidates[indexPath.row]
+        field.text = word
         refreshCandidates()
         commit()
     }
 
     override func tableView(_ tableView: UITableView,
                             accessoryButtonTappedForRowWith indexPath: IndexPath) {
-        guard Section(rawValue: indexPath.section) == .candidates else { return }
-        lookUp(term: candidates[indexPath.row], sender: self)
+        guard case .candidate(let word) = row(at: indexPath) else { return }
+        lookUp(term: word, sender: self)
     }
 }
 
