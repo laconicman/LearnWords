@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleExecutable</key>
@@ -39,8 +41,6 @@
 	<string>Speech recognition will be used to test your pronunciation</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
-	<!-- iOS 12 loads the root UI from this storyboard (AppDelegate owns the window).
-	     iOS 13+ ignores this key and uses UIApplicationSceneManifest below instead. -->
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
 	<key>UIApplicationSceneManifest</key>
@@ -60,12 +60,6 @@
 			</array>
 		</dict>
 	</dict>
-	<!-- CloudKit mirroring subscribes to database changes and expects the resulting
-	     silent pushes; without this key it logs "BUG IN CLIENT OF CLOUDKIT" on every
-	     launch and sync falls back to launch/foreground/schedule polling. Delivery also
-	     needs the Push Notifications capability (aps-environment), which lives in
-	     Signing & Capabilities because it changes the App ID — see docs/CloudKitSetup.md.
-	     No app code is required: NSPersistentCloudKitContainer owns the subscription. -->
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>

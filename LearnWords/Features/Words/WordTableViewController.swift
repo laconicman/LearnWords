@@ -118,20 +118,88 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
             context: context,
             title: NSLocalizedString("Add meaning", comment: "Screen title")) { [weak self] meaning in
             guard let self else { return }
-            do {
-                try self.lexicon.addSense(to: set.id,
-                                          terms: [Term.Draft(word, in: pair.secondary),
-                                                  Term.Draft(meaning, in: pair.primary)])
-                self.reload()
-            } catch {
-                debugLog("Could not add \(word): \(error)")
-            }
+            self.storePair(word, meaning: meaning, in: set, pair: pair)
         }
         guard let navigation = navigationController else { return }
         var stack = navigation.viewControllers
         if stack.last is WordInputViewController { stack.removeLast() }
         stack.append(screen)
         navigation.setViewControllers(stack, animated: true)
+    }
+
+    /// Stores the pair, unless the word is already in the library — in which case the
+    /// learner decides what "again" meant.
+    ///
+    /// The store deduplicates *words*: adding "bear" twice links the existing row rather
+    /// than making a twin. It does not deduplicate **meanings**, so adding bear/медведь
+    /// twice produced two meanings sharing both words — one word listed twice, with its
+    /// review history split between them. Nothing below the UI can tell a mistake from a
+    /// word that genuinely has two meanings, so the question is asked here and the store
+    /// stays free of policy.
+    private func storePair(_ word: String, meaning: String, in set: WordSet, pair: LanguagePair) {
+        let existing = (try? lexicon.usages(ofTerm: word, in: pair.secondary)) ?? []
+        guard let clash = existing.first else {
+            return commitPair(word, meaning: meaning, in: set, pair: pair)
+        }
+        askAboutDuplicate(word, meaning: meaning, in: set, pair: pair, existing: clash)
+    }
+
+    private func commitPair(_ word: String, meaning: String, in set: WordSet, pair: LanguagePair) {
+        do {
+            try lexicon.addSense(to: set.id,
+                                 terms: [Term.Draft(word, in: pair.secondary),
+                                         Term.Draft(meaning, in: pair.primary)])
+            reload()
+        } catch {
+            debugLog("Could not add \(word): \(error)")
+        }
+    }
+
+    /// Three answers, because "you already have this" has three sensible resolutions and
+    /// silently picking one is how the duplicates appeared.
+    private func askAboutDuplicate(_ word: String,
+                                   meaning: String,
+                                   in set: WordSet,
+                                   pair: LanguagePair,
+                                   existing: Lexicon.TermUsage) {
+        let known = existing.translations.joined(separator: ", ")
+        let alert = UIAlertController(
+            title: String(format: NSLocalizedString("“%@” is already in your words",
+                                                    comment: "Alert title; the word"), word),
+            message: known.isEmpty
+                ? NSLocalizedString("You already have this word.", comment: "Alert message")
+                : String(format: NSLocalizedString("You already have it as “%@”.",
+                                                   comment: "Alert message; existing translations"),
+                         known),
+            preferredStyle: .alert)
+
+        // Replaces what the existing meaning says while keeping its identity — and so its
+        // whole review history, which delete-and-re-add would throw away.
+        alert.addAction(UIAlertAction(
+            title: NSLocalizedString("Replace meaning", comment: "AlertAction title"),
+            style: .default) { [weak self] _ in
+                guard let self else { return }
+                do {
+                    try self.lexicon.replaceTerms(ofSense: existing.senseID,
+                                                  in: pair.primary,
+                                                  with: [Term.Draft(meaning, in: pair.primary)])
+                    self.reload()
+                } catch {
+                    debugLog("Could not replace the meaning of \(word): \(error)")
+                }
+            })
+
+        // A word genuinely can mean two things — the case the store cannot tell from a
+        // mistake, which is exactly why it asks rather than guesses.
+        alert.addAction(UIAlertAction(
+            title: NSLocalizedString("Add as another meaning", comment: "AlertAction title"),
+            style: .default) { [weak self] _ in
+                self?.commitPair(word, meaning: meaning, in: set, pair: pair)
+            })
+
+        alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: "AlertAction title"),
+                                      style: .cancel))
+        present(alert, animated: true)
     }
 
     @IBAction func unwindSegue(segue: UIStoryboardSegue) {}

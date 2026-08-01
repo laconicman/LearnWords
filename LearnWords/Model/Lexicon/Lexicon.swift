@@ -37,6 +37,12 @@ final class Lexicon {
 
     private var viewContext: NSManagedObjectContext { persistence.viewContext }
 
+    /// Reads terms on the view context, for the one query that lives in another file.
+    /// Narrower than exposing the context itself, which would let anything read anything.
+    func fetchTerms(_ request: NSFetchRequest<CDTerm>) throws -> [CDTerm] {
+        try viewContext.fetch(request)
+    }
+
     // MARK: - Word sets
 
     /// Every set, newest first.
@@ -210,6 +216,30 @@ final class Lexicon {
         try write { context in
             let trimmed = note?.trimmingCharacters(in: .whitespacesAndNewlines)
             try Self.sense(id, in: context).note = (trimmed?.isEmpty == false) ? trimmed : nil
+        }
+    }
+
+    /// Swaps every word a meaning has in one language for a new set of them.
+    ///
+    /// The meaning keeps its identity, so its review history survives — which is the whole
+    /// reason this exists rather than the caller deleting and re-adding. Words left with no
+    /// meaning are not removed: another meaning may use them, and `deleteOrphanedSenses`
+    /// is the deliberate place for collecting what nothing points at.
+    @discardableResult
+    func replaceTerms(ofSense senseID: UUID,
+                      in language: String,
+                      with drafts: [Term.Draft]) throws -> Sense {
+        try write { context in
+            let sense = try Self.sense(senseID, in: context)
+            let code = LanguageCode.canonical(language)
+            for term in sense.terms where LanguageCode.canonical(term.language?.code ?? "") == code {
+                sense.removeTerm(term)
+            }
+            var languages = LanguageCache()
+            for draft in drafts {
+                sense.addTerm(try Self.findOrCreateTerm(draft, languages: &languages, in: context))
+            }
+            return Sense(sense)
         }
     }
 

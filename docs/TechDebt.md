@@ -1112,3 +1112,20 @@ confidence — the existing `pulse` then `spray` for a confident match, somethin
 hesitant one — plus a colour or a meter on the recognised text. Wants a device to tune,
 since the confidence range in real speech is not the range in a quiet room.
 Maybe set logging points ask the operator to execute some phonetic exercises and provide their log.
+
+## TD-39 — The add-word hint and the meaning editor still allow duplicates
+
+`Lexicon.usages(ofTerm:in:)` answers "do I already have this word?", and the add-word flow
+now asks it before committing. Two halves of the owner's request remain:
+
+* **The hint while typing.** The first add-word screen should show a word's existing
+  meanings as it is entered — footnote style, with the set name smaller and truncatable when
+  it is a different set. The lookup exists and is tested; only the presentation is missing,
+  and it is the half that prevents the mistake rather than catching it.
+* **The meaning editor.** Renaming a word there can still collide with an existing one, and
+  it does not ask. It should reuse the same three-answer alert rather than grow its own.
+
+**Cost:** the guard covers the commonest path and not every path, which is the shape of bug
+that reads as inconsistent behaviour. **Discharge:** inject the lookup into
+`WordInputViewController` as a closure — it must stay store-free — and route the editor's
+rename through the same decision the add flow uses.
