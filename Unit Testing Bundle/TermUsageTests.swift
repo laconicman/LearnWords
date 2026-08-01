@@ -199,9 +199,8 @@ struct TermUsageTests {
 
     // MARK: - Orphans
 
-    /// Deleting a word takes its meaning out of the set without deleting it, so orphans
-    /// accumulate until something collects them (TD-26). They are invisible everywhere else
-    /// in the app, and the hint showed one as a translation with no set beside it.
+    /// Removal now deletes when the set was the last one holding the meaning, so this is
+    /// belt and braces: whatever route strands a meaning, the hint must not name it.
     @Test func aMeaningInNoSetIsNotAUsage() throws {
         let lexicon = makeLexicon()
         let set = try makeSet(lexicon, named: "Animals")
@@ -224,5 +223,58 @@ struct TermUsageTests {
         let usages = try lexicon.usages(ofTerm: "bear", in: "en")
         #expect(usages.count == 1)
         #expect(usages.first?.translations == ["нести"])
+    }
+
+    // MARK: - Removal
+
+    /// The rule the orphan problem was traded for: a meaning nothing can reach is deleted
+    /// rather than kept, because nothing in the app could ever show it again.
+    @Test func removingFromTheLastSetDeletesTheMeaning() throws {
+        let lexicon = makeLexicon()
+        let set = try makeSet(lexicon, named: "Animals")
+        let sense = try add("bear", "медведь", to: set, in: lexicon)
+
+        try lexicon.removeSense(sense.id, from: set.id)
+
+        #expect(try lexicon.sense(sense.id) == nil)
+    }
+
+    // The "still held by another set" branch has no test: nothing in the app yet puts one
+    // meaning in two sets, so it is reachable only through a CloudKit merge. Asserting it
+    // would mean inventing API for the test's benefit, which is worse than saying so.
+
+    /// Deleting the meaning must not delete the record that the work happened: the events
+    /// carry text snapshots and a nullify relationship precisely so they outlive it.
+    @Test func removingAMeaningKeepsItsReviewEvents() throws {
+        let lexicon = makeLexicon()
+        let set = try makeSet(lexicon, named: "Animals")
+        let sense = try add("bear", "медведь", to: set, in: lexicon)
+
+        let session = try PracticeSession.start(
+            .dictation, in: set.id,
+            languages: LanguagePair(primary: "ru", secondary: "en", showsSecondaryAsPrompt: true),
+            lexicon: lexicon, scope: .everything(includingLearned: true))
+        _ = session.nextQuestion()
+        try session.record(.correctVerbatim)
+
+        try lexicon.removeSense(sense.id, from: set.id)
+
+        let logged = try lexicon.history(ofSession: session.id)
+        #expect(logged.count == 1, "the log still records that the work happened")
+        #expect(logged.first?.prompt == "bear", "and what it was about")
+    }
+
+    /// The collector no longer spares meanings with history — that condition protected
+    /// nothing, since a meaning in no set contributes to no index.
+    @Test func theCollectorTakesOrphansWithHistoryToo() throws {
+        let lexicon = makeLexicon()
+        let set = try makeSet(lexicon, named: "Animals")
+        try add("bear", "медведь", to: set, in: lexicon)
+
+        // Deleting the set strands its meanings without deleting them.
+        try lexicon.deleteWordSet(set.id)
+
+        #expect(try lexicon.deleteOrphanedSenses() == 1)
+        #expect(try lexicon.deleteOrphanedSenses() == 0, "and nothing is left to collect")
     }
 }

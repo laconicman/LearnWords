@@ -608,6 +608,32 @@ assertion is a plain `defer`.
 design one — the read/write boundary and the value types either side of it stay exactly as
 they are. Migration is mechanical, which is the point of having drawn the boundary there.
 
+## Decision: a meaning nothing can reach is deleted, not kept
+
+**Decision (owner, 2026-08-01).** Removing a word from its last set **deletes** the meaning.
+Meanings stranded by other paths are collected at launch, whether or not they carry history.
+
+**What this reverses.** The earlier rule kept them, reasoning that a review history is
+evidence of work done and the effort index must not fall because a set was reorganised. The
+flaw is that such a meaning is **unreachable**: nothing in the app can list, practise,
+search or restore it, and every index is built from the meanings *in a set*, so it
+contributes to nothing. Keeping it preserved no work — it leaked rows, and eventually leaked
+one into the duplicate hint.
+
+**The owner's argument, which is the deciding one:** even in principle the retained history
+could not be justified, because there is nothing left to say *which definition* the work was
+against. Effort you cannot attribute is not effort you can report.
+
+**The log is not what is being deleted.** `ReviewEvent.synset` is a **nullify** relationship
+and every event carries text snapshots of the prompt, the answer and both languages — the
+decisions in *"a manual reset appends a marker"* and *"the lexical model"* were made for
+exactly this. The record that the work happened survives; only its attribution to a meaning
+goes.
+
+**Cost (accepted).** A learner who deletes a word and re-adds it starts its history over.
+That was already true in practice — nothing could reattach an orphan — so the change makes
+the store honest about it rather than changing what the learner experiences.
+
 ## Decision: a manual reset appends a marker; it never deletes history
 
 **Decision (2026-07-26).** "Reset progress" on a word appends a `ReviewEvent` of kind

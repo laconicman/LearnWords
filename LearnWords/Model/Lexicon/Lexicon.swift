@@ -273,10 +273,29 @@ final class Lexicon {
         }
     }
 
-    /// Takes a meaning out of one set without deleting it — it may live in others.
+    /// Takes a meaning out of a set — and deletes it if that was the last set holding it.
+    ///
+    /// **Changed 2026-08-01 (owner).** It used to leave the meaning behind, on the reasoning
+    /// that its review history was evidence of work done. The flaw is that nothing in the
+    /// app can reach such a meaning: it cannot be listed, practised, searched or restored,
+    /// so keeping it preserved no work — it leaked rows, and eventually leaked one into the
+    /// duplicate hint, which was the first screen to look words up by *word* rather than by
+    /// set.
+    ///
+    /// The history is not destroyed. `ReviewEvent.synset` is a **nullify** relationship and
+    /// every event carries text snapshots of the prompt, the answer and both languages, so
+    /// the log keeps its record of what was practised. What is lost is the attribution of
+    /// that work to a meaning — and the owner's argument is that the attribution was never
+    /// justifiable once the meaning became invisible: there is nothing left to say *which
+    /// definition* the work was against.
     func removeSense(_ senseID: UUID, from setID: UUID) throws {
         try write { context in
-            try Self.set(setID, in: context).removeSense(try Self.sense(senseID, in: context))
+            let sense = try Self.sense(senseID, in: context)
+            try Self.set(setID, in: context).removeSense(sense)
+            // Still in another set: the meaning is reachable there and stays.
+            if sense.sets.isEmpty {
+                context.delete(sense)
+            }
         }
     }
 
@@ -442,15 +461,24 @@ final class Lexicon {
 
     // MARK: - Housekeeping
 
-    /// Deletes meanings that belong to no set **and** carry no history.
+    /// Deletes every meaning that belongs to no set.
     ///
-    /// Explicit, never automatic: a sense with events is evidence of work done, and the
-    /// effort index must not fall because a set was reorganised.
+    /// **No longer spares those with history.** That condition existed to protect the
+    /// effort index from a set being reorganised, but it protected nothing: a meaning in no
+    /// set contributes to no index, because every index is built from the meanings *in a
+    /// set*. All it did was guarantee that the orphans which mattered least were the ones
+    /// that accumulated forever.
+    ///
+    /// The events survive the deletion — `ReviewEvent.synset` nullifies — so the log still
+    /// records that the work happened. See `removeSense(_:from:)`.
+    ///
+    /// Now that removal deletes as it goes, this is a collector for what other paths leave
+    /// behind: sets deleted wholesale, and meanings a CloudKit merge strands.
     @discardableResult
     func deleteOrphanedSenses() throws -> Int {
         try write { context in
             let request = CDSynset.fetchRequest()
-            request.predicate = NSPredicate(format: "sets.@count == 0 AND events.@count == 0")
+            request.predicate = NSPredicate(format: "sets.@count == 0")
             let orphans = try context.fetch(request)
             orphans.forEach(context.delete)
             return orphans.count

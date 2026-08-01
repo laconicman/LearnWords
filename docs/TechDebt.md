@@ -854,21 +854,18 @@ merge — assigning an id to any row missing one before it sorts. That turns a f
 into self-healing, in the file that already owns post-merge repair. Cheap enough to do
 before the two-device test; not urgent enough to block it.
 
-## TD-26 — Orphan collection has no way to run — **surfaced in the UI, 2026-08-01**
+## TD-26 — Orphan meanings — **resolved (2026-08-01)**
 
-Deleting a word from the list calls `removeSense(_:from:)`, which takes the meaning out of
-the set without deleting it — its review history is evidence of work done. Nothing calls
-`deleteOrphanedSenses`, so orphans accumulate silently. The duplicate hint made that
-visible: it listed an orphaned meaning as a translation with **no set name beside it**,
-because there was no set to name. `usages` now skips them, which is right for the hint and
-does nothing about the accumulation.
+Deleting a word took its meaning out of the set without deleting it, on the reasoning that
+its review history was evidence of work done. Nothing collected the orphans, so they
+accumulated silently — and the duplicate hint eventually surfaced one, being the first
+screen to look words up by *word* rather than by set.
 
-`deleteOrphanedSenses` and `deleteOrphanedTerms` are "explicit, never automatic" by design
-(docs/Design.md), and nothing in the app is that explicit thing: no screen calls either.
-Rows accumulate — a meaning removed from its last set, a synonym unlinked in the editor —
-and only a test has ever collected them. **Cost:** slow growth of dead rows, which sync
-then copies to every device. **Discharge:** one row in Settings ("Clean up unused words"),
-reporting how many it removed, so the user chooses rather than the app guessing.
+**Resolved by deciding the retention was never justified** (owner). See
+[Design](Design.md) § "a meaning nothing can reach is deleted". Removal now deletes when the
+set was the last one holding the meaning; `deleteOrphanedSenses` collects what other paths
+strand and no longer spares those with history; `Library.prepareForLaunch` runs it once per
+launch.
 
 ## TD-27 — Constraint break from the system dictionary's own navigation bar
 

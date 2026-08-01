@@ -212,21 +212,30 @@ struct LexiconTests {
 
     /// Orphan collection is explicit and refuses to touch anything with history — the
     /// effort index must not fall because a set was reorganised.
-    @Test func orphanCollectionSparesMeaningsThatCarryHistory() throws {
+    /// **Reversed 2026-08-01 (owner).** This used to assert that a meaning with history was
+    /// spared. That rule protected nothing: a meaning in no set contributes to no index,
+    /// because every index is built from the meanings *in* a set — so all it guaranteed was
+    /// that the orphans which mattered least accumulated forever.
+    ///
+    /// What must survive is the *log*, and it does: `ReviewEvent.synset` nullifies and each
+    /// event carries text snapshots, so the record of what was practised outlives the
+    /// meaning it was practised against.
+    @Test func orphanCollectionTakesMeaningsWithHistoryButKeepsTheLog() throws {
         let lexicon = makeLexicon()
         let set = try lexicon.addWordSet(named: "Animals")
-        let plain = try lexicon.addSense(to: set.id, terms: [Term.Draft("camel", in: "en"),
-                                                             Term.Draft("верблюд", in: "ru")])
+        try lexicon.addSense(to: set.id, terms: [Term.Draft("camel", in: "en"),
+                                                 Term.Draft("верблюд", in: "ru")])
         let practised = try lexicon.addSense(to: set.id, terms: [Term.Draft("bear", in: "en"),
                                                                  Term.Draft("медведь", in: "ru")])
-        try lexicon.record(draft(sense: practised, set: set))
+        let event = draft(sense: practised, set: set)
+        try lexicon.record(event)
 
         try lexicon.deleteWordSet(set.id)
         let collected = try lexicon.deleteOrphanedSenses()
 
-        #expect(collected == 1, "only the one with no history")
-        #expect(try lexicon.history(ofSense: practised.id).count == 1)
-        _ = plain
+        #expect(collected == 2, "both, now that history no longer buys a reprieve")
+        #expect(try lexicon.history(ofSession: event.sessionID).count == 1,
+                "the log still records that the work happened")
     }
 
     // MARK: - Review log
