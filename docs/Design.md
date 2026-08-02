@@ -634,6 +634,40 @@ goes.
 That was already true in practice — nothing could reattach an orphan — so the change makes
 the store honest about it rather than changing what the learner experiences.
 
+## Open question: is a meaning in more than one set? — **decide before the CloudKit deploy**
+
+**Why it is open.** `deleteOrphanedSenses` exists because Core Data cannot express the rule
+we want. Its four deletion rules are No Action, Nullify, Cascade and Deny; none of them is
+*reference counting*. `Cascade` on `WordSet.synsets` deletes a meaning when **any** holding
+set is deleted, even if another set still holds it — so with a many-to-many, "delete when
+the last set lets go" cannot be a schema rule and something has to sweep.
+
+**Unless the relationship is to-one.** If a meaning belonged to exactly one set,
+`Cascade` would do the entire job in the schema: the explicit delete in `removeSense` and
+the collector would both disappear, and orphans would become unrepresentable rather than
+merely collected.
+
+| | Many-to-many (today) | To-one |
+|---|---|---|
+| Orphans | swept, by code that must keep working | impossible by construction |
+| "Favourites"/"Hard words" holding a meaning already in another set | natural | needs a duplicate meaning, with split history |
+| Cost of being wrong | a sweep runs forever for nothing | a feature needs a schema change after deploy |
+
+**What is actually shared today.** The redesign specified sharing the *`Term`* — the atomic
+word — which stays many-to-many with meanings and is doing real work. A whole *meaning* in
+two sets is a different claim, and **nothing in the app yet creates one**: the branch is
+reachable only through a CloudKit merge.
+
+**Recommendation: keep many-to-many, keep the collector.** A set like "Hard words" holding
+the same meaning as "Animals", sharing one history rather than forking it, is the obvious
+next feature and the many-to-many is what makes it possible. The collector is eight lines
+run once per launch — a small, visible price for a model that can say what it means.
+
+**But decide deliberately, and decide now.** CloudKit's production schema is immutable once
+deployed, and the deploy is on the pre-ship list. Narrowing to to-one is free today and
+impossible afterwards. This belongs beside the three enrichment additions in
+[Handoff](Handoff.md) § *Before shipping*.
+
 ## Decision: a manual reset appends a marker; it never deletes history
 
 **Decision (2026-07-26).** "Reset progress" on a word appends a `ReviewEvent` of kind

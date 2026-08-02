@@ -53,20 +53,24 @@ column as the first.
    in the word editor. Both need a device and a human: the harness cannot operate a
    `UISwitch` (TD-29), and no simulator has a microphone worth testing against. Everything
    up to the system boundary is covered; nothing past it is.
-2. **Decide the three schema additions** — `Variety`, `Pronunciation`, `Tag.category` from
+2. **Decide whether a meaning belongs to one set or many** — see [Design](Design.md)
+   § *is a meaning in more than one set?*. To-one would make orphans unrepresentable and
+   retire `deleteOrphanedSenses`; many-to-many keeps a shared "Hard words" set possible.
+   Free today, impossible after the deploy.
+3. **Decide the three schema additions** — `Variety`, `Pronunciation`, `Tag.category` from
    [Enrichment](Enrichment.md) — **before** the production deploy. CloudKit can add record
    types and fields to production but never remove or retype them, so deferring means
    `Term.transcription` is vestigial forever. Deferring is allowed; deferring by accident
    is not.
-3. **Two-device retest** of the deferred seed and live refresh. Delete the app from both
+4. **Two-device retest** of the deferred seed and live refresh. Delete the app from both
    devices and reset the CloudKit Development environment first, so double-seeded
    duplicates are not mistaken for a regression.
-4. **Deploy Schema Changes** in the CloudKit Console — *after* re-running
+5. **Deploy Schema Changes** in the CloudKit Console — *after* re-running
    `-LWInitializeCloudKitSchema 1` and confirming the exported schema still lists all
    `CD_` types. Irreversible.
-5. **Push Notifications capability** for timely sync ([CloudKitSetup](CloudKitSetup.md)).
+6. **Push Notifications capability** for timely sync ([CloudKitSetup](CloudKitSetup.md)).
    Unrelated to the local reminders above, which need no capability.
-6. **TD-24** — extension `CFBundleVersion` is `1` against the app's `7`. App Store Connect
+7. **TD-24** — extension `CFBundleVersion` is `1` against the app's `7`. App Store Connect
    rejects that at submission.
 
 ## Candidate forks
