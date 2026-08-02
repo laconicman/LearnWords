@@ -94,9 +94,12 @@ final class WordInputViewController: UITableViewController {
     private let field = UITextField()
     private let dictationButton = UIButton(type: .system)
 
-    /// Set while dictation is running, so a partial transcription can replace the last one
-    /// instead of appending to it.
-    private var isDictating = false {
+    /// What the microphone is doing, as opposed to what has been asked of it.
+    ///
+    /// Was a `Bool` set the instant the button was tapped, which made the button red about
+    /// a second before anything was being recorded (TD-42). The wait is inherent — see
+    /// `DictationController.Activity` — so the only honest fix is to show it.
+    private var dictation: DictationController.Activity = .idle {
         didSet { updateDictationButton() }
     }
 
@@ -165,13 +168,13 @@ final class WordInputViewController: UITableViewController {
         // Leaving with the microphone open would keep the audio session — and the recording
         // indicator — alive behind an unrelated screen.
         DictationController.shared.stop()
-        isDictating = false
+        dictation = .idle
         cancelUsageLookup()
     }
 
     // MARK: - The input row
 
-    /// A text field with the dictation button as its right view. The field is in a table
+    /// A text field with the dictation button as its left view. The field is in a table
     /// header rather than a cell so it never scrolls away from the candidates it filters.
     private func buildInputRow() {
         field.borderStyle = .roundedRect
@@ -188,17 +191,38 @@ final class WordInputViewController: UITableViewController {
         // buttons and 44pt rows. A scaled floor keeps it in the same family and grows with
         // Dynamic Type; `greaterThanOrEqual` so a larger intrinsic height still wins.
         field.heightAnchor.constraint(
-            greaterThanOrEqualToConstant:
-                UIFontMetrics.default.scaledValue(for: 44)).isActive = true
+            greaterThanOrEqualToConstant: Self.minimumTouchTarget).isActive = true
 
-        dictationButton.setImage(.systemImage("mic.circle.fill"), for: .normal)
-        dictationButton.tintColor = .lwAccent
         dictationButton.addTarget(self, action: #selector(dictationTapped), for: .touchUpInside)
-        dictationButton.accessibilityLabel = NSLocalizedString("Dictate", comment: "Button label")
-        dictationButton.isHidden = purpose.language == nil    // nothing to recognise a note in
-        dictationButton.sizeToFit()
-        field.rightView = dictationButton
-        field.rightViewMode = .always
+        // Image, tint and label all follow the state, so they are set in exactly one place.
+        updateDictationButton()
+        // **The glyph is sized, then the button is sized around it.** `sizeToFit` did the
+        // reverse — it grew the button to whatever the symbol happened to be, which at the
+        // default configuration is about 50pt: a solid accent disc heavier than the Save
+        // button, and the loudest thing on a screen whose subject is the text beside it.
+        // `.body` is the field's own text style: the glyph sits inline with the word being
+        // typed, so it takes the size of that word rather than a size of its own. A text
+        // style rather than a point size also keeps it tracking Dynamic Type.
+        if #available(iOS 13, *) {
+            dictationButton.setPreferredSymbolConfiguration(
+                UIImage.SymbolConfiguration(textStyle: .body), forImageIn: .normal)
+        }
+        // The square is the touch target, and the padding is the difference between it and
+        // the glyph — a derived gap rather than a chosen one, so it cannot drift out of step
+        // with either the type scale or the target.
+        dictationButton.frame = CGRect(x: 0, y: 0,
+                                       width: Self.minimumTouchTarget,
+                                       height: Self.minimumTouchTarget)
+        // **The leading side, because the clear button owns the trailing one.** A `rightView`
+        // and the clear button occupy the same place and the `rightView` wins silently, so
+        // the field could not be emptied except by selecting and deleting (TD-41).
+        // Omitted rather than hidden where there is no language: nothing could recognise a
+        // note, and an installed-but-invisible view is a question the next reader has to
+        // answer.
+        if purpose.language != nil {
+            field.leftView = dictationButton
+            field.leftViewMode = .always
+        }
 
         let stack = UIStackView(arrangedSubviews: contextViews() + [field])
         stack.axis = .vertical
@@ -227,9 +251,30 @@ final class WordInputViewController: UITableViewController {
         tableView.tableHeaderView = header
     }
 
+    /// The smallest square a finger reliably hits, scaled with Dynamic Type.
+    ///
+    /// Named because three things now depend on it — the field's height floor, the
+    /// dictation button and the hint's lookup button — and three literals that happen to
+    /// agree are not the same as one rule. 44pt is Apple's, not a taste: see the HIG's
+    /// [Layout](https://developer.apple.com/design/human-interface-guidelines/layout) guidance.
+    private static var minimumTouchTarget: CGFloat {
+        UIFontMetrics.default.scaledValue(for: 44)
+    }
+
+    /// The slab's own padding, and the gap between its text and its button.
+    ///
+    /// One token rather than the four literals it replaced: they were never four decisions.
+    private static let slabPadding = UIEdgeInsets(top: 10, left: 12, bottom: 10, right: 12)
+
     /// The pinned term: a caption and the word, in a tinted slab so it reads as *context*
     /// rather than as another thing to fill in. Deliberately not a table row — nothing
     /// here is selectable, and a row invites a tap.
+    ///
+    /// **It carries a lookup button** (TD-44). The learner may well have typed the word
+    /// without looking it up, and this screen is where they have to say what it *means* —
+    /// which is exactly the moment the definition is worth having. The ⓘ is the same
+    /// control the suggestion rows below use for the same job, so the affordance is
+    /// learned once.
     private func contextViews() -> [UIView] {
         guard let context else { return [] }
 
@@ -254,21 +299,63 @@ final class WordInputViewController: UITableViewController {
         // A plain view behind the stack rather than the stack's own `backgroundColor`,
         // which `UIStackView` ignores below iOS 14 — at the 12.1 floor the slab would
         // simply not be there, and the whole point of it is being visible.
+        // The system ⓘ, which is what `.detailButton` draws on the suggestion rows below.
+        // Never stretched: the text takes the width, the button takes its own.
+        // `.detailDisclosure` rather than an `info.circle` image: it is the one that still
+        // draws something at the iOS 12 floor, where `UIImage.systemImage` returns `nil`.
+        let lookUpButton = UIButton(type: .detailDisclosure)
+        lookUpButton.tintColor = .lwAccent
+        // Sized by the same rule as the microphone opposite it — left to itself the symbol
+        // renders about 50pt, twice the ⓘ on the rows below, which reads as a different
+        // control rather than the same one.
+        if #available(iOS 13, *) {
+            lookUpButton.setPreferredSymbolConfiguration(
+                UIImage.SymbolConfiguration(textStyle: .body), forImageIn: .normal)
+        }
+        lookUpButton.translatesAutoresizingMaskIntoConstraints = false
+        lookUpButton.setContentHuggingPriority(.required, for: .horizontal)
+        lookUpButton.setContentCompressionResistancePriority(.required, for: .horizontal)
+        lookUpButton.addTarget(self, action: #selector(lookUpContext), for: .touchUpInside)
+        lookUpButton.accessibilityLabel = String(
+            format: NSLocalizedString("Look up %@", comment: "Button label; placeholder is a word"),
+            context.term)
+
+        let padding = Self.slabPadding
         let slab = UIView()
         slab.backgroundColor = UIColor.lwAccent.withAlphaComponent(0.12)
         slab.layer.cornerRadius = 10
         slab.addSubview(inner)
-        let innerTrailing = inner.trailingAnchor.constraint(equalTo: slab.trailingAnchor, constant: -12)
+        slab.addSubview(lookUpButton)
+        let innerTrailing = inner.trailingAnchor.constraint(
+            equalTo: lookUpButton.leadingAnchor, constant: -padding.right)
         innerTrailing.priority = .required - 1
         NSLayoutConstraint.activate([
-            inner.leadingAnchor.constraint(equalTo: slab.leadingAnchor, constant: 12),
+            inner.leadingAnchor.constraint(equalTo: slab.leadingAnchor, constant: padding.left),
             innerTrailing,
-            inner.topAnchor.constraint(equalTo: slab.topAnchor, constant: 10),
-            inner.bottomAnchor.constraint(equalTo: slab.bottomAnchor, constant: -10),
+            inner.topAnchor.constraint(equalTo: slab.topAnchor, constant: padding.top),
+            inner.bottomAnchor.constraint(equalTo: slab.bottomAnchor, constant: -padding.bottom),
+            lookUpButton.trailingAnchor.constraint(
+                equalTo: slab.trailingAnchor, constant: -padding.right),
+            lookUpButton.centerYAnchor.constraint(equalTo: slab.centerYAnchor),
+            // The glyph is around 22pt; the rest is reachable area, exactly as for the
+            // microphone. `greaterThanOrEqual` so a larger accessibility size still wins.
+            lookUpButton.widthAnchor.constraint(
+                greaterThanOrEqualToConstant: Self.minimumTouchTarget),
+            lookUpButton.heightAnchor.constraint(
+                greaterThanOrEqualToConstant: Self.minimumTouchTarget),
         ])
-        slab.isAccessibilityElement = true
-        slab.accessibilityLabel = "\(context.caption): \(context.term)"
+
+        // The caption and the term read as one phrase; the button is its own element. The
+        // slab therefore cannot be a single accessibility element any more — that would
+        // hide the button it now contains from VoiceOver entirely.
+        inner.isAccessibilityElement = true
+        inner.accessibilityLabel = "\(context.caption): \(context.term)"
         return [slab]
+    }
+
+    @objc private func lookUpContext() {
+        guard let context else { return }
+        lookUp(term: context.term, sender: self)
     }
 
     /// Table header views size by frame, not by constraints.
@@ -396,36 +483,53 @@ final class WordInputViewController: UITableViewController {
 
     @objc private func dictationTapped() {
         guard let language = purpose.language else { return }
-        guard !isDictating else {
+        guard dictation == .idle else {
             DictationController.shared.stop()
-            isDictating = false
+            dictation = .idle
             return
         }
 
-        isDictating = true
+        dictation = .starting
         DictationController.shared.start(
             language: language,
+            onListening: { [weak self] in self?.dictation = .listening },
             onTranscription: { [weak self] heard in
                 guard let self else { return }
                 // Replaces rather than appends: each callback carries the whole
                 // transcription so far, not the newest fragment.
                 self.field.text = heard.text
                 self.refreshCandidates()
-                if heard.isFinal { self.isDictating = false }
+                if heard.isFinal { self.dictation = .idle }
             },
             onFailure: { [weak self] failure in
-                self?.isDictating = false
+                self?.dictation = .idle
                 self?.present(failure)
             })
     }
 
+    /// Red means *listening*, and only listening.
+    ///
+    /// Grey for `starting` rather than a spinner: `beginRecording` runs on the main queue,
+    /// so an activity indicator would sit frozen through the very wait it is meant to
+    /// describe. A colour that does not need to animate tells the truth either way.
     private func updateDictationButton() {
-        let symbol = isDictating ? "mic.circle" : "mic.circle.fill"
-        dictationButton.setImage(.systemImage(symbol), for: .normal)
-        dictationButton.tintColor = isDictating ? .lwAnswerWrong : .lwAccent
-        dictationButton.accessibilityLabel = isDictating
-            ? NSLocalizedString("Stop dictating", comment: "Button label")
-            : NSLocalizedString("Dictate", comment: "Button label")
+        switch dictation {
+        case .idle:
+            dictationButton.setImage(.systemImage("mic.circle.fill"), for: .normal)
+            dictationButton.tintColor = .lwAccent
+            dictationButton.accessibilityLabel =
+                NSLocalizedString("Dictate", comment: "Button label")
+        case .starting:
+            dictationButton.setImage(.systemImage("mic.circle.fill"), for: .normal)
+            dictationButton.tintColor = .lwTextSecondary
+            dictationButton.accessibilityLabel =
+                NSLocalizedString("Starting dictation", comment: "Button label")
+        case .listening:
+            dictationButton.setImage(.systemImage("mic.circle"), for: .normal)
+            dictationButton.tintColor = .lwAnswerWrong
+            dictationButton.accessibilityLabel =
+                NSLocalizedString("Stop dictating", comment: "Button label")
+        }
     }
 
     /// Says what went wrong, and offers Settings only when Settings is genuinely the way

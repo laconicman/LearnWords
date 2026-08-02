@@ -47,6 +47,20 @@ final class DictationController {
     /// discovering it means an uncatchable `NSException` from `installTap`.
     enum DictationError: Error { case noAudioInput }
 
+    /// What the microphone is actually doing, in the vocabulary a control should show.
+    ///
+    /// **`starting` exists because it is slow and cannot be made fast.** Activating the
+    /// audio session and starting the engine are most of the delay before the first audio,
+    /// and `prewarm` deliberately cannot do either — claiming the microphone for a
+    /// recording that may never happen is exactly what a warm-up must not do, and pulling
+    /// the input node early is what made the app crash. So the wait is inherent, and a
+    /// control that goes straight from `idle` to red spends it telling the learner to speak
+    /// into a microphone that is not open yet.
+    ///
+    /// Declared here rather than in each screen because it is the *controller's* knowledge:
+    /// two surfaces show this state, and a copy each is how they drift.
+    enum Activity: Equatable { case idle, starting, listening }
+
     /// One reading of what was heard.
     ///
     /// `confidence` is the recogniser's own certainty, 0…1 — and it is **0 until
@@ -132,11 +146,16 @@ final class DictationController {
     /// Begins recognising `language`, reporting partial transcriptions as they arrive.
     ///
     /// - Parameters:
+    ///   - onListening: called once the engine is running and the microphone is genuinely
+    ///     open — the first moment a control may say it is listening. Not optional, so that
+    ///     a caller has to decide what to show while `Activity.starting` lasts rather than
+    ///     defaulting into claiming it is already recording.
     ///   - onTranscription: called repeatedly with the best transcription so far, and a
     ///     flag for whether recognition considers it final. Always on the main queue.
     ///   - onFailure: called once, and only when something went wrong. Stopping normally
     ///     is not a failure.
     func start(language: String,
+               onListening: @escaping () -> Void,
                onTranscription: @escaping (Heard) -> Void,
                onFailure: @escaping (Failure) -> Void) {
         authorize { [weak self] failure in
@@ -148,7 +167,8 @@ final class DictationController {
             }
 
             do {
-                try self.beginRecording(onTranscription: onTranscription, onFailure: onFailure)
+                try self.beginRecording(onListening: onListening,
+                                        onTranscription: onTranscription, onFailure: onFailure)
             } catch DictationError.noAudioInput {
                 onFailure(.unavailable(language: language))
             } catch {
@@ -232,7 +252,8 @@ final class DictationController {
 
     // MARK: - Recording
 
-    private func beginRecording(onTranscription: @escaping (Heard) -> Void,
+    private func beginRecording(onListening: @escaping () -> Void,
+                                onTranscription: @escaping (Heard) -> Void,
                                 onFailure: @escaping (Failure) -> Void) throws {
         task?.cancel()
         task = nil
@@ -302,6 +323,10 @@ final class DictationController {
         }
         audioEngine.prepare()
         try audioEngine.start()
+        // Everything above can fail, and until `start` returns nothing is being captured.
+        // This is the earliest honest moment — the graph is running and the tap is
+        // installed, so the next buffer is already on its way.
+        onListening()
     }
 }
 

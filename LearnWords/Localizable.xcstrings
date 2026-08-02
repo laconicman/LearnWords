@@ -1050,6 +1050,23 @@
         }
       }
     },
+    "Look up %@" : {
+      "comment" : "Button label; placeholder is a word",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Buscar %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "В словаре: %@"
+          }
+        }
+      }
+    },
     "Looks like you only have those keyboards:" : {
       "comment" : "Alert message, langID appended",
       "localizations" : {
@@ -1990,6 +2007,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Начните набирать"
+          }
+        }
+      }
+    },
+    "Starting dictation" : {
+      "comment" : "Button label",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Iniciando dictado"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Запуск диктовки"
+          }
+        }
+      }
+    },
+    "Starting…" : {
+      "comment" : "Button title while the microphone opens",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Empezando…"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Запуск…"
           }
         }
       }

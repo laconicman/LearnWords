@@ -1183,13 +1183,121 @@ floor allows it".
 moment anything reads off the main queue — an import, an enrichment pass, a background
 refresh — which is exactly the work the roadmap is heading towards.
 
-## TD-41 — The dictation button hides the text field's clear button
+## TD-41 — The dictation button hides the text field's clear button — **resolved (2026-08-02)**
 
-`WordInputViewController` sets both `clearButtonMode = .whileEditing` and a dictation
+`WordInputViewController` set both `clearButtonMode = .whileEditing` and a dictation
 button as the field's `rightView`. They occupy the same place, and the `rightView` wins —
-so there is no way to clear the field except selecting and deleting.
+so there was no way to clear the field except selecting and deleting.
 
-**Cost:** small but constant, on the screen a learner uses most. **Discharge:** move
-dictation to the field's `leftView`, or into an input accessory above the keyboard where it
-is closer to the thumbs anyway. Noticed while verifying the crash fix; not fixed there
-because the two changes have nothing to do with each other.
+**Dictation moved to the field's `leftView`** — the first of the two discharges named here.
+The input accessory was the more interesting option and the wrong one: an accessory lives
+with the keyboard, and this screen sets `keyboardDismissMode = .interactive`, so swiping the
+keyboard away to read the candidate list would take the microphone with it. The button
+exists precisely because *"a control in the interface says the capability exists"*; one that
+leaves with the keyboard is the keyboard's microphone again, in a costlier form.
+
+The button is now **omitted rather than hidden** where there is no language to recognise it
+in. `isHidden` left an installed control that could not act, and raised a question — does a
+hidden side view still inset the text? — that not installing it does not.
+
+`WordInputFieldTests` asserts the geometry rather than the assignment: the rects UIKit
+reports for the clear button and the dictation button must not intersect. Confirmed to fail
+against the old arrangement.
+
+**The screenshot found what the diff could not.** Moving the button revealed that its size
+was never chosen: `sizeToFit` grew the button to whatever the symbol happened to be, which
+at the default configuration is about **50pt** — a solid accent disc heavier than the Save
+button, sitting flush against the word being typed. The glyph is now sized first, with a
+`.body` symbol configuration (the field's own text style, since it sits inline with the
+word), and the 44pt square around it is both the touch target and the padding. It measures
+about 37pt against the system clear button's 33 — an action that reads slightly stronger
+than an affordance, which is the right order. Verified on an iOS 26.5 simulator; the iOS 12
+rendering is unverified for the usual reason (TD-8), and on that floor there is no SF
+Symbol at all — `UIImage.systemImage` returns `nil` below iOS 13, so the button is blank
+there. Pre-existing, and its own defect.
+
+## TD-42 — The microphone said "listening" about a second before it was — **resolved (2026-08-02)**
+
+Both dictation surfaces set their state the instant the button was tapped —
+`isDictating = true` in `WordInputViewController`, `isRecording = true` in
+`SpokenAnswerSurface` — and only then called `DictationController.start`. So the mic went
+red, and Phonetics offered "Stop recognition", while the audio session was still being
+activated and the engine still being started. The learner was told to speak into a
+microphone that was not open, and the first word of what they said was routinely lost.
+
+**Not fixable by making it faster.** TD-37 already asks whether `prewarm` earns its place;
+this is the answer from the other direction. `prewarm` deliberately cannot activate the
+session or touch the engine — claiming the microphone for a recording that may never happen
+is what a warm-up must not do, and pulling the input node early is what made the app crash.
+The wait is inherent to the start path, so the only honest fix is to show it.
+
+`DictationController.Activity` (`idle` / `starting` / `listening`) is declared on the
+controller, because it is the controller's knowledge and two surfaces render it — a copy
+each is how they drift. `start` gained a mandatory `onListening`, called only after
+`audioEngine.start()` returns, which is the first moment anything is being captured. It has
+no default value on purpose: a caller must decide what to show while `starting` lasts
+rather than defaulting back into claiming it is already recording.
+
+Grey for `starting` on both screens — `.lwTextSecondary` on the mic glyph, `LWButton`'s
+existing `.utility` purpose in Phonetics — so red keeps meaning *listening* and nothing
+else. **Deliberately not a spinner:** `beginRecording` runs on the main queue (TD-43), so an
+activity indicator would sit frozen through exactly the wait it was added to describe.
+
+## TD-43 — Opening the microphone blocks the main queue
+
+`DictationController.beginRecording` runs `setCategory`, `setActive`, a possible
+`audioEngine.reset()`, `installTap`, `prepare` and `start` synchronously on the main queue.
+That is roughly the second TD-42 now labels honestly — but labelling it does not unfreeze
+the interface: for that second the screen cannot scroll, the keyboard cannot dismiss, and
+the button cannot be tapped.
+
+**Cost:** a visible hang on the two screens that use speech, on every first dictation. It
+also hides a smaller defect: between the tap and the permission callback there is one
+runloop turn where the interface *is* live, and a tap that lands there calls `stop()` before
+`beginRecording` has run — which then starts the recording anyway, opening the microphone
+after the learner cancelled. Narrow today because the main queue is busy for the rest of the
+window; moving the work off it widens the window and makes the fix mandatory.
+
+**Discharge:** run the session and engine setup on a private queue and hop back to the main
+queue for `onListening`, `onTranscription` and `onFailure` — which already promise the main
+queue. Needs a cancellation token (a generation counter checked after each await point) so a
+`stop()` issued mid-start is honoured rather than overwritten. Best done with the
+`AsyncStream` rewrite [Design](Design.md) already sketches for the iOS 13+ floor, rather than
+twice.
+
+## TD-44 — The hint could not be looked up — **resolved (2026-08-02)**
+
+The pinned-term slab on the second step of the add-word flow showed the word and offered
+nothing to do with it. The ⓘ dictionary lookup is everywhere else in this app — the word
+list's long press, the exercise screen's Look Up button, the suggestion rows on this very
+screen — and the one place it was missing is the place it is most useful: the learner may
+have typed the word without ever looking it up, and this step is where they have to say
+what it *means* (owner).
+
+`UIButton(type: .detailDisclosure)` rather than an `info.circle` image, because it is the
+one that still draws something at the iOS 12 floor — `UIImage.systemImage` returns `nil`
+below iOS 13. It calls the same `lookUp(term:sender:)` as every other caller, so the guard
+against double presentation and the comma-splitting are not repeated here.
+
+**The slab stopped being a single accessibility element.** It was `isAccessibilityElement =
+true` with a combined label, which would have hidden the button it now contains from
+VoiceOver entirely. The caption and the term are one element (they read as one phrase); the
+button is its own, labelled "Look up <word>".
+
+### Sizing, and the numbers behind it
+
+Left alone the ⓘ renders about 50pt — twice the one on the rows below, which reads as a
+different control rather than the same one. It now takes the same `.body` symbol
+configuration as the microphone opposite it: one rule for both controls on the screen,
+tracking Dynamic Type rather than a chosen size.
+
+Three literals were retired in the process (owner: *"I try to avoid magic numbers… you must
+be sure enough if you yet decide to use one"*):
+
+* `minimumTouchTarget` — 44pt scaled, now the single source for the field's height floor,
+  the microphone and this button. Three literals that happen to agree are not one rule, and
+  44 is Apple's number, not taste.
+* `slabPadding` — one `UIEdgeInsets` in place of the four inset literals it replaced, which
+  were never four decisions. The gap between the term and the button is the same token.
+* The **padding around each glyph is not a number at all** — it is the difference between
+  the touch target and the type-scaled symbol, so it cannot drift out of step with either.

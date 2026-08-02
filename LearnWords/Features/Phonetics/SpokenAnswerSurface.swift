@@ -24,7 +24,12 @@ final class SpokenAnswerSurface: NSObject, ExerciseAnswerSurface {
     private let recordButton = LWButton(type: .system)
     private weak var screen: ExerciseScreen?
 
-    private var isRecording = false { didSet { updateRecordButton() } }
+    /// What the microphone is doing, not what has been asked of it — the same distinction
+    /// word entry needed (TD-42). "Stop recognition" appeared about a second before there
+    /// was anything to stop.
+    private var dictation: DictationController.Activity = .idle {
+        didSet { updateRecordButton() }
+    }
 
     /// Whether this question has already been answered by voice.
     ///
@@ -72,7 +77,7 @@ final class SpokenAnswerSurface: NSObject, ExerciseAnswerSurface {
         if isAutomatic {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { [weak self] in
                 guard let self, !self.isDetached, self.isAutomatic,
-                      !self.hasAnswered, !self.isRecording else { return }
+                      !self.hasAnswered, self.dictation == .idle else { return }
                 self.recordButtonTapped()
             }
         }
@@ -92,32 +97,33 @@ final class SpokenAnswerSurface: NSObject, ExerciseAnswerSurface {
     /// screen moves on. Delegated, so this knowledge exists once.
     func willLeaveCurrentQuestion() {
         DictationController.shared.stop()
-        isRecording = false
+        dictation = .idle
     }
 
     func detach() {
         isDetached = true
         DictationController.shared.stop()
-        isRecording = false
+        dictation = .idle
     }
 
     // MARK: - Recognition
 
     @objc private func recordButtonTapped() {
-        guard !isRecording else {
+        guard dictation == .idle else {
             DictationController.shared.stop()
-            isRecording = false
+            dictation = .idle
             return
         }
 
-        isRecording = true
+        dictation = .starting
         DictationController.shared.start(
             language: screen?.languages.answerLanguage ?? "en",
+            onListening: { [weak self] in self?.dictation = .listening },
             onTranscription: { [weak self] heard in
                 self?.consider(heard)
             },
             onFailure: { [weak self] failure in
-                self?.isRecording = false
+                self?.dictation = .idle
                 self?.present(failure)
             })
     }
@@ -141,7 +147,7 @@ final class SpokenAnswerSurface: NSObject, ExerciseAnswerSurface {
 
         hasAnswered = true
         DictationController.shared.stop()
-        isRecording = false
+        dictation = .idle
 
         // Clearly pronounced *and* an exact match reads as verbatim; anything the
         // recogniser was unsure of stays judged. The threshold is a first guess, recorded
@@ -192,12 +198,20 @@ final class SpokenAnswerSurface: NSObject, ExerciseAnswerSurface {
     }
 
     private func updateRecordButton() {
-        recordButton.purpose = isRecording ? .negative : .prominent
+        // `.utility` is the grey one: while starting, the button is neither the main action
+        // nor a running recording, and saying so costs no new colour vocabulary.
+        switch dictation {
+        case .idle:      recordButton.purpose = .prominent
+        case .starting:  recordButton.purpose = .utility
+        case .listening: recordButton.purpose = .negative
+        }
         // A chevron says "there is more here" — without it the long-press menu is a secret,
         // and auto mode looked like the button had silently changed its mind (owner).
         recordButton.setImage(.systemImage("chevron.down.circle"), for: .normal)
         let title: String
-        if isRecording {
+        if dictation == .starting {
+            title = NSLocalizedString("Starting…", comment: "Button title while the microphone opens")
+        } else if dictation == .listening {
             title = NSLocalizedString("Stop recognition", comment: "Button title")
         } else if isAutomatic {
             title = NSLocalizedString("Listening automatically", comment: "Button title")
