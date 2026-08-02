@@ -311,7 +311,32 @@ render on iOS 13+ and degrade to **text-only tabs on iOS 12**. Adding PNG fallba
 programmatic tab images (completing `UIImage+backport`) is future work if iOS-12 icon
 fidelity is wanted.
 
-## TD-8 — iOS 12 path is unverifiable on Xcode 26
+## TD-8 — iOS 12 path is unverifiable on Xcode 26 — **confirmed against Apple's own numbers (2026-08-02)**
+
+Apple's [Xcode system requirements](https://developer.apple.com/xcode/system-requirements/)
+now state it outright: Xcode 26 supports **on-device debugging for iOS 15 or later**, and a
+deployment-target range of **iOS 15–26.5**. So the legacy path cannot be run from the
+current toolchain at all — not a tooling inconvenience, a stated limit.
+
+**Two consequences worth separating.**
+
+*Verification* needs an older Xcode, and that needs an older Mac. **Xcode 15.2** is the last
+release that runs on Ventura (15.3+ requires Sonoma) and it debugs devices back to iOS 12.
+It cannot be run on Tahoe: Xcode 15 is unsupported there, and even Xcode 16.2 has
+[reported launch failures on 26.0](https://github.com/XcodesOrg/XcodesApp/issues/763). The
+Ventura machine is therefore not a convenience — it is the only route.
+
+*The shipped binary is a separate problem.* The project builds at
+`IPHONEOS_DEPLOYMENT_TARGET = 12.1` under Xcode 26 and always has, but 12.1 is **below the
+range Apple documents for that Xcode**. It is tolerated, not supported — the same situation
+reported for Xcode 16 accepting iOS 12 against an official iOS 13 minimum — and Xcode 27
+already documents a floor of 15.0. A toolchain update can withdraw it without warning.
+
+**This makes the floor a product decision, not just a debt item.** Either the project keeps
+12.1 knowing it rests on undocumented tolerance and an old Mac, or it raises the floor to
+iOS 15 and gains Swift Concurrency, `context.perform` async and the actor-based
+confinement recorded in [Design](Design.md) — the whole list of things currently deferred
+"until the floor allows it". See TD-40 and the concurrency decision.
 
 Xcode 26 ships no simulator below iOS 15 and won't connect sub-15 devices, so the iOS 12
 branch (`AppDelegate` window + `application(_:open:)`, `UIMainStoryboardFile`) **cannot be
