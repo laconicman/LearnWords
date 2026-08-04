@@ -1301,3 +1301,132 @@ be sure enough if you yet decide to use one"*):
   were never four decisions. The gap between the term and the button is the same token.
 * The **padding around each glyph is not a number at all** — it is the difference between
   the touch target and the type-scaled symbol, so it cannot drift out of step with either.
+
+## TD-45 — Asset catalogs use formats the verification toolchain cannot read
+
+TD-8 concluded that the App-Store build (Xcode 26) and the iOS-12 verification build
+(Xcode 15.2, Ventura) are two separate steps. This is the first thing that made that split
+cost something: the **assets** had quietly become Xcode-26-only, so the verification build
+died at `CompileAssetCatalog` before it could get anywhere near iOS 12.
+
+Two causes, both introduced by a newer Xcode's defaults rather than by a decision:
+
+- **The app icon is an Icon Composer file.** `85e9d6b` (2025-11-24) deleted
+  `LearnWords/Assets.xcassets/AppIcon.appiconset` and replaced it with `AppIcon.icon` at
+  the repo root, leaving `ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon`. Xcode 26's
+  `actool` resolves that name from the `.icon`; Xcode 15.2 predates Icon Composer entirely
+  and fails with *"None of the input catalogs contained a matching app icon set named
+  AppIcon"*.
+- **`WordWidget/Assets.xcassets/AppIcon.appiconset` declared the iOS 18 `tinted`
+  luminosity appearance** (Xcode 16+), in a set that carried no image files at all — the
+  widget template's placeholder. `WordWidgetExtension` inherited the project-level
+  `AppIcon` name, so that set was compiled rather than ignored.
+
+**Resolution.** The widget extension no longer asks for an app icon
+(`ASSETCATALOG_COMPILER_APPICON_NAME = ""` on both its configurations) and the empty
+placeholder set is deleted — a widget extension never displays one; the gallery uses the
+containing app's icon. The app target gets a plain **single-1024 `AppIcon.appiconset`**
+back alongside `AppIcon.icon`, which is the format Xcode 14–15 understand and which
+`actool` expands to every size at the 12.1 floor.
+
+**Keeping both is free, and that was measured rather than assumed.** Compiling the app's
+catalog with and without the restored `.appiconset` produces a **byte-identical**
+`Assets.car` (3,416,616 bytes) and an identical `AppIcon60x60@2x.png`, which does *not*
+match the legacy PNG — so Xcode 26 uses the Icon Composer file unconditionally and the
+`.appiconset` exists purely to give the older toolchain something to compile. That also
+means its art never ships while `AppIcon.icon` is present.
+
+**Cost, going forward:** this will recur. Every asset format a future Xcode introduces —
+and every placeholder its templates generate — is invisible until someone opens the
+project on the Ventura machine. **Discharge:** run the verification build after adding
+any asset, and prefer the oldest format that expresses the intent. A catalog is compiled
+by whichever toolchain opens it; it has no deployment target of its own.
+
+## TD-46 — The app hard-linked Core Haptics, so iOS 12 could not launch it
+
+The first iOS 12 run after the Xcode 15.2 build went green died on a `SIGABRT` a moment
+after the launch screen, with no usable stack. The instinct was a mis-wired life cycle —
+the dual `AppDelegate`/`SceneDelegate` split being the newest thing near launch. It was
+not: **nothing in this app had run yet.** The process was killed by `dyld`, before `main`.
+
+`KaPow` — linked into the app for TD-16 — does `import CoreHaptics` in `Support/Haptics.swift`
+and `Effects/EffectProxy+Spray.swift`. **Core Haptics is iOS 13+.** A Swift `import` emits an
+autolink directive that the linker turns into a plain `LC_LOAD_DYLIB`, and a plain load
+command is a *requirement*: `dyld` must find
+`/System/Library/Frameworks/CoreHaptics.framework/CoreHaptics` at launch or it terminates
+the process. iOS 12 has no such framework.
+
+**This is the hole in TD-7's reasoning.** That entry concluded the Swift code is iOS-12
+clean because "a green build proves there are no unguarded iOS 13+ API uses" — true, and
+KaPow's guarding is exemplary (`@available(iOS 13.0, *) enum Haptics`, and `playHaptics()`
+opens with `guard #available(iOS 13.0, *) else { return }`). **`@available` guards code, not
+linkage.** The framework is loaded before a single availability check can run, so no amount
+of correct gating inside the module saves it. Compile-time availability and run-time
+linkage are separate claims, and only the first one is machine-checked.
+
+**Fix:** `OTHER_LDFLAGS = -weak_framework CoreHaptics` on the app target (both
+configurations). Verified with `otool -l`: the load command becomes `LC_LOAD_WEAK_DYLIB`,
+so `dyld` binds the missing symbols to null on iOS 12 instead of aborting, and every use
+sits behind the existing availability guards. An audit of the remaining hard load commands
+found **no other iOS 13+ framework** — `Speech` and `UserNotifications` are iOS 10, the
+rest older; `SwiftUI` and `libswiftOSLog` were already weak.
+
+**Remaining:** the flag fixes *this* consumer, not the cause. KaPow declares `.iOS(.v12)`
+and its `Package.swift` says outright that "effects that need more (Core Haptics, iOS 13)
+guard at the call site" — which is exactly the assumption that does not hold, so **any**
+consumer at an iOS 12 floor is broken on launch by taking the dependency. The package-side
+discharge is to stop importing Core Haptics from a target that claims iOS 12: move the
+haptic burst behind a separate product, or drop the import and reach the API dynamically.
+Tracked as KaPow debt.
+
+**Discharge for the register:** when adding a dependency or an `import` at this floor,
+check the link, not just the build — `otool -l <binary> | grep -A2 LC_LOAD_DYLIB` and
+confirm every named framework predates the deployment target.
+
+## TD-47 — The tab bar was built twice, and iOS 12 got the other one — **resolved (2026-08-04)**
+
+On an iPad running iOS 12 the app showed **three** tabs — "Набор слов", "Элемент",
+"Упражнения" — against four on iOS 13+, and the middle one was named after Xcode's default
+placeholder. Two independent causes, both invisible on any simulator this project can run.
+
+**Settings was missing because the composition root was not shared.** `AppRoot` opens by
+declaring itself "the single place that constructs the app's root UI … so the two code
+paths can't drift", and `makeRoot()` is where the Settings tab is appended. But
+`Info.plist` still carried `UIMainStoryboardFile = Main` from before the scene split, so on
+iOS 12 UIKit instantiated the storyboard and assigned `AppDelegate.window` *before any of
+our code ran*. `makeRoot()` was never called on that path. Only `SceneDelegate` used it.
+
+A comment claiming a single source of truth is not one. The second construction site was a
+**plist key**, which is why reading the Swift did not reveal it — and why the eventual
+`window?.tintColor = .orange` line in `didFinishLaunching`, which only makes sense if
+something else already made the window, was the visible symptom nobody read as one.
+
+**Fix:** delete the key; `AppDelegate` now builds the window itself on iOS 12, through
+`AppRoot.makeRoot()`, exactly as `SceneDelegate` does on 13+. `AppRootTests` pins the key's
+absence, since it is the kind of thing Xcode restores.
+
+**The middle tab was named twice.** `Main.storyboard` declared a `UITabBarItem` on the
+Manage Sets navigation controller (`H9N-Y4-X4Z`, Xcode's untouched "Item" placeholder) *and*
+another on that controller's root view controller (`EEA-CH-FD5`, the real "Manage Sets" with
+its folder symbol). On iOS 13+ a navigation controller forwards `tabBarItem` to its root, so
+the placeholder was masked; iOS 12 does not forward, so the placeholder won. The Russian
+translators had by then dutifully rendered it as "Элемент".
+
+**Fix:** one declaration, on the navigation controller — where tabs 1 and 3 already kept
+theirs. The stale `EEA-CH-FD5.title` entry is gone from `Main.xcstrings` and its
+translations moved onto the surviving key.
+
+**Not covered by a test, and the attempt is instructive.** `AppRootTests` now asserts each
+tab's title at the index `AppRoot.Tab` routes on. That test was run against the *old*
+storyboard and **passed**: the forwarding makes the placeholder unobservable from the object
+graph on iOS 13+. A duplicate declaration of this kind is only detectable by reading the
+storyboard source or by running iOS 12. The test is still worth having — it pins tab order
+against the routing constants — but it does not guard this.
+
+**Remaining: iOS 12 has no tab icons at all.** The storyboard's images are SF Symbols
+(`catalog="system"`), which iOS 12 has no notion of, and the eleven `.symbolset` assets
+added as fallbacks are themselves an iOS 13 format. `UIImage.systemImage` returns `nil`
+below 13 with a standing `TODO: look up in assets`, across 17 call sites. Giving iOS 12 real
+icons means PNG `.imageset`s and a backport that consults them — related to TD-45's lesson
+that a catalog is compiled by whichever toolchain opens it, and has no deployment target of
+its own. Deliberately deferred; a labels-only tab bar is legible, if plain.
