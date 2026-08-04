@@ -12,25 +12,39 @@ import UserNotifications
 @main
 final class AppDelegate: UIResponder, UIApplicationDelegate {
 
-    /// iOS 12 only: UIKit loads `Main` via `UIMainStoryboardFile`, creates this window, and
-    /// assigns it here. On iOS 13+ the window lives in `SceneDelegate` and this stays `nil`.
-    /// (See the dual-life-cycle decision in `docs/Design.md`.)
+    /// iOS 12 only: this delegate owns the window. On iOS 13+ it lives in `SceneDelegate`
+    /// and this stays `nil`. (See the dual-life-cycle decision in `docs/Design.md`.)
+    ///
+    /// **Built here rather than by `UIMainStoryboardFile`.** That key made UIKit instantiate
+    /// `Main.storyboard` and assign the window before any of our code ran, which meant iOS 12
+    /// never reached `AppRoot.makeRoot()` — the one place that appends the Settings tab. The
+    /// result was an app whose tab bar had four tabs on iOS 13+ and three on iOS 12, from a
+    /// "shared composition root" that one of the two life cycles silently bypassed. A root
+    /// built in two places is not a shared root; the storyboard key was the second place.
     var window: UIWindow?
 
     func application(
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
-        // App-wide appearance. The proxies apply on every OS; `window?.tintColor` is the
-        // iOS 12 path (no-op on iOS 13+, where `SceneDelegate` sets it on its own window).
+        // App-wide appearance. The proxies apply on every OS, and must be set before any
+        // bar is created — on iOS 12 that is a few lines below rather than in `SceneDelegate`.
         UINavigationBar.appearance().tintColor = .orange
         UITabBar.appearance().tintColor = .orange
-        window?.tintColor = .orange
 
         // Opens the store and seeds it on a fresh install, so no screen has to cope with
-        // an empty library. Runs for both lifecycles — `SceneDelegate` builds the UI
-        // after this, on iOS 13+.
+        // an empty library. Runs for both lifecycles, and before either builds its UI.
         Library.shared.prepareForLaunch()
+
+        // iOS 12 has no scenes, so nothing else will build the window. `SceneDelegate` does
+        // exactly this on iOS 13+, through the same `AppRoot.makeRoot()`.
+        if #available(iOS 13.0, *) {} else {
+            let window = UIWindow(frame: UIScreen.main.bounds)
+            window.tintColor = .orange
+            window.rootViewController = AppRoot.makeRoot()
+            self.window = window
+            window.makeKeyAndVisible()
+        }
 
         // Must be set before launch finishes, or a notification that *started* the app is
         // delivered before anything is listening and the tap goes nowhere.

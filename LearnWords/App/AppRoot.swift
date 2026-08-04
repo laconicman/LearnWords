@@ -53,8 +53,13 @@ enum AppRoot {
     static let shareActionReceived = Notification.Name("AppRoot.shareActionReceived")
 
     /// Tab indexes in `Main.storyboard`, named so a routing decision reads as one.
-    private enum Tab {
+    ///
+    /// Not private, so `AppRootTests` can assert that each index still names the tab it
+    /// claims to. They are positions in a storyboard file, and nothing in the storyboard
+    /// knows they exist.
+    enum Tab {
         static let words = 0
+        static let manageSets = 1
         static let exercises = 2
         static let settings = 3
     }

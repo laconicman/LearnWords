@@ -337,30 +337,6 @@
         }
       }
     },
-    "EEA-CH-FD5.title" : {
-      "comment" : "Class = \"UITabBarItem\"; title = \"Manage Sets\"; ObjectID = \"EEA-CH-FD5\";",
-      "extractionState" : "extracted_with_value",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "Manage Sets"
-          }
-        },
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Manage Sets"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Управлять наборами"
-          }
-        }
-      }
-    },
     "fb2-Kp-cfL.title" : {
       "comment" : "Class = \"UINavigationItem\"; title = \"Learning\"; ObjectID = \"fb2-Kp-cfL\";",
       "extractionState" : "stale",
@@ -434,25 +410,25 @@
       }
     },
     "H9N-Y4-X4Z.title" : {
-      "comment" : "Class = \"UITabBarItem\"; title = \"Item\"; ObjectID = \"H9N-Y4-X4Z\";",
+      "comment" : "Class = \"UITabBarItem\"; title = \"Manage Sets\"; ObjectID = \"H9N-Y4-X4Z\";",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Item"
+            "value" : "Manage Sets"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Item"
+            "value" : "Conjuntos"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Элемент"
+            "value" : "Управлять наборами"
           }
         }
       }

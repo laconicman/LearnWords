@@ -174,11 +174,11 @@
             </objects>
             <point key="canvasLocation" x="2448.8000000000002" y="527.58620689655174"/>
         </scene>
-        <!--Item-->
+        <!--Manage Sets-->
         <scene sceneID="Eoc-ru-1UW">
             <objects>
                 <navigationController id="wE2-zt-kta" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Item" id="H9N-Y4-X4Z"/>
+                    <tabBarItem key="tabBarItem" title="Manage Sets" image="folder" catalog="system" selectedImage="folder.fill" id="H9N-Y4-X4Z"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="BrJ-AT-8gB">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -232,7 +232,6 @@
                             <outlet property="delegate" destination="IOT-Jj-vto" id="fFX-GY-Izj"/>
                         </connections>
                     </tableView>
-                    <tabBarItem key="tabBarItem" title="Manage Sets" image="folder" catalog="system" selectedImage="folder.fill" id="EEA-CH-FD5"/>
                     <navigationItem key="navigationItem" title="Word Sets" id="vYV-WR-kC4">
                         <barButtonItem key="leftBarButtonItem" title="Export" id="sgg-W9-3fN">
                             <connections>
