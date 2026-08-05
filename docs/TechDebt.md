@@ -1342,6 +1342,31 @@ project on the Ventura machine. **Discharge:** run the verification build after 
 any asset, and prefer the oldest format that expresses the intent. A catalog is compiled
 by whichever toolchain opens it; it has no deployment target of its own.
 
+### Where the older toolchain lives — `chore/xcode-15-project`
+
+TD-8 established that verification needs Xcode 15.2 on the Ventura machine. Xcode 15 has
+no synchronized folders (`PBXFileSystemSynchronizedRootGroup`, and `objectVersion = 100`
+with it), so it needs a project file written in the older format — which master's cannot
+be, without giving up folder membership here.
+
+The rule that keeps this cheap: **the branch only ever *adds* files.** It carries
+`LearnWords-Xcode15.xcodeproj` and leaves `LearnWords.xcodeproj` alone, so `git merge
+master` has nothing to conflict with. The first attempt rewrote the shared project in
+place, which made every sync a ~900-line conflict in generated text whose only honest
+resolution was to redo the downgrade. Anything that is *not* purely a file-format
+concern — a linker flag, an icon set, a package reference — belongs on **master**, not
+here; a fix that only exists on a verification branch is a fix the App Store build does
+not get.
+
+**The one manual cost, which no layout removes:** Xcode 15 has no folder membership, so a
+source file added on master must be added to the legacy project by hand before the next
+verification run. It fails loudly at compile time, which is the right failure mode.
+
+The long-term alternative is a generated project (XcodeGen, Tuist): one spec, and since
+neither emits synchronized folders, a *single* generated project would open in both
+toolchains and this branch would stop existing. The trade is losing Xcode 16+ folder
+auto-membership on master in exchange for a spec to maintain. Not taken yet.
+
 ## TD-46 — The app hard-linked Core Haptics, so iOS 12 could not launch it
 
 The first iOS 12 run after the Xcode 15.2 build went green died on a `SIGABRT` a moment
