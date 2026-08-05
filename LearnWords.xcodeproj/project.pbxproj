@@ -433,7 +433,7 @@
 			);
 			mainGroup = DA246CA71F8A6E5E00A75ED1;
 			packageReferences = (
-				DACAF0DE300C000100DC9410 /* XCLocalSwiftPackageReference "../../../../../Documents/Code/Animations/KaPow" */,
+				DACAF0DE300C000100DC9410 /* XCRemoteSwiftPackageReference "KaPow" */,
 			);
 			preferredProjectObjectVersion = 100;
 			productRefGroup = DA246CB11F8A6E5E00A75ED1 /* Products */;
@@ -881,6 +881,7 @@
 		DACDF177300B672D00DC9410 /* Debug configuration for PBXNativeTarget "WordWidgetExtension" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "";
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -920,6 +921,7 @@
 		DACDF178300B672D00DC9410 /* Release configuration for PBXNativeTarget "WordWidgetExtension" */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "";
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -1007,16 +1009,21 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		DACAF0DE300C000100DC9410 /* XCLocalSwiftPackageReference "../../../../../Documents/Code/Animations/KaPow" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = ../../../../../Documents/Code/Animations/KaPow;
+/* Begin XCRemoteSwiftPackageReference section */
+		DACAF0DE300C000100DC9410 /* XCRemoteSwiftPackageReference "KaPow" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/laconicman/KaPow";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
 		};
-/* End XCLocalSwiftPackageReference section */
+/* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
 		DACAF0DE300C000200DC9410 /* KaPow */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = DACAF0DE300C000100DC9410 /* XCRemoteSwiftPackageReference "KaPow" */;
 			productName = KaPow;
 		};
 /* End XCSwiftPackageProductDependency section */
