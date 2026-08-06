@@ -1362,6 +1362,16 @@ not get.
 source file added on master must be added to the legacy project by hand before the next
 verification run. It fails loudly at compile time, which is the right failure mode.
 
+**`Package.resolved` stays untracked, deliberately** (owner). Xcode 16 writes it as
+`"version" : 3` with an `originHash`; Xcode 15 cannot read that and refuses the file, so a
+tracked copy would have to be deleted by hand on the Ventura machine every single time.
+This is the same fault as the asset catalogs above — a file format only the newer
+toolchain understands — and the `.gitignore` entry is the fix, not an oversight. The cost
+is that a fresh resolve is not pinned; with KaPow now on a remote, note the tag rather than
+assuming a build reproduces byte-for-byte. Copying the working directory to Ventura carries
+the untracked file along, which is what forces the manual delete — a `git clone` or a
+checkout of this branch would not.
+
 The long-term alternative is a generated project (XcodeGen, Tuist): one spec, and since
 neither emits synchronized folders, a *single* generated project would open in both
 toolchains and this branch would stop existing. The trade is losing Xcode 16+ folder
