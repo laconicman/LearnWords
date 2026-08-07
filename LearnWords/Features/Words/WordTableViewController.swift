@@ -99,7 +99,7 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
             .add(language: pair.secondary),
             initialText: prefilled,
             existingUsages: { [weak self] typed in
-                (try? self?.lexicon.usages(ofTerm: typed, in: pair.secondary)) as? [Lexicon.TermUsage] ?? []
+                (try? self?.lexicon.usages(ofTerm: typed, in: pair.secondary)) ?? []
             }) { [weak self] word in
             self?.askMeaning(of: word, in: set, pair: pair)
         }
