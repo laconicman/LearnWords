@@ -201,7 +201,7 @@ final class MeaningEditorViewController: UITableViewController {
     private func addWord(in language: String) {
         push(.add(language: language),
              existingUsages: { [weak self] typed in
-                 ((try? self?.lexicon.usages(ofTerm: typed, in: language)) as? [Lexicon.TermUsage] ?? [])
+                 ((try? self?.lexicon.usages(ofTerm: typed, in: language)) ?? [])
                      .filter { $0.senseID != self?.sense.id }
              }) { [weak self] entered in
             guard let self else { return }
@@ -221,7 +221,7 @@ final class MeaningEditorViewController: UITableViewController {
         push(.rename(term), initialText: term.text,
              existingUsages: { [weak self] typed in
                  // The word being renamed is not a clash with itself.
-                 ((try? self?.lexicon.usages(ofTerm: typed, in: term.language)) as? [Lexicon.TermUsage] ?? [])
+                 ((try? self?.lexicon.usages(ofTerm: typed, in: term.language)) ?? [])
                      .filter { $0.senseID != self?.sense.id }
              }) { [weak self] entered in
             self?.rename(term, to: entered)
