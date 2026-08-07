@@ -849,13 +849,50 @@ per row on every scroll, and the noise hides real messages — the constraint br
 opened TD-17 was found by reading exactly this console. Non-fatal. **Discharged** with the meaning editor: the eight entries are gone from
 `Main.storyboard`, and the console is quiet on scroll again.
 
-## TD-24 — Extension bundle versions drift from the app's — **not reproducible (2026-07-29)**
+## TD-24 — Extension bundle versions drift from the app's — **resolved (2026-08-07)**
 
 `CFBundleVersion` is `1` on the app extensions and `7` on the host app, which
 `ValidateEmbeddedBinary` warns about on every build and **App Store Connect rejects at
 submission**. **Cost:** invisible until the first upload, then a blocked release.
 **Discharge:** drive all four targets' `CURRENT_PROJECT_VERSION` from one place — a shared
 `.xcconfig`, or `$(inherited)` from the project level — rather than per-target literals.
+
+**It was marked "not reproducible" on 2026-07-29. It reproduced.** An ordinary
+`xcodebuild` of the app scheme printed:
+
+```
+warning: The CFBundleVersion of an app extension ('8') must match that of its
+containing parent app ('9').
+```
+
+A debt item recorded as imaginary is worse than one recorded as open: nobody looks again,
+and this one only surfaces on upload. Whatever the 07-29 check was, it did not read the
+build log of a full app build — the warning comes from `ValidateEmbeddedBinary`, which runs
+in the *host app's* target while embedding the `.appex`, so building the extension scheme
+alone never shows it.
+
+**Also understated.** The entry named only `CFBundleVersion`; `MARKETING_VERSION` had
+drifted too (1.2.1 against 1.2.2), and App Store Connect rejects a
+`CFBundleShortVersionString` mismatch just as readily.
+
+**One target was at fault.** Everything else already inherited the project level; only
+`WordWidgetExtension` declared its own literals, in both configurations:
+
+| target | `CURRENT_PROJECT_VERSION` | `MARKETING_VERSION` |
+|---|---|---|
+| project level — app, Widget, ImportAsDictAction | 9 | 1.2.2 |
+| `WordWidgetExtension` (before) | 8 | 1.2.1 |
+| Unit Testing Bundle | 1 | 1.0 — never submitted, left alone |
+
+**Fixed by deletion, not by re-syncing.** The first pass bumped the literals to 9 / 1.2.2,
+which silences today's warning and leaves the debt exactly where it was — two numbers that
+must be remembered together, in a file nobody re-reads, drifting again at the next release.
+The four overrides are gone, so the extension inherits. Verified: the app scheme builds
+with no `ValidateEmbeddedBinary` warning.
+
+**Note for the verification branch:** `LearnWords-Xcode15.xcodeproj` carried the same
+overrides and needed the same deletion. Two projects means build-setting fixes land twice
+until one of them goes away (TD-45).
 
 ## TD-25 — A nil UUID would trap on read, if anything ever inserted one
 
