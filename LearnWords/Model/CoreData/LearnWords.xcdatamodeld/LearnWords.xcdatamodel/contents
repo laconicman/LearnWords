@@ -23,11 +23,20 @@
     <entity name="Language" representedClassName="CDLanguage" syncable="YES">
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
         <attribute name="code" attributeType="String" defaultValueString=""/>
+        <attribute name="wiktionaryCode" optional="YES" attributeType="String"/>
         <relationship name="sets" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="WordSet" inverseName="languages" inverseEntity="WordSet"/>
         <relationship name="terms" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Term" inverseName="language" inverseEntity="Term"/>
         <fetchIndex name="byCode">
             <fetchIndexElement property="code" type="Binary" order="ascending"/>
         </fetchIndex>
+    </entity>
+    <entity name="Pronunciation" representedClassName="CDPronunciation" syncable="YES">
+        <attribute name="audioURLString" optional="YES" attributeType="String"/>
+        <attribute name="createdAt" attributeType="Date" defaultDateTimeInterval="0" usesScalarValueType="NO"/>
+        <attribute name="ipa" optional="YES" attributeType="String"/>
+        <attribute name="modifiedAt" attributeType="Date" defaultDateTimeInterval="0" usesScalarValueType="NO"/>
+        <relationship name="term" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Term" inverseName="pronunciations" inverseEntity="Term"/>
+        <relationship name="variety" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Variety" inverseName="pronunciations" inverseEntity="Variety"/>
     </entity>
     <entity name="ReviewEvent" representedClassName="CDReviewEvent" syncable="YES">
         <attribute name="answerLanguage" attributeType="String" defaultValueString=""/>
@@ -71,6 +80,7 @@
     <entity name="Tag" representedClassName="CDTag" syncable="YES">
         <attribute name="createdAt" attributeType="Date" defaultDateTimeInterval="0" usesScalarValueType="NO"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="category" optional="YES" attributeType="String"/>
         <attribute name="name" attributeType="String" defaultValueString="" spotlightIndexingEnabled="YES"/>
         <relationship name="synsets" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Synset" inverseName="tags" inverseEntity="Synset"/>
         <fetchIndex name="byName">
@@ -88,9 +98,20 @@
         <relationship name="forms" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="WordForm" inverseName="term" inverseEntity="WordForm"/>
         <relationship name="illustrations" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Illustration" inverseName="term" inverseEntity="Illustration"/>
         <relationship name="language" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Language" inverseName="terms" inverseEntity="Language"/>
+        <relationship name="pronunciations" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Pronunciation" inverseName="term" inverseEntity="Pronunciation"/>
         <relationship name="synsets" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Synset" inverseName="terms" inverseEntity="Synset"/>
+        <relationship name="varieties" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Variety" inverseName="terms" inverseEntity="Variety"/>
         <fetchIndex name="byText">
             <fetchIndexElement property="text" type="Binary" order="ascending"/>
+        </fetchIndex>
+    </entity>
+    <entity name="Variety" representedClassName="CDVariety" syncable="YES">
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="subtag" attributeType="String" defaultValueString=""/>
+        <relationship name="pronunciations" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Pronunciation" inverseName="variety" inverseEntity="Pronunciation"/>
+        <relationship name="terms" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Term" inverseName="varieties" inverseEntity="Term"/>
+        <fetchIndex name="bySubtag">
+            <fetchIndexElement property="subtag" type="Binary" order="ascending"/>
         </fetchIndex>
     </entity>
     <entity name="WordForm" representedClassName="CDWordForm" syncable="YES">

@@ -95,7 +95,8 @@ struct PersistenceSchemaTests {
     @Test func modelDefinesTheLexicalEntities() {
         let names = Set(LWPersistence.model.entities.compactMap(\.name))
         #expect(names == ["WordSet", "Synset", "Term", "Comment", "Illustration",
-                          "WordForm", "Tag", "Language", "ErrorTag", "ReviewEvent"])
+                          "WordForm", "Pronunciation", "Variety", "Tag", "Language",
+                          "ErrorTag", "ReviewEvent"])
     }
 
     /// CloudKit refuses non-optional attributes without defaults, relationships without
@@ -144,6 +145,7 @@ struct PersistenceSchemaTests {
             "Tag": ["name"],
             "ErrorTag": ["name"],
             "Language": ["code"],
+            "Variety": ["subtag"],
             "ReviewEvent": ["date", "sessionID"],
         ]
         for (entityName, properties) in expected {
@@ -173,10 +175,17 @@ struct PersistenceSchemaTests {
         #expect(isOptional("Term", "transcription") == true, "not recorded is not empty")
         #expect(isOptional("Term", "partOfSpeech") == true)
         #expect(isOptional("Synset", "note") == true, "most senses need no disambiguation")
+        // A sound entry upstream carries an IPA string *or* an audio file, never both, so
+        // requiring either would make half the source unrepresentable.
+        #expect(isOptional("Pronunciation", "ipa") == true, "an audio-only entry has none")
+        #expect(isOptional("Pronunciation", "audioURLString") == true, "an IPA-only entry has none")
+        #expect(isOptional("Tag", "category") == true, "a tag a learner invents belongs to neither list")
+        #expect(isOptional("Language", "wiktionaryCode") == true, "nil means it agrees with code")
 
         // The creating API always supplies these — the store enforces it.
         for (entity, attribute) in [("WordSet", "name"), ("Term", "text"), ("Tag", "name"),
                                     ("Language", "code"), ("ErrorTag", "name"),
+                                    ("Variety", "subtag"),
                                     ("ReviewEvent", "outcome"), ("ReviewEvent", "promptLanguage"),
                                     ("ReviewEvent", "answerLanguage"), ("Comment", "text")] {
             #expect(isOptional(entity, attribute) == false, "\(entity).\(attribute) is always known")
@@ -348,6 +357,70 @@ struct PersistenceSchemaTests {
         let coversGerman = CDWordSet.fetchRequest()
         coversGerman.predicate = NSPredicate(format: "ANY languages.code == %@", "de")
         #expect(try context.count(for: coversGerman) == 1)
+    }
+
+    /// The whole reason `Pronunciation` is a row: one string cannot hold two accents.
+    /// Also pins the cascade — a pronunciation is meaningless without its term, so it goes
+    /// with it, exactly like the other term satellites.
+    @Test func aTermHoldsSeveralPronunciationsEachWithItsOwnVariety() throws {
+        let context = makeContext()
+        let schedule = makeTerm(context, "schedule", "en")
+
+        for (ipa, subtag) in [("ˈskɛdʒuːl", "US"), ("ˈʃɛdjuːl", "GB")] {
+            let variety = CDVariety(context: context)
+            variety.subtag = subtag
+            let sound = CDPronunciation(context: context)
+            sound.ipa = ipa
+            sound.term = schedule
+            sound.variety = variety
+        }
+        try context.save()
+
+        #expect(schedule.pronunciations.count == 2, "both accents survive; a string could hold one")
+        #expect(Set(schedule.pronunciations.compactMap { $0.variety?.subtag }) == ["US", "GB"])
+
+        // An audio-only entry is representable — upstream never carries both at once.
+        let audioOnly = CDPronunciation(context: context)
+        audioOnly.audioURLString = "https://upload.wikimedia.org/en-us-schedule.ogg"
+        audioOnly.term = schedule
+        try context.save()
+        #expect(audioOnly.ipa == nil)
+        #expect(audioOnly.audioURL != nil)
+
+        context.delete(schedule)
+        try context.save()
+        #expect(try context.count(for: CDPronunciation.fetchRequest()) == 0, "satellites cascade")
+        #expect(try context.count(for: CDVariety.fetchRequest()) == 2,
+                "a variety is a shared lookup row, not a satellite — it outlives the term")
+    }
+
+    /// A variety is find-or-create like `Tag` and `Language`, and is shared by the two
+    /// owners that have one: the spelling and the accent. It never reaches a `Synset` —
+    /// that is the whole reason it is not a `Tag`.
+    @Test func varietiesAreQueryableRowsSharedByTermsAndPronunciations() throws {
+        let context = makeContext()
+        let us = CDVariety(context: context)
+        us.subtag = "US"
+
+        let color = makeTerm(context, "color", "en")
+        color.mutableSetValue(forKey: "varieties").add(us)
+        let sound = CDPronunciation(context: context)
+        sound.ipa = "ˈkʌlɚ"
+        sound.term = color
+        sound.variety = us
+        try context.save()
+
+        #expect(try context.count(for: CDVariety.fetchRequest()) == 1, "one row, two owners")
+        #expect(us.terms.count == 1)
+        #expect(us.pronunciations.count == 1)
+
+        let american = CDTerm.fetchRequest()
+        american.predicate = NSPredicate(format: "ANY varieties.subtag == %@", "US")
+        #expect(try context.count(for: american) == 1, "a predicate, which is why it is a row")
+
+        #expect(LWPersistence.model.entitiesByName["Variety"]?
+            .relationshipsByName.keys.contains("synsets") == false,
+                "variety belongs to the term and the accent, never to a meaning")
     }
 
     @Test func aSynsetIsSharedAcrossSetsAndSurvivesSetDeletion() throws {

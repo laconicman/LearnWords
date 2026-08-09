@@ -372,14 +372,30 @@ database schema is how `tags: [String]` got into this model in the first place.
    space-separated `notes.tags` string holds user tags, `marked`, `leech` and `::`
    hierarchy at once, with prefix conventions as the only structure.
 
-**Sequenced, not built yet.** Nothing reads a variety today, so the entity waits for its
-first consumer — the near-miss coefficient in `ScoringPolicy` (a variety mismatch is
-`correctJudged` with a note, never `incorrect`) or enrichment. `LanguageCode.parse` already
-produces the value it will be keyed on.
+**Built ahead of its consumer (2026-08-07), reversing the sequencing below.** `CDVariety`
+and `CDPronunciation` are in the model now, and nothing reads them yet. The reason is
+CloudKit, not need: a production schema accepts additions for ever but never removals, so
+the choice was one schema deploy before App Store submission or two. See
+[TechDebt § TD-48](TechDebt.md) for what that costs — chiefly that these shapes are derived
+from wiktextract's format rather than from a working consumer, and are now permanent.
 
-**Also pending under this decision:** `Term.transcription: String?` cannot hold both
-/ˈskedʒuːl/ and /ˈʃedjuːl/. It becomes a child row with a variety when pronunciations are
-ingested; wiktextract's `sounds[]` is the shape to copy.
+*The original sequencing, kept because it is the right default:* nothing reads a variety
+today, so the entity would otherwise wait for its first consumer — the near-miss coefficient
+in `ScoringPolicy` (a variety mismatch is `correctJudged` with a note, never `incorrect`) or
+enrichment. `LanguageCode.parse` already produces the value it is keyed on.
+
+**One correction to the reasoning above.** Point 2 called variety "closed and
+registry-backed" as against the open tag folksonomy. [Enrichment](Enrichment.md) measured
+the source: wiktextract carries **2,062** dialect tags, which we can no more ship and
+validate against than a folksonomy. `Variety` is find-or-create exactly like `Tag` and
+`Language`. The decision stands on point 1 — the wrong-owner argument — which was always
+the stronger leg.
+
+**Also under this decision:** `Term.transcription: String?` cannot hold both /ˈskedʒuːl/ and
+/ˈʃedjuːl/, so `Pronunciation` is now the child row with a variety, copying wiktextract's
+`sounds[]`. The attribute is **superseded but still live** — `Lexicon` reads and writes it,
+and it is permanent in the deployed CloudKit schema regardless (TD-48). New writers should
+prefer a row; the attribute goes when a migration retires it.
 
 ## Decision: CloudKit mirrors in the app only, and duplicates are repaired after the fact
 
