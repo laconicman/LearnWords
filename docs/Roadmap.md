@@ -4,9 +4,21 @@ Priority-ordered. Rationale lives in [Design](Design.md); debt items in [TechDeb
 
 ## Now
 
-- **iOS 12 on-device verification (TD-8) — deferred by owner.** Lifecycle + colors are
-  unverified on real iOS 12 until checked on an owner device (visual side-load path in TD-8)
-  or Xcode 15. Do before any lifecycle/UI-touching release.
+- **Ship the iOS 12 fix.** The App Store is the only route that reaches an iOS 12 device —
+  TestFlight's own minimum is far above it — and the store serves the last compatible build
+  to devices that cannot run the current one. Submitting also spends the CloudKit schema
+  deploy that TD-48's additions are waiting on, which is why they went in first.
+- **iOS 12 *behaviour* is still unverified.** Launch is proven (below); the store changed
+  completely under TD-13 and none of it has run on iOS 12. Word list, add/edit a word, all
+  three exercises, import/export, the Today widget. TD-8's toolchain works today — its value
+  decays as more code lands behind an untested boundary.
+
+## Done (2026-08-04) — iOS 12 launches
+
+Verified by the owner on an iPad running iOS 12: builds on Xcode 15.2 and launches.
+Three faults had to be cleared first, none of them visible on any simulator this project can
+run — asset formats only Xcode 26 understands (TD-45), a hard link to Core Haptics that
+`dyld` refused at launch (TD-46), and a tab bar built twice (TD-47).
 
 ## Done (2026-07-17)
 
@@ -146,11 +158,13 @@ Priority-ordered. Rationale lives in [Design](Design.md); debt items in [TechDeb
   measurement any implementing fork must take is the reduction ratio on one real kaikki
   file; every size estimate downstream is a guess until then. Whether FTS5 exists in the
   system SQLite at the 12.1 floor needs an old device (TD-8 territory).
-- **`Variety`, `Pronunciation` and `Tag.category`** — the three schema additions
-  [Enrichment](Enrichment.md) implies. **Cheapest before the CloudKit production deploy
-  and permanent after it:** CloudKit allows adding record types and fields to production
-  but never removing or retyping them, so `Term.transcription` would stay vestigial
-  forever. Decide deliberately alongside the deploy, not after.
+- ~~**`Variety`, `Pronunciation` and `Tag.category`**~~ — **done (2026-08-07)**, plus
+  `Language.wiktionaryCode`, which this list had missed. The framing here was wrong: the
+  production deploy had already happened, so `Term.transcription` was vestigial before the
+  question was asked, and additions were never on a clock — CloudKit accepts them for ever.
+  They went in anyway, to spend one schema deploy rather than two. See
+  [TechDebt § TD-48](TechDebt.md). **Still to do:** give the new rows a writer (TD-22
+  enrichment), and retire `Term.transcription` from the model once they have one.
 - **`SearchWordViewController` (TD-28)** — ~600 lines doing search, suggestions, dictionary
   lookup, segue routing and store writes. Every bug in the add-word flow so far has been a
   coordination bug hiding in its size.

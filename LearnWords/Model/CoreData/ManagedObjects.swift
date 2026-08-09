@@ -197,6 +197,11 @@ final class CDTerm: NSManagedObject, Timestamped {
     @NSManaged var text: String
     /// Pronunciation — Apple's `d:pr` / Japanese yomi. Optional because "not recorded"
     /// is a real state, distinct from "transcribed as empty".
+    ///
+    /// **Superseded by `pronunciations`, still live.** One string cannot hold two accents,
+    /// which is why `CDPronunciation` exists — but this is what `Lexicon` reads and writes
+    /// today, and it is permanent in the deployed CloudKit schema either way (TD-48). New
+    /// writers should prefer a `Pronunciation` row; this stays until a migration retires it.
     @NSManaged var transcription: String?
     /// Also optional: unknown until someone (or an enrichment source) supplies it.
     @NSManaged var partOfSpeech: String?
@@ -207,6 +212,11 @@ final class CDTerm: NSManagedObject, Timestamped {
     @NSManaged var comments: Set<CDComment>
     @NSManaged var illustrations: Set<CDIllustration>
     @NSManaged var forms: Set<CDWordForm>
+    @NSManaged var pronunciations: Set<CDPronunciation>
+    /// Many-to-many rather than to-one: upstream marks a spelling with an *array* of
+    /// dialect tags, and a form valid in both the US and Canada is ordinary. Cardinality
+    /// cannot be widened later without a schema change, so it is chosen wide once.
+    @NSManaged var varieties: Set<CDVariety>
 
     override func awakeFromInsert() {
         super.awakeFromInsert()
@@ -256,6 +266,11 @@ final class CDLanguage: NSManagedObject {
     /// anything; a UUID can. Optional in the store, non-optional here — see `CDReviewEvent`.
     @NSManaged var id: UUID
     @NSManaged var code: String
+    /// The code this language is looked up under in Wiktionary, when it differs from
+    /// `code`. Croatian, Serbian and Bosnian stay distinct for the learner but fold into
+    /// `sh` upstream, and enrichment is where that seam is crossed (docs/Design.md).
+    /// `nil` — the ordinary case — means the two agree.
+    @NSManaged var wiktionaryCode: String?
     @NSManaged var terms: Set<CDTerm>
     @NSManaged var sets: Set<CDWordSet>
 
@@ -285,6 +300,12 @@ final class CDTag: NSManagedObject {
     /// Merge tie-breaker, not a lookup key — see `CDLanguage.id`.
     @NSManaged var id: UUID
     @NSManaged var name: String
+    /// Which vocabulary the name came from — "register" ("slang", "dated") or "topic"
+    /// ("medicine", "law"), separate lists upstream. Optional because a tag a learner
+    /// invents belongs to neither, and guessing is worse than recording that we do not
+    /// know. Replaces the `domain:` name prefix, which was a convention doing a column's
+    /// job (docs/Enrichment.md).
+    @NSManaged var category: String?
     @NSManaged var createdAt: Date
     @NSManaged var synsets: Set<CDSynset>
 
@@ -298,6 +319,39 @@ final class CDTag: NSManagedObject {
 extension CDTag {
     static func fetchRequest() -> NSFetchRequest<CDTag> {
         NSFetchRequest<CDTag>(entityName: "Tag")
+    }
+}
+
+/// A regional or orthographic variety — "US", "GB", "Hans", "Latn-RS" — in the stable
+/// BCP-47 casing `LanguageCode.parse` already produces.
+///
+/// Its own dimension rather than a `Tag`, per docs/Design.md: a variety belongs to the
+/// **term** (which spelling) and to a **pronunciation** (which accent), never to a sense,
+/// so it cannot share `Tag`'s relationship to `Synset`.
+///
+/// **Find-or-create, exactly like `Tag` and `Language`.** The original reasoning called
+/// variety a "closed, registry-backed set" as against the open tag folksonomy;
+/// docs/Enrichment.md corrects that — wiktextract carries 2,062 dialect tags, which we can
+/// no more ship and validate against than a folksonomy. The decision stands on the owner
+/// argument alone, which was always the stronger one.
+///
+/// Identity is `objectID`; `id` is the merge tie-breaker — see `CDLanguage.id`.
+@objc(CDVariety)
+final class CDVariety: NSManagedObject {
+    @NSManaged var id: UUID
+    @NSManaged var subtag: String
+    @NSManaged var terms: Set<CDTerm>
+    @NSManaged var pronunciations: Set<CDPronunciation>
+
+    override func awakeFromInsert() {
+        super.awakeFromInsert()
+        id = UUID()
+    }
+}
+
+extension CDVariety {
+    static func fetchRequest() -> NSFetchRequest<CDVariety> {
+        NSFetchRequest<CDVariety>(entityName: "Variety")
     }
 }
 
@@ -407,6 +461,52 @@ extension CDWordForm {
     static func fetchRequest() -> NSFetchRequest<CDWordForm> {
         NSFetchRequest<CDWordForm>(entityName: "WordForm")
     }
+}
+
+/// One recorded way of saying a term: an IPA transcription, an audio recording, or both,
+/// optionally attributed to a `Variety`.
+///
+/// A row rather than `Term.transcription`, because a single string cannot hold both
+/// /ˈskedʒuːl/ and /ˈʃedjuːl/ — and wiktextract's `sounds[]` proves the source carries
+/// several per word (docs/Enrichment.md). `Term.transcription` is superseded but still
+/// live: it is what `Lexicon` reads and writes today, and it is permanent in the deployed
+/// CloudKit schema regardless (TD-48), so nothing is gained by racing to delete it.
+///
+/// **Both payload attributes are optional, and that is the point.** Upstream a sound
+/// entry carries an IPA string *or* an audio file, never both, so requiring either would
+/// make half the source unrepresentable. A row with neither is meaningless, but that is a
+/// validity rule the store cannot express — the creating API owns it, as it does
+/// `Term.language`.
+@objc(CDPronunciation)
+final class CDPronunciation: NSManagedObject, Timestamped {
+    /// Not indexed for Spotlight: nobody searches their phone in IPA.
+    @NSManaged var ipa: String?
+    /// Remote, like `Illustration.urlString` — Wikimedia audio is linked rather than
+    /// bundled, which is also what keeps its per-file licences out of our redistribution
+    /// (docs/Enrichment.md § Licence).
+    @NSManaged var audioURLString: String?
+    @NSManaged var createdAt: Date
+    @NSManaged var modifiedAt: Date
+    @NSManaged var term: CDTerm?
+    @NSManaged var variety: CDVariety?
+
+    override func awakeFromInsert() {
+        super.awakeFromInsert()
+        startTimestamps()
+    }
+
+    override func willSave() {
+        super.willSave()
+        touchModified()
+    }
+}
+
+extension CDPronunciation {
+    static func fetchRequest() -> NSFetchRequest<CDPronunciation> {
+        NSFetchRequest<CDPronunciation>(entityName: "Pronunciation")
+    }
+
+    var audioURL: URL? { audioURLString.flatMap(URL.init(string:)) }
 }
 
 // MARK: - Review event

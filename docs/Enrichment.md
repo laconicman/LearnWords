@@ -146,19 +146,35 @@ in none — both attach to `Synset`, both are open-ended, both are just a name. 
 differs in owner. So this is not a reversal; it is the same test giving a different answer
 on different facts.
 
-### The CloudKit timing window — read this before deploying the schema
+### The CloudKit timing window — closed, and the three landed anyway (2026-08-07)
 
-[Handoff](Handoff.md) lists "Deploy Schema Changes" as a pending pre-ship step. **These
-three additions are cheapest before that deploy and permanent after it.**
+**This section used to describe a deadline. It had already passed when it was written.**
+The production schema exported from the CloudKit Console carries
+`CD_Term.CD_transcription`, so the deploy this warned about was history, and
+`transcription` was permanent before anyone read the warning. Kept here rather than
+deleted, because the reasoning is right and only its tense was wrong.
 
-CloudKit lets you *add* record types and fields to a deployed production schema. It does not
-let you remove or retype them. So after the deploy, `Pronunciation` and `Variety` can still
-be added — but `Term.transcription` can never be *removed*. It becomes a vestigial field
-that every future reader has to be told to ignore, forever.
+CloudKit lets you *add* record types and fields to a deployed production schema, at any
+time, for ever. It does not let you remove or retype them. **The asymmetry is only about
+removal** — which means `Pronunciation`, `Variety` and `Tag.category` were never on a clock;
+retiring `Term.transcription` was, and that clock had run out.
 
-This is not a reason to rush a half-designed entity into the model. It **is** a reason to
-decide deliberately: either add the three now, or accept `transcription` as permanent
-baggage and write that down as a known cost.
+The additions were nevertheless made on 2026-08-07 (owner), for a reason that has nothing
+to do with the deadline: **one production schema deploy before App Store submission is
+worth more than a second one later.** The risk that buys — designing entities from a source
+format rather than from a working consumer, with CloudKit making *their* mistakes permanent
+too — is recorded with the rest of the decision in
+[TechDebt § TD-48](TechDebt.md), along with the accepted cost of `transcription` and the
+fourth addition (`Language.wiktionaryCode`) that this document implies but the Roadmap's
+list of three omitted.
+
+**What shipped, against the design above:** `Pronunciation` takes `ipa` and
+`audioURLString`, both optional — upstream a sound entry carries one or the other, never
+both, so requiring either would make half the source unrepresentable. `Term.varieties` is
+**many-to-many**, not to-one: upstream marks a spelling with an array of dialect tags, and
+cardinality cannot be widened later without a schema change. `Tag.category` and
+`Language.wiktionaryCode` are optional, because "a tag the learner invented" and "this
+language needs no bridge" are the ordinary cases, not missing data.
 
 ### The `hr`/`sr`/`bs` bridge
 

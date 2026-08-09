@@ -1502,3 +1502,49 @@ below 13 with a standing `TODO: look up in assets`, across 17 call sites. Giving
 icons means PNG `.imageset`s and a backport that consults them — related to TD-45's lesson
 that a catalog is compiled by whichever toolchain opens it, and has no deployment target of
 its own. Deliberately deferred; a labels-only tab bar is legible, if plain.
+
+## TD-48 — The CloudKit removal window closed before anyone noticed it was open
+
+[Enrichment](Enrichment.md) frames three schema additions as a deadline: *"cheapest before
+that deploy and permanent after it."* The deploy in question had **already happened**. The
+production schema exported from the CloudKit Console contains
+`CD_Term.CD_transcription` and its `_ckAsset` sibling, so the thing the deadline protected —
+retiring `Term.transcription` once `Pronunciation` supersedes it — was lost before the
+sentence was read.
+
+**The asymmetry is only about removal.** CloudKit lets you add record types and fields to a
+production schema at any time, for ever; it never lets you delete or retype one. So the
+additions were never on a clock. What was on a clock was the deletion, and that clock had
+already run out.
+
+**Consequences, deliberately accepted (owner, 2026-08-07).**
+
+1. **`Term.transcription` is permanent in this container.** The cost is two dead columns
+   visible in the CloudKit Console and nowhere else: when a migration eventually retires the
+   attribute from the Core Data model, mirroring simply stops writing the field, because the
+   remote schema only has to be a *superset* of what the model mirrors. It is not a code cost.
+2. **The container stays.** A new container identifier is the only way to reset a production
+   schema, and with no users that escape hatch is still free — but spending it on two dead
+   columns, in the same release as the iOS 12 fix, would be trading a real signing and
+   deployment risk for a cosmetic gain.
+3. **The additions landed anyway, now rather than at their first consumer** — against
+   [Design](Design.md)'s "sequenced, not built yet", and knowingly. The reason is not the
+   false deadline: it is that one production schema deploy before submission is worth more
+   than a second one later. **The risk taken:** these entities have no consumer yet, so their
+   shape is designed from the source format rather than from working code, and CloudKit makes
+   *their* mistakes permanent too. Mitigated by keeping every new attribute optional except
+   the natural key, so nothing forces a value the ingestion pipeline may turn out not to have.
+
+**A fourth addition was found while doing this** and is not in the Roadmap's list of three:
+**`Language.wiktionaryCode`**, for the `hr`/`sr`/`bs` → `sh` bridge that
+[Design](Design.md) puts "on the `Language` row when TD-22 lands". Included, for the same
+one-deploy reason.
+
+**Discharge:** none needed for the schema. What remains is that
+`Term.transcription` and `Term.pronunciations` now both exist and only the first is written
+— a second source of truth with a documented reason and no deadline. Retire the attribute
+when enrichment gives the rows a writer; until then new code should prefer the row.
+
+**Rule worth carrying:** a document that says "before the deploy" is a trap once the deploy
+is history. When a doc states a deadline, check whether it has passed before planning around
+it — the CloudKit Console export answers this in one look.
