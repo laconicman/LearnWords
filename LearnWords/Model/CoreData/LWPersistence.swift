@@ -172,9 +172,31 @@ final class LWPersistence {
 
     private var importObserver: NSObjectProtocol?
 
-    /// Sync belongs to the host app. `.appex` is how a bundle says it is an extension.
+    /// Whether to attach CloudKit mirroring at all.
+    ///
+    /// Two conditions, and the second one is load-bearing in a way the first is not:
+    ///
+    /// 1. Sync belongs to the host app. `.appex` is how a bundle says it is an extension.
+    /// 2. **An iCloud account must be signed in.** Without one, `loadPersistentStores`
+    ///    still succeeds — the store is fine — and then `NSCloudKitMirroringDelegate`
+    ///    traps *asynchronously* on `com.apple.coredata.cloudkit.queue` while setting up
+    ///    the container. That trap happens long after `init`'s `do/catch` has returned, so
+    ///    the fallback below never runs and the app dies at launch. Checking the account
+    ///    up front is the only place this can be caught: an async trap inside a system
+    ///    framework is not catchable anywhere else (TD-54).
+    ///
+    /// `ubiquityIdentityToken` is the documented "is there an account" question. It does
+    /// not prove the *container* exists — a provisioning mistake still surfaces through
+    /// the event notifications in `observeRemoteChanges` — but it removes the case that
+    /// crashes, which is the common one: no account on a simulator, or a user who simply
+    /// does not use iCloud.
     private static var shouldSync: Bool {
-        !Bundle.main.bundlePath.hasSuffix(".appex")
+        guard !Bundle.main.bundlePath.hasSuffix(".appex") else { return false }
+        guard FileManager.default.ubiquityIdentityToken != nil else {
+            debugLog("No iCloud account; opening the local store without mirroring.")
+            return false
+        }
+        return true
     }
 
     private static func localDescription() -> NSPersistentStoreDescription {
