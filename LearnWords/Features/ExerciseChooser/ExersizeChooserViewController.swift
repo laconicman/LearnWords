@@ -202,9 +202,12 @@ class ExersizeChooserViewController: UIViewController {
         alert.addAction(UIAlertAction(
             title: NSLocalizedString("Practise anyway", comment: "AlertAction title"),
             style: .default) { [weak self] _ in
-                self?.push(exercise, in: set,
-                           scope: .everything(
-                               includingLearned: LWUserDefaults.standard.includeLearnedWords))
+                // `includingLearned: true`, not the learner's filter. This button is only
+                // reachable when nothing is due, so with the filter on it can select an
+                // empty queue and the screen opens and bounces straight back. Choosing
+                // "practise anyway" at that moment *is* the request to include them.
+                // Reported by review, PR #1.
+                self?.push(exercise, in: set, scope: .everything(includingLearned: true))
             })
         alert.addAction(UIAlertAction(
             title: NSLocalizedString("Cancel", comment: "AlertAction title"), style: .cancel))

@@ -22,17 +22,6 @@ import Foundation
 @Suite(.serialized)
 struct PracticeSessionTests {
 
-    /// Runs `body` with the "learned" bar pinned, then puts the user's setting back.
-    /// The preference is real, process-wide state; a test must neither depend on what
-    /// the machine happens to hold nor leave its own value behind.
-    private func withKnownLevel(_ level: Int, _ body: () throws -> Void) rethrows {
-        let prefs = LWUserDefaults.standard
-        let saved = prefs.maxKnownLevelPreference
-        defer { prefs.maxKnownLevelPreference = saved }
-        prefs.maxKnownLevelPreference = level
-        try body()
-    }
-
     private func makeLexicon() -> Lexicon {
         Lexicon(persistence: LWPersistence(inMemory: true))
     }

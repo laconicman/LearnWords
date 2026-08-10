@@ -29,8 +29,10 @@ struct ReviewSchedule {
     struct SetDigest: Equatable {
         let setID: UUID
         let name: String
-        /// Meanings practisable right now in *some* exercise, in the direction this set is
-        /// studied in. The headline number; `dueCount(for:)` is what a sitting will ask.
+        /// Meanings due in an **engaged** exercise — one the learner has practised before.
+        ///
+        /// What reminders count, so they can fall silent rather than nag about exercises
+        /// never chosen. Not what the chooser shows: see `anyExerciseDueCount`.
         let dueCount: Int
         /// Meanings due per exercise. Since TD-49 each exercise carries its own schedule,
         /// so the count that matters is the one for the exercise about to be started —
