@@ -132,10 +132,10 @@ run — asset formats only Xcode 26 understands (TD-45), a hard link to Core Hap
     which strips entitlements; a normally signed build of unmodified HEAD is fine. The
     `ubiquityIdentityToken` guard was reverted — review flagged that it could have disabled
     sync for everyone, since this app has no ubiquity entitlement.
-  - Remaining, in order: **TD-53** (comma entry → several meanings, entry-time only) →
-    **TD-50** (per-term stats popup; now has strands to show) → **TD-52** (measure, then
-    cache) → **TD-51** (set summary, pivoted by exercise). TD-50/51 also owe the settings
-    switch for `requireProductionForLearned` and the slider minimum of 10.
+  - Remaining, in order: **TD-53** → **TD-50** → **TD-52** → **TD-51**, handed off in
+    [TASK-TD53-batch](TASK-TD53-batch.md) (self-contained: scope, the owner's UI asks, the
+    build flag that must not be used, and the review loop). TD-50/51 also owe the settings
+    switch for `requireProductionForLearned`; the slider minimum is done.
 - **CloudKit account setup — [step-by-step](CloudKitSetup.md).** The container does not
   exist server-side yet (`BadContainer` on device), so the app is running local-only. The
   capability, the container and the development-schema upload are all account-side work.
