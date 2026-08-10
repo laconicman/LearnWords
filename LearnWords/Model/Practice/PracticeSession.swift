@@ -128,7 +128,7 @@ final class PracticeSession {
         return PracticeSession(exercise: exercise,
                                languages: languages,
                                wordSetID: wordSetID,
-                               senses: order(chosen, by: index),
+                               senses: order(chosen, by: index, for: exercise),
                                lexicon: lexicon)
     }
 
@@ -140,10 +140,16 @@ final class PracticeSession {
     /// on it to carry a prior shuffle through ties would be relying on unspecified
     /// behaviour. Without it a fresh set, where every meaning ties at "never seen", would
     /// be asked in insertion order every single time.
-    private static func order(_ senses: [Sense], by index: ProgressIndex) -> [Sense] {
+    ///
+    /// Ordered by *this exercise's* due date, not the meaning's earliest across all of
+    /// them: a word overdue as a flashcard is not overdue as dictation, and sorting on the
+    /// whole-meaning date pushed never-typed words in among the genuinely overdue ones
+    /// instead of last. Reported by review, PR #1.
+    private static func order(_ senses: [Sense], by index: ProgressIndex,
+                              for exercise: Exercise) -> [Sense] {
         senses
             .map { sense -> (sense: Sense, due: TimeInterval, tiebreak: Double) in
-                let dueAt = index[sense.id].dueAt?.timeIntervalSinceReferenceDate
+                let dueAt = index[sense.id][exercise].dueAt?.timeIntervalSinceReferenceDate
                 return (sense, dueAt ?? .greatestFiniteMagnitude, .random(in: 0..<1))
             }
             .sorted { ($0.due, $0.tiebreak) < ($1.due, $1.tiebreak) }

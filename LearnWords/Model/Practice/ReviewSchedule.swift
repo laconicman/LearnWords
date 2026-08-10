@@ -29,8 +29,14 @@ struct ReviewSchedule {
     struct SetDigest: Equatable {
         let setID: UUID
         let name: String
-        /// Meanings practisable right now, in the direction this set is studied in.
+        /// Meanings practisable right now in *some* exercise, in the direction this set is
+        /// studied in. The headline number; `dueCount(for:)` is what a sitting will ask.
         let dueCount: Int
+        /// Meanings due per exercise. Since TD-49 each exercise carries its own schedule,
+        /// so the count that matters is the one for the exercise about to be started —
+        /// otherwise the chooser can push a screen with an empty queue, or fall silent
+        /// while two exercises have never been practised. Reported by review, PR #1.
+        let dueByExercise: [Exercise: Int]
         /// Meanings that are askable at all, whether due or not.
         let askableCount: Int
         /// When each not-yet-due meaning comes up, earliest first.
@@ -39,6 +45,9 @@ struct ReviewSchedule {
         /// "how much will be waiting *on Thursday*" — a question no single summary number
         /// can answer.
         let upcomingDueAt: [Date]
+
+        /// How many meanings this exercise would ask right now.
+        func dueCount(for exercise: Exercise) -> Int { dueByExercise[exercise] ?? 0 }
 
         /// When the earliest not-yet-due meaning comes up. `nil` when nothing is waiting —
         /// either everything is already due, or the set has nothing to ask.
@@ -104,12 +113,17 @@ struct ReviewSchedule {
         self.sets = sets.map { set in
             let senses = askable[set.id] ?? []
             let due = senses.filter { index[$0.id].isDue }
+            var dueByExercise: [Exercise: Int] = [:]
+            for exercise in Exercise.allCases {
+                dueByExercise[exercise] = senses.filter { index[$0.id].isDue(exercise) }.count
+            }
             // Only meanings that are *not* due have a future date worth waiting for.
             let upcoming = senses.filter { !index[$0.id].isDue }
                 .compactMap { index[$0.id].dueAt }
                 .sorted()
             return SetDigest(setID: set.id, name: set.name,
-                             dueCount: due.count, askableCount: senses.count,
+                             dueCount: due.count, dueByExercise: dueByExercise,
+                             askableCount: senses.count,
                              upcomingDueAt: upcoming)
         }
     }

@@ -1646,25 +1646,45 @@ strong flashcard strand hide a failing spoken one, and "done" should mean usable
 **Settings UI still owes a switch** for `requireProductionForLearned`, and the slider's
 minimum should move from 1 to 10 to match the floor. Both belong to the TD-50/51 screens.
 
-## TD-54 — No iCloud account crashed the app at launch — **resolved (2026-08-09)**
+## TD-54 — The launch crash was my build flag, not the app — **withdrawn (2026-08-09)**
 
-Found while trying to run the suite for TD-49: **the app could not launch on any simulator,
-and had not been able to for some time.** `LWPersistence.shouldSync` asked only "am I the
-host app?" before attaching `cloudKitContainerOptions`. Without an iCloud account
-`loadPersistentStores` still *succeeds* — the store is fine — and then
-`NSCloudKitMirroringDelegate` traps asynchronously on `com.apple.coredata.cloudkit.queue`
-inside `_performSetupRequest:`. That trap lands long after `init`'s `do/catch` has returned,
-so the carefully written local-store fallback never ran and the process died. The intent
-was already recorded in that method — *"a provisioning mistake should cost the user sync,
-not their vocabulary"* — the guard just did not cover the asynchronous half.
+**Retracted in full. There was no user-facing bug, and the "fix" was reverted.**
 
-**This was not a test-only problem.** Any user not signed into iCloud got a crash on launch.
+What happened: while trying to run the suite for TD-49, the app crashed at launch on every
+simulator, on a thread named `com.apple.coredata.cloudkit.queue` — `NSCloudKitMirroringDelegate`
+trapping inside `_performSetupRequest:`. Unmodified HEAD crashed identically, so it was not
+TD-49. The conclusion drawn — *"`shouldSync` never checks whether iCloud is available, so any
+user not signed into iCloud crashes at launch"* — was wrong, and a guard on
+`FileManager.ubiquityIdentityToken` was written and briefly committed.
 
-**Fix:** `shouldSync` also requires `FileManager.default.ubiquityIdentityToken != nil`.
-Checking up front is the only place this is catchable: a trap inside a system framework's
-own queue cannot be caught anywhere else. It does not prove the *container* exists — that
-still surfaces through the event notifications — but it removes the case that crashes.
+**Review (PR #1) caught the danger**: this app's entitlement declares
+`com.apple.developer.icloud-services = [CloudKit]` with no `CloudDocuments` and no ubiquity
+container, and `ubiquityIdentityToken` is the *ubiquity* identity — widely reported nil
+without that service. The guard could therefore have disabled CloudKit sync **for every
+user**, silently, with the local-store fallback hiding it. Trading a crash nobody had for
+the loss of the flagship feature.
 
-**Rule worth carrying:** a `do/catch` around `loadPersistentStores` does not make CloudKit
-failures survivable. Mirroring sets up asynchronously; anything that must not kill the app
-has to be decided *before* the options are attached.
+Checking that properly turned up the real cause: **every failing build was made with
+`CODE_SIGNING_ALLOWED=NO`**, which strips entitlements entirely. Built normally — ad-hoc
+"Sign to Run Locally" — the *unmodified* baseline launches and the suite runs green. The
+crash is an artefact of unsigned simulator builds asking CloudKit for a container the
+binary is not entitled to.
+
+**Resolution:** guard reverted; `LWPersistence` is back to its previous state. Nothing to fix.
+
+**The lesson, which is the part worth keeping:**
+
+> `CODE_SIGNING_ALLOWED=NO` is not a neutral convenience. It strips entitlements, so any
+> framework that resolves them — CloudKit above all — can fail in ways that never happen to
+> a real build. Verify with a normally signed build before concluding the *app* is broken;
+> a crash that only reproduces under an unusual build flag is a fact about the flag.
+
+Two observations from the same review remain open and are worth keeping, neither urgent:
+
+* Sync is decided once, in `LWPersistence`'s `init`, for the life of the process. A learner
+  who signs into iCloud after launch — or whose account is unavailable before first unlock —
+  keeps a local-only store until relaunch, silently. `NSUbiquityIdentityDidChange` is the
+  notification that would let the app notice.
+* If an account check is ever genuinely wanted, `CKContainer.accountStatus` is the API
+  CloudKit documents for it — asynchronous, so it cannot gate the synchronous store open
+  directly; it would have to defer attaching the container or reopen the store afterwards.

@@ -163,7 +163,10 @@ struct ScoringPolicy {
     /// Bumped whenever the mapping below changes, so a stored index (should one ever be
     /// cached) can be told apart from one computed under different rules. The rules
     /// themselves are never migrated — they are re-run.
-    static let version = 1
+    /// 2 since TD-49: replay is partitioned per exercise, mastery carries a distinct-day
+    /// ceiling and the preference has a floor. Any cache written under 1 means something
+    /// else (TD-52). Reported by review, PR #1.
+    static let version = 2
 
     static let `default` = ScoringPolicy()
 
@@ -206,6 +209,14 @@ struct ScoringPolicy {
     /// Successful recalls on separate days before an exercise may be called learned.
     /// Two is the smallest number for which the word "spaced" means anything.
     static let defaultMinimumSuccessfulDays = 2
+
+    /// The most mastery an exercise may show while the distinct-day gate still holds it.
+    ///
+    /// Not 0.99: the ring would read as full for a meaning the app explicitly refuses to
+    /// call learned, and a progress indicator that disagrees with the word beside it is
+    /// worse than a coarse one. Three quarters says "nearly there, not there".
+    /// Reported by review, PR #1.
+    static let gatedMasteryCeiling = 0.75
 
     /// Distinct successful days an exercise needs before it may be called learned.
     /// Injectable so a test about something *else* can opt out of the gate.
@@ -252,7 +263,10 @@ struct ScoringPolicy {
 
             effort += effortWeight(of: event)
             sittings.insert(event.sessionID)
-            if let direction = event.direction {
+            // Graded answers only: a skip is exposure, and "you answered 12 productively"
+            // must not count the ones passed over. Reported by review, PR #1.
+            if let direction = event.direction, event.outcome?.isPositive != nil,
+               event.outcome != .skipped {
                 answersByDirection[direction, default: 0] += 1
             }
 
@@ -292,8 +306,19 @@ struct ScoringPolicy {
             strands: strands,
             effort: display(effort: effort),
             answersByDirection: answersByDirection,
-            // Nothing engaged yet is not overdue — it is simply new, and always worth
-            // asking. Otherwise: any engaged strand falling due makes the meaning due.
+            // **Engaged strands only** — deliberately, and symmetrically with `isLearned`.
+            //
+            // Review (PR #1) proposed counting every exercise, engaged or not, so that the
+            // aggregate matched what a sitting asks. That direction was tried and rejected:
+            // an untouched strand is always due, so every meaning would be due forever
+            // until all three exercises were learned, reminders could never fall silent,
+            // and "nothing due" would become unreachable — the streak-nagging the whole
+            // design avoids. The app must not demand exercises the learner does not use.
+            //
+            // The genuine half of that report — a set reporting "nothing due" while
+            // dictation has never been tried — is answered where it belongs, in the UI:
+            // `SetDigest.dueByExercise` gives the chooser a per-exercise count, so the
+            // number shown is the number that exercise will ask.
             isDue: strands.isEmpty || strands.values.contains(where: \.isDue))
         return progress
     }
@@ -375,7 +400,7 @@ struct ScoringPolicy {
     private func mastery(forStability stability: Double, successfulDays: Int) -> Float {
         guard stability > 0, masteryHorizonDays > 0 else { return 0 }
         let value = log1p(stability) / log1p(masteryHorizonDays)
-        let ceiling: Double = successfulDays >= minimumSuccessfulDays ? 1 : 0.99
+        let ceiling = successfulDays >= minimumSuccessfulDays ? 1 : Self.gatedMasteryCeiling
         return Float(min(max(value, 0), ceiling))
     }
 
@@ -437,7 +462,11 @@ struct ProgressIndex {
     }
 
     var learnedCount: Int {
-        progress.values.filter(\.isLearned).count
+        // Read once for the whole index rather than once per meaning: `isLearned`'s default
+        // argument reaches into UserDefaults, and a large library would pay for that on
+        // every row of a summary. Reported by review, PR #1.
+        let requireProduction = LWUserDefaults.standard.requireProductionForLearned
+        return progress.values.filter { $0.isLearned(requireProduction: requireProduction) }.count
     }
 
     func senses(_ senses: [Sense], matching predicate: (SenseProgress) -> Bool) -> [Sense] {

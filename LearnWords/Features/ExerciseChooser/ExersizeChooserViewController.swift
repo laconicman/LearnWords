@@ -158,7 +158,10 @@ class ExersizeChooserViewController: UIViewController {
         }
         // With the switch on, the schedule is bypassed on purpose and there is nothing to
         // ask about; with it off, an empty due list is worth a word before drilling ahead.
-        if includeLeanedWords.isOn || digest.dueCount > 0 {
+        // The exercise's own count, not the set's: with per-exercise schedules the set can
+        // have work waiting while *this* exercise has none, and pushing then would open a
+        // sitting with an empty queue that pops straight back. Reported by review, PR #1.
+        if includeLeanedWords.isOn || digest.dueCount(for: exercise) > 0 {
             push(exercise, in: set, scope: chosenScope)
         } else {
             offerToPractiseAhead(exercise, in: set, digest: digest)

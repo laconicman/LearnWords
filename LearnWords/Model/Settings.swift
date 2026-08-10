@@ -155,8 +155,6 @@ userDefaultsGroup.set(newValue, forKey: "pronounceQuestionsPreference")
         set { userDefaultsGroup.set(newValue, forKey: "continuousRecognition") }
     }
 
-    /// Whether the learner wants to be reminded. Off until they say otherwise — the
-    /// permission sheet is asked for at the switch, not at launch.
     /// Whether a meaning must be proven in a *productive* exercise — typed or spoken —
     /// before it counts as learned (TD-49).
     ///
@@ -169,6 +167,8 @@ userDefaultsGroup.set(newValue, forKey: "pronounceQuestionsPreference")
         set { userDefaultsGroup.set(newValue, forKey: "requireProductionForLearned") }
     }
 
+    /// Whether the learner wants to be reminded. Off until they say otherwise — the
+    /// permission sheet is asked for at the switch, not at launch.
     var remindersEnabled: Bool {
         get { userDefaultsGroup.bool(forKey: "remindersEnabled") }
         set { userDefaultsGroup.set(newValue, forKey: "remindersEnabled") }

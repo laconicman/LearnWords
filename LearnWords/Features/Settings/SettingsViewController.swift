@@ -61,7 +61,9 @@ final class SettingsViewController: UITableViewController {
     /// same 1…100 range, which reads sensibly as days.
     private lazy var masteryHorizonCell = SliderCell(
         title: NSLocalizedString("Remembered for (days)", comment: "setting"),
-        minimum: 1, maximum: 100, format: "%.0f",
+        // Floor matches `ScoringPolicy.minimumHorizonDays`: below it a single fast answer
+        // fills the ring outright, so offering 1…9 would be a control that does nothing.
+        minimum: Float(ScoringPolicy.minimumHorizonDays), maximum: 100, format: "%.0f",
         value: Float(prefs.maxKnownLevelPreference)
     ) { [weak self] in self?.prefs.maxKnownLevelPreference = Int($0.rounded()) }
 
