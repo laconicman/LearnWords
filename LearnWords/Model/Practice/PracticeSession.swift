@@ -104,18 +104,25 @@ final class PracticeSession {
                       languages: LanguagePair,
                       lexicon: Lexicon,
                       scope: Scope,
+                      policy: ScoringPolicy = .default,
                       now: Date = Date()) throws -> PracticeSession {
         let askable = try lexicon.senses(in: wordSetID,
                                          from: languages.promptLanguage,
                                          to: languages.answerLanguage)
-        let index = try ProgressIndex(lexicon: lexicon, senses: askable, now: now)
+        let index = try ProgressIndex(lexicon: lexicon, senses: askable,
+                                      policy: policy, now: now)
 
+        // Both filters are asked *of this exercise*: memory is per strand since TD-49, so
+        // a meaning can be due for dictation while its flashcard strand rests, and one
+        // learned as a flashcard is still unproven as a typed answer.
         let chosen: [Sense]
         switch scope {
         case .due:
-            chosen = index.senses(askable) { $0.isDue }
+            chosen = index.senses(askable) { $0.isDue(exercise) }
         case .everything(let includingLearned):
-            chosen = includingLearned ? askable : index.senses(askable) { !$0.isLearned }
+            chosen = includingLearned
+                ? askable
+                : index.senses(askable) { !$0.isLearned(exercise) }
         }
 
         return PracticeSession(exercise: exercise,
