@@ -121,6 +121,20 @@ run — asset formats only Xcode 26 understands (TD-45), a hard link to Core Hap
 
 ## Next
 
+- **The learning-design batch (TD-49…TD-53), researched 2026-08-09.** Answers four owner
+  questions and, notably, **none of them needs a schema change** — the event log already
+  carries what they read. Research: [MasteryAndProgressUI](MasteryAndProgressUI.md) and
+  [LexicalModelResearch](LexicalModelResearch.md) § *Commas at entry*.
+  - **TD-49 — done (2026-08-09).** Memory is per exercise (`StrandProgress`); learned =
+    every *engaged* exercise learned, gated on successes across 2 separate days, with the
+    preference floored at 10 days and an opt-in "require production". 294 tests green.
+  - **TD-54 — done, found on the way.** No iCloud account crashed the app at launch, for
+    every user and not just the harness; the CloudKit fallback only covered the
+    *synchronous* half of store opening.
+  - Remaining, in order: **TD-53** (comma entry → several meanings, entry-time only) →
+    **TD-50** (per-term stats popup; now has strands to show) → **TD-52** (measure, then
+    cache) → **TD-51** (set summary, pivoted by exercise). TD-50/51 also owe the settings
+    switch for `requireProductionForLearned` and the slider minimum of 10.
 - **CloudKit account setup — [step-by-step](CloudKitSetup.md).** The container does not
   exist server-side yet (`BadContainer` on device), so the app is running local-only. The
   capability, the container and the development-schema upload are all account-side work.

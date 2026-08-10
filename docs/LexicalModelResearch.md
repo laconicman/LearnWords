@@ -292,6 +292,55 @@ Codd's rules about ad-hoc query languages and views don't apply to it — but
 normalization discipline does, because the SQLite store only optimises what the model
 exposes.)
 
+## Commas at entry (owner request, 2026-08-09)
+
+> "When defining a term, words entered separated by comma should go to different meanings."
+
+**The ask is right, and the wording hides the one hard case.** A comma in a translation
+field is genuinely ambiguous, and this model is the first version of the schema able to
+tell the two readings apart:
+
+| Input | Reading | Correct shape |
+|---|---|---|
+| `лиса, лисица` for *fox* | **synonyms** — one meaning, two words | one Synset, two Terms in `ru` |
+| `берег, банк` for *bank* | **distinct senses** — two meanings | two Synsets |
+
+Splitting every comma into separate Synsets gets the second row right and the first row
+wrong; keeping today's behaviour gets the first right and the second wrong. Neither is
+decidable from the text alone — *fox* has synonyms and *bank* is polysemous, and both were
+typed with the same key.
+
+**Prior art.** Anki does not try: fields are free text and the note structure is the
+learner's business. Dictionary formats refuse the ambiguity by construction — Apple's
+`d:entry` carries an *ordered list of senses*, each with its own gloss, and synonyms live
+inside a sense; kaikki/wiktextract likewise emits senses explicitly with glosses as lists.
+Every source that gets this right does so by **making the sense boundary explicit at
+authoring time** rather than inferring it from punctuation.
+
+**Decision: parse, propose, confirm.** Split on comma at entry — but into *editable rows in
+the editor*, not silently into the store. The learner sees "2 meanings will be created"
+with the split laid out and one control to merge rows back into synonyms of a single
+meaning. Default = the owner's rule (comma → separate meanings); the misparse of `лиса,
+лисица` costs one tap to fix, and it is visible before it reaches the store rather than
+discovered months later in practice. `Lexicon.addSenses(to:terms:)` already takes
+`[[Term.Draft]]`, so the batch shape needed for this exists.
+
+Rejected: **a punctuation convention** (comma = senses, semicolon = synonyms). It is
+learnable in a manual and forgotten in a hurry, and it silently produces the wrong graph
+when forgotten. Rejected: **asking a language model to decide.** Polysemy detection is
+genuinely hard, the app must work at the iOS 12 floor, and a wrong automatic split is
+worse than a visible manual one — though an FM *suggestion* in the confirm step (iOS 26+)
+is a natural later addition, since the learner still approves it.
+
+**The history warning — this is entry-time only.** A Synset owns its `ReviewEvent` log.
+Splitting an *existing* sense into two creates a new Synset with no history, so a
+retroactive "split all commas" migration would silently discard learning records for every
+word it touched. Splitting is for words being entered; any later split of an existing
+meaning must be an explicit, warned action. (The reverse — merging two Synsets into
+synonyms — has the same problem from the other side: two logs, one survivor.)
+
+No schema change: Synsets, Terms and the batch API all exist. → **TD-53.**
+
 ## Rejected alternatives
 
 - **Word-pair entity (the first iteration-1 schema).** No synonyms, no third language
