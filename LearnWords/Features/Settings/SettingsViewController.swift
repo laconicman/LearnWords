@@ -64,8 +64,21 @@ final class SettingsViewController: UITableViewController {
         // Floor matches `ScoringPolicy.minimumHorizonDays`: below it a single fast answer
         // fills the ring outright, so offering 1…9 would be a control that does nothing.
         minimum: Float(ScoringPolicy.minimumHorizonDays), maximum: 100, format: "%.0f",
-        value: Float(prefs.maxKnownLevelPreference)
+        // Clamped, and written back: a value stored below the floor (from before it
+        // existed) would otherwise sit in the defaults forever while the slider drew the
+        // floor and the policy enforced it — three numbers disagreeing. Reported by
+        // review, PR #1.
+        value: Float(Self.horizonInForce)
     ) { [weak self] in self?.prefs.maxKnownLevelPreference = Int($0.rounded()) }
+
+    /// The stored horizon, raised to the floor the policy will apply anyway — and
+    /// persisted, so the stored value and the enforced one are the same number.
+    private static var horizonInForce: Int {
+        let prefs = LWUserDefaults.standard
+        let floored = max(prefs.maxKnownLevelPreference, Int(ScoringPolicy.minimumHorizonDays))
+        if floored != prefs.maxKnownLevelPreference { prefs.maxKnownLevelPreference = floored }
+        return floored
+    }
 
     private lazy var remindersCell = SwitchCell(
         title: NSLocalizedString("Daily reminder", comment: "setting"),

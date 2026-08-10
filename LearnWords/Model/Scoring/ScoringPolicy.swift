@@ -148,6 +148,14 @@ struct SenseProgress: Equatable {
     }
 
     /// Whether this one exercise has passed the bar.
+    ///
+    /// Deliberately blind to `requireProductionForLearned`: that preference is a statement
+    /// about the *meaning* ("do not call it learned until it can be produced"), and asking
+    /// it of a single strand would be a category error — a flashcard strand cannot become
+    /// productive. So a meaning can be excluded from a flashcard drill as "learned there"
+    /// while the summary still counts it unlearned overall, and both are true of different
+    /// questions. Raised by review, PR #1; pinned by
+    /// `LearnedThresholdTests.perExerciseLearnedIsAboutTheStrandNotTheProductionRule`.
     func isLearned(_ exercise: Exercise) -> Bool { self[exercise].mastery >= 1 }
 
     /// Non-parameterised form, for call sites that just want the current rule.
@@ -258,6 +266,10 @@ struct ScoringPolicy {
             // answers before it are still work the learner did (ProgressModel R1/R3).
             guard event.kind == .answer else {
                 replays.removeAll()
+                // `answersByDirection` is *not* cleared, deliberately and for the same
+                // reason effort is not: a reset restarts the schedule, it does not unsay
+                // the answers already given (ProgressModel R1/R3). The tally describes
+                // work done, not standing. Raised by review, PR #1.
                 continue
             }
 

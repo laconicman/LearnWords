@@ -108,17 +108,28 @@ class ExersizeChooserViewController: UIViewController {
                 comment: "Label when the schedule is being bypassed")
         }
         if let digest = setDigest() {
-            summary += " " + (digest.dueCount > 0
+            // `anyExerciseDueCount`, not `dueCount`: this screen's buttons each open a
+            // per-exercise queue, so a headline built from engaged strands alone could say
+            // "Nothing due" while Dictation had the whole set waiting. Reported by review,
+            // PR #1. Reminders keep using `dueCount` — they should stay quiet about
+            // exercises the learner has never chosen.
+            summary += " " + (digest.anyExerciseDueCount > 0
                 ? String(format: NSLocalizedString("%@ due now.", comment: "Label words due now"),
-                         pluralizedWordCount(digest.dueCount))
+                         pluralizedWordCount(digest.anyExerciseDueCount))
                 : nextDueDescription(digest))
         }
         numberOfWordsInSet.text = summary
     }
 
     /// "Nothing due — next on Thursday", or just "Nothing due" when the schedule is empty.
-    private func nextDueDescription(_ digest: ReviewSchedule.SetDigest) -> String {
-        guard let next = digest.nextDueAt else {
+    ///
+    /// `exercise` picks which schedule the date comes from. Without it the alert shown for
+    /// one exercise quoted the whole set's earliest date — belonging to a different
+    /// exercise, or missing entirely because a meaning due elsewhere is never "upcoming".
+    /// Reported by review, PR #1.
+    private func nextDueDescription(_ digest: ReviewSchedule.SetDigest,
+                                    for exercise: Exercise? = nil) -> String {
+        guard let next = exercise.map({ digest.nextDueAt(for: $0) }) ?? digest.nextDueAt else {
             return NSLocalizedString("Nothing due.", comment: "Label when nothing is scheduled")
         }
         let formatter = DateFormatter()
@@ -184,7 +195,7 @@ class ExersizeChooserViewController: UIViewController {
                                       digest: ReviewSchedule.SetDigest) {
         let alert = UIAlertController(
             title: NSLocalizedString("Nothing is due", comment: "Title for alert"),
-            message: nextDueDescription(digest) + " "
+            message: nextDueDescription(digest, for: exercise) + " "
                 + NSLocalizedString("Practising ahead of schedule still counts, it just teaches less.",
                                     comment: "Message when nothing is due"),
             preferredStyle: .alert)

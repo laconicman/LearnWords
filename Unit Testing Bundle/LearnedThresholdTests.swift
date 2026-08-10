@@ -161,3 +161,22 @@ struct LearnedThresholdTests {
         #expect(progress.answersByDirection[.receptive] == 1)
     }
 }
+
+// MARK: - The two readings of "learned"
+
+extension LearnedThresholdTests {
+
+    /// Raised by review (PR #1): the per-exercise overload ignores `requireProduction`,
+    /// so practice filtering and the summary count can disagree. They are different
+    /// questions, and this pins that rather than letting it drift.
+    @Test func perExerciseLearnedIsAboutTheStrandNotTheProductionRule() {
+        let events = [answer(.selfAssessedKnown, .learning, onDay: 0),
+                      answer(.selfAssessedKnown, .learning, onDay: 1)]
+        let progress = policy().progress(replaying: events, now: day(1))
+
+        #expect(progress.isLearned(.learning), "the flashcard strand is learned, and stays so")
+        #expect(!progress.isLearned(requireProduction: true),
+                "the meaning is not, because nothing productive was proven")
+        #expect(!progress.isLearned(.dictation), "an untouched strand is never learned")
+    }
+}

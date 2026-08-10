@@ -37,6 +37,16 @@ struct ReviewSchedule {
         /// otherwise the chooser can push a screen with an empty queue, or fall silent
         /// while two exercises have never been practised. Reported by review, PR #1.
         let dueByExercise: [Exercise: Int]
+        /// Meanings due in *at least one* exercise, engaged or not.
+        ///
+        /// The honest headline for a screen whose buttons each open a per-exercise queue:
+        /// `dueCount` counts only engaged strands (so reminders can fall silent), which
+        /// meant the summary could read "Nothing due" while every exercise button had a
+        /// full sitting behind it. Reported by review, PR #1.
+        let anyExerciseDueCount: Int
+        /// Not-yet-due dates per exercise, earliest first — the per-exercise twin of
+        /// `upcomingDueAt`, so a message about one exercise cannot quote another's date.
+        let upcomingByExercise: [Exercise: [Date]]
         /// Meanings that are askable at all, whether due or not.
         let askableCount: Int
         /// When each not-yet-due meaning comes up, earliest first.
@@ -52,6 +62,9 @@ struct ReviewSchedule {
         /// When the earliest not-yet-due meaning comes up. `nil` when nothing is waiting —
         /// either everything is already due, or the set has nothing to ask.
         var nextDueAt: Date? { upcomingDueAt.first }
+
+        /// When this exercise's earliest not-yet-due meaning comes up.
+        func nextDueAt(for exercise: Exercise) -> Date? { upcomingByExercise[exercise]?.first }
     }
 
     /// The moment this was computed. Everything below is relative to it.
@@ -114,8 +127,16 @@ struct ReviewSchedule {
             let senses = askable[set.id] ?? []
             let due = senses.filter { index[$0.id].isDue }
             var dueByExercise: [Exercise: Int] = [:]
+            var upcomingByExercise: [Exercise: [Date]] = [:]
             for exercise in Exercise.allCases {
                 dueByExercise[exercise] = senses.filter { index[$0.id].isDue(exercise) }.count
+                upcomingByExercise[exercise] = senses
+                    .filter { !index[$0.id].isDue(exercise) }
+                    .compactMap { index[$0.id][exercise].dueAt }
+                    .sorted()
+            }
+            let anyExerciseDue = senses.filter { sense in
+                Exercise.allCases.contains { index[sense.id].isDue($0) }
             }
             // Only meanings that are *not* due have a future date worth waiting for.
             let upcoming = senses.filter { !index[$0.id].isDue }
@@ -123,6 +144,8 @@ struct ReviewSchedule {
                 .sorted()
             return SetDigest(setID: set.id, name: set.name,
                              dueCount: due.count, dueByExercise: dueByExercise,
+                             anyExerciseDueCount: anyExerciseDue.count,
+                             upcomingByExercise: upcomingByExercise,
                              askableCount: senses.count,
                              upcomingDueAt: upcoming)
         }
