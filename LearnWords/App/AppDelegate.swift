@@ -29,6 +29,16 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
     ) -> Bool {
         // App-wide appearance. The proxies apply on every OS, and must be set before any
         // bar is created — on iOS 12 that is a few lines below rather than in `SceneDelegate`.
+        // A horizon stored below `ScoringPolicy.minimumHorizonDays` is raised to it once,
+        // here: values from before the floor existed would otherwise sit in the defaults
+        // forever while the slider drew the floor and the policy enforced it — three
+        // numbers disagreeing. This is the app's own launch path, which matters because
+        // `LWUserDefaults` and `Library` are both compiled into the extensions, where
+        // `ScoringPolicy` does not exist. Reported by review, PR #1.
+        let prefs = LWUserDefaults.standard
+        prefs.maxKnownLevelPreference = max(prefs.maxKnownLevelPreference,
+                                            Int(ScoringPolicy.minimumHorizonDays))
+
         UINavigationBar.appearance().tintColor = .orange
         UITabBar.appearance().tintColor = .orange
 

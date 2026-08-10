@@ -247,3 +247,60 @@ struct ReviewScheduleTests {
         #expect(prefs.remindersEnabled == false)
     }
 }
+
+// MARK: - Per-exercise counts (TD-49; requested by review, PR #1)
+
+// `@MainActor` like the suite above: these touch the store's view context, and reading it
+// off the main thread crashes the whole runner rather than failing one case.
+@MainActor
+@Suite(.serialized)
+struct SetDigestPerExerciseTests {
+
+    private func makeLexicon() -> Lexicon { Lexicon(persistence: LWPersistence(inMemory: true)) }
+
+    /// One meaning, answered twice in dictation so that strand rests while the others
+    /// have never been asked.
+    private func stocked() throws -> (Lexicon, WordSet) {
+        let lexicon = makeLexicon()
+        let set = try lexicon.addWordSet(named: "Animals", languages: ["en", "ru"])
+        try lexicon.addSense(to: set.id, terms: [Term.Draft("bear", in: "en"),
+                                                 Term.Draft("медведь", in: "ru")])
+        return (lexicon, set)
+    }
+
+    @Test func anUntouchedExerciseIsDueWhileThePractisedOneRests() throws {
+        let (lexicon, set) = try stocked()
+        let session = try PracticeSession.start(
+            .dictation, in: set.id,
+            languages: LanguagePair(primary: "ru", secondary: "en", showsSecondaryAsPrompt: true),
+            lexicon: lexicon, scope: .everything(includingLearned: true))
+        _ = session.nextQuestion()
+        try session.record(.correctVerbatim)
+
+        let schedule = try ReviewSchedule(sets: [set], lexicon: lexicon)
+        let digest = try #require(schedule.sets.first)
+
+        #expect(digest.dueCount(for: .dictation) == 0, "just answered")
+        #expect(digest.dueCount(for: .learning) == 1, "never asked as a flashcard")
+        #expect(digest.dueCount(for: .phonetics) == 1)
+        #expect(digest.anyExerciseDueCount == 1,
+                "the headline must not read 'nothing due' while two exercises are waiting")
+        #expect(digest.dueCount == 0,
+                "the reminder count stays engaged-only, so reminders can fall silent")
+    }
+
+    /// The alert shown for one exercise must quote that exercise's date.
+    @Test func upcomingDatesAreKeptPerExercise() throws {
+        let (lexicon, set) = try stocked()
+        let session = try PracticeSession.start(
+            .dictation, in: set.id,
+            languages: LanguagePair(primary: "ru", secondary: "en", showsSecondaryAsPrompt: true),
+            lexicon: lexicon, scope: .everything(includingLearned: true))
+        _ = session.nextQuestion()
+        try session.record(.correctVerbatim)
+
+        let digest = try #require(try ReviewSchedule(sets: [set], lexicon: lexicon).sets.first)
+        #expect(digest.nextDueAt(for: .dictation) != nil, "answered, so it has a next date")
+        #expect(digest.nextDueAt(for: .learning) == nil, "due now, so nothing is 'upcoming'")
+    }
+}

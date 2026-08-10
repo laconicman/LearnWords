@@ -27,6 +27,7 @@ func releaseLog(_ message: String = "called", file: String = #file, function: St
 	print("\(timestamp) \(fileName): \(function) \(message)")
 }
 
+// TODO: Replace with native `Logger`
 func debugLog(_ message: String = "called", file: String = #file, function: String = #function)
 {
 	#if DEBUG

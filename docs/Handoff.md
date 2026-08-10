@@ -38,30 +38,30 @@ column as the first.
 | Practice is due-driven; study-ahead offered when nothing is due | ✅ exercised on the simulator |
 | Reminder *derivation* — which days, what count, what identifier | ✅ 9 tests, pinned clock |
 | The reminder switch requests permission | ✅ owner-confirmed on device |
-| **A reminder actually arrives** (schedule → deliver → tap → route) | ❌ **unverified** — see TD-29 |
+| **A reminder actually arrives** | ✅ **owner-confirmed on device, 2026-08-09.** Content and timing are a separate matter — the "learned" rule behind what it counts as due is TD-49 |
 | Word entry: suggestions, recents, commit | ✅ 10 tests + built |
-| **Dictation actually transcribes** | ❌ **unverified** — needs a microphone and a human |
+| **Dictation actually transcribes** | ✅ **owner-confirmed, 2026-08-09** — works on iOS 12 and above |
 | Audio session returns to playback after recognition (TD-15's bug) | ✅ 5 tests, two proven to fail against the old code |
 | **Speech still audible after a Phonetics round, on a device** | ⚠️ tests pin the session state; the sound itself needs an ear |
 | Deferred seeding stops the second device seeding | ⚠️ not verified — needs a clean install on device 2 |
 | Live UI refresh on incoming changes | ⚠️ not verified on two devices |
-| iOS 12–14 behaviour since the store change | ❌ unverified (TD-8; owner has devices) |
+| iOS 12–14 behaviour since the store change | ⚠️ partly — dictation confirmed on iOS 12; the rest **deferred to testers and users after publication** (owner, 2026-08-09), so TD-8 is a beta-feedback item rather than a pre-ship gate |
 
 ## Before shipping anything
 
-1. **Confirm a reminder arrives and lands on Exercises**, and **try the dictation button**
-   in the word editor. Both need a device and a human: the harness cannot operate a
-   `UISwitch` (TD-29), and no simulator has a microphone worth testing against. Everything
-   up to the system boundary is covered; nothing past it is.
-2. **Decide whether a meaning belongs to one set or many** — see [Design](Design.md)
-   § *is a meaning in more than one set?*. To-one would make orphans unrepresentable and
-   retire `deleteOrphanedSenses`; many-to-many keeps a shared "Hard words" set possible.
-   Free today, impossible after the deploy.
-3. **Decide the three schema additions** — `Variety`, `Pronunciation`, `Tag.category` from
-   [Enrichment](Enrichment.md) — **before** the production deploy. CloudKit can add record
-   types and fields to production but never remove or retype them, so deferring means
-   `Term.transcription` is vestigial forever. Deferring is allowed; deferring by accident
-   is not.
+1. ~~Confirm a reminder arrives and try the dictation button.~~ **Done 2026-08-09** — both
+   owner-confirmed on device. What a reminder *says* still depends on the learned rule,
+   which TD-49 changes.
+2. ~~Decide whether a meaning belongs to one set or many.~~ **Closed 2026-08-09 — many.**
+   Not chosen: settled by the deploy that TD-48 found had already happened, since narrowing
+   a mirrored relationship's cardinality is exactly what an immutable production schema
+   forbids. It landed on the recommended option, so only the optionality was lost.
+   `deleteOrphanedSenses` (already given its semantics by TD-26) is now permanent
+   architecture rather than a placeholder, and a shared "Hard words" set is unlocked.
+   [Design](Design.md) § *a meaning belongs to many sets*.
+3. ~~Decide the three schema additions.~~ **Done** — `Variety`, `Pronunciation`,
+   `Tag.category` and `Language.wiktionaryCode` landed in `f833280`; `Term.transcription`
+   stays as two dead columns in the container, deliberately (TD-48).
 4. **Two-device retest** of the deferred seed and live refresh. Delete the app from both
    devices and reset the CloudKit Development environment first, so double-seeded
    duplicates are not mistaken for a regression.

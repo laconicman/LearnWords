@@ -155,6 +155,18 @@ userDefaultsGroup.set(newValue, forKey: "pronounceQuestionsPreference")
         set { userDefaultsGroup.set(newValue, forKey: "continuousRecognition") }
     }
 
+    /// Whether a meaning must be proven in a *productive* exercise — typed or spoken —
+    /// before it counts as learned (TD-49).
+    ///
+    /// Off by default. Production lags recognition and only improves when practised
+    /// productively (Laufer, via docs/ProgressResearch.md §1.4), so turning this on is the
+    /// academically stricter setting — and a real increase in work, which is why the
+    /// learner opts into it rather than out.
+    var requireProductionForLearned: Bool {
+        get { userDefaultsGroup.bool(forKey: "requireProductionForLearned") }
+        set { userDefaultsGroup.set(newValue, forKey: "requireProductionForLearned") }
+    }
+
     /// Whether the learner wants to be reminded. Off until they say otherwise — the
     /// permission sheet is asked for at the switch, not at launch.
     var remindersEnabled: Bool {

@@ -650,7 +650,35 @@ goes.
 That was already true in practice — nothing could reattach an orphan — so the change makes
 the store honest about it rather than changing what the learner experiences.
 
-## Open question: is a meaning in more than one set? — **decide before the CloudKit deploy**
+## Decision: a meaning belongs to many sets — **closed by the deploy (2026-08-09)**
+
+> **Resolved, and not by choosing.** The model ships `Synset.sets` ↔ `WordSet.synsets` as
+> many-to-many, and TD-48 established that the production CloudKit schema was deployed
+> before anyone read the deadline protecting this choice. Narrowing to to-one would change
+> the cardinality of a relationship that is already mirrored in an immutable production
+> schema — the same add-only rule that made `Term.transcription` permanent. The window
+> that the section below says is "free today" had already shut when it was written.
+>
+> **The outcome is the one this section recommends**, so the loss is the optionality, not
+> the design: many-to-many was the argued preference, and it is what is deployed. Two
+> consequences are now permanent rather than provisional:
+>
+> 1. **`deleteOrphanedSenses` is architecture, not a stopgap.** Reference counting is the
+>    one rule Core Data's four deletion rules cannot express, so with many-to-many
+>    permanent, the sweep is permanent too — it will never be retired by a narrowing
+>    migration. TD-26 already gave it the right semantics (removal deletes when the last
+>    set lets go; the collector catches what other paths strand, history or not); what
+>    changes is only its status: a fixed part of the design rather than a placeholder.
+> 2. **A shared "Hard words" set is unlocked** — the feature that justified many-to-many
+>    can be built whenever wanted, with one history rather than a forked duplicate.
+>
+> A new container identifier remains the only way to reset a production schema, and with no
+> users it is still free (TD-48) — but spending it here would buy a *worse* model, so it is
+> moot. Verified in passing: the code is already many-to-many-correct — `Lexicon` iterates
+> `sense.sets`, orphan detection is `sets.isEmpty`, and the word editor already displays a
+> meaning's several set names. No single-set assumptions to unpick.
+
+The original analysis, kept because the reasoning still explains the design:
 
 **Why it is open.** `deleteOrphanedSenses` exists because Core Data cannot express the rule
 we want. Its four deletion rules are No Action, Nullify, Cascade and Deny; none of them is
@@ -679,10 +707,9 @@ the same meaning as "Animals", sharing one history rather than forking it, is th
 next feature and the many-to-many is what makes it possible. The collector is eight lines
 run once per launch — a small, visible price for a model that can say what it means.
 
-**But decide deliberately, and decide now.** CloudKit's production schema is immutable once
-deployed, and the deploy is on the pre-ship list. Narrowing to to-one is free today and
-impossible afterwards. This belongs beside the three enrichment additions in
-[Handoff](Handoff.md) § *Before shipping*.
+~~**But decide deliberately, and decide now.**~~ *(Superseded — see the decision above. The
+deploy this sentence planned around had already happened; the choice was settled by it, on
+the recommended option.)*
 
 ## Decision: a manual reset appends a marker; it never deletes history
 

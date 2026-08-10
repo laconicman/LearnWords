@@ -1548,3 +1548,143 @@ when enrichment gives the rows a writer; until then new code should prefer the r
 **Rule worth carrying:** a document that says "before the deploy" is a trap once the deploy
 is history. When a doc states a deadline, check whether it has passed before planning around
 it — the CloudKit Console export answers this in one look.
+
+## TD-49 — Learned: per-exercise strands, spacing gate, horizon floor — **resolved (2026-08-09)**
+
+`isLearned` is `mastery >= 1`, i.e. FSRS stability ≥ the "Remembered for (days)" horizon.
+A first *Easy* grade (fast verbatim answer) sets initial stability to **8.30 days** under
+the shipped FSRS-6 weights, so **any horizon below ~8 days makes one answer sufficient** —
+and the slider's range starts at 1. The meaning is then excluded from practice
+(`PracticeSession` filters `!isLearned`) on the strength of a single retrieval, which by
+definition carries no spacing evidence at all.
+
+Research is unambiguous that spacing, not count, is the dial (Bahrick et al. 1993: 13
+sessions @ 56 d ≈ 26 @ 14 d) — but equally that *one* sitting is not a spaced anything.
+**Discharge:** add a distinct-day gate — `learned ⇔ stability ≥ horizon AND ≥N successful
+retrievals on N distinct days` (N = 2 minimum, 3 conservative) — and floor the horizon
+slider above the Easy initial stability. Both derive from the existing log (`sessionID`,
+`date`); no schema change. Optionally expose FSRS `requestRetention` (hard-coded 0.9) as
+the second Study dial, the way Anki does. Full reasoning:
+[MasteryAndProgressUI](MasteryAndProgressUI.md) §1.
+
+## TD-50 — No per-term statistics view
+
+The log holds far more than the ring shows — per-direction (receptive vs productive),
+per-exercise, effort, latency, next-due — and none of it is reachable from the word list.
+**Discharge:** long press → `UIContextMenuInteraction` context menu with a preview
+(iOS 13+; `UILongPressGestureRecognizer` + sheet at the iOS 12 floor, plus
+`accessibilityCustomActions` either way — a bare gesture is invisible to VoiceOver).
+Trailing swipe is **not** available: the sets screen already uses it for rename/delete.
+Content and gesture rationale: [MasteryAndProgressUI](MasteryAndProgressUI.md) §2. The
+receptive/productive split is the part no surveyed competitor shows. No schema change.
+
+## TD-51 — No set-level summary
+
+**Discharge:** a summary screen built on distribution rather than means — stacked
+untouched/learning/learned bar, a 14-day due forecast (honest forgetting, not streaks),
+true retention split young/mature, effort totals, and the receptive/productive gap; the
+requested averages shown *beside* the distribution, never instead of it (a mean of 0.5
+describes two opposite sets). Reference implementation is Anki's stats screen.
+[MasteryAndProgressUI](MasteryAndProgressUI.md) §3. No schema change.
+
+## TD-52 — The progress cache ProgressModel deferred is now due
+
+[ProgressModel](ProgressModel.md) agreed per-word cached index values "in principle,
+mechanism negotiable", deferring the mechanism to implementation; the word list already
+replays the log per row, and TD-51's summary would replay it for every sense in a set on
+every appearance. **Discharge:** measure first on a realistic library, then cache
+per-sense progress invalidated on event append and recomputed off the cell path. Decide
+before shipping the summary, not after. Not a schema commitment.
+
+## TD-53 — Comma-separated entry creates one meaning, not several
+
+Typing `берег, банк` for *bank* should create two meanings; today it creates one. But the
+same key produces `лиса, лисица`, which is **one** meaning with two synonyms — undecidable
+from the text, and the schema is now able to represent both. **Discharge:** split on comma
+into editable rows in the editor and let the learner confirm or merge before commit
+(default = the owner's rule, comma → separate meanings); `Lexicon.addSenses(to:terms:)`
+already accepts `[[Term.Draft]]`. **Entry-time only:** a Synset owns its `ReviewEvent` log,
+so retroactively splitting existing meanings would discard their history — any later split
+or merge must be an explicit, warned action. Prior art and rejected alternatives (a
+punctuation convention; automatic FM splitting):
+[LexicalModelResearch](LexicalModelResearch.md) § *Commas at entry*. No schema change.
+
+## TD-49 resolution note (2026-08-09)
+
+Implemented, 294 tests green. Three changes, one of them larger than the ticket asked for
+because the owner widened it: *"which skill is practiced, and in which direction"*.
+
+**Memory is now per exercise.** `ScoringPolicy` replays the log partitioned by
+`ReviewEvent.task`, so every exercise carries its own FSRS state, schedule and due date
+(`StrandProgress`). This is Anki's card model — its scheduling unit is note × template, not
+the note — and Nation's receptive/productive split says the same thing from the pedagogy
+side. `PracticeSession` now asks both of its questions *of the exercise being practised*:
+a meaning can be due for dictation while its flashcard strand rests.
+
+**The learned rule.** `isLearned` = every exercise the learner has **engaged** is learned,
+and at least one is. Engagement rather than "all three" is deliberate: it is what stops
+strands from wiping progress on meanings drilled in one exercise. Failing a *new* exercise
+un-learns the meaning, which is true and is the hypercorrection moment worth surfacing.
+`requireProductionForLearned` (preference, off by default) additionally demands a typed or
+spoken strand — the academically stricter reading, opt-in because it is real extra work.
+
+**The two guards.** Mastery is held below 1 until an exercise has successes on
+`minimumSuccessfulDays` (2) **separate days**: one retrieval carries no spacing evidence,
+whatever its stability. And the *preference* is floored at `minimumHorizonDays` (10) —
+above the 8.2956-day stability a single Easy answer produces. The floor deliberately does
+**not** apply to an injected horizon: an initialiser that ignores its argument is a worse
+bug than the one it guards against, so the floor protects the slider only.
+
+**Direction is tallied, not forked.** `answersByDirection` is carried for display (TD-50);
+memory stays keyed by exercise. Because direction is on every event, a per-direction split
+of memory remains computable later without backfill — `ProgressResearch` Change 5's
+deferral, still deferred and still cheap.
+
+Aggregates report the **weakest engaged strand**, never an average: an average lets a
+strong flashcard strand hide a failing spoken one, and "done" should mean usable.
+
+**Settings UI still owes a switch** for `requireProductionForLearned`, and the slider's
+minimum should move from 1 to 10 to match the floor. Both belong to the TD-50/51 screens.
+
+## TD-54 — The launch crash was my build flag, not the app — **withdrawn (2026-08-09)**
+
+**Retracted in full. There was no user-facing bug, and the "fix" was reverted.**
+
+What happened: while trying to run the suite for TD-49, the app crashed at launch on every
+simulator, on a thread named `com.apple.coredata.cloudkit.queue` — `NSCloudKitMirroringDelegate`
+trapping inside `_performSetupRequest:`. Unmodified HEAD crashed identically, so it was not
+TD-49. The conclusion drawn — *"`shouldSync` never checks whether iCloud is available, so any
+user not signed into iCloud crashes at launch"* — was wrong, and a guard on
+`FileManager.ubiquityIdentityToken` was written and briefly committed.
+
+**Review (PR #1) caught the danger**: this app's entitlement declares
+`com.apple.developer.icloud-services = [CloudKit]` with no `CloudDocuments` and no ubiquity
+container, and `ubiquityIdentityToken` is the *ubiquity* identity — widely reported nil
+without that service. The guard could therefore have disabled CloudKit sync **for every
+user**, silently, with the local-store fallback hiding it. Trading a crash nobody had for
+the loss of the flagship feature.
+
+Checking that properly turned up the real cause: **every failing build was made with
+`CODE_SIGNING_ALLOWED=NO`**, which strips entitlements entirely. Built normally — ad-hoc
+"Sign to Run Locally" — the *unmodified* baseline launches and the suite runs green. The
+crash is an artefact of unsigned simulator builds asking CloudKit for a container the
+binary is not entitled to.
+
+**Resolution:** guard reverted; `LWPersistence` is back to its previous state. Nothing to fix.
+
+**The lesson, which is the part worth keeping:**
+
+> `CODE_SIGNING_ALLOWED=NO` is not a neutral convenience. It strips entitlements, so any
+> framework that resolves them — CloudKit above all — can fail in ways that never happen to
+> a real build. Verify with a normally signed build before concluding the *app* is broken;
+> a crash that only reproduces under an unusual build flag is a fact about the flag.
+
+Two observations from the same review remain open and are worth keeping, neither urgent:
+
+* Sync is decided once, in `LWPersistence`'s `init`, for the life of the process. A learner
+  who signs into iCloud after launch — or whose account is unavailable before first unlock —
+  keeps a local-only store until relaunch, silently. `NSUbiquityIdentityDidChange` is the
+  notification that would let the app notice.
+* If an account check is ever genuinely wanted, `CKContainer.accountStatus` is the API
+  CloudKit documents for it — asynchronous, so it cannot gate the synchronous store open
+  directly; it would have to defer attaching the container or reopen the store afterwards.

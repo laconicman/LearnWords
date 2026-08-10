@@ -74,7 +74,7 @@ struct ProgressResetTests {
         let lexicon = makeLexicon()
         let (set, sense) = try stocked(lexicon)
         // A one-day horizon, so a handful of sittings clears it.
-        let policy = ScoringPolicy(masteryHorizonDays: 1)
+        let policy = ScoringPolicy(masteryHorizonDays: 1, minimumSuccessfulDays: 1)
         try practise(lexicon, set, times: 4)
         let senses = try lexicon.senses(in: set.id)
         #expect(try ProgressIndex(lexicon: lexicon, senses: senses, policy: policy)[sense.id]
@@ -92,7 +92,7 @@ struct ProgressResetTests {
     @Test func answersAfterAResetCountNormally() throws {
         let lexicon = makeLexicon()
         let (set, sense) = try stocked(lexicon)
-        let policy = ScoringPolicy(masteryHorizonDays: 1)
+        let policy = ScoringPolicy(masteryHorizonDays: 1, minimumSuccessfulDays: 1)
         try practise(lexicon, set, times: 2)
         try lexicon.resetProgress(ofSense: sense.id, in: set.id)
         try practise(lexicon, set, times: 2)

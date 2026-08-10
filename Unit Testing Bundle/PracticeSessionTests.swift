@@ -22,17 +22,6 @@ import Foundation
 @Suite(.serialized)
 struct PracticeSessionTests {
 
-    /// Runs `body` with the "learned" bar pinned, then puts the user's setting back.
-    /// The preference is real, process-wide state; a test must neither depend on what
-    /// the machine happens to hold nor leave its own value behind.
-    private func withKnownLevel(_ level: Int, _ body: () throws -> Void) rethrows {
-        let prefs = LWUserDefaults.standard
-        let saved = prefs.maxKnownLevelPreference
-        defer { prefs.maxKnownLevelPreference = saved }
-        prefs.maxKnownLevelPreference = level
-        try body()
-    }
-
     private func makeLexicon() -> Lexicon {
         Lexicon(persistence: LWPersistence(inMemory: true))
     }
@@ -59,12 +48,26 @@ struct PracticeSessionTests {
                        _ exercise: Exercise = .dictation,
                        reversed: Bool = false,
                        scope: PracticeSession.Scope = .everything(includingLearned: true),
+                       policy: ScoringPolicy = .default,
                        now: Date = Date()) throws -> PracticeSession {
         try PracticeSession.start(exercise, in: set.id,
                                   languages: pair(!reversed),
                                   lexicon: lexicon,
                                   scope: scope,
+                                  policy: policy,
                                   now: now)
+    }
+
+    /// A policy that keeps the *threshold* out of tests that are about something else:
+    /// one sitting is enough to be learned, which is what these tests assumed before
+    /// TD-49 made the distinct-day gate the production default.
+    ///
+    /// The horizon still matters to what a *lapse* does. One Easy answer opens at 8.3 days
+    /// of stability, and a same-day lapse takes FSRS-6's short-term path down to roughly
+    /// 2.9 — so a 2-day horizon is still cleared after the mistake, while 5 is not. Tests
+    /// about lapses ask for the wider one.
+    private func quickLearn(horizonDays: Double = 2) -> ScoringPolicy {
+        ScoringPolicy(masteryHorizonDays: horizonDays, minimumSuccessfulDays: 1)
     }
 
     // MARK: - Asking
@@ -259,45 +262,49 @@ struct PracticeSessionTests {
     // MARK: - Learned filtering
 
     @Test func learnedMeaningsAreLeftOutUnlessAskedFor() throws {
-        // The preference is now a *stability horizon in days*, so 2 means "counts as
-        // learned once it should survive two days" — which one correct answer achieves.
-        try withKnownLevel(2) {
-            let lexicon = makeLexicon()
-            let set = try stock(lexicon, count: 2)
+        // What this test is about is the *filter*, not the threshold — so the threshold is
+        // injected out of the way. Under the shipped policy one correct answer could never
+        // do it: TD-49's gate wants successes on two separate days, and the comment that
+        // used to sit here ("which one correct answer achieves") described the defect.
+        let lexicon = makeLexicon()
+        let set = try stock(lexicon, count: 2)
 
-            let target = try #require(try lexicon.senses(in: set.id).first)
-            let session = try start(lexicon, set)
-            while let question = session.nextQuestion() {
-                try session.record(question.sense.id == target.id ? .correctVerbatim : .skipped)
-            }
-
-            #expect(try !asked(in: start(lexicon, set, scope: .everything(includingLearned: false))).contains(target.id),
-                    "a learned meaning is not asked again")
-            #expect(try asked(in: start(lexicon, set, scope: .everything(includingLearned: true))).contains(target.id),
-                    "unless the learner asks for it")
+        let target = try #require(try lexicon.senses(in: set.id).first)
+        let session = try start(lexicon, set, policy: quickLearn())
+        while let question = session.nextQuestion() {
+            try session.record(question.sense.id == target.id ? .correctVerbatim : .skipped)
         }
+
+        #expect(try !asked(in: start(lexicon, set, scope: .everything(includingLearned: false),
+                                     policy: quickLearn())).contains(target.id),
+                "a learned meaning is not asked again")
+        #expect(try asked(in: start(lexicon, set, scope: .everything(includingLearned: true),
+                                    policy: quickLearn())).contains(target.id),
+                "unless the learner asks for it")
     }
 
     @Test func aMistakeSendsALearnedMeaningBackIntoRotation() throws {
-        // Five days: enough that one confident answer clears it and a lapse does not.
-        try withKnownLevel(5) {
-            let lexicon = makeLexicon()
-            let set = try stock(lexicon, count: 1)
+        // About the lapse, not the threshold — so the threshold is injected out of the way
+        // (TD-49: under the shipped policy one answer can no longer clear the bar).
+        let lexicon = makeLexicon()
+        let set = try stock(lexicon, count: 1)
 
-            let first = try start(lexicon, set)
-            _ = first.nextQuestion()
-            try first.record(.correctVerbatim)
+        let policy = quickLearn(horizonDays: 5)
+        let first = try start(lexicon, set, policy: policy)
+        _ = first.nextQuestion()
+        try first.record(.correctVerbatim)
 
-            let learned = try start(lexicon, set, scope: .everything(includingLearned: false))
-            #expect(learned.nextQuestion() == nil, "precondition: it counts as learned")
+        let learned = try start(lexicon, set, scope: .everything(includingLearned: false),
+                                policy: policy)
+        #expect(learned.nextQuestion() == nil, "precondition: it counts as learned")
 
-            let slip = try start(lexicon, set)
-            _ = slip.nextQuestion()
-            try slip.record(.incorrect, response: "no")
+        let slip = try start(lexicon, set, policy: policy)
+        _ = slip.nextQuestion()
+        try slip.record(.incorrect, response: "no")
 
-            let again = try start(lexicon, set, scope: .everything(includingLearned: false))
-            #expect(again.nextQuestion() != nil, "a mistake puts it back in the queue")
-        }
+        let again = try start(lexicon, set, scope: .everything(includingLearned: false),
+                              policy: policy)
+        #expect(again.nextQuestion() != nil, "a mistake puts it back in the queue")
     }
 
 

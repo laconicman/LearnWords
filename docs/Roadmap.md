@@ -121,6 +121,21 @@ run — asset formats only Xcode 26 understands (TD-45), a hard link to Core Hap
 
 ## Next
 
+- **The learning-design batch (TD-49…TD-53), researched 2026-08-09.** Answers four owner
+  questions and, notably, **none of them needs a schema change** — the event log already
+  carries what they read. Research: [MasteryAndProgressUI](MasteryAndProgressUI.md) and
+  [LexicalModelResearch](LexicalModelResearch.md) § *Commas at entry*.
+  - **TD-49 — done (2026-08-09).** Memory is per exercise (`StrandProgress`); learned =
+    every *engaged* exercise learned, gated on successes across 2 separate days, with the
+    preference floored at 10 days and an opt-in "require production". 294 tests green.
+  - **TD-54 — withdrawn.** The launch crash reproduced only under `CODE_SIGNING_ALLOWED=NO`,
+    which strips entitlements; a normally signed build of unmodified HEAD is fine. The
+    `ubiquityIdentityToken` guard was reverted — review flagged that it could have disabled
+    sync for everyone, since this app has no ubiquity entitlement.
+  - Remaining, in order: **TD-53** → **TD-50** → **TD-52** → **TD-51**, handed off in
+    [TASK-TD53-batch](TASK-TD53-batch.md) (self-contained: scope, the owner's UI asks, the
+    build flag that must not be used, and the review loop). TD-50/51 also owe the settings
+    switch for `requireProductionForLearned`; the slider minimum is done.
 - **CloudKit account setup — [step-by-step](CloudKitSetup.md).** The container does not
   exist server-side yet (`BadContainer` on device), so the app is running local-only. The
   capability, the container and the development-schema upload are all account-side work.

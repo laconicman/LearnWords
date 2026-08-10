@@ -104,24 +104,31 @@ final class PracticeSession {
                       languages: LanguagePair,
                       lexicon: Lexicon,
                       scope: Scope,
+                      policy: ScoringPolicy = .default,
                       now: Date = Date()) throws -> PracticeSession {
         let askable = try lexicon.senses(in: wordSetID,
                                          from: languages.promptLanguage,
                                          to: languages.answerLanguage)
-        let index = try ProgressIndex(lexicon: lexicon, senses: askable, now: now)
+        let index = try ProgressIndex(lexicon: lexicon, senses: askable,
+                                      policy: policy, now: now)
 
+        // Both filters are asked *of this exercise*: memory is per strand since TD-49, so
+        // a meaning can be due for dictation while its flashcard strand rests, and one
+        // learned as a flashcard is still unproven as a typed answer.
         let chosen: [Sense]
         switch scope {
         case .due:
-            chosen = index.senses(askable) { $0.isDue }
+            chosen = index.senses(askable) { $0.isDue(exercise) }
         case .everything(let includingLearned):
-            chosen = includingLearned ? askable : index.senses(askable) { !$0.isLearned }
+            chosen = includingLearned
+                ? askable
+                : index.senses(askable) { !$0.isLearned(exercise) }
         }
 
         return PracticeSession(exercise: exercise,
                                languages: languages,
                                wordSetID: wordSetID,
-                               senses: order(chosen, by: index),
+                               senses: order(chosen, by: index, for: exercise),
                                lexicon: lexicon)
     }
 
@@ -133,10 +140,16 @@ final class PracticeSession {
     /// on it to carry a prior shuffle through ties would be relying on unspecified
     /// behaviour. Without it a fresh set, where every meaning ties at "never seen", would
     /// be asked in insertion order every single time.
-    private static func order(_ senses: [Sense], by index: ProgressIndex) -> [Sense] {
+    ///
+    /// Ordered by *this exercise's* due date, not the meaning's earliest across all of
+    /// them: a word overdue as a flashcard is not overdue as dictation, and sorting on the
+    /// whole-meaning date pushed never-typed words in among the genuinely overdue ones
+    /// instead of last. Reported by review, PR #1.
+    private static func order(_ senses: [Sense], by index: ProgressIndex,
+                              for exercise: Exercise) -> [Sense] {
         senses
             .map { sense -> (sense: Sense, due: TimeInterval, tiebreak: Double) in
-                let dueAt = index[sense.id].dueAt?.timeIntervalSinceReferenceDate
+                let dueAt = index[sense.id][exercise].dueAt?.timeIntervalSinceReferenceDate
                 return (sense, dueAt ?? .greatestFiniteMagnitude, .random(in: 0..<1))
             }
             .sorted { ($0.due, $0.tiebreak) < ($1.due, $1.tiebreak) }

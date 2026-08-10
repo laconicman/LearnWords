@@ -108,17 +108,28 @@ class ExersizeChooserViewController: UIViewController {
                 comment: "Label when the schedule is being bypassed")
         }
         if let digest = setDigest() {
-            summary += " " + (digest.dueCount > 0
+            // `anyExerciseDueCount`, not `dueCount`: this screen's buttons each open a
+            // per-exercise queue, so a headline built from engaged strands alone could say
+            // "Nothing due" while Dictation had the whole set waiting. Reported by review,
+            // PR #1. Reminders keep using `dueCount` — they should stay quiet about
+            // exercises the learner has never chosen.
+            summary += " " + (digest.anyExerciseDueCount > 0
                 ? String(format: NSLocalizedString("%@ due now.", comment: "Label words due now"),
-                         pluralizedWordCount(digest.dueCount))
+                         pluralizedWordCount(digest.anyExerciseDueCount))
                 : nextDueDescription(digest))
         }
         numberOfWordsInSet.text = summary
     }
 
     /// "Nothing due — next on Thursday", or just "Nothing due" when the schedule is empty.
-    private func nextDueDescription(_ digest: ReviewSchedule.SetDigest) -> String {
-        guard let next = digest.nextDueAt else {
+    ///
+    /// `exercise` picks which schedule the date comes from. Without it the alert shown for
+    /// one exercise quoted the whole set's earliest date — belonging to a different
+    /// exercise, or missing entirely because a meaning due elsewhere is never "upcoming".
+    /// Reported by review, PR #1.
+    private func nextDueDescription(_ digest: ReviewSchedule.SetDigest,
+                                    for exercise: Exercise? = nil) -> String {
+        guard let next = exercise.map({ digest.nextDueAt(for: $0) }) ?? digest.nextDueAt else {
             return NSLocalizedString("Nothing due.", comment: "Label when nothing is scheduled")
         }
         let formatter = DateFormatter()
@@ -158,7 +169,10 @@ class ExersizeChooserViewController: UIViewController {
         }
         // With the switch on, the schedule is bypassed on purpose and there is nothing to
         // ask about; with it off, an empty due list is worth a word before drilling ahead.
-        if includeLeanedWords.isOn || digest.dueCount > 0 {
+        // The exercise's own count, not the set's: with per-exercise schedules the set can
+        // have work waiting while *this* exercise has none, and pushing then would open a
+        // sitting with an empty queue that pops straight back. Reported by review, PR #1.
+        if includeLeanedWords.isOn || digest.dueCount(for: exercise) > 0 {
             push(exercise, in: set, scope: chosenScope)
         } else {
             offerToPractiseAhead(exercise, in: set, digest: digest)
@@ -181,16 +195,19 @@ class ExersizeChooserViewController: UIViewController {
                                       digest: ReviewSchedule.SetDigest) {
         let alert = UIAlertController(
             title: NSLocalizedString("Nothing is due", comment: "Title for alert"),
-            message: nextDueDescription(digest) + " "
+            message: nextDueDescription(digest, for: exercise) + " "
                 + NSLocalizedString("Practising ahead of schedule still counts, it just teaches less.",
                                     comment: "Message when nothing is due"),
             preferredStyle: .alert)
         alert.addAction(UIAlertAction(
             title: NSLocalizedString("Practise anyway", comment: "AlertAction title"),
             style: .default) { [weak self] _ in
-                self?.push(exercise, in: set,
-                           scope: .everything(
-                               includingLearned: LWUserDefaults.standard.includeLearnedWords))
+                // `includingLearned: true`, not the learner's filter. This button is only
+                // reachable when nothing is due, so with the filter on it can select an
+                // empty queue and the screen opens and bounces straight back. Choosing
+                // "practise anyway" at that moment *is* the request to include them.
+                // Reported by review, PR #1.
+                self?.push(exercise, in: set, scope: .everything(includingLearned: true))
             })
         alert.addAction(UIAlertAction(
             title: NSLocalizedString("Cancel", comment: "AlertAction title"), style: .cancel))
