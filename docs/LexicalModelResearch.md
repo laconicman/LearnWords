@@ -341,6 +341,14 @@ synonyms — has the same problem from the other side: two logs, one survivor.)
 
 No schema change: Synsets, Terms and the batch API all exist. → **TD-53.**
 
+**Shipped 2026-08-11.** `SenseEntry` is the rule as a value type; `SenseEntryViewController`
+is the confirm step. Two things the research left open were settled in code and are recorded
+in [TechDebt](TechDebt.md) § *TD-53 resolution note*: the confirm screen appears only when
+the parse yields more than one meaning (a single word keeps its one-tap path), and the
+meaning editor reads a comma as *synonyms*, which is the entry-time-only guard above made
+concrete. `PlainText`'s comma — synonyms within a line, because `render` writes it that way
+— was deliberately left unshared, so the file format is not tied to the keyboard's meaning.
+
 ## Rejected alternatives
 
 - **Word-pair entity (the first iteration-1 schema).** No synonyms, no third language

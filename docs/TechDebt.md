@@ -1596,7 +1596,7 @@ every appearance. **Discharge:** measure first on a realistic library, then cach
 per-sense progress invalidated on event append and recomputed off the cell path. Decide
 before shipping the summary, not after. Not a schema commitment.
 
-## TD-53 — Comma-separated entry creates one meaning, not several
+## TD-53 — Comma-separated entry creates one meaning, not several — **resolved (2026-08-11)**
 
 Typing `берег, банк` for *bank* should create two meanings; today it creates one. But the
 same key produces `лиса, лисица`, which is **one** meaning with two synonyms — undecidable
@@ -1608,6 +1608,49 @@ so retroactively splitting existing meanings would discard their history — any
 or merge must be an explicit, warned action. Prior art and rejected alternatives (a
 punctuation convention; automatic FM splitting):
 [LexicalModelResearch](LexicalModelResearch.md) § *Commas at entry*. No schema change.
+
+## TD-53 resolution note (2026-08-11)
+
+Implemented, 320 tests green (was 298). No schema change, as specced.
+
+**The rule is one line.** `SenseEntry.proposals(_:_:)` splits each side on commas and lets
+the side with more parts decide how many meanings there are; a side split into exactly that
+many is paired in order, and any other side goes into *every* meaning. That covers `bank` /
+`берег, банк` (one word, two senses), two parallel lists (paired), and mismatched lists —
+where the shorter side is shared rather than a correspondence being invented. `merging(_:at:)`
+is the confirm step's one control, and it drops duplicates so a shared word does not arrive
+twice.
+
+**A comma means different things in the two directions, deliberately.** On the way in it
+proposes separate meanings. In `MeaningEditorViewController` it adds *synonyms*, because
+that meaning already exists and owns its `ReviewEvent` log — splitting it would leave every
+recorded answer on one half. `PlainText`'s identical-looking splitter was left alone and
+not shared: there a comma separates synonyms within a line because `render` writes it that
+way, and a lossless round trip must not be tied to what the keyboard means today.
+
+**Two judgment calls worth flagging.**
+
+* *The confirm screen appears only when the parse yields more than one meaning.* A single
+  word keeps today's one-tap path. The owner's "make commas less necessary" is served from
+  inside the screen — empty trailing rows, an empty trailing section — which a learner
+  reaches with one comma, or from "Add another meaning" once there.
+* *Rows push `WordInputViewController` rather than being inline text fields.* "Input rows"
+  reads as inline fields, but inline fields would drop completions, dictionary lookup and
+  dictation — the alert-with-a-text-field this codebase already replaced once.
+
+**The duplicate prompt is not asked on the multi-meaning path.** Laying meanings out one
+per section *is* the learner saying they are separate. Consequence, unhandled: entering
+`bank` / `берег, банк` when `bank`/`банк` already exists creates a second `банк` meaning.
+Visible on the confirm screen before Save, but nothing warns. → worth a small follow-up.
+
+**What the tests did not catch.** Making Back pop to the word (the owner's second ask) left
+`WordInputViewController.hasCommitted` set from the first commit, so the returned-to screen
+had a dead Save button and no way out but Back. Every test was green; it was found by
+driving the simulator. `hasCommitted` is now cleared on each appearance, which still closes
+the hole it was added for — a double-commit between a commit and the push that follows it.
+`WordInputCommitTests` pins both halves, and drives appearance with
+`beginAppearanceTransition` because a pushed/popped navigation controller in the test host
+does not run its own appearance transitions (a window-based version passed either way).
 
 ## TD-49 resolution note (2026-08-09)
 

@@ -132,7 +132,13 @@ run — asset formats only Xcode 26 understands (TD-45), a hard link to Core Hap
     which strips entitlements; a normally signed build of unmodified HEAD is fine. The
     `ubiquityIdentityToken` guard was reverted — review flagged that it could have disabled
     sync for everyone, since this app has no ubiquity entitlement.
-  - Remaining, in order: **TD-53** → **TD-50** → **TD-52** → **TD-51**, handed off in
+  - **TD-53 — done (2026-08-11).** A comma at entry proposes one meaning per part, laid out
+    on a confirm screen (a section per meaning, an empty row after each language's words,
+    an empty section for another meaning) with one control to merge them back into synonyms.
+    Entry-time only: a comma in the *meaning editor* adds synonyms, because a stored meaning
+    owns its `ReviewEvent` log. Back now pops to the word instead of leaving the flow — which
+    exposed `hasCommitted` as a one-way door and made it per-appearance. 320 tests green.
+  - Remaining, in order: **TD-50** → **TD-52** → **TD-51**, handed off in
     [TASK-TD53-batch](TASK-TD53-batch.md) (self-contained: scope, the owner's UI asks, the
     build flag that must not be used, and the review loop). TD-50/51 also owe the settings
     switch for `requireProductionForLearned`; the slider minimum is done.
