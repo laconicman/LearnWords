@@ -206,10 +206,17 @@ final class MeaningEditorViewController: UITableViewController {
              }) { [weak self] entered in
             guard let self else { return }
             do {
-                // Links an existing word when the spelling already exists, rather than
-                // making a twin — the point of an atomic term (TD-18).
-                self.sense = try self.lexicon.addTerm(Term.Draft(entered, in: language),
-                                                      to: self.sense.id)
+                // **A comma here means synonyms, not new meanings** (TD-53). Everywhere on
+                // the way *in* a comma proposes separate meanings, but this meaning already
+                // exists and owns its `ReviewEvent` log — splitting it would leave the
+                // history on one half and none on the other. Adding words to the meaning
+                // being edited is the only reading that cannot lose anything.
+                for word in SenseEntry.words(in: entered) {
+                    // Links an existing word when the spelling already exists, rather than
+                    // making a twin — the point of an atomic term (TD-18).
+                    self.sense = try self.lexicon.addTerm(Term.Draft(word, in: language),
+                                                          to: self.sense.id)
+                }
                 self.reload()
             } catch {
                 debugLog("Could not add \(entered): \(error)")

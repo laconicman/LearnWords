@@ -103,13 +103,19 @@ final class WordInputViewController: UITableViewController {
         didSet { updateDictationButton() }
     }
 
-    /// One commit per screen, ever.
+    /// One commit per *appearance*.
     ///
     /// `commit` does not dismiss when its callback navigates onwards — that is what lets
     /// one screen serve both a single edit and a two-step flow. The cost is that the screen
     /// survives its own commit for the length of the push animation, with the keyboard up
     /// and the Save button live, so Return or a second tap ran the whole thing again and
-    /// added the word twice. Committing is a one-way door.
+    /// added the word twice.
+    ///
+    /// **Cleared on every appearance, not set once for the screen's life** (TD-53). It was
+    /// a one-way door while a committed screen was always taken off the stack; now that Back
+    /// returns to the word step, a door that never reopens is a screen with a dead Save
+    /// button and no way out but Back. Resetting here still closes the original hole, which
+    /// only ever opened between a commit and the push that follows it.
     private var hasCommitted = false
 
     /// - Parameter title: overrides the title `purpose` would pick. The add-word flow uses
@@ -152,6 +158,10 @@ final class WordInputViewController: UITableViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        // Being shown is being asked again: a screen returned to by Back must be answerable,
+        // and the guard below only exists to cover the gap between a commit and its push.
+        hasCommitted = false
+        navigationItem.rightBarButtonItem?.isEnabled = true
         // The microphone button is one tap away; do its slow setup while the push animates.
         if let language = purpose.language {
             DictationController.shared.prewarm(language: language)
