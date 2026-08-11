@@ -1746,3 +1746,64 @@ Two observations from the same review remain open and are worth keeping, neither
 * If an account check is ever genuinely wanted, `CKContainer.accountStatus` is the API
   CloudKit documents for it — asynchronous, so it cannot gate the synchronous store open
   directly; it would have to defer attaching the container or reopen the store afterwards.
+
+## TD-55 — The entry screen should have the structure, not the punctuation (owner, 2026-08-11)
+
+**Recorded, not built.** The owner's decision on 2026-08-11 was to write this down and
+implement it after TD-50/52/51. It revises part of TD-53 rather than replacing it.
+
+### The idea
+
+Defining a term becomes a table with **two sections — "Synonyms" and "Meanings" — each
+with a growing row list and an input row that is always available.** Adding is a control in
+the section header ("Add" is enough), so the learner is never composing structure out of
+punctuation. Typing a comma **advances to the next row**, with a control choosing which
+kind of row that is — **synonym by default**, because synonyms are the more common entry
+(owner; "a subject to consider"). **Enter** commits and returns to the screen the flow
+started from, which on this path is the word list. On a future macOS port, **Tab** is the
+same gesture and keyboard users never reach for the mouse.
+
+### Why it is the better shape, and not merely a workaround
+
+[LexicalModelResearch](LexicalModelResearch.md) § *Commas at entry* found that every source
+that gets this right — Apple's `d:entry`, kaikki/wiktextract — **makes the sense boundary
+explicit at authoring time rather than inferring it from punctuation.** TD-53 as shipped
+still infers and then asks for confirmation. A comma that *performs a structural action*
+stops inferring: pressing it is the learner saying which kind of row comes next, which is
+the explicit boundary those formats have. It also moves the correction earlier — `лиса,
+лисица` is fixed when the second row appears, not one screen later.
+
+**Rejected on the way (owner considered it): blocking comma input with visual feedback.**
+Paste, dictation and the share-extension import all still deliver comma text, so the parser
+survives either way and the keyboard would merely disagree with the file format. Rejecting
+meaningful input is also worse than accepting it and doing the right thing — a comma is not
+invalid, only ambiguous.
+
+### What TD-53's work is still for
+
+`SenseEntry` and the parse do not go away: they become the path for text that **arrives
+whole** rather than being typed — paste, dictation, and `importPlainText`. The confirm
+screen is that path's fallback. Live structure when typing; confirm when text arrives from
+elsewhere.
+
+### Open before this can be built
+
+* **What "Synonyms" is scoped to.** A studied-language synonym belongs to a *sense*, not to
+  a term: `bank`/`riverbank` are synonyms in the `берег` sense and not in the `банк` one. A
+  flat "Synonyms" section next to "Meanings" has to say which meaning it is adding to once
+  more than one meaning exists — or the two sections have to nest.
+* **Dictation emits commas.** `DictationController` replaces `field.text` wholesale on every
+  transcription callback (each carries the whole transcription so far), so a comma rule that
+  fires on *typing* must not fire on programmatic text, or one dictated phrase explodes into
+  rows.
+* **Where the rows live.** TD-53's confirm screen deliberately pushes
+  `WordInputViewController` per row rather than editing inline, because completions,
+  dictionary lookup and dictation live there and an inline `UITextField` is the
+  alert-with-a-text-field this codebase already replaced once. An always-available input row
+  is inline by definition, so this needs those three capabilities designed into the row —
+  not dropped by omission.
+* **Enter today** commits *and* pops one screen (`WordInputViewController.commit`). "Returns
+  to the originating screen" is `unwindToList`'s job now, so the two need reconciling rather
+  than both popping.
+
+No schema change: synonyms and senses are what the model already stores.

@@ -341,6 +341,17 @@ synonyms — has the same problem from the other side: two logs, one survivor.)
 
 No schema change: Synsets, Terms and the batch API all exist. → **TD-53.**
 
+**Revised 2026-08-11 → TD-55, recorded not built.** The owner proposed making a comma
+*perform* the structural step instead of being parsed into one: two sections, "Synonyms" and
+"Meanings", each with an always-available input row and an "Add" in its header; comma
+advances to the next row with a control choosing its kind (synonym by default); Enter
+commits and returns. That is closer to this section's own finding than what shipped — the
+sources cited above make the boundary explicit *at authoring time*, and a confirm screen
+still infers first and asks second. The parse survives as the path for text that arrives
+whole (paste, dictation, `importPlainText`), with the confirm screen as its fallback. Open
+questions and the rejected "block commas at the keyboard" alternative are in
+[TechDebt](TechDebt.md) § TD-55.
+
 **Shipped 2026-08-11.** `SenseEntry` is the rule as a value type; `SenseEntryViewController`
 is the confirm step. Two things the research left open were settled in code and are recorded
 in [TechDebt](TechDebt.md) § *TD-53 resolution note*: the confirm screen appears only when

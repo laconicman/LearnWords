@@ -140,7 +140,14 @@ run — asset formats only Xcode 26 understands (TD-45), a hard link to Core Hap
     exposed `hasCommitted` as a one-way door and made it per-appearance. Review then found
     that storing a *single* meaning stranded the learner on "Add word", so finishing an
     entry now unwinds the whole flow. 326 tests green.
-  - Remaining, in order: **TD-50** → **TD-52** → **TD-51**, handed off in
+  - **TD-55 — recorded 2026-08-11, to build after this batch.** The owner's revision of the
+    comma decision: the entry screen should carry the *structure* — "Synonyms" and "Meanings"
+    sections, an always-available input row, "Add" in the header — and a comma should advance
+    to the next row rather than be parsed afterwards. Closer to the prior art than the
+    confirm screen TD-53 shipped, and it makes Tab natural for a macOS port. TD-53's parse
+    stays, as the path for text that arrives whole. Open questions in
+    [TechDebt](TechDebt.md) § TD-55.
+  - Remaining, in order: **TD-50** → **TD-52** → **TD-51** → **TD-55**, handed off in
     [TASK-TD53-batch](TASK-TD53-batch.md) (self-contained: scope, the owner's UI asks, the
     build flag that must not be used, and the review loop). TD-50/51 also owe the settings
     switch for `requireProductionForLearned`; the slider minimum is done.
