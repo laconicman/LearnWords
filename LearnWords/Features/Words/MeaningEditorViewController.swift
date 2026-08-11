@@ -205,14 +205,29 @@ final class MeaningEditorViewController: UITableViewController {
                      .filter { $0.senseID != self?.sense.id }
              }) { [weak self] entered in
             guard let self else { return }
+            self.add(SenseEntry.words(in: entered), in: language)
+            self.reload()
+        }
+    }
+
+    /// Links words to the meaning being edited.
+    ///
+    /// **A comma here means synonyms, never new meanings** (TD-53). That is also the default
+    /// on the way in since the owner's pivot, but here it is not a default at all: this
+    /// meaning exists and owns its `ReviewEvent` log, so splitting it would leave the record
+    /// of every answer on one half. Adding to the meaning being edited is the only reading
+    /// that cannot lose anything.
+    ///
+    /// Failure does not abandon the rest — a comma makes this several writes, and a caller
+    /// that reloads afterwards should see whatever actually landed.
+    private func add(_ words: [String], in language: String) {
+        for word in words {
             do {
                 // Links an existing word when the spelling already exists, rather than
                 // making a twin — the point of an atomic term (TD-18).
-                self.sense = try self.lexicon.addTerm(Term.Draft(entered, in: language),
-                                                      to: self.sense.id)
-                self.reload()
+                sense = try lexicon.addTerm(Term.Draft(word, in: language), to: sense.id)
             } catch {
-                debugLog("Could not add \(entered): \(error)")
+                debugLog("Could not add \(word): \(error)")
             }
         }
     }
@@ -237,24 +252,37 @@ final class MeaningEditorViewController: UITableViewController {
     /// here: unlike the add flow there is no second meaning to create, just one meaning
     /// being edited and a question of which word it should use.
     private func rename(_ term: Term, to entered: String) {
-        let clash = ((try? lexicon.usages(ofTerm: entered, in: term.language)) ?? [])
+        // **A comma renames into synonyms**, the same as typing one anywhere else (TD-53).
+        // `updateTerm` stores what it is given, so passing the whole string through left one
+        // word literally spelled "лиса, лисица" — the flattening `PlainText` warns about,
+        // and a term that `render` writes and `parse` reads back as *two*, so an export and
+        // re-import would silently disagree with the store.
+        let words = SenseEntry.words(in: entered)
+        guard let first = words.first else { return }
+        let synonyms = Array(words.dropFirst())
+
+        let clash = ((try? lexicon.usages(ofTerm: first, in: term.language)) ?? [])
             .filter { $0.senseID != sense.id }
 
         guard let existing = clash.first else {
             // Every meaning and set using this word sees the change — an atomic term.
-            try? lexicon.updateTerm(term.id, text: entered)
+            try? lexicon.updateTerm(term.id, text: first)
+            add(synonyms, in: term.language)
             return reload()
         }
 
-        DuplicateWordPrompt.ask(on: self, word: entered, existing: existing,
+        // Asked about the word that actually clashes — the first one typed — not about the
+        // whole string, which may name several.
+        DuplicateWordPrompt.ask(on: self, word: first, existing: existing,
                                 offering: [.useExisting]) { [weak self] _ in
             guard let self else { return }
             do {
                 self.sense = try self.lexicon.replaceTerm(
-                    term.id, with: Term.Draft(entered, in: term.language), inSense: self.sense.id)
+                    term.id, with: Term.Draft(first, in: term.language), inSense: self.sense.id)
+                self.add(synonyms, in: term.language)
                 self.reload()
             } catch {
-                debugLog("Could not merge \(entered): \(error)")
+                debugLog("Could not merge \(first): \(error)")
             }
         }
     }

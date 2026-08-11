@@ -341,6 +341,33 @@ synonyms — has the same problem from the other side: two logs, one survivor.)
 
 No schema change: Synsets, Terms and the batch API all exist. → **TD-53.**
 
+**Revised 2026-08-11 → TD-55, recorded not built.** The owner proposed making a comma
+*perform* the structural step instead of being parsed into one: two sections, "Synonyms" and
+"Meanings", each with an always-available input row and an "Add" in its header; comma
+advances to the next row with a control choosing its kind (synonym by default); Enter
+commits and returns. That is closer to this section's own finding than what shipped — the
+sources cited above make the boundary explicit *at authoring time*, and a confirm screen
+still infers first and asks second. The parse survives as the path for text that arrives
+whole (paste, dictation, `importPlainText`), with the confirm screen as its fallback. Open
+questions and the rejected "block commas at the keyboard" alternative are in
+[TechDebt](TechDebt.md) § TD-55.
+
+**Shipped 2026-08-11, with the default inverted.** The table above says `берег, банк` is two
+meanings and `лиса, лисица` is one; the decision recorded here defaulted to *separate
+meanings*, and the owner reversed it on 2026-08-11 to **synonyms**, on the grounds that
+synonyms are far more often what a learner types. Both readings are wrong half the time, so
+the choice is only about which mistake is cheaper to undo — and the undo is a control on the
+confirm screen either way (`splitting(_:at:)` / `merging(_:at:)`).
+
+The pivot has a pleasant consequence: entry, the meaning editor and `PlainText`'s file
+format now all read a comma as synonyms, so the app no longer means three different things
+by one key. They stay separate implementations — TD-55 changes entry again, and a lossless
+file round trip must not be tied to the keyboard.
+
+`SenseEntry` is the rule as a value type; `SenseEntryViewController` is the confirm step,
+shown only when a comma actually put more than one word on a side. The remaining judgment
+calls are in [TechDebt](TechDebt.md) § *TD-53 resolution note*.
+
 ## Rejected alternatives
 
 - **Word-pair entity (the first iteration-1 schema).** No synonyms, no third language

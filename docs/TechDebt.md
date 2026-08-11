@@ -1596,7 +1596,7 @@ every appearance. **Discharge:** measure first on a realistic library, then cach
 per-sense progress invalidated on event append and recomputed off the cell path. Decide
 before shipping the summary, not after. Not a schema commitment.
 
-## TD-53 — Comma-separated entry creates one meaning, not several
+## TD-53 — Comma-separated entry creates one meaning, not several — **resolved (2026-08-11)**
 
 Typing `берег, банк` for *bank* should create two meanings; today it creates one. But the
 same key produces `лиса, лисица`, which is **one** meaning with two synonyms — undecidable
@@ -1608,6 +1608,80 @@ so retroactively splitting existing meanings would discard their history — any
 or merge must be an explicit, warned action. Prior art and rejected alternatives (a
 punctuation convention; automatic FM splitting):
 [LexicalModelResearch](LexicalModelResearch.md) § *Commas at entry*. No schema change.
+
+## TD-53 resolution note (2026-08-11)
+
+Implemented, 337 tests green (was 298). No schema change, as specced.
+
+**The default is synonyms** (owner's pivot, 2026-08-11). `SenseEntry.proposals(_:_:)` splits
+each side on commas and returns **one** meaning holding all of them. The first rule was the
+opposite — comma → separate meanings — and it is the right reading of `берег, банк` and the
+wrong reading of `лиса, лисица`; both are wrong half the time, and the owner's call is that
+synonyms are far more often what a learner types, so the wrong guess should be the one that
+needs undoing rather than the one that needs confirming.
+
+**Both directions are one tap, and each other's inverse.** `splitting(_:at:)` breaks a
+meaning apart — the language with the most words decides how many meanings there are, an
+equal-length list is paired in order, and any other language goes into every meaning, so
+nothing is guessed where lists cannot be paired. `merging(_:at:)` folds two back together,
+dropping duplicates so a shared word does not arrive twice. A round trip through both is
+the identity, which is a test.
+
+**The pivot made the whole app agree about a comma.** Entry, `MeaningEditorViewController`
+and `PlainText`'s file format now all read one as *synonyms*. In the editor it is not a
+default but a rule: that meaning exists and owns its `ReviewEvent` log, so splitting it
+would leave every recorded answer on one half. The three stay separate implementations —
+TD-55 will change entry again, and a lossless file round trip must not be tied to what the
+keyboard means today.
+
+**Two judgment calls worth flagging.**
+
+* *The confirm screen appears only when a comma actually did something* — when the entry has
+  synonyms on either side. A single word keeps today's one-tap path. The owner's "make
+  commas less necessary" is served from inside the screen — empty trailing rows, an empty
+  trailing section — which a learner reaches with one comma, or from "Add another meaning"
+  once there.
+* *Rows push `WordInputViewController` rather than being inline text fields.* "Input rows"
+  reads as inline fields, but inline fields would drop completions, dictionary lookup and
+  dictation — the alert-with-a-text-field this codebase already replaced once.
+
+**The duplicate prompt is not asked on the multi-meaning path.** Laying meanings out one
+per section *is* the learner saying they are separate. Consequence, unhandled: entering
+`bank` / `берег, банк` when `bank`/`банк` already exists creates a second `банк` meaning.
+Visible on the confirm screen before Save, but nothing warns. → worth a small follow-up.
+
+**Three more the review found after that.** Renaming a word with a comma stored one word
+literally spelled "лиса, лисица" — the add path had been fixed and its sibling had not, and
+`PlainText.render` writes synonyms with a comma while `parse` reads them back as two, so an
+export and re-import would have disagreed with the store. Cancelling the duplicate prompt
+threw the whole entry away silently, newly reachable because the flow is now torn down
+before the alert is raised — `resumeEntry` rebuilds both steps, so Cancel means "let me
+change it". And the confirm screen's trailing footer counted sections rather than storable
+meanings, so it promised "3 meanings will be created" while Save sat greyed out.
+
+**Finishing an entry unwinds the whole flow, not one screen of it.** The review found the
+cost of pushing step two instead of replacing it: the single-meaning path popped onto the
+*word* step, which greeted the learner with the word they had just filed and a live Save
+button, and tapping it filed the entry twice. `unwindToList` is now the single exit, and it
+waits on the transition coordinator before raising the duplicate alert — that alert is
+presented from the word list, which is two pushes down while the entry is being typed.
+
+**What the tests did not catch — twice.** Making Back pop to the word (the owner's second ask) left
+`WordInputViewController.hasCommitted` set from the first commit, so the returned-to screen
+had a dead Save button and no way out but Back. Every test was green; it was found by
+driving the simulator. `hasCommitted` is now cleared on each appearance, which still closes
+the hole it was added for — a double-commit between a commit and the push that follows it.
+`WordInputCommitTests` pins both halves, and drives appearance with
+`beginAppearanceTransition` because a pushed/popped navigation controller in the test host
+does not run its own appearance transitions (a window-based version passed either way).
+
+The second miss is the lesson worth keeping. Having found that defect on the device, this
+session then verified only the *comma* path on the device and left the single-word path —
+the common one — unwalked, so the same PR shipped the same shape of bug three lines away:
+storing a single meaning popped one screen and stranded the learner on "Add word". Review
+caught it. **Walking one path on the device is not walking the flow**; the paths that
+branch on user input each need driving, and here there are three (single, multi-meaning,
+duplicate).
 
 ## TD-49 resolution note (2026-08-09)
 
@@ -1688,3 +1762,67 @@ Two observations from the same review remain open and are worth keeping, neither
 * If an account check is ever genuinely wanted, `CKContainer.accountStatus` is the API
   CloudKit documents for it — asynchronous, so it cannot gate the synchronous store open
   directly; it would have to defer attaching the container or reopen the store afterwards.
+
+## TD-55 — The entry screen should have the structure, not the punctuation (owner, 2026-08-11)
+
+**Recorded, not built.** The owner's decision on 2026-08-11 was to write this down and
+implement it after TD-50/52/51. It revises part of TD-53 rather than replacing it.
+
+### The idea
+
+Defining a term becomes a table with **two sections — "Synonyms" and "Meanings" — each
+with a growing row list and an input row that is always available.** Adding is a control in
+the section header ("Add" is enough), so the learner is never composing structure out of
+punctuation. Typing a comma **advances to the next row**, with a control choosing which
+kind of row that is — **synonym by default**, because synonyms are the more common entry
+(owner; "a subject to consider"). That default landed early, in TD-53 itself: a comma now
+proposes synonyms and `splitting(_:at:)` is the undo, so what TD-55 still adds is the
+*structure* — sections, always-available input rows, and the comma as a keystroke rather
+than as text to parse. **Enter** commits and returns to the screen the flow
+started from, which on this path is the word list. On a future macOS port, **Tab** is the
+same gesture and keyboard users never reach for the mouse.
+
+### Why it is the better shape, and not merely a workaround
+
+[LexicalModelResearch](LexicalModelResearch.md) § *Commas at entry* found that every source
+that gets this right — Apple's `d:entry`, kaikki/wiktextract — **makes the sense boundary
+explicit at authoring time rather than inferring it from punctuation.** TD-53 as shipped
+still infers and then asks for confirmation. A comma that *performs a structural action*
+stops inferring: pressing it is the learner saying which kind of row comes next, which is
+the explicit boundary those formats have. It also moves the correction earlier — `лиса,
+лисица` is fixed when the second row appears, not one screen later.
+
+**Rejected on the way (owner considered it): blocking comma input with visual feedback.**
+Paste, dictation and the share-extension import all still deliver comma text, so the parser
+survives either way and the keyboard would merely disagree with the file format. Rejecting
+meaningful input is also worse than accepting it and doing the right thing — a comma is not
+invalid, only ambiguous.
+
+### What TD-53's work is still for
+
+`SenseEntry` and the parse do not go away: they become the path for text that **arrives
+whole** rather than being typed — paste, dictation, and `importPlainText`. The confirm
+screen is that path's fallback. Live structure when typing; confirm when text arrives from
+elsewhere.
+
+### Open before this can be built
+
+* **What "Synonyms" is scoped to.** A studied-language synonym belongs to a *sense*, not to
+  a term: `bank`/`riverbank` are synonyms in the `берег` sense and not in the `банк` one. A
+  flat "Synonyms" section next to "Meanings" has to say which meaning it is adding to once
+  more than one meaning exists — or the two sections have to nest.
+* **Dictation emits commas.** `DictationController` replaces `field.text` wholesale on every
+  transcription callback (each carries the whole transcription so far), so a comma rule that
+  fires on *typing* must not fire on programmatic text, or one dictated phrase explodes into
+  rows.
+* **Where the rows live.** TD-53's confirm screen deliberately pushes
+  `WordInputViewController` per row rather than editing inline, because completions,
+  dictionary lookup and dictation live there and an inline `UITextField` is the
+  alert-with-a-text-field this codebase already replaced once. An always-available input row
+  is inline by definition, so this needs those three capabilities designed into the row —
+  not dropped by omission.
+* **Enter today** commits *and* pops one screen (`WordInputViewController.commit`). "Returns
+  to the originating screen" is `unwindToList`'s job now, so the two need reconciling rather
+  than both popping.
+
+No schema change: synonyms and senses are what the model already stores.
