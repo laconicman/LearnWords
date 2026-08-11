@@ -181,6 +181,13 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
     /// the list; now it pops onto the *word* step, which greets the learner with the word
     /// they just filed and a live Save button — tapping it a second time files it twice.
     /// Finishing an entry has to unwind the whole flow, not one screen of it.
+    ///
+    /// **This runs inside a screen that is about to pop itself**, and the two do not fight
+    /// only because `viewControllers` updates synchronously: by the time
+    /// `WordInputViewController.commit` re-checks `topViewController === self`, this has
+    /// already taken it off the stack, so its own pop is skipped. `SenseEntryViewController`
+    /// ends the same way. Said out loud because it is the kind of thing a later edit can
+    /// quietly break, and the symptom would be the word list popping off its own tab.
     private func unwindToList(then: @escaping () -> Void = {}) {
         guard let navigation = navigationController, navigation.topViewController !== self else {
             return then()
