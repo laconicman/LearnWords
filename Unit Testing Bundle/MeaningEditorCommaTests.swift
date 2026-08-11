@@ -57,6 +57,27 @@ struct MeaningEditorCommaTests {
         _ = save.target?.perform(save.action, with: save)
     }
 
+    /// Taps the *first* Russian word to rename it, types `typed`, and saves.
+    private func renameFirstRussianWord(_ typed: String,
+                                        of sense: Sense,
+                                        in lexicon: Lexicon) throws {
+        let editor = MeaningEditorViewController(sense: sense, languages: pair, lexicon: lexicon)
+        let navigation = UINavigationController(rootViewController: editor)
+        editor.loadViewIfNeeded()
+
+        editor.tableView(editor.tableView,
+                         didSelectRowAt: IndexPath(row: 0, section: russianSection))
+
+        let input = try #require(navigation.topViewController as? WordInputViewController,
+                                 "tapping a word must push the word input screen")
+        input.view.frame = CGRect(x: 0, y: 0, width: 390, height: 800)
+        input.view.layoutIfNeeded()
+        try #require(firstTextField(in: input.view)).text = typed
+
+        let save = try #require(input.navigationItem.rightBarButtonItem)
+        _ = save.target?.perform(save.action, with: save)
+    }
+
     private func stocked() throws -> (lexicon: Lexicon, set: WordSet, sense: Sense) {
         let lexicon = Lexicon(persistence: LWPersistence(inMemory: true))
         let set = try lexicon.addWordSet(named: "Animals", languages: ["en", "ru"])
@@ -87,6 +108,20 @@ struct MeaningEditorCommaTests {
 
         #expect(try lexicon.senses(in: set.id).count == 1,
                 "splitting here would strand the meaning's ReviewEvent log")
+    }
+
+    /// The sibling path, which the add path's fix originally missed: renaming stored the
+    /// string whole, so one word ended up literally spelled "лиса, лисица" — the flattening
+    /// `PlainText` warns about, and a term that `render` writes and `parse` reads back as
+    /// *two*, so an export and re-import would disagree with the store.
+    @Test func aCommaWhileRenamingSplitsIntoSynonyms() throws {
+        let (lexicon, _, sense) = try stocked()
+
+        try renameFirstRussianWord("лисица, кума", of: sense, in: lexicon)
+
+        let words = try #require(try lexicon.sense(sense.id)).terms(in: "ru").map(\.text)
+        #expect(words == ["кума", "лисица"], "renamed to the first, the rest added as synonyms")
+        #expect(!words.contains { $0.contains(",") }, "no word may carry a comma into the store")
     }
 
     @Test func aWordWithoutCommasIsStillJustOneWord() throws {

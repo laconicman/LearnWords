@@ -103,6 +103,23 @@
         }
       }
     },
+    "These are separate meanings" : {
+      "comment" : "Row",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Son significados distintos"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Это разные значения"
+          }
+        }
+      }
+    },
     "“%@” is already in your words" : {
       "comment" : "Alert title; the word"
     },

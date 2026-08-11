@@ -76,6 +76,8 @@ final class SenseEntryViewController: UITableViewController {
         case addWord(language: String)
         /// Folds this meaning into the one above, turning both into synonyms of one meaning.
         case merge
+        /// Breaks this meaning's synonyms into separate meanings — the undo for the default.
+        case split
         /// The empty section at the end.
         case addMeaning
     }
@@ -133,7 +135,9 @@ final class SenseEntryViewController: UITableViewController {
                 }
                 section.append(.addWord(language: language))
             }
-            // Nothing above the first meaning to merge into.
+            // Offered only where it would do something: a meaning that says everything once
+            // has nothing to split, and nothing sits above the first to merge into.
+            if entry.hasSynonyms { section.append(.split) }
             if index > 0 { section.append(.merge) }
             return section
         }
@@ -178,13 +182,18 @@ final class SenseEntryViewController: UITableViewController {
     /// still missing, or — under the last one — what Save will do.
     override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
         guard section < proposals.count else {
-            // A plural entry in the string catalog, the way `WordCount` already does it —
-            // not a `%d` format. Merging down to one meaning is the *point* of this screen,
-            // so "1 meanings will be created" is what a plain format string says at the end
-            // of it, and Russian needs `one`/`few`/`many` rather than two forms.
+            // **Counts what Save would actually store**, not how many sections there are.
+            // Reporting every section let the screen say "3 meanings will be created" while
+            // Save sat greyed out because one of them was half-filled — two footers
+            // contradicting each other, with the per-section one telling the truth.
+            //
+            // A plural entry in the string catalog, the way `WordCount` already does it, not
+            // a `%d` format: merging down to one meaning is the *point* of this screen, so a
+            // plain format string ends it saying "1 meanings will be created", and Russian
+            // needs `one`/`few`/`many` rather than two forms.
             return String.localizedStringWithFormat(
                 NSLocalizedString("MeaningsWillBeCreated", comment: "Count of meanings the confirm screen will store"),
-                proposals.count)
+                proposals.filter(isComplete).count)
         }
         guard let missing = practisedLanguages.first(where: { proposals[section].words(in: $0).isEmpty })
         else { return nil }
@@ -216,6 +225,14 @@ final class SenseEntryViewController: UITableViewController {
         case .merge:
             let cell = tableView.dequeueReusableCell(withIdentifier: Cell.action, for: indexPath)
             configure(cell, text: NSLocalizedString("Merge into the meaning above",
+                                                    comment: "Row"),
+                      colour: .lwAccent)
+            cell.accessoryType = .none
+            return cell
+
+        case .split:
+            let cell = tableView.dequeueReusableCell(withIdentifier: Cell.action, for: indexPath)
+            configure(cell, text: NSLocalizedString("These are separate meanings",
                                                     comment: "Row"),
                       colour: .lwAccent)
             cell.accessoryType = .none
@@ -255,6 +272,9 @@ final class SenseEntryViewController: UITableViewController {
             addWord(in: language, toMeaning: indexPath.section)
         case .merge:
             proposals = SenseEntry.merging(proposals, at: indexPath.section)
+            rebuildRows()
+        case .split:
+            proposals = SenseEntry.splitting(proposals, at: indexPath.section)
             rebuildRows()
         case .addMeaning:
             addMeaning()
@@ -304,8 +324,12 @@ final class SenseEntryViewController: UITableViewController {
                   // when another row of the same meaning says the same word.
                   let position = self.proposals[meaning].position(ofWordAt: index, in: language)
             else { return }
+            // **The draft's own tag, not the section's.** Rows are grouped by canonical
+            // subtag, so a draft made in "en-US" shows under the "en" rows — and writing the
+            // replacement back with the section's tag would quietly downgrade it.
+            let tag = self.proposals[meaning].terms[position].language
             self.proposals[meaning].terms.replaceSubrange(
-                position...position, with: replacements.map { Term.Draft($0, in: language) })
+                position...position, with: replacements.map { Term.Draft($0, in: tag) })
             self.rebuildRows()
         }
     }

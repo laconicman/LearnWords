@@ -1611,29 +1611,36 @@ punctuation convention; automatic FM splitting):
 
 ## TD-53 resolution note (2026-08-11)
 
-Implemented, 326 tests green (was 298). No schema change, as specced.
+Implemented, 337 tests green (was 298). No schema change, as specced.
 
-**The rule is one line.** `SenseEntry.proposals(_:_:)` splits each side on commas and lets
-the side with more parts decide how many meanings there are; a side split into exactly that
-many is paired in order, and any other side goes into *every* meaning. That covers `bank` /
-`берег, банк` (one word, two senses), two parallel lists (paired), and mismatched lists —
-where the shorter side is shared rather than a correspondence being invented. `merging(_:at:)`
-is the confirm step's one control, and it drops duplicates so a shared word does not arrive
-twice.
+**The default is synonyms** (owner's pivot, 2026-08-11). `SenseEntry.proposals(_:_:)` splits
+each side on commas and returns **one** meaning holding all of them. The first rule was the
+opposite — comma → separate meanings — and it is the right reading of `берег, банк` and the
+wrong reading of `лиса, лисица`; both are wrong half the time, and the owner's call is that
+synonyms are far more often what a learner types, so the wrong guess should be the one that
+needs undoing rather than the one that needs confirming.
 
-**A comma means different things in the two directions, deliberately.** On the way in it
-proposes separate meanings. In `MeaningEditorViewController` it adds *synonyms*, because
-that meaning already exists and owns its `ReviewEvent` log — splitting it would leave every
-recorded answer on one half. `PlainText`'s identical-looking splitter was left alone and
-not shared: there a comma separates synonyms within a line because `render` writes it that
-way, and a lossless round trip must not be tied to what the keyboard means today.
+**Both directions are one tap, and each other's inverse.** `splitting(_:at:)` breaks a
+meaning apart — the language with the most words decides how many meanings there are, an
+equal-length list is paired in order, and any other language goes into every meaning, so
+nothing is guessed where lists cannot be paired. `merging(_:at:)` folds two back together,
+dropping duplicates so a shared word does not arrive twice. A round trip through both is
+the identity, which is a test.
+
+**The pivot made the whole app agree about a comma.** Entry, `MeaningEditorViewController`
+and `PlainText`'s file format now all read one as *synonyms*. In the editor it is not a
+default but a rule: that meaning exists and owns its `ReviewEvent` log, so splitting it
+would leave every recorded answer on one half. The three stay separate implementations —
+TD-55 will change entry again, and a lossless file round trip must not be tied to what the
+keyboard means today.
 
 **Two judgment calls worth flagging.**
 
-* *The confirm screen appears only when the parse yields more than one meaning.* A single
-  word keeps today's one-tap path. The owner's "make commas less necessary" is served from
-  inside the screen — empty trailing rows, an empty trailing section — which a learner
-  reaches with one comma, or from "Add another meaning" once there.
+* *The confirm screen appears only when a comma actually did something* — when the entry has
+  synonyms on either side. A single word keeps today's one-tap path. The owner's "make
+  commas less necessary" is served from inside the screen — empty trailing rows, an empty
+  trailing section — which a learner reaches with one comma, or from "Add another meaning"
+  once there.
 * *Rows push `WordInputViewController` rather than being inline text fields.* "Input rows"
   reads as inline fields, but inline fields would drop completions, dictionary lookup and
   dictation — the alert-with-a-text-field this codebase already replaced once.
@@ -1642,6 +1649,15 @@ way, and a lossless round trip must not be tied to what the keyboard means today
 per section *is* the learner saying they are separate. Consequence, unhandled: entering
 `bank` / `берег, банк` when `bank`/`банк` already exists creates a second `банк` meaning.
 Visible on the confirm screen before Save, but nothing warns. → worth a small follow-up.
+
+**Three more the review found after that.** Renaming a word with a comma stored one word
+literally spelled "лиса, лисица" — the add path had been fixed and its sibling had not, and
+`PlainText.render` writes synonyms with a comma while `parse` reads them back as two, so an
+export and re-import would have disagreed with the store. Cancelling the duplicate prompt
+threw the whole entry away silently, newly reachable because the flow is now torn down
+before the alert is raised — `resumeEntry` rebuilds both steps, so Cancel means "let me
+change it". And the confirm screen's trailing footer counted sections rather than storable
+meanings, so it promised "3 meanings will be created" while Save sat greyed out.
 
 **Finishing an entry unwinds the whole flow, not one screen of it.** The review found the
 cost of pushing step two instead of replacing it: the single-meaning path popped onto the
@@ -1759,7 +1775,10 @@ with a growing row list and an input row that is always available.** Adding is a
 the section header ("Add" is enough), so the learner is never composing structure out of
 punctuation. Typing a comma **advances to the next row**, with a control choosing which
 kind of row that is — **synonym by default**, because synonyms are the more common entry
-(owner; "a subject to consider"). **Enter** commits and returns to the screen the flow
+(owner; "a subject to consider"). That default landed early, in TD-53 itself: a comma now
+proposes synonyms and `splitting(_:at:)` is the undo, so what TD-55 still adds is the
+*structure* — sections, always-available input rows, and the comma as a keystroke rather
+than as text to parse. **Enter** commits and returns to the screen the flow
 started from, which on this path is the word list. On a future macOS port, **Tab** is the
 same gesture and keyboard users never reach for the mouse.
 

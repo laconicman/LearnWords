@@ -8,9 +8,17 @@
 //  **A comma is genuinely ambiguous, so this type proposes rather than decides.** `берег,
 //  банк` for *bank* is two meanings; `лиса, лисица` for *fox* is one meaning with two
 //  synonyms; no parser can tell them apart, because both were typed with the same key
-//  (docs/LexicalModelResearch.md § *Commas at entry*). The default is the owner's rule —
-//  comma → separate meanings — and the misparse costs one tap to merge, in front of the
-//  learner, rather than being discovered months later in practice.
+//  (docs/LexicalModelResearch.md § *Commas at entry*).
+//
+//  **The default is synonyms** (owner, 2026-08-11) — one meaning, however many words. It was
+//  the opposite first, and both readings are wrong half the time; the owner's call is that
+//  synonyms are what a learner types far more often, so the wrong guess should be the one
+//  that needs splitting to undo. Either way the guess is shown before it is stored, and both
+//  directions are one tap: `splitting(_:at:)` and `merging(_:at:)`.
+//
+//  It also makes the whole app agree about a comma at last: this, the meaning editor, and
+//  `PlainText`'s file format now all read one as *synonyms*. They stay separate
+//  implementations — see `words(in:)` — but they no longer contradict each other.
 //
 //  Pure: no store, no UIKit. `SenseEntryViewController` shows the proposal and
 //  `Lexicon.addSenses(to:terms:)` takes the confirmed result, which already accepts the
@@ -82,44 +90,78 @@ extension SenseEntry {
         }
     }
 
-    /// The meanings two typed sides propose.
+    /// The meaning two typed sides propose: **one meaning, and the words are synonyms.**
     ///
-    /// **One rule decides the shape:** each side is split on commas, and the side with more
-    /// parts says how many meanings there are. A side split into exactly that many parts is
-    /// paired in order — two parallel lists are two meanings, not one crowd. Any other side
-    /// goes into *every* meaning, which is what makes `bank` the word being defined whether
-    /// its meaning is `берег` or `банк`.
+    /// **Synonyms rather than separate meanings** (owner, 2026-08-11). The first rule here
+    /// was the opposite — comma → separate meanings — and it is the right reading of `берег,
+    /// банк`. It is the wrong reading of `лиса, лисица`, and the owner's call is that
+    /// synonyms are what a learner types far more often, so the cheaper mistake to make is
+    /// the one that needs `splitting(_:at:)` to undo rather than `merging(_:at:)`.
     ///
-    /// Empty on either side yields nothing: a meaning needs a word on both sides to be
-    /// worth proposing, and an empty proposal is the caller's cue to stay where it is.
+    /// A list, not one value, because the confirm screen edits a list and splitting turns
+    /// this into several. Empty on either side yields nothing: a meaning needs a word on
+    /// both sides to be worth proposing, and an empty proposal is the caller's cue to stay
+    /// where it is.
     static func proposals(_ first: Side, _ second: Side) -> [SenseEntry] {
         let left = words(in: first.text)
         let right = words(in: second.text)
         guard !left.isEmpty, !right.isEmpty else { return [] }
 
-        let count = max(left.count, right.count)
-        return (0..<count).map { index in
-            SenseEntry(terms:
-                share(left, forMeaning: index, of: count).map { Term.Draft($0, in: first.language) }
-                + share(right, forMeaning: index, of: count).map { Term.Draft($0, in: second.language) })
-        }
+        return [SenseEntry(terms: left.map { Term.Draft($0, in: first.language) }
+                                + right.map { Term.Draft($0, in: second.language) })]
     }
 
-    /// Which of a side's words belong to one of the proposed meanings — the whole of the
-    /// rule above, in the one place it is applied.
-    private static func share(_ side: [String], forMeaning index: Int, of count: Int) -> [String] {
-        side.count == count ? [side[index]] : side
+    /// Whether this meaning says the same thing more than one way in some language — which
+    /// is exactly when the learner should be shown the choice, because it is exactly when a
+    /// comma did something.
+    var hasSynonyms: Bool {
+        Set(terms.map { LanguageCode.canonical($0.language) })
+            .contains { words(in: $0).count > 1 }
+    }
+
+    /// Breaks one meaning into several: the inverse of `merging(_:at:)`, and the control
+    /// that turns `берег, банк` into two senses.
+    ///
+    /// **The language with the most words decides how many meanings there are.** One split
+    /// into exactly that many is paired in order — two parallel lists are two meanings, not
+    /// one crowd — and any other language goes into *every* meaning, which is what keeps
+    /// `bank` the word being defined whether its meaning is `берег` or `банк`. Nothing is
+    /// guessed where the lists cannot be paired.
+    ///
+    /// A meaning that says everything once has nothing to split, and is left alone.
+    static func splitting(_ proposals: [SenseEntry], at index: Int) -> [SenseEntry] {
+        guard proposals.indices.contains(index) else { return proposals }
+        let entry = proposals[index]
+        // Deduplicated but kept in first-seen order, so the sections come out in the order
+        // the words were typed rather than in whatever order a `Set` yields.
+        var languages: [String] = []
+        for term in entry.terms
+        where !languages.contains(LanguageCode.canonical(term.language)) {
+            languages.append(LanguageCode.canonical(term.language))
+        }
+        let count = languages.map { entry.words(in: $0).count }.max() ?? 0
+        guard count > 1 else { return proposals }
+
+        let split = (0..<count).map { position in
+            SenseEntry(terms: languages.flatMap { language -> [Term.Draft] in
+                let drafts = entry.terms.filter { LanguageCode.canonical($0.language) == language }
+                return drafts.count == count ? [drafts[position]] : drafts
+            })
+        }
+        var separated = proposals
+        separated.replaceSubrange(index...index, with: split)
+        return separated
     }
 
     /// Typed text split into the words it names. Empty parts are dropped, so a trailing
     /// comma is a typo rather than a blank word.
     ///
-    /// **Deliberately not `PlainText`'s splitter, which looks identical.** There a comma
-    /// separates *synonyms* within one line, because `render` writes it that way and a
-    /// round trip has to be lossless; here it separates *meanings*, because that is what
-    /// the owner asked typing one to do. Two rules that agree on mechanics today and are
-    /// free to disagree tomorrow — sharing the code would tie the file format to the
-    /// keyboard.
+    /// **Deliberately not `PlainText`'s splitter, which looks identical — and, since the
+    /// synonyms pivot, agrees.** There a comma separates synonyms within one line because
+    /// `render` writes it that way and a round trip has to be lossless; here it does so
+    /// because that is what the owner asked typing one to do. Same answer, different
+    /// reasons, and TD-55 will change this one again — sharing the code would tie the file
+    /// format to the keyboard.
     static func words(in typed: String) -> [String] {
         typed.split(separator: ",")
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }

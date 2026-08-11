@@ -2,9 +2,9 @@
 //  SenseEntryScreenTests.swift
 //  Unit Testing Bundle
 //
-//  The confirm screen for TD-53: the proposed split laid out one section per meaning, the
-//  empty row that follows each language's words, and the merge control that turns two
-//  meanings back into synonyms of one.
+//  The confirm screen for TD-53: the proposal laid out one section per meaning, the empty
+//  row that follows each language's words, and the two controls that reshape it — "These
+//  are separate meanings" to split synonyms apart, and merge to fold them back.
 //
 //  Driven through the table's own data source rather than by reading private state — the
 //  claim is what the learner is shown and what tapping does, and a snapshot the table never
@@ -20,9 +20,17 @@ struct SenseEntryScreenTests {
 
     private let pair = LanguagePair(primary: "ru", secondary: "en", showsSecondaryAsPrompt: true)
 
-    /// `bank` with two Russian meanings — the case the owner's rule is right about.
+    /// `bank` with two Russian words, separated — the case the *default* is wrong about, so
+    /// the screen is exercised in the shape a learner reaches by tapping "These are separate
+    /// meanings".
     private var polysemous: [SenseEntry] {
-        SenseEntry.proposals(.init("bank", in: "en"), .init("берег, банк", in: "ru"))
+        SenseEntry.splitting(
+            SenseEntry.proposals(.init("bank", in: "en"), .init("берег, банк", in: "ru")), at: 0)
+    }
+
+    /// What the comma actually proposes now: one meaning, two synonyms.
+    private var synonymous: [SenseEntry] {
+        SenseEntry.proposals(.init("fox", in: "en"), .init("лиса, лисица", in: "ru"))
     }
 
     private func screen(_ proposals: [SenseEntry],
@@ -86,23 +94,58 @@ struct SenseEntryScreenTests {
         #expect(vc.tableView(vc.tableView, titleForFooterInSection: 2) == "2 meanings will be created")
     }
 
+    // MARK: - Splitting
+
+    /// What a comma now proposes, and the one tap that undoes it for `берег, банк`.
+    @Test func synonymsArriveAsOneMeaningWithASplitControl() throws {
+        var committed: [SenseEntry] = []
+        let vc = screen(synonymous) { committed = $0 }
+
+        #expect(vc.numberOfSections(in: vc.tableView) == 2, "one meaning, plus the empty section")
+        #expect(labels(ofSection: 0, on: vc) ==
+                ["fox", "Add a word in English", "лиса", "лисица", "Add a word in Russian",
+                 "These are separate meanings"])
+        #expect(vc.tableView(vc.tableView, titleForFooterInSection: 1) == "1 meaning will be created")
+
+        let split = try #require(labels(ofSection: 0, on: vc).firstIndex(of: "These are separate meanings"))
+        tapRow(split, inSection: 0, on: vc)
+
+        #expect(vc.numberOfSections(in: vc.tableView) == 3)
+        #expect(labels(ofSection: 0, on: vc) == ["fox", "Add a word in English", "лиса", "Add a word in Russian"])
+        #expect(labels(ofSection: 1, on: vc) ==
+                ["fox", "Add a word in English", "лисица", "Add a word in Russian",
+                 "Merge into the meaning above"])
+
+        try save(vc)
+        #expect(committed.count == 2)
+        #expect(committed.map { $0.words(in: "ru") } == [["лиса"], ["лисица"]])
+    }
+
+    /// Offered only where it would do something — a meaning said once has nothing to split.
+    @Test func aMeaningSaidOnceOffersNoSplit() {
+        let vc = screen(polysemous)
+
+        #expect(!labels(ofSection: 0, on: vc).contains("These are separate meanings"))
+    }
+
     // MARK: - Merging
 
-    /// The case the split gets wrong — `лиса, лисица` is one meaning — and the single tap
-    /// that fixes it, in front of the learner rather than months later in practice.
+    /// Merge is the undo for a split the learner asked for, in front of them rather than
+    /// months later in practice.
     @Test func tappingMergeFoldsTheMeaningIntoTheOneAbove() throws {
         var committed: [SenseEntry] = []
-        let proposed = SenseEntry.proposals(.init("fox", in: "en"), .init("лиса, лисица", in: "ru"))
-        let vc = screen(proposed) { committed = $0 }
-        #expect(vc.numberOfSections(in: vc.tableView) == 3, "precondition: the default splits")
+        let separated = SenseEntry.splitting(synonymous, at: 0)
+        let vc = screen(separated) { committed = $0 }
+        #expect(vc.numberOfSections(in: vc.tableView) == 3, "precondition: two meanings")
 
         let merge = try #require(labels(ofSection: 1, on: vc).firstIndex(of: "Merge into the meaning above"))
         tapRow(merge, inSection: 1, on: vc)
 
         #expect(vc.numberOfSections(in: vc.tableView) == 2, "one meaning, plus the empty section")
         #expect(labels(ofSection: 0, on: vc) ==
-                ["fox", "Add a word in English", "лиса", "лисица", "Add a word in Russian"],
-                "the two meanings became synonyms of one, and the shared word arrived once")
+                ["fox", "Add a word in English", "лиса", "лисица", "Add a word in Russian",
+                 "These are separate meanings"],
+                "the two became synonyms of one, and the result offers to separate them again")
 
         // The footer has to survive the merge it exists for: a single format string ends
         // this screen saying "1 meanings will be created".
@@ -138,7 +181,8 @@ struct SenseEntryScreenTests {
                                        Term.Draft("банк", in: "ru")])
         let vc = screen([twins]) { committed = $0 }
         #expect(labels(ofSection: 0, on: vc) ==
-                ["bank", "Add a word in English", "банк", "банк", "Add a word in Russian"],
+                ["bank", "Add a word in English", "банк", "банк", "Add a word in Russian",
+                 "These are separate meanings"],
                 "precondition: both rows are shown")
 
         // The second "банк" — row 3 of the section.
@@ -203,6 +247,9 @@ struct SenseEntryScreenTests {
         // store it — and the footer says which side is missing rather than just going grey.
         #expect(vc.navigationItem.rightBarButtonItem?.isEnabled == false)
         #expect(vc.tableView(vc.tableView, titleForFooterInSection: 2) == "Needs a word in Russian.")
+        // The two footers must not contradict each other: counting sections said "3 meanings
+        // will be created" while Save sat greyed out because one of them was half-filled.
+        #expect(vc.tableView(vc.tableView, titleForFooterInSection: 3) == "2 meanings will be created")
     }
 
     private func firstTextField(in view: UIView) -> UITextField? {

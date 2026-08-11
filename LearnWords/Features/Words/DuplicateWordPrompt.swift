@@ -19,7 +19,8 @@ import UIKit
 
 enum DuplicateWordPrompt {
 
-    /// What the learner chose. `cancel` is absent on purpose — it is the absence of a call.
+    /// What the learner chose to *do*. Cancelling is not one of them — it is the absence of
+    /// a choice, and `onCancel` is where a caller says what that costs.
     enum Choice {
         /// Overwrite what the existing meaning says, keeping its identity and its history.
         case replaceExisting
@@ -29,13 +30,18 @@ enum DuplicateWordPrompt {
         case useExisting
     }
 
-    /// Asks, and calls back only if the learner chose to proceed.
+    /// Asks, and calls back with whatever the learner chose to do.
     ///
     /// - Parameter offering: the answers that make sense here, in the order to show them.
+    /// - Parameter onCancel: what backing out costs the caller. Optional because for the
+    ///   meaning editor it costs nothing — the meaning is still on screen, unchanged. The
+    ///   add-word flow has torn its screens down by the time this is asked, so for it,
+    ///   cancelling without a way back is the learner's typing silently thrown away.
     static func ask(on presenter: UIViewController,
                     word: String,
                     existing: Lexicon.TermUsage,
                     offering choices: [Choice],
+                    onCancel: (() -> Void)? = nil,
                     onChoice: @escaping (Choice) -> Void) {
         let known = existing.translations.joined(separator: ", ")
         let alert = UIAlertController(
@@ -50,7 +56,7 @@ enum DuplicateWordPrompt {
             })
         }
         alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: "AlertAction title"),
-                                      style: .cancel))
+                                      style: .cancel) { _ in onCancel?() })
         presenter.present(alert, animated: true)
     }
 

@@ -115,16 +115,9 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
     /// now returns to the word, which is what the storyboard-wired app did (owner,
     /// 2026-08-09).
     private func askMeaning(of word: String, in set: WordSet, pair: LanguagePair) {
-        // The word stays on screen while its meaning is typed. Without it the two steps are
-        // visually identical and there is nothing to say which one you are on — the job the
-        // old search screen's first section was doing (owner).
-        let context = WordInputViewController.Context(
-            caption: String(format: NSLocalizedString("Word in %@", comment: "Caption; a language"),
-                            LanguageCode.displayName(pair.secondary)),
-            term: word)
         let screen = WordInputViewController(
             .add(language: pair.primary),
-            context: context,
+            context: meaningContext(for: word, pair: pair),
             title: NSLocalizedString("Add meaning", comment: "Screen title")) { [weak self] meaning in
             guard let self else { return }
             self.storePair(word, meaning: meaning, in: set, pair: pair)
@@ -132,15 +125,28 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         navigationController?.pushViewController(screen, animated: true)
     }
 
+    /// The word, pinned above the field while its meaning is typed.
+    ///
+    /// Without it the two steps are visually identical and there is nothing to say which one
+    /// you are on — the job the old search screen's first section was doing (owner). Shared
+    /// with `resumeEntry`, so a rebuilt step two looks like the one it replaces.
+    private func meaningContext(for word: String, pair: LanguagePair) -> WordInputViewController.Context {
+        WordInputViewController.Context(
+            caption: String(format: NSLocalizedString("Word in %@", comment: "Caption; a language"),
+                            LanguageCode.displayName(pair.secondary)),
+            term: word)
+    }
+
     /// Stores what was typed — after asking, when what was typed is ambiguous.
     ///
     /// Two different questions can arise here, and only one of them at a time:
     ///
-    /// * **A comma proposed more than one meaning** (TD-53). `берег, банк` is two meanings
-    ///   and `лиса, лисица` is one with two synonyms, and nothing in the text tells them
-    ///   apart — so the split is laid out on `SenseEntryViewController` to be confirmed or
-    ///   merged. The duplicate question below is not also asked: laying the meanings out one
-    ///   per section *is* the learner saying these are separate meanings.
+    /// * **A comma put more than one word on a side** (TD-53). `лиса, лисица` is one meaning
+    ///   with two synonyms and `берег, банк` is two meanings, and nothing in the text tells
+    ///   them apart — so the proposal is laid out on `SenseEntryViewController`, as synonyms
+    ///   by default, with one control to separate them. The duplicate question below is not
+    ///   also asked there: the learner is already being shown what will be stored, and is
+    ///   the one saying how many meanings it is.
     /// * **The word is already in the library.** The store deduplicates *words*: adding
     ///   "bear" twice links the existing row rather than making a twin. It does not
     ///   deduplicate **meanings**, so adding bear/медведь twice produced two meanings sharing
@@ -153,7 +159,7 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         // Punctuation and nothing else — "a word with no letters is not a word", and there
         // is nothing here to store or to ask about.
         guard let only = proposed.first else { return }
-        guard proposed.count == 1 else { return confirmMeanings(proposed, in: set, pair: pair) }
+        guard !only.hasSynonyms else { return confirmMeanings(proposed, in: set, pair: pair) }
 
         // **The word as it will be stored, not as it was typed.** `SenseEntry` trims and
         // drops empty parts, so "bank," is stored as "bank" — and asking the store about
@@ -170,8 +176,38 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         // typed, and presenting from a view that is not in the window is how an alert
         // becomes a line in the log instead.
         unwindToList { [weak self] in
-            self?.askAboutDuplicate(only, word: typed, in: set, pair: pair, existing: clash)
+            self?.askAboutDuplicate(only, word: typed, meaning: meaning,
+                                    in: set, pair: pair, existing: clash)
         }
+    }
+
+    /// Puts the learner back where they were typing, with both words still in place.
+    ///
+    /// **Cancelling must not cost the entry.** Because the flow is torn down before the
+    /// duplicate question is asked — it has to be, or the alert has no visible screen to
+    /// come from — backing out of that question would otherwise land on the word list with
+    /// everything typed silently gone. Rebuilding both steps is what makes Cancel mean
+    /// "let me change it" rather than "throw it away".
+    private func resumeEntry(word: String, meaning: String, in set: WordSet, pair: LanguagePair) {
+        guard let navigation = navigationController else { return }
+        let wordStep = WordInputViewController(
+            .add(language: pair.secondary),
+            initialText: word,
+            existingUsages: { [weak self] typed in
+                (try? self?.lexicon.usages(ofTerm: typed, in: pair.secondary)) ?? []
+            }) { [weak self] entered in
+            self?.askMeaning(of: entered, in: set, pair: pair)
+        }
+        let meaningStep = WordInputViewController(
+            .add(language: pair.primary),
+            initialText: meaning,
+            context: meaningContext(for: word, pair: pair),
+            title: NSLocalizedString("Add meaning", comment: "Screen title")) { [weak self] entered in
+            self?.storePair(word, meaning: entered, in: set, pair: pair)
+        }
+        // Both steps at once, so Back from the meaning still reaches the word.
+        navigation.setViewControllers(
+            navigation.viewControllers + [wordStep, meaningStep], animated: true)
     }
 
     /// Takes the entry screens off the stack, and runs `then` once they are actually gone.
@@ -193,7 +229,13 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
             return then()
         }
         navigation.popToViewController(self, animated: true)
-        guard let coordinator = navigation.transitionCoordinator else { return then() }
+        guard let coordinator = navigation.transitionCoordinator else {
+            // No coordinator to wait on — a pop coalesced with another transition, say.
+            // Still not *this* turn of the runloop: running `then` here would present from a
+            // view that has just been told to leave the window, which is the exact symptom
+            // waiting was added to remove.
+            return DispatchQueue.main.async(execute: then)
+        }
         coordinator.animate(alongsideTransition: nil) { _ in then() }
     }
 
@@ -229,11 +271,16 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
     /// `DuplicateWordPrompt`, shared with the meaning editor.
     private func askAboutDuplicate(_ entry: SenseEntry,
                                    word: String,
+                                   meaning: String,
                                    in set: WordSet,
                                    pair: LanguagePair,
                                    existing: Lexicon.TermUsage) {
-        DuplicateWordPrompt.ask(on: self, word: word, existing: existing,
-                                offering: [.replaceExisting, .addAnother]) { [weak self] choice in
+        DuplicateWordPrompt.ask(
+            on: self, word: word, existing: existing,
+            offering: [.replaceExisting, .addAnother],
+            onCancel: { [weak self] in
+                self?.resumeEntry(word: word, meaning: meaning, in: set, pair: pair)
+            }) { [weak self] choice in
             guard let self else { return }
             switch choice {
             case .replaceExisting:
