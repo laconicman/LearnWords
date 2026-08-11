@@ -1611,7 +1611,7 @@ punctuation convention; automatic FM splitting):
 
 ## TD-53 resolution note (2026-08-11)
 
-Implemented, 320 tests green (was 298). No schema change, as specced.
+Implemented, 325 tests green (was 298). No schema change, as specced.
 
 **The rule is one line.** `SenseEntry.proposals(_:_:)` splits each side on commas and lets
 the side with more parts decide how many meanings there are; a side split into exactly that
@@ -1643,7 +1643,14 @@ per section *is* the learner saying they are separate. Consequence, unhandled: e
 `bank` / `берег, банк` when `bank`/`банк` already exists creates a second `банк` meaning.
 Visible on the confirm screen before Save, but nothing warns. → worth a small follow-up.
 
-**What the tests did not catch.** Making Back pop to the word (the owner's second ask) left
+**Finishing an entry unwinds the whole flow, not one screen of it.** The review found the
+cost of pushing step two instead of replacing it: the single-meaning path popped onto the
+*word* step, which greeted the learner with the word they had just filed and a live Save
+button, and tapping it filed the entry twice. `unwindToList` is now the single exit, and it
+waits on the transition coordinator before raising the duplicate alert — that alert is
+presented from the word list, which is two pushes down while the entry is being typed.
+
+**What the tests did not catch — twice.** Making Back pop to the word (the owner's second ask) left
 `WordInputViewController.hasCommitted` set from the first commit, so the returned-to screen
 had a dead Save button and no way out but Back. Every test was green; it was found by
 driving the simulator. `hasCommitted` is now cleared on each appearance, which still closes
@@ -1651,6 +1658,14 @@ the hole it was added for — a double-commit between a commit and the push that
 `WordInputCommitTests` pins both halves, and drives appearance with
 `beginAppearanceTransition` because a pushed/popped navigation controller in the test host
 does not run its own appearance transitions (a window-based version passed either way).
+
+The second miss is the lesson worth keeping. Having found that defect on the device, this
+session then verified only the *comma* path on the device and left the single-word path —
+the common one — unwalked, so the same PR shipped the same shape of bug three lines away:
+storing a single meaning popped one screen and stranded the learner on "Add word". Review
+caught it. **Walking one path on the device is not walking the flow**; the paths that
+branch on user input each need driving, and here there are three (single, multi-meaning,
+duplicate).
 
 ## TD-49 resolution note (2026-08-09)
 
