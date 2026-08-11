@@ -1567,7 +1567,7 @@ slider above the Easy initial stability. Both derive from the existing log (`ses
 the second Study dial, the way Anki does. Full reasoning:
 [MasteryAndProgressUI](MasteryAndProgressUI.md) §1.
 
-## TD-50 — No per-term statistics view
+## TD-50 — No per-term statistics view — **resolved (2026-08-11)**
 
 The log holds far more than the ring shows — per-direction (receptive vs productive),
 per-exercise, effort, latency, next-due — and none of it is reachable from the word list.
@@ -1577,6 +1577,49 @@ per-exercise, effort, latency, next-due — and none of it is reachable from the
 Trailing swipe is **not** available: the sets screen already uses it for rename/delete.
 Content and gesture rationale: [MasteryAndProgressUI](MasteryAndProgressUI.md) §2. The
 receptive/productive split is the part no surveyed competitor shows. No schema change.
+
+## TD-50 resolution note (2026-08-11)
+
+Implemented, 349 tests green (was 337). No schema change, as specced.
+
+**A section per exercise, which is the owner's headline ask and the shape TD-49 gave the
+data.** Memory is kept per exercise, so a word can be solid as a flashcard and untouched in
+dictation; the ring on the word list shows the weakest engaged strand, which is the right
+summary and says nothing about *which* strand is weak. `SenseStatisticsViewController` is
+where that goes, plus effort and the receptive/productive split — the part no surveyed
+competitor shows, and the reason `ReviewDirection` has been recorded per event since TD-13.
+
+**An exercise never tried says so.** Reporting 0% mastery and "due now" for an exercise the
+learner has never opened is three numbers about nothing, and it reads as failure rather than
+as absence.
+
+**The gesture is the platform's.** `UIContextMenuInteraction` via the table's own
+`contextMenuConfigurationForRowAt` on iOS 13+, with the statistics as the *preview* — which
+is the whole reason for preferring it to a sheet — and a `UILongPressGestureRecognizer`
+pushing the same screen at the 12.1 floor. Trailing swipe was never available: the sets
+screen uses it for rename and delete, and a swipe acts on a row rather than inspecting it.
+
+**Two things the gesture cost, and how they were paid.**
+
+* *Long press already looked a word up.* The context menu carries "Look up" as an action,
+  and the statistics screen carries it as a row — so the capability survives on both sides
+  of the 12.1 floor, where there is no menu to hang an action on.
+* *A long press is invisible to VoiceOver*, and a context menu is reachable only through the
+  rotor. Both destinations are `accessibilityCustomActions` on the cell. The action carries
+  the **sense id**, not an index path: cells are reused and search re-sorts the rows, so a
+  captured position is stale the moment the table reloads.
+
+**`MemoryWording` picks the unit itself.** Left to choose, `DateComponentsFormatter` says
+"2 weeks" for twelve days — a 17% overstatement, and worse, incomparable with the horizon
+preference the learner has already met, which is denominated in days and floored at ten. So:
+days below a month, then weeks, months, years. Above a month the reverse argument holds and
+"45 days" is precision nobody has.
+
+**Known, not fixed:** for a word with history in more than one exercise the context-menu
+preview is taller than iOS will show and clips — the last section's header can appear with
+its rows cut off. Tapping the preview opens the full screen, which is what a preview
+promises, and UIKit clamps tall previews as a matter of course. A shorter preview would mean
+a second layout, which is not worth it before TD-51 decides what a summary looks like.
 
 ## TD-51 — No set-level summary
 

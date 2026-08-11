@@ -148,6 +148,12 @@ run — asset formats only Xcode 26 understands (TD-45), a hard link to Core Hap
     confirm screen TD-53 shipped, and it makes Tab natural for a macOS port. TD-53's parse
     stays, as the path for text that arrives whole. Open questions in
     [TechDebt](TechDebt.md) § TD-55.
+  - **TD-50 — done (2026-08-11).** Long press on a word opens its statistics, **per
+    exercise** — memory in plain words, recall now, next due, spaced days — plus effort and
+    the receptive/productive split. Context menu with the statistics as its preview on
+    iOS 13+, the same screen from a long press at the 12.1 floor, and
+    `accessibilityCustomActions` either way, since a long press is invisible to VoiceOver.
+    349 tests green.
   - Remaining: **TD-55**, recorded but not built. The rest of the batch is in flight, one
     branch each; every item's state is its heading in [TechDebt](TechDebt.md), which is
     where to look rather than here. Scope and conventions are in
