@@ -103,6 +103,35 @@ struct SenseEntryTests {
         #expect(merged[0].words(in: "en") == ["fox"])
     }
 
+    /// The de-duplication has to hold on the language *subtag*, or a proposal assembled from
+    /// "en" and "en-US" drafts keeps two rows spelled the same inside one meaning — the very
+    /// thing it is there to stop.
+    @Test func mergingDropsADuplicateWrittenInAVarietyOfTheSameLanguage() {
+        let proposals = [
+            SenseEntry(terms: [Term.Draft("bank", in: "en"), Term.Draft("берег", in: "ru")]),
+            SenseEntry(terms: [Term.Draft("bank", in: "en-US"), Term.Draft("банк", in: "ru")]),
+        ]
+
+        let merged = SenseEntry.merging(proposals, at: 1)
+
+        #expect(merged.count == 1)
+        #expect(merged[0].words(in: "en") == ["bank"])
+        #expect(merged[0].words(in: "ru") == ["берег", "банк"])
+    }
+
+    /// Rows are addressed by position, because two rows of one meaning can say the same
+    /// word and "the first one spelled like that" is then the wrong row.
+    @Test func aWordIsFoundByItsPlaceInItsLanguage() {
+        let entry = SenseEntry(terms: [Term.Draft("bank", in: "en"),
+                                       Term.Draft("берег", in: "ru"),
+                                       Term.Draft("банк", in: "ru")])
+
+        #expect(entry.position(ofWordAt: 0, in: "ru") == 1)
+        #expect(entry.position(ofWordAt: 1, in: "ru") == 2)
+        #expect(entry.position(ofWordAt: 0, in: "en") == 0)
+        #expect(entry.position(ofWordAt: 2, in: "ru") == nil)
+    }
+
     @Test func mergingTheFirstMeaningDoesNothing() {
         let proposed = SenseEntry.proposals(english("bank"), russian("берег, банк"))
 

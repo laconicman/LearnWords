@@ -155,9 +155,39 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         guard let only = proposed.first else { return }
         guard proposed.count == 1 else { return confirmMeanings(proposed, in: set, pair: pair) }
 
-        let existing = (try? lexicon.usages(ofTerm: word, in: pair.secondary)) ?? []
-        guard let clash = existing.first else { return commit([only], in: set) }
-        askAboutDuplicate(only, word: word, in: set, pair: pair, existing: clash)
+        // **The word as it will be stored, not as it was typed.** `SenseEntry` trims and
+        // drops empty parts, so "bank," is stored as "bank" — and asking the store about
+        // "bank," matches nothing, which silently skipped the duplicate question for the
+        // one word it exists to ask about.
+        let typed = only.words(in: pair.secondary).first ?? word
+        let existing = (try? lexicon.usages(ofTerm: typed, in: pair.secondary)) ?? []
+
+        guard let clash = existing.first else {
+            commit([only], in: set)
+            return unwindToList()
+        }
+        // Asked *after* unwinding: this screen is two pushes down while the entry is being
+        // typed, and presenting from a view that is not in the window is how an alert
+        // becomes a line in the log instead.
+        unwindToList { [weak self] in
+            self?.askAboutDuplicate(only, word: typed, in: set, pair: pair, existing: clash)
+        }
+    }
+
+    /// Takes the entry screens off the stack, and runs `then` once they are actually gone.
+    ///
+    /// The add flow is `list → word → meaning` since Back started returning to the word
+    /// (TD-53). Storing used to be the end of it because the meaning step popped itself onto
+    /// the list; now it pops onto the *word* step, which greets the learner with the word
+    /// they just filed and a live Save button — tapping it a second time files it twice.
+    /// Finishing an entry has to unwind the whole flow, not one screen of it.
+    private func unwindToList(then: @escaping () -> Void = {}) {
+        guard let navigation = navigationController, navigation.topViewController !== self else {
+            return then()
+        }
+        navigation.popToViewController(self, animated: true)
+        guard let coordinator = navigation.transitionCoordinator else { return then() }
+        coordinator.animate(alongsideTransition: nil) { _ in then() }
     }
 
     /// Shows the proposed split and stores whatever comes back from it.
@@ -173,7 +203,7 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
             }) { [weak self] confirmed in
             guard let self else { return }
             self.commit(confirmed, in: set)
-            self.navigationController?.popToViewController(self, animated: true)
+            self.unwindToList()
         }
         navigationController?.pushViewController(screen, animated: true)
     }

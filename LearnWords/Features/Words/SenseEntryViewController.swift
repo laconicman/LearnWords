@@ -96,6 +96,15 @@ final class SenseEntryViewController: UITableViewController {
         rebuildRows()
     }
 
+    /// Rebuilt on every appearance, for the same reason `WordInputViewController` clears its
+    /// commit guard there: a screen that is being shown is a screen that can be answered,
+    /// and `commit` puts Save out before handing over. It also picks up the word that was
+    /// just typed on the screen pushed from here.
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        rebuildRows()
+    }
+
     /// The one place the table's contents are built.
     private func rebuildRows() {
         var built: [[Row]] = proposals.enumerated().map { index, entry in
@@ -151,9 +160,13 @@ final class SenseEntryViewController: UITableViewController {
     /// still missing, or — under the last one — what Save will do.
     override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
         guard section < proposals.count else {
-            return String(format: NSLocalizedString("%d meanings will be created",
-                                                    comment: "Footer; a count"),
-                          proposals.count)
+            // A plural entry in the string catalog, the way `WordCount` already does it —
+            // not a `%d` format. Merging down to one meaning is the *point* of this screen,
+            // so "1 meanings will be created" is what a plain format string says at the end
+            // of it, and Russian needs `one`/`few`/`many` rather than two forms.
+            return String.localizedStringWithFormat(
+                NSLocalizedString("MeaningsWillBeCreated", comment: "Count of meanings the confirm screen will store"),
+                proposals.count)
         }
         guard let missing = sectionLanguages.first(where: { proposals[section].words(in: $0).isEmpty })
         else { return nil }
@@ -251,40 +264,32 @@ final class SenseEntryViewController: UITableViewController {
     /// Removing a meaning's last word removes the meaning: an entry with nothing in it is
     /// not a meaning being edited, it is one being taken back.
     private func remove(wordAt index: Int, in language: String, ofMeaning meaning: Int) {
-        guard proposals.indices.contains(meaning) else { return }
-        let word = proposals[meaning].words(in: language)[index]
-        if let position = proposals[meaning].terms.firstIndex(where: {
-            $0.text == word && LanguageCode.canonical($0.language) == LanguageCode.canonical(language)
-        }) {
-            proposals[meaning].terms.remove(at: position)
-        }
+        guard proposals.indices.contains(meaning),
+              let position = proposals[meaning].position(ofWordAt: index, in: language)
+        else { return }
+        proposals[meaning].terms.remove(at: position)
         if proposals[meaning].isEmpty { proposals.remove(at: meaning) }
         rebuildRows()
     }
 
     private func editWord(at index: Int, in language: String, ofMeaning meaning: Int) {
-        let existing = proposals[meaning].words(in: language)[index]
         push(language: language,
-             initialText: existing,
+             initialText: proposals[meaning].words(in: language)[index],
              title: NSLocalizedString("Edit word", comment: "Screen title")) { [weak self] entered in
             guard let self, self.proposals.indices.contains(meaning) else { return }
             // A comma typed *here* adds synonyms to this meaning. It cannot split: the row
             // being edited belongs to a meaning the learner has already laid out, and the
             // sections above are where meanings are added or removed.
             let replacements = SenseEntry.words(in: entered)
-            guard !replacements.isEmpty else { return }
-            self.replace(existing, in: language, ofMeaning: meaning, with: replacements)
+            guard !replacements.isEmpty,
+                  // By position, not by spelling: the row being edited is *this* row, even
+                  // when another row of the same meaning says the same word.
+                  let position = self.proposals[meaning].position(ofWordAt: index, in: language)
+            else { return }
+            self.proposals[meaning].terms.replaceSubrange(
+                position...position, with: replacements.map { Term.Draft($0, in: language) })
+            self.rebuildRows()
         }
-    }
-
-    private func replace(_ word: String, in language: String, ofMeaning meaning: Int,
-                         with replacements: [String]) {
-        guard let position = proposals[meaning].terms.firstIndex(where: {
-            $0.text == word && LanguageCode.canonical($0.language) == LanguageCode.canonical(language)
-        }) else { return }
-        proposals[meaning].terms.replaceSubrange(
-            position...position, with: replacements.map { Term.Draft($0, in: language) })
-        rebuildRows()
     }
 
     private func addWord(in language: String, toMeaning meaning: Int) {

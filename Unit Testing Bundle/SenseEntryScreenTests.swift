@@ -104,6 +104,10 @@ struct SenseEntryScreenTests {
                 ["fox", "Add a word in English", "лиса", "лисица", "Add a word in Russian"],
                 "the two meanings became synonyms of one, and the shared word arrived once")
 
+        // The footer has to survive the merge it exists for: a single format string ends
+        // this screen saying "1 meanings will be created".
+        #expect(vc.tableView(vc.tableView, titleForFooterInSection: 1) == "1 meaning will be created")
+
         try save(vc)
         #expect(committed.count == 1)
         #expect(committed[0].words(in: "ru") == ["лиса", "лисица"])
@@ -123,6 +127,26 @@ struct SenseEntryScreenTests {
 
         #expect(vc.numberOfSections(in: vc.tableView) == 2)
         #expect(labels(ofSection: 0, on: vc).contains("берег"), "the meaning kept is the first")
+    }
+
+    /// Two rows of one meaning can say the same word — nothing stops adding one twice — and
+    /// deleting the second must not take the first.
+    @Test func deletingActsOnTheRowTappedEvenWhenTwoRowsAgree() throws {
+        var committed: [SenseEntry] = []
+        let twins = SenseEntry(terms: [Term.Draft("bank", in: "en"),
+                                       Term.Draft("банк", in: "ru"),
+                                       Term.Draft("банк", in: "ru")])
+        let vc = screen([twins]) { committed = $0 }
+        #expect(labels(ofSection: 0, on: vc) ==
+                ["bank", "Add a word in English", "банк", "банк", "Add a word in Russian"],
+                "precondition: both rows are shown")
+
+        // The second "банк" — row 3 of the section.
+        vc.tableView(vc.tableView, commit: .delete, forRowAt: IndexPath(row: 3, section: 0))
+
+        try save(vc)
+        #expect(committed.count == 1)
+        #expect(committed[0].words(in: "ru") == ["банк"], "one of the two, not both and not neither")
     }
 
     /// Only words are swipeable — not the empty rows, and not the merge control.

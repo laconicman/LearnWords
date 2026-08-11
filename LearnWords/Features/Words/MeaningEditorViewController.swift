@@ -217,10 +217,13 @@ final class MeaningEditorViewController: UITableViewController {
                     self.sense = try self.lexicon.addTerm(Term.Draft(word, in: language),
                                                           to: self.sense.id)
                 }
-                self.reload()
             } catch {
                 debugLog("Could not add \(entered): \(error)")
             }
+            // Outside the `catch`, because a comma makes this several writes: failing on the
+            // second of "лисица, кума" leaves the first one stored, and a screen that skipped
+            // its refresh would go on showing neither.
+            self.reload()
         }
     }
 

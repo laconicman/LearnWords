@@ -38,6 +38,35 @@ struct SenseEntry: Equatable {
     }
 
     var isEmpty: Bool { terms.isEmpty }
+
+    /// Whether this meaning already says the same word in the same language — spelling and
+    /// canonical subtag, ignoring whatever else a draft happens to carry.
+    func holds(_ draft: Term.Draft) -> Bool {
+        position(of: draft.text, in: draft.language) != nil
+    }
+
+    /// Where a word sits in `terms`, found by spelling and language.
+    func position(of text: String, in language: String) -> Int? {
+        let code = LanguageCode.canonical(language)
+        return terms.firstIndex { $0.text == text && LanguageCode.canonical($0.language) == code }
+    }
+
+    /// Where the *n*th word of one language sits in `terms`.
+    ///
+    /// The screen shows a language's words as its own list, so row 2 of Russian has to mean
+    /// the second Russian draft — not "the first draft spelled like that". Two rows can be
+    /// spelled the same (nothing stops adding one word twice), and matching by text made
+    /// editing or deleting the second silently act on the first.
+    func position(ofWordAt index: Int, in language: String) -> Int? {
+        let code = LanguageCode.canonical(language)
+        var seen = 0
+        for (position, term) in terms.enumerated()
+        where LanguageCode.canonical(term.language) == code {
+            if seen == index { return position }
+            seen += 1
+        }
+        return nil
+    }
 }
 
 extension SenseEntry {
@@ -107,8 +136,10 @@ extension SenseEntry {
         var merged = proposals
         let absorbed = merged.remove(at: index)
         // Duplicates would become two rows spelled the same inside one meaning, which is
-        // what `findOrCreateTerm` prevents everywhere below this.
-        for term in absorbed.terms where !merged[index - 1].terms.contains(term) {
+        // what `findOrCreateTerm` prevents everywhere below this. Compared on the canonical
+        // subtag, like `words(in:)` — matching the raw tag would let a draft made in "en"
+        // and one made in "en-US" both through, which is exactly the pair this drops.
+        for term in absorbed.terms where !merged[index - 1].holds(term) {
             merged[index - 1].terms.append(term)
         }
         return merged
