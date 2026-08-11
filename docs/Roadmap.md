@@ -139,7 +139,7 @@ run — asset formats only Xcode 26 understands (TD-45), a hard link to Core Hap
     owns its `ReviewEvent` log. Back now pops to the word instead of leaving the flow — which
     exposed `hasCommitted` as a one-way door and made it per-appearance. Review then found
     that storing a *single* meaning stranded the learner on "Add word", so finishing an
-    entry now unwinds the whole flow. 325 tests green.
+    entry now unwinds the whole flow. 326 tests green.
   - Remaining, in order: **TD-50** → **TD-52** → **TD-51**, handed off in
     [TASK-TD53-batch](TASK-TD53-batch.md) (self-contained: scope, the owner's UI asks, the
     build flag that must not be used, and the review loop). TD-50/51 also owe the settings

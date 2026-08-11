@@ -1611,7 +1611,7 @@ punctuation convention; automatic FM splitting):
 
 ## TD-53 resolution note (2026-08-11)
 
-Implemented, 325 tests green (was 298). No schema change, as specced.
+Implemented, 326 tests green (was 298). No schema change, as specced.
 
 **The rule is one line.** `SenseEntry.proposals(_:_:)` splits each side on commas and lets
 the side with more parts decide how many meanings there are; a side split into exactly that

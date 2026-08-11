@@ -159,6 +159,44 @@ struct SenseEntryScreenTests {
         #expect(!vc.tableView(vc.tableView, canEditRowAt: IndexPath(row: 0, section: 2)))
     }
 
+    // MARK: - Adding without a comma
+
+    /// The owner's *"make commas less necessary"*, end to end: a third meaning arrives from
+    /// the empty section, with no comma typed anywhere.
+    @Test func anotherMeaningCanBeAddedWithoutTypingAComma() throws {
+        let vc = screen(polysemous)
+        let navigation = UINavigationController(rootViewController: vc)
+        let trailing = vc.numberOfSections(in: vc.tableView) - 1
+        #expect(labels(ofSection: trailing, on: vc) == ["Add another meaning"], "precondition")
+
+        tapRow(0, inSection: trailing, on: vc)
+        let input = try #require(navigation.topViewController as? WordInputViewController,
+                                 "the empty section has to push the word input screen")
+        input.view.frame = CGRect(x: 0, y: 0, width: 390, height: 800)
+        input.view.layoutIfNeeded()
+        try #require(firstTextField(in: input.view)).text = "cat"
+        let save = try #require(input.navigationItem.rightBarButtonItem)
+        _ = save.target?.perform(save.action, with: save)
+
+        #expect(vc.numberOfSections(in: vc.tableView) == 4, "three meanings, plus the empty section")
+        // Merge is offered here too: it is a later meaning like any other.
+        #expect(labels(ofSection: 2, on: vc) ==
+                ["cat", "Add a word in English", "Add a word in Russian",
+                 "Merge into the meaning above"])
+        // Half a meaning cannot be practised in either direction, so Save does not promise to
+        // store it — and the footer says which side is missing rather than just going grey.
+        #expect(vc.navigationItem.rightBarButtonItem?.isEnabled == false)
+        #expect(vc.tableView(vc.tableView, titleForFooterInSection: 2) == "Needs a word in Russian.")
+    }
+
+    private func firstTextField(in view: UIView) -> UITextField? {
+        if let field = view as? UITextField { return field }
+        for subview in view.subviews {
+            if let found = firstTextField(in: subview) { return found }
+        }
+        return nil
+    }
+
     // MARK: - Saving
 
     /// A meaning needs a word on both practised languages or it can be asked in neither
