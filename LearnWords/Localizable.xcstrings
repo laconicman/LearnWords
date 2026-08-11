@@ -1,6 +1,108 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Add a word in %@" : {
+      "comment" : "Row; a language name",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agregar palabra en %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить слово на %@"
+          }
+        }
+      }
+    },
+    "Add another meaning" : {
+      "comment" : "Row",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agregar otro significado"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить ещё значение"
+          }
+        }
+      }
+    },
+    "Confirm meanings" : {
+      "comment" : "Screen title",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirmar significados"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подтвердите значения"
+          }
+        }
+      }
+    },
+    "Meaning %d" : {
+      "comment" : "Section header; a number",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Significado %d"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Значение %d"
+          }
+        }
+      }
+    },
+    "Merge into the meaning above" : {
+      "comment" : "Row",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Combinar con el significado anterior"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Объединить с предыдущим значением"
+          }
+        }
+      }
+    },
+    "Needs a word in %@." : {
+      "comment" : "Footer; a language name",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Falta una palabra en %@."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нужно слово на %@."
+          }
+        }
+      }
+    },
     "“%@” is already in your words" : {
       "comment" : "Alert title; the word"
     },

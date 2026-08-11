@@ -159,6 +159,22 @@ struct SenseEntryScreenTests {
         #expect(!vc.tableView(vc.tableView, canEditRowAt: IndexPath(row: 0, section: 2)))
     }
 
+    /// `commit` hands the proposal back whole, so anything the rows do not cover would be
+    /// stored having never been shown. A third language gets rows like any other; only
+    /// *completeness* is judged on the practised pair.
+    @Test func aLanguageOutsideThePractisedPairIsStillShown() {
+        let trilingual = SenseEntry(terms: [Term.Draft("bank", in: "en"),
+                                            Term.Draft("берег", in: "ru"),
+                                            Term.Draft("Ufer", in: "de")])
+        let vc = screen([trilingual])
+
+        #expect(labels(ofSection: 0, on: vc) ==
+                ["bank", "Add a word in English", "берег", "Add a word in Russian",
+                 "Ufer", "Add a word in German"])
+        #expect(vc.navigationItem.rightBarButtonItem?.isEnabled == true,
+                "the practised pair is filled, so the meaning is storable")
+    }
+
     // MARK: - Adding without a comma
 
     /// The owner's *"make commas less necessary"*, end to end: a third meaning arrives from

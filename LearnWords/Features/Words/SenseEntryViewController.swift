@@ -33,9 +33,27 @@ final class SenseEntryViewController: UITableViewController {
     /// The meanings as they stand, edited in place by every action on this screen.
     private var proposals: [SenseEntry]
 
-    /// The languages a meaning needs to be practisable, in display order: the studied
-    /// language first, then the learner's own.
-    private let sectionLanguages: [String]
+    /// The languages a meaning needs to be practisable: the studied language, then the
+    /// learner's own. What `isComplete` insists on.
+    private let practisedLanguages: [String]
+
+    /// The languages that get rows, in display order: the practised pair first, then
+    /// anything else the proposal happens to cover.
+    ///
+    /// **Every language in the proposal, not just the pair** — the same rule
+    /// `MeaningEditorViewController.rebuildSections` follows. `commit` hands back the
+    /// proposal whole, so a language the rows did not cover would be stored without ever
+    /// having been shown, let alone editable. Unreachable from today's only caller, which
+    /// builds proposals from exactly the two languages; the screen's contract is "edit this
+    /// proposal", and it should be able to.
+    private var sectionLanguages: [String] {
+        var codes = practisedLanguages
+        for language in proposals.flatMap({ $0.terms.map(\.language) }).sorted()
+        where !codes.contains(where: { LanguageCode.canonical($0) == LanguageCode.canonical(language) }) {
+            codes.append(language)
+        }
+        return codes
+    }
 
     private let onCommit: ([SenseEntry]) -> Void
 
@@ -67,7 +85,7 @@ final class SenseEntryViewController: UITableViewController {
          existingUsages: ((String, String) -> [Lexicon.TermUsage])? = nil,
          onCommit: @escaping ([SenseEntry]) -> Void) {
         self.proposals = proposals
-        self.sectionLanguages = [languages.secondary, languages.primary]
+        self.practisedLanguages = [languages.secondary, languages.primary]
         self.existingUsages = existingUsages
         self.onCommit = onCommit
         super.init(style: .grouped)
@@ -129,7 +147,7 @@ final class SenseEntryViewController: UITableViewController {
     /// A meaning needs a word on **both** practised languages, or it cannot be asked in
     /// either direction — `Sense.canPractise` is the same rule, one layer down.
     private func isComplete(_ entry: SenseEntry) -> Bool {
-        sectionLanguages.allSatisfy { !entry.words(in: $0).isEmpty }
+        practisedLanguages.allSatisfy { !entry.words(in: $0).isEmpty }
     }
 
     private var isStorable: Bool {
@@ -168,7 +186,7 @@ final class SenseEntryViewController: UITableViewController {
                 NSLocalizedString("MeaningsWillBeCreated", comment: "Count of meanings the confirm screen will store"),
                 proposals.count)
         }
-        guard let missing = sectionLanguages.first(where: { proposals[section].words(in: $0).isEmpty })
+        guard let missing = practisedLanguages.first(where: { proposals[section].words(in: $0).isEmpty })
         else { return nil }
         return String(format: NSLocalizedString("Needs a word in %@.",
                                                 comment: "Footer; a language name"),
@@ -306,7 +324,7 @@ final class SenseEntryViewController: UITableViewController {
     /// A new meaning starts with the studied language, the same side the add-word flow asks
     /// for first; its footer then says what it still needs.
     private func addMeaning() {
-        guard let language = sectionLanguages.first else { return }
+        guard let language = practisedLanguages.first else { return }
         push(language: language,
              initialText: "",
              title: NSLocalizedString("Add meaning", comment: "Screen title")) { [weak self] entered in

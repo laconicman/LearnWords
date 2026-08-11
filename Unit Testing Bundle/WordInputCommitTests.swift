@@ -70,6 +70,41 @@ struct WordInputCommitTests {
         vc.endAppearanceTransition()
     }
 
+    /// Punctuation is not an answer.
+    ///
+    /// "," passed the old non-empty check, so the screen committed and called back — and
+    /// every reader of that callback parses it into no words and stores nothing, which left
+    /// the learner bounced back a step with the other half of the entry gone and nothing
+    /// said. Refused here, so Save simply does not act, exactly as on an empty field.
+    @Test func punctuationAloneIsNotAnAnswer() throws {
+        var committed: [String] = []
+        for typed in [",", ", ,", "  "] {
+            let word = WordInputViewController(.add(language: "en"), initialText: typed) {
+                committed.append($0)
+            }
+            let navigation = UINavigationController(rootViewController: UIViewController())
+            navigation.pushViewController(word, animated: false)
+            word.loadViewIfNeeded()
+
+            try tapSave(word)
+
+            #expect(committed.isEmpty, "\(typed.debugDescription) must not answer")
+            #expect(navigation.topViewController === word,
+                    "\(typed.debugDescription) must leave the screen up, not unwind it")
+        }
+    }
+
+    /// A note is exempt: nothing splits it, and it may be cleared.
+    @Test func aNoteMayStillBeCleared() throws {
+        var committed: [String] = []
+        let note = WordInputViewController(.note, initialText: "") { committed.append($0) }
+        note.loadViewIfNeeded()
+
+        try tapSave(note)
+
+        #expect(committed == [""])
+    }
+
     /// The hole the guard was put there to close, which must stay closed: between a commit
     /// and the push that follows it, Return or a second tap must not answer twice.
     @Test func oneAppearanceStillCommitsOnlyOnce() throws {

@@ -473,13 +473,17 @@ final class WordInputViewController: UITableViewController {
 
     @objc private func commit() {
         let entered = (field.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !hasCommitted, purpose.allowsEmpty || !entered.isEmpty else { return }
+        guard !hasCommitted, purpose.allowsEmpty || purpose.namesAWord(in: entered) else { return }
         hasCommitted = true
         // Nothing more can be typed into a screen that has already answered.
         field.resignFirstResponder()
         navigationItem.rightBarButtonItem?.isEnabled = false
         DictationController.shared.stop()
-        suggestions?.remember(entered)
+        // **Remembered as words, not as what was typed.** A comma-separated answer is
+        // several words everywhere it lands, and remembering "лиса, лисица" whole put a
+        // phrase into the recents list that is not a word and would be re-split on every
+        // tap (TD-53).
+        SenseEntry.words(in: entered).forEach { suggestions?.remember($0) }
         onCommit(entered)
         // Only dismiss if the callback did not navigate onwards. The add-word flow pushes a
         // second step from here; popping unconditionally would tear that step straight back
@@ -675,5 +679,19 @@ private extension WordInputViewController.Purpose {
     var allowsEmpty: Bool {
         if case .note = self { return true }
         return false
+    }
+
+    /// Whether typed text names at least one word.
+    ///
+    /// **Punctuation alone is not an answer** (TD-53). "," passed the old non-empty check,
+    /// so the screen marked itself committed and called back — and every reader of that
+    /// callback now parses it into *no* words and stores nothing, leaving the learner
+    /// bounced back a step with the other half of the entry gone and nothing said. Refusing
+    /// it here treats "," exactly as an empty field is treated: Save does not act, and the
+    /// screen stays put with the text still in it.
+    ///
+    /// A note is exempt above — nothing splits a note, and it may be cleared.
+    func namesAWord(in typed: String) -> Bool {
+        !SenseEntry.words(in: typed).isEmpty
     }
 }
