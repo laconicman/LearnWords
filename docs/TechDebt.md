@@ -1587,7 +1587,7 @@ requested averages shown *beside* the distribution, never instead of it (a mean 
 describes two opposite sets). Reference implementation is Anki's stats screen.
 [MasteryAndProgressUI](MasteryAndProgressUI.md) §3. No schema change.
 
-## TD-52 — The progress cache ProgressModel deferred is now due
+## TD-52 — The progress cache ProgressModel deferred is now due — **resolved (2026-08-12)**
 
 [ProgressModel](ProgressModel.md) agreed per-word cached index values "in principle,
 mechanism negotiable", deferring the mechanism to implementation; the word list already
@@ -1595,6 +1595,67 @@ replays the log per row, and TD-51's summary would replay it for every sense in 
 every appearance. **Discharge:** measure first on a realistic library, then cache
 per-sense progress invalidated on event append and recomputed off the cell path. Decide
 before shipping the summary, not after. Not a schema commitment.
+
+## TD-52 resolution note (2026-08-12)
+
+Measured first, then cached. 345 tests green (was 337), no schema change.
+
+### What it cost, before
+
+`ProgressCostTests` seeds a library and times `ProgressIndex`. iPhone 17 Pro simulator,
+Debug:
+
+| Library | Events | Scoring one pass |
+|---|---|---|
+| 250 meanings × 12 | 3,000 | 106 ms |
+| 500 meanings × 12 | 6,000 | 179 ms |
+| 1,000 meanings × 12 | 12,000 | 461 ms |
+| 100 meanings × 100 | 10,000 | 263 ms |
+| 2,000 meanings × 20 | 40,000 | 2,042 ms |
+
+Linear in *events*, not in meanings — the 100 × 100 case costs about what 1,000 × 12 does.
+That is the good news; the bad news is the constant. The word list reloads in
+`viewDidAppear`, so a 500-word library paid ~180 ms **every time the tab was opened**, and
+TD-51's summary would have paid it again.
+
+Two findings shaped the fix:
+
+* **Release is barely faster than Debug** (161 ms vs 179 ms at 500 × 12). The cost is not
+  arithmetic waiting for an optimiser.
+* **The fetch is ~1.4× the replay** (265 ms vs 189 ms at 1,000 × 12). Both halves are real,
+  which rules out optimising either one in isolation and argues for not doing the work at
+  all when nothing has changed.
+
+### The cache
+
+`ProgressCache` keeps `SenseProgress` per meaning **in memory** and replays only what it
+does not already know, fetching the misses in one pass. A warm screen does no work.
+
+*In memory, not in the store*, because a persisted cache would have to record
+`ScoringPolicy.version`, live in the CloudKit schema, and sync — a migration and a sync
+surface for a number that is always re-derivable. `ProgressModel` said "not a schema
+commitment", and this keeps that. A cold start still pays once, which is the case worth
+revisiting if a library ever gets large enough to feel it.
+
+*Correctness before speed.* An entry is dropped when the log grows for that meaning
+(`Lexicon.didAppendToLog`, posted by `record` and `resetProgress`), the whole cache is
+dropped when another device changes the store, and everything expires when the day turns —
+retention decays with the clock, so yesterday's scores answer a question nobody asked.
+`ProgressCacheTests` is about those four moments, not about speed: a stale ring tells the
+learner something untrue about their own memory, which is worse than a slow one.
+
+**It is not on `Library`**, where it belongs by subject. `Library.swift` is compiled into
+the widget extension, which has no scoring layer; putting it there would drag all of scoring
+into an extension that only wants a word count. `ProgressCache.shared`, until TD-5 lands
+injection.
+
+### On the benchmarks themselves
+
+They are opt-in — `TEST_RUNNER_LW_BENCH=1` — with one small guard left in the default suite
+to catch a per-row fetch sneaking back in. Left running by default they made
+`ExerciseScreenAppearanceTests`, which waits on a real 0.5 s animation, flaky under load.
+Note also that Swift Testing does not forward `print` to the `xcodebuild` log, so the
+numbers above were harvested by making the measurements fail deliberately once.
 
 ## TD-53 — Comma-separated entry creates one meaning, not several — **resolved (2026-08-11)**
 

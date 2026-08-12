@@ -398,6 +398,23 @@ final class Lexicon {
             event.wordSetID = wordSetID
             event.promptTermID = UUID()
         }
+        announceLogGrew(for: senseID)
+    }
+
+    /// Posted after anything is appended to the review log, naming the meaning it was
+    /// appended to.
+    ///
+    /// Exists for `ProgressCache` (TD-52), which may hold a score only for as long as the
+    /// log that produced it is unchanged. A notification rather than a delegate because the
+    /// store must not know what is listening — nothing here changes if nothing is.
+    static let didAppendToLog = Notification.Name("Lexicon.didAppendToLog")
+
+    /// The meaning named by `didAppendToLog`. Absent means "assume all of them".
+    static let senseIDKey = "senseID"
+
+    private func announceLogGrew(for senseID: UUID) {
+        NotificationCenter.default.post(name: Self.didAppendToLog, object: self,
+                                        userInfo: [Self.senseIDKey: senseID])
     }
 
     /// Appends one answer. The only way an *answer* enters the log, which is otherwise
@@ -422,6 +439,7 @@ final class Lexicon {
                 event.addErrorTag(try Self.findOrCreate(CDErrorTag.self, named: name, in: context))
             }
         }
+        announceLogGrew(for: draft.senseID)
     }
 
     /// One meaning's history, oldest first.

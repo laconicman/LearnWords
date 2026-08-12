@@ -93,7 +93,7 @@ class ExersizeChooserViewController: UIViewController {
     private func showSetSummary() {
         let library = Library.shared
         let senses = (try? library.selectedSenses()) ?? []
-        let learned = (try? ProgressIndex(lexicon: library.lexicon, senses: senses))?
+        let learned = (try? ProgressCache.shared.index(for: senses, in: library.lexicon))?
             .learnedCount ?? 0
 
         var summary =

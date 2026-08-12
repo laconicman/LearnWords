@@ -148,6 +148,11 @@ run — asset formats only Xcode 26 understands (TD-45), a hard link to Core Hap
     confirm screen TD-53 shipped, and it makes Tab natural for a macOS port. TD-53's parse
     stays, as the path for text that arrives whole. Open questions in
     [TechDebt](TechDebt.md) § TD-55.
+  - **TD-52 — done (2026-08-12).** Measured before built: a 500-meaning library cost ~180 ms
+    to score and was paying it on *every* appearance of the word list; 2,000 meanings cost
+    two seconds. `ProgressCache` scores each meaning once per change instead, in memory —
+    dropped when the log grows for that meaning, when another device changes the store, or
+    when the day turns. No schema change, as `ProgressModel` promised. 345 tests green.
   - Remaining: **TD-55**, recorded but not built. The rest of the batch is in flight, one
     branch each; every item's state is its heading in [TechDebt](TechDebt.md), which is
     where to look rather than here. Scope and conventions are in
