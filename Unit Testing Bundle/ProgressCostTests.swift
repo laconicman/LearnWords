@@ -78,33 +78,38 @@ struct ProgressCostTests {
         return (lexicon, stored)
     }
 
-    /// Wall-clock for one run, appended to a file in the app container.
+    /// One measurement, and what it describes.
     ///
-    /// **Not `print`**: Swift Testing does not forward standard output to the `xcodebuild`
-    /// log, so a measurement printed there is a measurement nobody reads. The file survives
-    /// the run and is fetched with `simctl get_app_container`, which is what put the
-    /// numbers in `docs/TechDebt.md`.
+    /// `policyVersion` is not decoration: `ScoringPolicy.version` is the reason the constant
+    /// exists, and a CSV from a run under different scoring rules is measuring something
+    /// else. A stale number that cannot be told apart from a current one is worse than none.
+    private struct Sample: Codable, Attachable {
+        let label: String
+        let meanings: Int
+        let events: Int
+        let milliseconds: Double
+        let policyVersion: Int
+    }
+
+    /// Wall-clock for one run, **attached** to the result bundle.
+    ///
+    /// Not `print`, which Swift Testing does not forward to the `xcodebuild` log; and not a
+    /// deliberate `#expect(false)`, which is the workaround ST-0009 was written to retire —
+    /// it lies in CI, cannot be left in the suite, and has to be re-broken for every fresh
+    /// reading. `Attachment.record` puts the number in the `.xcresult` without touching
+    /// pass/fail, and `xcresulttool export attachments` takes it out again.
     @discardableResult
-    private func measure(_ label: String, _ work: () throws -> Void) rethrows -> TimeInterval {
+    private func measure(_ label: String, meanings: Int, events: Int,
+                         _ work: () throws -> Void) rethrows -> TimeInterval {
         let started = Date()
         try work()
         let elapsed = Date().timeIntervalSince(started)
-        Self.report("\(label): \(String(format: "%.0f", elapsed * 1000)) ms")
+        Attachment.record(
+            Sample(label: label, meanings: meanings, events: meanings * events,
+                   milliseconds: (elapsed * 1000).rounded(),
+                   policyVersion: ScoringPolicy.version),
+            named: "td52-\(meanings)x\(events).json")
         return elapsed
-    }
-
-    private static let reportURL = URL(fileURLWithPath: NSTemporaryDirectory())
-        .appendingPathComponent("td52-progress-cost.txt")
-
-    private static func report(_ line: String) {
-        let stamped = line + "\n"
-        if let handle = try? FileHandle(forWritingTo: reportURL) {
-            handle.seekToEndOfFile()
-            handle.write(Data(stamped.utf8))
-            try? handle.close()
-        } else {
-            try? stamped.write(to: reportURL, atomically: true, encoding: .utf8)
-        }
     }
 
     /// The heavy sizes are a benchmark, not a regression guard, and seeding tens of
@@ -124,7 +129,7 @@ struct ProgressCostTests {
     @Test func aWholeSetScoresInOnePass() throws {
         let (lexicon, senses) = try library(senses: 300, eventsPerSense: 8)
 
-        let elapsed = try measure("300 meanings × 8 answers") {
+        let elapsed = try measure("whole set, one pass", meanings: 300, events: 8) {
             let index = try ProgressIndex(lexicon: lexicon, senses: senses)
             #expect(index[senses[0].id].effort > 0, "precondition: the seed actually scored")
         }
@@ -139,10 +144,10 @@ struct ProgressCostTests {
         let (smallLexicon, small) = try library(senses: 250, eventsPerSense: 12)
         let (largeLexicon, large) = try library(senses: 1_000, eventsPerSense: 12)
 
-        let smallElapsed = try measure("250 meanings × 12 answers") {
+        let smallElapsed = try measure("scaling, small", meanings: 250, events: 12) {
             _ = try ProgressIndex(lexicon: smallLexicon, senses: small)
         }
-        let largeElapsed = try measure("1000 meanings × 12 answers") {
+        let largeElapsed = try measure("scaling, large", meanings: 1_000, events: 12) {
             _ = try ProgressIndex(lexicon: largeLexicon, senses: large)
         }
 
@@ -159,7 +164,7 @@ struct ProgressCostTests {
     func aLongHistoryOnFewWordsStaysCheap() throws {
         let (lexicon, senses) = try library(senses: 100, eventsPerSense: 100)
 
-        let elapsed = try measure("100 meanings × 100 answers") {
+        let elapsed = try measure("long history, few words", meanings: 100, events: 100) {
             _ = try ProgressIndex(lexicon: lexicon, senses: senses)
         }
 
@@ -175,17 +180,21 @@ struct ProgressCostTests {
         let (lexicon, senses) = try library(senses: 1_000, eventsPerSense: 12)
 
         var histories: [UUID: [ReviewEvent]] = [:]
-        let fetching = try measure("fetch · 1000 × 12") {
+        let fetching = try measure("fetch only", meanings: 1_000, events: 12) {
             histories = try lexicon.history(ofSenses: senses.map(\.id))
         }
         let policy = ScoringPolicy.default
-        let replaying = measure("replay · 1000 × 12") {
+        let replaying = measure("replay only", meanings: 1_000, events: 12) {
             for sense in senses {
                 _ = policy.progress(replaying: histories[sense.id] ?? [], now: Date())
             }
         }
 
-        Self.report("fetch is \(String(format: "%.1f", fetching / max(replaying, 0.0001)))× the replay")
+        // A ratio a human should glance at, recorded as a warning rather than asserted:
+        // which half dominates decides what a cache should avoid, and it is not a contract
+        // worth failing CI over.
+        Issue.record("fetch is \(String(format: "%.1f", fetching / max(replaying, 0.0001)))× the replay",
+                     severity: .warning)
         #expect(fetching > 0 && replaying > 0)
     }
 
@@ -195,7 +204,7 @@ struct ProgressCostTests {
     func aRealisticLibraryScoresFastEnoughToDrawAScreen() throws {
         let (lexicon, senses) = try library(senses: 2_000, eventsPerSense: 20)
 
-        let elapsed = try measure("2000 meanings × 20 answers") {
+        let elapsed = try measure("realistic library", meanings: 2_000, events: 20) {
             _ = try ProgressIndex(lexicon: lexicon, senses: senses)
         }
 

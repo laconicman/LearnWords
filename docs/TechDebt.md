@@ -1607,11 +1607,11 @@ Debug:
 
 | Library | Events | Scoring one pass |
 |---|---|---|
-| 250 meanings × 12 | 3,000 | 106 ms |
-| 500 meanings × 12 | 6,000 | 179 ms |
-| 1,000 meanings × 12 | 12,000 | 461 ms |
-| 100 meanings × 100 | 10,000 | 263 ms |
-| 2,000 meanings × 20 | 40,000 | 2,042 ms |
+| 250 meanings × 12 | 3,000 | 81 ms |
+| 300 meanings × 8 | 2,400 | 67 ms |
+| 1,000 meanings × 12 | 12,000 | 369 ms |
+| 100 meanings × 100 | 10,000 | 288 ms |
+| 2,000 meanings × 20 | 40,000 | 1,860 ms |
 
 Linear in *events*, not in meanings — the 100 × 100 case costs about what 1,000 × 12 does.
 That is the good news; the bad news is the constant. The word list reloads in
@@ -1622,9 +1622,9 @@ Two findings shaped the fix:
 
 * **Release is barely faster than Debug** (161 ms vs 179 ms at 500 × 12). The cost is not
   arithmetic waiting for an optimiser.
-* **The fetch is ~1.4× the replay** (265 ms vs 189 ms at 1,000 × 12). Both halves are real,
-  which rules out optimising either one in isolation and argues for not doing the work at
-  all when nothing has changed.
+* **The fetch and the replay are comparable** — 250 ms vs 222 ms at 1,000 × 12, and the
+  ratio wanders between about 1.1× and 1.4× from run to run. Neither half can be optimised
+  away, which argues for not doing the work at all when nothing has changed.
 
 ### The cache
 
@@ -1654,8 +1654,24 @@ injection.
 They are opt-in — `TEST_RUNNER_LW_BENCH=1` — with one small guard left in the default suite
 to catch a per-row fetch sneaking back in. Left running by default they made
 `ExerciseScreenAppearanceTests`, which waits on a real 0.5 s animation, flaky under load.
-Note also that Swift Testing does not forward `print` to the `xcodebuild` log, so the
-numbers above were harvested by making the measurements fail deliberately once.
+
+**Each measurement is an attachment**, not a `print` and not a deliberate failure. Swift
+Testing does not forward standard output to the `xcodebuild` log, and failing a test to read
+its numbers is the workaround [ST-0009](https://github.com/swiftlang/swift-evolution/blob/main/proposals/testing/0009-attachments.md)
+was written to retire — it lies in CI and has to be re-broken for every fresh reading. Each
+sample records `ScoringPolicy.version` alongside the number, so a CSV from a run under
+different scoring rules cannot be mistaken for a current one. The fetch-versus-replay ratio
+is an `Issue.record(severity: .warning)`: worth a human's glance, not worth failing CI over.
+
+```
+TEST_RUNNER_LW_BENCH=1 xcodebuild test -project LearnWords.xcodeproj -scheme LearnWords \
+  -destination 'id=<sim>' -resultBundlePath /tmp/td52.xcresult \
+  -only-testing:"Unit Testing Bundle/ProgressCostTests"
+xcrun xcresulttool export attachments --path /tmp/td52.xcresult --output-path /tmp/out
+```
+
+Note the explicit `-resultBundlePath`: picking the newest bundle out of DerivedData with
+`ls -t` is a documented way to read the wrong run, and this project has been bitten by it.
 
 ## TD-53 — Comma-separated entry creates one meaning, not several — **resolved (2026-08-11)**
 
