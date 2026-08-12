@@ -338,6 +338,14 @@ iOS 15 and gains Swift Concurrency, `context.perform` async and the actor-based
 confinement recorded in [Design](Design.md) — the whole list of things currently deferred
 "until the floor allows it". See TD-40 and the concurrency decision.
 
+**The floor now has a measured price** (2026-08-12). TD-52 timed the cost of scoring a
+library and every millisecond of it is *main-thread* time: ~370 ms for 1,000 meanings, ~1.9 s
+for 2,000. Reads are pinned to the main queue because `async` does not exist at 12.1 —
+`LWPersistence.write`'s own comment says so — so the alternatives are a callback twin of the
+read API (TD-56) or raising the floor and moving the whole of `Lexicon` to `context.perform`
+async, which is the same work done once and properly. This is the first item where the floor
+costs the *user* something rather than costing the project verification effort.
+
 Xcode 26 ships no simulator below iOS 15 and won't connect sub-15 devices, so the iOS 12
 branch (`AppDelegate` window + `application(_:open:)`, `UIMainStoryboardFile`) **cannot be
 run or tested** on the current toolchain. **Cost:** the legacy path can regress silently;
@@ -1932,3 +1940,42 @@ elsewhere.
   than both popping.
 
 No schema change: synonyms and senses are what the model already stores.
+
+## TD-56 — Scoring the library is main-thread work (2026-08-12)
+
+TD-52 measured what replaying the review log costs and then stopped paying it twice. What it
+did **not** change is *where* the remaining pass runs: `Lexicon`'s reads are pinned to the
+main queue, so a cold `ProgressIndex` is built on the thread that draws the UI.
+
+| Library | Events | Main-thread time |
+|---|---|---|
+| 1,000 meanings × 12 | 12,000 | ~370 ms |
+| 2,000 meanings × 20 | 40,000 | ~1.9 s |
+
+`ProgressCache` removes the *repetition* — a warm screen does no work — so this is a
+cold-start and first-appearance cost, not a per-appearance one. It is nonetheless a hitch on
+the thread that can least afford one, and it grows with the library.
+
+**Why it is pinned.** `Lexicon.viewContext` asserts `dispatchPrecondition(.onQueue(.main))`,
+and every read is synchronous because `async` does not back-deploy below iOS 13 while the
+floor is 12.1 (see TD-8). The precondition is doing its job — it caught a test calling a read
+off the main actor during TD-52 and failed deterministically in setup rather than corrupting
+anything.
+
+**The hard part is already done.** No `Lexicon` method returns a managed object: callers get
+`Sense`, `Term`, `WordSet` and `ReviewEvent` value types, and identity crosses every boundary
+as a `UUID` that each context re-resolves — stronger than `NSManagedObjectID`, which is
+store-scoped and has a temporary/permanent state, and which CloudKit does not sync. Passing a
+managed object between queues is therefore structurally impossible here, which is exactly the
+property that makes background reads safe to add.
+
+**Discharge, at the current floor:** give `ProgressCache` a completion-handler path that
+replays the misses on a private-queue context and calls back on main. It already owns "score
+what I do not know", the screens already tolerate arriving-later data (the word list reloads
+on appearance), and no `async` is required. **Discharge, if the floor rises:** do it once and
+properly — `Lexicon` reads become `async` over `context.perform`, and the callback twin never
+gets written. Worth deciding which before building either.
+
+Not urgent: a library large enough to feel this does not exist yet, and the seed is nine
+words. Recorded now because the measurement exists now, and because it is the first concrete
+user-facing cost of the 12.1 floor.
