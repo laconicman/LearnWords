@@ -65,6 +65,13 @@ final class WordSetsTableViewController: UITableViewController, UIDocumentPicker
 
         let isSelected = set.id == library.selectedSet?.id
         cell.accessoryType = isSelected ? .checkmark : .none
+        // A long press is invisible to VoiceOver and a context menu is reachable only
+        // through the rotor, so the destination is named here as well.
+        cell.accessibilityCustomActions = [
+            UIAccessibilityCustomAction(
+                name: NSLocalizedString("Progress", comment: "Screen title"),
+                target: self, selector: #selector(showSummaryForAccessibleRow(_:))),
+        ]
         if isSelected {
             tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
         } else {
@@ -92,6 +99,64 @@ final class WordSetsTableViewController: UITableViewController, UIDocumentPicker
         library.select(sets[indexPath.row])
         tableView.reloadData()          // the checkmark moved off another row too
         tabBarController?.selectedIndex = 0
+    }
+
+    // MARK: - Set summary (TD-51)
+
+    /// The same gesture TD-50 gave a word, for the same reason: trailing swipe is taken
+    /// here too — by rename and delete — and a swipe acts on a row rather than inspecting
+    /// it. Long press on a word shows how that word stands; long press on a set shows how
+    /// the set does.
+    private func makeSummary(for set: WordSet) -> SetSummaryViewController? {
+        guard let senses = try? lexicon.senses(in: set.id) else { return nil }
+        let progress = (try? ProgressIndex(lexicon: lexicon, senses: senses))
+            ?? ProgressIndex(scored: [:])
+        // Retention is a statement about answers already given, so it needs the log itself:
+        // a word answered wrong ten times and right once today scores exactly like one
+        // answered right once, and they are not the same learner.
+        let histories = (try? lexicon.history(ofSenses: senses.map(\.id))) ?? [:]
+        return SetSummaryViewController(
+            summary: SetSummary(senses: senses, progress: progress, histories: histories),
+            setName: set.name)
+    }
+
+    /// VoiceOver hands back only the action, so the row is found by identity rather than
+    /// captured — cells are reused and a captured index goes stale on the next reload.
+    @objc private func showSummaryForAccessibleRow(_ action: UIAccessibilityCustomAction) -> Bool {
+        guard let cell = tableView.visibleCells.first(where: {
+            $0.accessibilityCustomActions?.contains(action) == true
+        }), let indexPath = tableView.indexPath(for: cell), indexPath.row < sets.count
+        else { return false }
+        showSummary(for: sets[indexPath.row])
+        return true
+    }
+
+    private func showSummary(for set: WordSet) {
+        guard let screen = makeSummary(for: set) else { return }
+        navigationController?.pushViewController(screen, animated: true)
+    }
+
+    @available(iOS 13, *)
+    override func tableView(_ tableView: UITableView,
+                            contextMenuConfigurationForRowAt indexPath: IndexPath,
+                            point: CGPoint) -> UIContextMenuConfiguration? {
+        guard !tableView.isEditing, indexPath.row < sets.count else { return nil }
+        let set = sets[indexPath.row]
+        return UIContextMenuConfiguration(
+            identifier: nil,
+            previewProvider: { [weak self] in self?.makeSummary(for: set) },
+            actionProvider: nil)
+    }
+
+    /// Tapping the preview opens the real screen, which is what a preview promises.
+    @available(iOS 13, *)
+    override func tableView(_ tableView: UITableView,
+                            willPerformPreviewActionForMenuWith configuration: UIContextMenuConfiguration,
+                            animator: UIContextMenuInteractionCommitAnimating) {
+        guard let preview = animator.previewViewController else { return }
+        animator.addCompletion { [weak self] in
+            self?.navigationController?.pushViewController(preview, animated: true)
+        }
     }
 
     /// Delete and rename on swipe.

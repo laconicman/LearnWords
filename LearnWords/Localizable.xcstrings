@@ -1,6 +1,57 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "%1$d learned · %2$d learning · %3$d untouched" : {
+      "comment" : "Summary counts",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$d aprendidas · %2$d en curso · %3$d sin empezar"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$d выучено · %2$d в работе · %3$d не начато"
+          }
+        }
+      }
+    },
+    "%1$d recognised · %2$d produced" : {
+      "comment" : "Summary counts",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$d reconocidas · %2$d producidas"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$d узнано · %2$d воспроизведено"
+          }
+        }
+      }
+    },
+    "%d%% of the way in" : {
+      "comment" : "Summary effort",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%d %% del camino"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пройдено %d %%"
+          }
+        }
+      }
+    },
     "Add a word in %@" : {
       "comment" : "Row; a language name",
       "localizations" : {
@@ -35,6 +86,40 @@
         }
       }
     },
+    "Answers so far" : {
+      "comment" : "Summary section",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Respuestas hasta ahora"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ответы"
+          }
+        }
+      }
+    },
+    "Coming up" : {
+      "comment" : "Summary section",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Próximamente"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Впереди"
+          }
+        }
+      }
+    },
     "Confirm meanings" : {
       "comment" : "Screen title",
       "localizations" : {
@@ -48,6 +133,129 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Подтверждение"
+          }
+        }
+      }
+    },
+    "Day %d" : {
+      "comment" : "Summary axis",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Día %d"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "День %d"
+          }
+        }
+      }
+    },
+    "DueNowCount" : {
+      "comment" : "Count of meanings due now",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d due now"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d due now"
+                }
+              },
+              "zero" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Nothing due"
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d para repasar"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d para repasar"
+                }
+              },
+              "zero" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Nada pendiente"
+                }
+              }
+            }
+          }
+        },
+        "ru" : {
+          "variations" : {
+            "plural" : {
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d к повторению"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d к повторению"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d к повторению"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d к повторению"
+                }
+              },
+              "zero" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Ничего не нужно повторять"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Learned" : {
+      "comment" : "Summary legend",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aprendidas"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выучено"
           }
         }
       }
@@ -86,6 +294,23 @@
         }
       }
     },
+    "Mostly recognition so far — producing these words is the harder half." : {
+      "comment" : "Summary footer",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Por ahora sobre todo reconocimiento: producir estas palabras es la mitad más difícil."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пока в основном узнавание — воспроизводить эти слова труднее."
+          }
+        }
+      }
+    },
     "Needs a word in %@." : {
       "comment" : "Footer; a language name",
       "localizations" : {
@@ -103,6 +328,57 @@
         }
       }
     },
+    "Nothing answered yet" : {
+      "comment" : "Summary",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aún sin respuestas"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пока нет ответов"
+          }
+        }
+      }
+    },
+    "Progress" : {
+      "comment" : "Screen title",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Progreso"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Прогресс"
+          }
+        }
+      }
+    },
+    "Still learning: %d%% right" : {
+      "comment" : "Summary",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En curso: %d %% correctas"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "В работе: %d %% верных"
+          }
+        }
+      }
+    },
     "These are separate meanings" : {
       "comment" : "Row",
       "localizations" : {
@@ -116,6 +392,91 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Это разные значения"
+          }
+        }
+      }
+    },
+    "Today" : {
+      "comment" : "Summary axis",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hoy"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сегодня"
+          }
+        }
+      }
+    },
+    "Today to day %d" : {
+      "comment" : "Summary axis",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De hoy al día %d"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "От сегодня до дня %d"
+          }
+        }
+      }
+    },
+    "Untouched" : {
+      "comment" : "Summary legend",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin empezar"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не начато"
+          }
+        }
+      }
+    },
+    "Well known: %d%% right" : {
+      "comment" : "Summary",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bien sabidas: %d %% correctas"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Хорошо знакомые: %d %% верных"
+          }
+        }
+      }
+    },
+    "Work invested never falls, whatever a bad week does." : {
+      "comment" : "Summary caption",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El esfuerzo invertido nunca baja, pase lo que pase en una mala semana."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вложенный труд не убывает, какой бы ни выдалась неделя."
           }
         }
       }

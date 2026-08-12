@@ -1578,7 +1578,7 @@ Trailing swipe is **not** available: the sets screen already uses it for rename/
 Content and gesture rationale: [MasteryAndProgressUI](MasteryAndProgressUI.md) §2. The
 receptive/productive split is the part no surveyed competitor shows. No schema change.
 
-## TD-51 — No set-level summary
+## TD-51 — No set-level summary — **resolved (2026-08-12)**
 
 **Discharge:** a summary screen built on distribution rather than means — stacked
 untouched/learning/learned bar, a 14-day due forecast (honest forgetting, not streaks),
@@ -1586,6 +1586,50 @@ true retention split young/mature, effort totals, and the receptive/productive g
 requested averages shown *beside* the distribution, never instead of it (a mean of 0.5
 describes two opposite sets). Reference implementation is Anki's stats screen.
 [MasteryAndProgressUI](MasteryAndProgressUI.md) §3. No schema change.
+
+## TD-51 resolution note (2026-08-12)
+
+Implemented, 352 tests green (was 337). No schema change.
+
+**Distribution first, averages beside it.** `SetSummary` reports, per exercise, how many
+meanings are untouched / learning / learned — plus the mean the owner asked for, printed
+next to the distribution that qualifies it rather than instead of it. A mean of 0.5
+describes both fifty half-learned words and twenty-five mastered beside twenty-five
+untouched, and `theSameMeanDescribesTwoOppositeSets` is the first test in the file for that
+reason.
+
+**Pivoted by exercise**, which is only meaningful because TD-49 made memory per exercise: a
+set can be solid as flashcards and untouched in dictation, and one bar for the set says
+neither.
+
+**The open question is settled: rings fill one way and colour carries the bad news** (owner,
+2026-08-12). A ring running backwards for a losing set reads as an animation bug on first
+sight, and `ProgressRing` already blends toward red as retention falls — the same message
+without a new convention to learn.
+
+**True retention is computed from the log, not from the score**, because it is a statement
+about answers already given: a word answered wrong ten times and right once today scores
+exactly like one answered right once, and those are not the same learner. Split young/mature
+at 21 days of stability, Anki's own boundary.
+
+**One view for both charts.** `BarStrip` laid across is a distribution; laid along it is a
+forecast. Two views would have been two sets of rounding and two answers to what a zero
+looks like. Plain layers rather than a charting dependency — it is all rectangles, and it
+has to run at the 12.1 floor.
+
+**The gesture matches TD-50.** Long press on a word shows how that word stands; long press
+on a set shows how the set does. Trailing swipe was unavailable here for the same reason as
+there — rename and delete already own it.
+
+**What the tests did not catch.** The forecast read only `dueAt`, which is `nil` for a
+meaning never practised, so a new set reported *"Nothing due"* beside nine waiting words —
+the same lie PR #1's review found in the chooser, where `dueCount` counted only engaged
+strands. Found by opening the screen on the device. Fixed, and pinned by
+`meaningsNeverPractisedAreDueToday`.
+
+**Debt closed on the way:** `SetDigest.dueByExercise` had no test — flagged by the TD-49
+review, left open by the TD-53 handoff, and read by this screen. Three tests now cover it,
+including that answering dictation does not quiet the flashcard queue.
 
 ## TD-52 — The progress cache ProgressModel deferred is now due
 

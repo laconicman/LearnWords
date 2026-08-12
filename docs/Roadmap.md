@@ -148,6 +148,12 @@ run — asset formats only Xcode 26 understands (TD-45), a hard link to Core Hap
     confirm screen TD-53 shipped, and it makes Tab natural for a macOS port. TD-53's parse
     stays, as the path for text that arrives whole. Open questions in
     [TechDebt](TechDebt.md) § TD-55.
+  - **TD-51 — done (2026-08-12).** A set summary built on *distribution*, pivoted by
+    exercise: untouched/learning/learned per exercise with the mean beside it, a 14-day due
+    forecast, true retention split young/mature from the log, effort, and the
+    receptive/productive gap. Rings fill one way and colour carries the bad news (owner's
+    call on the open question). Long press a set, as TD-50 does a word. Closes the
+    `dueByExercise` test debt from the TD-49 review. 352 tests green.
   - Remaining: **TD-55**, recorded but not built. The rest of the batch is in flight, one
     branch each; every item's state is its heading in [TechDebt](TechDebt.md), which is
     where to look rather than here. Scope and conventions are in
