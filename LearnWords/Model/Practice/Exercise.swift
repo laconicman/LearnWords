@@ -22,6 +22,21 @@ enum Exercise: String, CaseIterable {
 }
 
 extension Exercise {
+
+    /// What this exercise is called on screen.
+    ///
+    /// Lifted out of `ExerciseViewController.make`, which was the only place that named
+    /// them, because the per-term statistics screen (TD-50) and the set summary (TD-51)
+    /// both need the same three names. Two switches would have been two chances to disagree
+    /// about what "Phonetic" is called.
+    var title: String {
+        switch self {
+        case .learning: return NSLocalizedString("Learning", comment: "Exercise screen title")
+        case .dictation: return NSLocalizedString("Dictation", comment: "Exercise screen title")
+        case .phonetics: return NSLocalizedString("Phonetic", comment: "Exercise screen title")
+        }
+    }
+
     /// Which way round this exercise asks by default.
     ///
     /// Typing and speaking are *production*; a flashcard the learner grades is
