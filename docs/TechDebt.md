@@ -1949,11 +1949,11 @@ main queue, so a cold `ProgressIndex` is built on the thread that draws the UI.
 
 | Library | Events | Main-thread time |
 |---|---|---|
-| 1,000 meanings × 12 | 12,000 | ~370 ms |
-| 2,000 meanings × 20 | 40,000 | ~1.9 s |
+| 1,000 meanings × 12 | 12,000 | 369 ms |
+| 2,000 meanings × 20 | 40,000 | 1,860 ms |
 
-`ProgressCache` removes the *repetition* — a warm screen does no work — so this is a
-cold-start and first-appearance cost, not a per-appearance one. It is nonetheless a hitch on
+`ProgressCache` (TD-52, immediately above) removes the *repetition* — a warm screen does no
+work — so this is a cold-start and first-appearance cost, not a per-appearance one. It is nonetheless a hitch on
 the thread that can least afford one, and it grows with the library.
 
 **Why it is pinned.** `Lexicon.viewContext` asserts `dispatchPrecondition(.onQueue(.main))`,
