@@ -33,7 +33,11 @@ struct SetSummaryTests {
                        memory: engaged ? FSRSMemory(stability: stability, difficulty: 5) : nil,
                        lastReviewedAt: engaged ? now : nil,
                        dueAt: days.map { now.addingTimeInterval($0 * 86_400) },
-                       isDue: days == nil,
+                       // Due when there is no date, or when the date has passed. The earlier
+                       // fixture said `days == nil`, which made a strand overdue by five days
+                       // report "not due" — an impossible state that would mislead the next
+                       // test to read it. Reported by review, PR #3.
+                       isDue: days.map { $0 <= 0 } ?? true,
                        successfulDays: engaged ? 2 : 0)
     }
 
@@ -132,6 +136,25 @@ struct SetSummaryTests {
         #expect(summary.dueForecast[1] == 0, "and it is waiting today, not tomorrow")
     }
 
+    /// A meaning answered once in one exercise still has two untried, and those are asked
+    /// immediately — so it is work waiting today, not work waiting on its Learning date.
+    /// Otherwise the same screen showed those exercises as untouched while the forecast filed
+    /// the meaning a week out. Reported by review, PR #5.
+    @Test func aPartlyPractisedMeaningIsDueToday() {
+        let word = sense("bear")
+        // Engaged and not-yet-due in Learning; dictation and phonetics never tried, which is
+        // what makes the meaning itself due.
+        let partly = SenseProgress(
+            strands: [.learning: strand(mastery: 0.5, dueIn: 7)],
+            effort: 0.4, answersByDirection: [.receptive: 1], isDue: true)
+        let summary = SetSummary(senses: [word],
+                                 progress: ProgressIndex(scored: [word.id: partly]),
+                                 histories: [:], now: now)
+
+        #expect(summary.dueNow == 1)
+        #expect(summary.dueForecast[7] == 0, "not filed on the one date it happens to have")
+    }
+
     /// A meaning due in three exercises is one piece of work arriving, not three.
     @Test func theForecastCountsMeaningsNotStrands() {
         let word = sense("bear")
@@ -195,6 +218,18 @@ struct SetSummaryTests {
 
         #expect(summary.retention.youngTotal == 1, "the marker is not an answer")
         #expect(summary.retention.young == 1)
+    }
+
+    /// A skip is exposure, not retrieval — the learner never claimed anything. Counting it
+    /// as a miss showed a worse record than the learner had. Reported by review, PR #5.
+    @Test func aSkippedQuestionIsNotAWrongAnswer() {
+        let word = sense("bear")
+        let summary = SetSummary(
+            senses: [word], progress: progress([(word, strand(mastery: 0.5))]),
+            histories: [word.id: [answer(.correctVerbatim), answer(.skipped)]], now: now)
+
+        #expect(summary.retention.youngTotal == 1, "the skip is not an answer to grade")
+        #expect(summary.retention.young == 1, "one attempt, one success")
     }
 
     // MARK: - The receptive/productive gap

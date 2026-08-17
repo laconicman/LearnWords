@@ -153,7 +153,7 @@ run — asset formats only Xcode 26 understands (TD-45), a hard link to Core Hap
     forecast, true retention split young/mature from the log, effort, and the
     receptive/productive gap. Rings fill one way and colour carries the bad news (owner's
     call on the open question). Long press a set, as TD-50 does a word. Closes the
-    `dueByExercise` test debt from the TD-49 review. 352 tests green.
+    `dueByExercise` test debt from the TD-49 review. 357 tests green.
   - Remaining: **TD-55**, recorded but not built. The rest of the batch is in flight, one
     branch each; every item's state is its heading in [TechDebt](TechDebt.md), which is
     where to look rather than here. Scope and conventions are in

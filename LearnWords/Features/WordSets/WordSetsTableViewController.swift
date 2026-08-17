@@ -68,9 +68,9 @@ final class WordSetsTableViewController: UITableViewController, UIDocumentPicker
         // A long press is invisible to VoiceOver and a context menu is reachable only
         // through the rotor, so the destination is named here as well.
         cell.accessibilityCustomActions = [
-            UIAccessibilityCustomAction(
-                name: NSLocalizedString("Progress", comment: "Screen title"),
-                target: self, selector: #selector(showSummaryForAccessibleRow(_:))),
+            SetAction(name: NSLocalizedString("Progress", comment: "Screen title"),
+                      setID: set.id,
+                      target: self, selector: #selector(showSummaryForAccessibleRow(_:))),
         ]
         if isSelected {
             tableView.selectRow(at: indexPath, animated: true, scrollPosition: .none)
@@ -109,25 +109,46 @@ final class WordSetsTableViewController: UITableViewController, UIDocumentPicker
     /// the set does.
     private func makeSummary(for set: WordSet) -> SetSummaryViewController? {
         guard let senses = try? lexicon.senses(in: set.id) else { return nil }
-        let progress = (try? ProgressIndex(lexicon: lexicon, senses: senses))
-            ?? ProgressIndex(scored: [:])
-        // Retention is a statement about answers already given, so it needs the log itself:
-        // a word answered wrong ten times and right once today scores exactly like one
-        // answered right once, and they are not the same learner.
+
+        // **Fetched once, used twice.** Retention is a statement about answers already given,
+        // so the summary needs the log itself — a word answered wrong ten times and right
+        // once today scores exactly like one answered right once, and they are not the same
+        // learner. Building a `ProgressIndex(lexicon:senses:)` would fetch those same
+        // histories again, so the replay is done here and handed over as values: two full
+        // fetches per long press, including the transient one behind a context-menu preview,
+        // for data already in hand. Reported by review, PR #5.
         let histories = (try? lexicon.history(ofSenses: senses.map(\.id))) ?? [:]
+        let policy = ScoringPolicy.default
+        let now = Date()
+        let scored = senses.reduce(into: [UUID: SenseProgress]()) { result, sense in
+            result[sense.id] = policy.progress(replaying: histories[sense.id] ?? [], now: now)
+        }
         return SetSummaryViewController(
-            summary: SetSummary(senses: senses, progress: progress, histories: histories),
+            summary: SetSummary(senses: senses, progress: ProgressIndex(scored: scored),
+                                histories: histories, now: now),
             setName: set.name)
     }
 
-    /// VoiceOver hands back only the action, so the row is found by identity rather than
-    /// captured — cells are reused and a captured index goes stale on the next reload.
+    /// An accessibility action that remembers *which set* it belongs to.
+    ///
+    /// It previously found the row by searching visible cells for one whose actions contained
+    /// this object, which worked only because `cellForRowAt` allocates a fresh action per
+    /// call — an action invoked after a reload that recycled its cell would have silently
+    /// done nothing. Carrying the id has neither problem, and matches what the word list
+    /// does. Reported by review, PR #5.
+    private final class SetAction: UIAccessibilityCustomAction {
+        let setID: UUID
+
+        init(name: String, setID: UUID, target: Any?, selector: Selector) {
+            self.setID = setID
+            super.init(name: name, target: target, selector: selector)
+        }
+    }
+
     @objc private func showSummaryForAccessibleRow(_ action: UIAccessibilityCustomAction) -> Bool {
-        guard let cell = tableView.visibleCells.first(where: {
-            $0.accessibilityCustomActions?.contains(action) == true
-        }), let indexPath = tableView.indexPath(for: cell), indexPath.row < sets.count
-        else { return false }
-        showSummary(for: sets[indexPath.row])
+        guard let action = action as? SetAction,
+              let set = sets.first(where: { $0.id == action.setID }) else { return false }
+        showSummary(for: set)
         return true
     }
 

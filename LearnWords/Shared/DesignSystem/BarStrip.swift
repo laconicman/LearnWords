@@ -23,7 +23,10 @@ final class BarStrip: UIView {
     struct Segment {
         let value: Int
         let colour: UIColor
-        /// Shown under the bar in `.alongside` layout, and read out by VoiceOver in both.
+        /// **Read out by VoiceOver; never drawn.** The forecast's only visible axis is the
+        /// caption under it — fourteen tick labels at this width would be unreadable, and the
+        /// earlier version of this comment claimed a text layer that does not exist. Reported
+        /// by review, PR #5.
         let label: String?
 
         init(value: Int, colour: UIColor, label: String? = nil) {

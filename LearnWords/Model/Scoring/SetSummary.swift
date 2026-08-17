@@ -44,8 +44,14 @@ struct SetSummary: Equatable {
         var meanRetention: Float = 1
     }
 
-    /// Answers already given, bucketed by how well the meaning was known at the time they
-    /// were counted — Anki's young/mature split.
+    /// Answers already given, bucketed by how well the meaning is known **now**.
+    ///
+    /// **An approximation of Anki's young/mature split, not the thing itself.** Anki buckets
+    /// each *review* by the interval in force when that review happened; this buckets every
+    /// answer for a meaning by the meaning's current stability, so once a word passes 21 days
+    /// its early struggles are counted as mature and the young bucket empties. Recoverable by
+    /// replaying the log and reading stability per answer, which is more machinery than a
+    /// first cut needs — recorded rather than glossed. Reported by review, PR #5.
     struct Retention: Equatable {
         var youngCorrect = 0
         var youngTotal = 0
@@ -141,7 +147,15 @@ extension SetSummary {
             // The forecast asks *the meaning*, not each strand: a word coming up in any
             // exercise is work arriving that day, and counting it three times would make a
             // thoroughly practised set look overwhelming.
-            if let dueAt = senseProgress.dueAt {
+            // **Asked "is it due" before "when is it due".** `dueAt` is the minimum over
+            // *engaged* strands only, so a meaning answered once in Learning and never in
+            // dictation carried a Learning date and was filed on it — while the same screen
+            // showed dictation as untouched and the dictation button had it queued. Checking
+            // `isDue` first, which is true when any exercise wants it, keeps the forecast and
+            // the distribution telling the same story. Reported by review, PR #5.
+            if senseProgress.isDue {
+                forecast[0] += 1
+            } else if let dueAt = senseProgress.dueAt {
                 let day = calendar.dateComponents([.day], from: today,
                                                   to: calendar.startOfDay(for: dueAt)).day ?? 0
                 if day >= 0 && day < Self.forecastDays {
@@ -150,17 +164,16 @@ extension SetSummary {
                     // Overdue is work waiting today, not work that happened in the past.
                     forecast[0] += 1
                 }
-            } else if senseProgress.isDue {
-                // **A meaning never practised has no date, and is due now.** Reading only
-                // `dueAt` made a brand-new set report "Nothing due" beside nine waiting
-                // words — the same lie PR #1's review found in the chooser, where
-                // `dueCount` counted only engaged strands. Caught on the device here.
-                forecast[0] += 1
             }
 
             let isMature = (senseProgress.memory?.stability ?? 0) >= Self.matureAfterDays
             for event in histories[sense.id] ?? [] where event.kind == .answer {
-                guard let outcome = event.outcome else { continue }
+                // **A skip is not a wrong answer.** It is exposure, not retrieval — the
+                // learner never claimed anything — and `ReviewOutcome.skipped.isPositive`
+                // being `false` would have counted every skipped question as a miss, showing
+                // a worse record than the learner has. Everywhere else in the model a skip
+                // is excluded rather than penalised. Reported by review, PR #5.
+                guard let outcome = event.outcome, outcome != .skipped else { continue }
                 if isMature {
                     retention.matureTotal += 1
                     if outcome.isPositive { retention.matureCorrect += 1 }

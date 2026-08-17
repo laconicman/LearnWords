@@ -31,7 +31,10 @@ final class SetSummaryViewController: UITableViewController {
         self.summary = summary
         self.setName = setName
         super.init(style: .grouped)
-        title = NSLocalizedString("Progress", comment: "Screen title")
+        // **The set's name, not a generic "Progress".** A preview or a pushed screen that
+        // does not say which set it describes is a screen the learner has to guess at, and
+        // the name was already being passed in and dropped. Reported by review, PR #5.
+        title = setName
     }
 
     @available(*, unavailable)
@@ -41,13 +44,11 @@ final class SetSummaryViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: Cell.value)
+        // No cell is registered: every row is built by `cell(embedding:)` with its own
+        // subview tree, and a registration nobody dequeues only invites a future reader to
+        // dequeue it. Reported by review, PR #5.
         tableView.estimatedRowHeight = 60
         tableView.rowHeight = UITableView.automaticDimension
-    }
-
-    private enum Cell {
-        static let value = "value"
     }
 
     /// Sections in the order the questions are asked: *where am I*, *what is coming*, *how
