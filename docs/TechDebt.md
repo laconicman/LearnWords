@@ -1656,6 +1656,21 @@ the widget extension, which has no scoring layer; putting it there would drag al
 into an extension that only wants a word count. `ProgressCache.shared`, until TD-5 lands
 injection.
 
+### Left open: `ReviewSchedule` does not read through the cache
+
+Only the three per-appearance *screens* were routed through `ProgressCache`. The exercise
+chooser still calls `setDigest()`, which builds a whole `ReviewSchedule`, which constructs its
+own uncached `ProgressIndex` over the same senses on every appearance — so the chooser pays the
+full replay TD-52 measured, and now mixes freshly computed due counts with cached learned
+counts in one sentence. Reported by review, PR #4.
+
+Deliberately out of scope, because it is not a one-liner: `ReviewSchedule` pins its own `now`
+and `policy`, and the reminder scheduler uses it too. A cache keyed on neither would be
+answering a different question than the caller asked, which is exactly the class of bug a cache
+is supposed to avoid. **Decide before anything else is built on it** — the summary (TD-51)
+already computes its own index from one fetch rather than through the cache, and a third
+convention would be one too many.
+
 ### On the benchmarks themselves
 
 They are opt-in — `TEST_RUNNER_LW_BENCH=1` — with one small guard left in the default suite
