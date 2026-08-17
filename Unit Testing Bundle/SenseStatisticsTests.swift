@@ -42,7 +42,11 @@ struct SenseStatisticsTests {
                        memory: FSRSMemory(stability: stability, difficulty: 5),
                        lastReviewedAt: now,
                        dueAt: days.map { now.addingTimeInterval($0 * 86_400) },
-                       isDue: days == nil,
+                       // Due when there is no date, or when the date has passed. `days == nil`
+                       // made a strand five days overdue report "not due" — an impossible
+                       // state that would mislead the next test to read it. Reported by
+                       // review, PR #3.
+                       isDue: days.map { $0 <= 0 } ?? true,
                        successfulDays: successfulDays)
     }
 
@@ -156,23 +160,19 @@ struct SenseStatisticsTests {
     // MARK: - Looking the word up
 
     /// The context menu took the long press that used to look a word up, and at the iOS 12
-    /// floor there is no menu to hang it on — so the screen carries it, on every version.
+    /// floor there is no menu to hang it on — so the screen carries it.
     @Test func theWordCanBeLookedUpFromHere() throws {
-        var lookedUp: [String] = []
         let vc = SenseStatisticsViewController(sense: sense(), progress: progress([:]),
-                                               languages: pair, now: now) { lookedUp.append($0) }
+                                               languages: pair, now: now, offersLookUp: true)
         vc.loadViewIfNeeded()
 
         let last = vc.numberOfSections(in: vc.tableView) - 1
         #expect(rows(inSection: last, on: vc) == ["Look up bear"])
-        vc.tableView(vc.tableView, didSelectRowAt: IndexPath(row: 0, section: last))
-
-        #expect(lookedUp == ["bear"])
     }
 
-    /// Offered only when there is somewhere to send it — the preview inside a context menu
-    /// has no navigation of its own.
-    @Test func noLookupRowWithoutSomewhereToSendIt() {
+    /// Off for a context-menu preview, which is not interactive: the row would be pure extra
+    /// height, and height is the clipping problem on that path.
+    @Test func aPreviewOffersNoLookupRow() {
         let vc = screen(progress([:]))
 
         #expect(vc.numberOfSections(in: vc.tableView) == 4, "three exercises and the overall section")
@@ -205,6 +205,14 @@ struct MemoryWordingTests {
     @Test func aMemoryShorterThanADayIsNotRoundedToZero() {
         #expect(MemoryWording.horizon(days: 0.4) == "Remembered for less than a day")
         #expect(MemoryWording.horizon(days: 0) == "Remembered for less than a day")
+    }
+
+    /// Rounding a two-hour wait up to "about 1 day" overstated it for exactly the items
+    /// closest to being forgotten. Reported by review, PR #3.
+    @Test func aWaitShorterThanADayIsNotRoundedUpToOne() {
+        #expect(MemoryWording.due(now.addingTimeInterval(2 * 3_600), now: now) == "Due later today")
+        #expect(MemoryWording.due(now.addingTimeInterval(23 * 3_600), now: now) == "Due later today")
+        #expect(MemoryWording.due(now.addingTimeInterval(25 * 3_600), now: now) == "Due in about 1 day")
     }
 
     @Test func aDueDateReadsAsAWaitOrAsNow() {

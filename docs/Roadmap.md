@@ -153,7 +153,7 @@ run — asset formats only Xcode 26 understands (TD-45), a hard link to Core Hap
     the receptive/productive split. Context menu with the statistics as its preview on
     iOS 13+, the same screen from a long press at the 12.1 floor, and
     `accessibilityCustomActions` either way, since a long press is invisible to VoiceOver.
-    349 tests green.
+    353 tests green.
   - Remaining: **TD-55**, recorded but not built. The rest of the batch is in flight, one
     branch each; every item's state is its heading in [TechDebt](TechDebt.md), which is
     where to look rather than here. Scope and conventions are in

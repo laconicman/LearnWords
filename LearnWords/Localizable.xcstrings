@@ -281,6 +281,23 @@
         }
       }
     },
+    "Due later today" : {
+      "comment" : "Statistics; a due date",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toca repasar hoy"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Повтор сегодня"
+          }
+        }
+      }
+    },
     "Due now" : {
       "comment" : "Statistics; a due date",
       "localizations" : {

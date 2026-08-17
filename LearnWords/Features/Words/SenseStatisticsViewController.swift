@@ -24,25 +24,39 @@ import UIKit
 final class SenseStatisticsViewController: UITableViewController {
 
     private let sense: Sense
+
+    /// Which meaning this screen describes, so a caller holding only the preview instance can
+    /// find it again — the commit path rebuilds the screen rather than pushing the preview.
+    var senseID: UUID { sense.id }
+
     private let progress: SenseProgress
     private let languages: LanguagePair
     private let now: Date
 
-    /// Looking the word up, offered from here because the context menu that presents this
-    /// screen took the long press that used to do it — and at the iOS 12 floor there is no
-    /// context menu to hang it on, so the row is the only place it can live.
-    private let onLookUp: ((String) -> Void)?
+    /// Whether to offer looking the word up.
+    ///
+    /// Offered from here because the context menu that presents this screen took the long
+    /// press that used to do it, and at the iOS 12 floor there is no menu to hang an action
+    /// on. **A flag rather than a closure**, and the presentation happens here: the closure
+    /// version was handed `WordTableViewController` as the presenter, whose view UIKit has
+    /// removed from the window by the time this screen is on top — so the dictionary could
+    /// fail to appear at all. A view controller presents from itself. Reported by review,
+    /// PR #3.
+    ///
+    /// Off for the context-menu *preview*, which is not interactive: the row would be pure
+    /// extra height, and height is the known clipping problem on that path.
+    private let offersLookUp: Bool
 
     init(sense: Sense,
          progress: SenseProgress,
          languages: LanguagePair,
          now: Date = Date(),
-         onLookUp: ((String) -> Void)? = nil) {
+         offersLookUp: Bool = false) {
         self.sense = sense
         self.progress = progress
         self.languages = languages
         self.now = now
-        self.onLookUp = onLookUp
+        self.offersLookUp = offersLookUp
         super.init(style: .grouped)
         title = sense.terms(in: languages.secondary).map(\.text).joined(separator: ", ")
     }
@@ -139,7 +153,7 @@ final class SenseStatisticsViewController: UITableViewController {
     }
 
     private var lookUpSection: [Section] {
-        guard onLookUp != nil, !prompt.isEmpty else { return [] }
+        guard offersLookUp, !prompt.isEmpty else { return [] }
         return [Section(title: nil, footer: nil,
                         rows: [Row(String(format: NSLocalizedString("Look up %@",
                                                                     comment: "Button label; a word"),
@@ -175,26 +189,29 @@ final class SenseStatisticsViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: Cell.value)
+        // Only the action cell is registered. Value rows are built as `.value1`, a style
+        // that cannot be registered, and a spare registration only invites a future reader to
+        // dequeue it and lose every detail label. Reported by review, PR #3.
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: Cell.action)
     }
 
     private enum Cell {
-        static let value = "value"
         static let action = "action"
     }
 
-    /// The size the context-menu preview opens at.
+    /// The size the context-menu preview opens at, measured from the content rather than
+    /// guessed — a preview too short scrolls inside a popover, one too tall is mostly empty.
     ///
-    /// Measured from the content rather than guessed: a preview that is too short scrolls
-    /// inside a popover, and one that is too tall is mostly empty. UIKit asks for this
-    /// before the table has laid out, so the table is asked for its own content size.
-    override var preferredContentSize: CGSize {
-        get {
-            tableView.layoutIfNeeded()
-            return CGSize(width: 0, height: tableView.contentSize.height)
+    /// **Set, not an overridden getter.** Overriding the getter made the property write-only:
+    /// any caller setting a preferred size (a popover, a form sheet, a split view) was
+    /// silently ignored and always read a width of 0, and computing it forced a layout pass
+    /// from inside a property UIKit queries *during* layout. Reported by review, PR #3.
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        let height = tableView.contentSize.height
+        if preferredContentSize.height != height {
+            preferredContentSize = CGSize(width: preferredContentSize.width, height: height)
         }
-        set { super.preferredContentSize = newValue }
     }
 
     // MARK: - Table view data source
@@ -252,7 +269,7 @@ final class SenseStatisticsViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
-        guard row(at: indexPath)?.isAction == true else { return }
-        onLookUp?(prompt)
+        guard row(at: indexPath)?.isAction == true, !prompt.isEmpty else { return }
+        lookUp(term: prompt, sender: self)
     }
 }

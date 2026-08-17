@@ -1580,7 +1580,7 @@ receptive/productive split is the part no surveyed competitor shows. No schema c
 
 ## TD-50 resolution note (2026-08-11)
 
-Implemented, 349 tests green (was 337). No schema change, as specced.
+Implemented, 353 tests green (340 on the seams base it sits on). No schema change, as specced.
 
 **A section per exercise, which is the owner's headline ask and the shape TD-49 gave the
 data.** Memory is kept per exercise, so a word can be solid as a flashcard and untouched in
@@ -1614,6 +1614,18 @@ screen uses it for rename and delete, and a swipe acts on a row rather than insp
 preference the learner has already met, which is denominated in days and floored at ten. So:
 days below a month, then weeks, months, years. Above a month the reverse argument holds and
 "45 days" is precision nobody has.
+
+**Six things review caught.** The dictionary was asked to open from the *word list* while the
+statistics screen sat on top of it, so the lookup could fail to appear at all — a view
+controller presents from itself now, and `offersLookUp` is a flag rather than a closure. The
+preview instance no longer grows that row: a preview is not interactive, so it was pure extra
+height on the one path where height already clips. `preferredContentSize` was an overridden
+*getter*, which made the property write-only and forced a layout pass from inside something
+UIKit queries during layout — set in `viewDidLayoutSubviews` instead. The iOS 12 long press
+ignored edit mode while the menu path guarded it. A sub-day wait read as "Due in about 1 day",
+overstating it for exactly the items closest to being forgotten — "Due later today" now. And a
+registered cell identifier nothing dequeued has gone, along with a test fixture that made a
+five-day-overdue strand report "not due".
 
 **Known, not fixed:** for a word with history in more than one exercise the context-menu
 preview is taller than iOS will show and clips — the last section's header can appear with

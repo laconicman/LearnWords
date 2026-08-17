@@ -426,7 +426,7 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
 
     /// The iOS 12 path: the same press, opening the same screen.
     @objc private func handleLongPress(_ gestureRecognizer: UILongPressGestureRecognizer) {
-        guard gestureRecognizer.state == .began else { return }
+        guard gestureRecognizer.state == .began, !tableView.isEditing else { return }
         let touchPoint = gestureRecognizer.location(in: tableView)
         guard let indexPath = tableView.indexPathForRow(at: touchPoint),
               indexPath.row < rows.count else { return }
@@ -440,18 +440,21 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
     /// Built from the snapshot the table is already drawing rather than from a fresh fetch:
     /// the screen is a reading of the log at the moment it was opened, and reading it twice
     /// would let the row and its detail disagree.
-    private func makeStatistics(for sense: Sense) -> SenseStatisticsViewController {
+    /// - Parameter offersLookUp: `false` for a context-menu preview, which is not
+    ///   interactive — the row would be pure extra height, and height is the clipping problem
+    ///   on that path. The menu offers the action beside the preview instead.
+    private func makeStatistics(for sense: Sense,
+                                offersLookUp: Bool) -> SenseStatisticsViewController {
         SenseStatisticsViewController(
             sense: sense,
             progress: progress?[sense.id] ?? .unseen,
-            languages: languages) { [weak self] word in
-            guard let self else { return }
-            lookUp(term: word, sender: self)
-        }
+            languages: languages,
+            offersLookUp: offersLookUp)
     }
 
     private func showStatistics(for sense: Sense) {
-        navigationController?.pushViewController(makeStatistics(for: sense), animated: true)
+        navigationController?.pushViewController(
+            makeStatistics(for: sense, offersLookUp: true), animated: true)
     }
 
     /// An accessibility action that remembers *which meaning* it belongs to.
@@ -500,7 +503,7 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
             // exactly this: it can show something, not only offer actions.
             previewProvider: { [weak self] in
                 guard let self, indexPath.row < self.rows.count else { return nil }
-                return self.makeStatistics(for: self.rows[indexPath.row])
+                return self.makeStatistics(for: self.rows[indexPath.row], offersLookUp: false)
             },
             actionProvider: { [weak self] _ in
                 guard let self, indexPath.row < self.rows.count,
@@ -524,9 +527,13 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
     override func tableView(_ tableView: UITableView,
                             willPerformPreviewActionForMenuWith configuration: UIContextMenuConfiguration,
                             animator: UIContextMenuInteractionCommitAnimating) {
-        guard let preview = animator.previewViewController else { return }
+        guard let preview = animator.previewViewController as? SenseStatisticsViewController,
+              let sense = rows.first(where: { $0.id == preview.senseID }) else { return }
+        // Not the preview instance: it was built without the lookup row, which the real
+        // screen should have. Rebuilt rather than mutated, so the two paths differ in exactly
+        // one argument.
         animator.addCompletion { [weak self] in
-            self?.navigationController?.pushViewController(preview, animated: true)
+            self?.showStatistics(for: sense)
         }
     }
 

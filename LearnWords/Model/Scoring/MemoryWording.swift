@@ -38,14 +38,26 @@ enum MemoryWording {
                       duration(days: days))
     }
 
-    /// When this is next worth practising: "Due now", or "Due in about 3 days".
+    /// When this is next worth practising: "Due now", "Due later today", or "Due in about
+    /// 3 days".
+    ///
+    /// **"Later today" exists because rounding up lied.** `duration(days:)` clamps its input
+    /// to a whole day, so a strand due in two hours was described as "Due in about 1 day" —
+    /// overstating the wait for exactly the items closest to being forgotten. The clamp is
+    /// needed because `DateComponentsFormatter` given `.day` and a sub-day interval drops the
+    /// zero component and returns an empty string, so the fallback below cannot fire either.
+    /// Reported by review, PR #3.
     static func due(_ date: Date?, now: Date = Date()) -> String {
         guard let date, date > now else {
             return NSLocalizedString("Due now", comment: "Statistics; a due date")
         }
+        let days = date.timeIntervalSince(now) / 86_400
+        guard days >= 1 else {
+            return NSLocalizedString("Due later today", comment: "Statistics; a due date")
+        }
         return String(format: NSLocalizedString("Due in about %@",
                                                 comment: "Statistics; a duration"),
-                      duration(days: date.timeIntervalSince(now) / 86_400))
+                      duration(days: days))
     }
 
     /// One unit, chosen by magnitude — "12 days", "6 weeks", "6 months", "1 year".
