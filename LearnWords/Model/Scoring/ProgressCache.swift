@@ -26,6 +26,14 @@
 import Foundation
 
 /// Per-meaning progress, remembered until the log that produced it changes.
+///
+/// **`@MainActor`, because every writer already is.** `scored` is a plain dictionary mutated
+/// from `index(for:in:)` and from three notification selectors; today that is safe only by
+/// convention — `storeDidChangeRemotely` is posted on the main queue, and the only writers of
+/// review events run on the main thread. A future background path (a batch import, a
+/// sync-side replay) would mutate it concurrently with a read, so the assumption is pinned by
+/// the compiler rather than left in a comment. Reported by review, PR #4.
+@MainActor
 final class ProgressCache {
 
     /// One cache for the app, matching the other shared controllers (`Library`,
@@ -55,6 +63,15 @@ final class ProgressCache {
         NotificationCenter.default.addObserver(
             self, selector: #selector(logDidGrow(_:)),
             name: Lexicon.didAppendToLog, object: nil)
+        // **A preference is an input to every score.** `ScoringPolicy.masteryHorizonDays`
+        // reads the horizon slider on *every use*, precisely so that moving it takes effect
+        // without a relaunch, and `isLearned` reads `requireProductionForLearned` the same
+        // way. Caching the results put the slider back to doing nothing until the day
+        // turned — the exact bug that comment was written to prevent. Reported by review,
+        // PR #4.
+        NotificationCenter.default.addObserver(
+            self, selector: #selector(invalidateAll),
+            name: UserDefaults.didChangeNotification, object: nil)
     }
 
     /// Scores `senses`, replaying only the ones not already known.
@@ -91,6 +108,9 @@ final class ProgressCache {
 
     @objc private func invalidateAll() {
         scored.removeAll()
+        // Cleared with the entries it describes. Harmless while the next call re-stamps it,
+        // but a stamp outliving everything it stamped is a trap for the next reader.
+        scoredOn = nil
     }
 
     /// One meaning changed, so one entry goes — the rest of the screen stays warm.

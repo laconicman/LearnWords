@@ -1602,8 +1602,10 @@ Measured first, then cached. 345 tests green (was 337), no schema change.
 
 ### What it cost, before
 
-`ProgressCostTests` seeds a library and times `ProgressIndex`. iPhone 17 Pro simulator,
-Debug:
+`ProgressCostTests` seeds a library and times `ProgressIndex`, attaching each sample to the
+result bundle. One run, iPhone 17 Pro simulator / iOS 26.5, Debug, `ScoringPolicy.version` 2
+— every row below comes from that single run, and every row is produced by a case in the
+suite, so it can be reproduced:
 
 | Library | Events | Scoring one pass |
 |---|---|---|
@@ -1615,8 +1617,13 @@ Debug:
 
 Linear in *events*, not in meanings — the 100 × 100 case costs about what 1,000 × 12 does.
 That is the good news; the bad news is the constant. The word list reloads in
-`viewDidAppear`, so a 500-word library paid ~180 ms **every time the tab was opened**, and
+`viewDidAppear`, so a **1,000-word library paid ~370 ms every time the tab was opened**, and
 TD-51's summary would have paid it again.
+
+(An earlier draft of this note headlined "~180 ms at 500 × 12" from a run whose case has
+since been resized to 300 × 8 as the always-on guard. No test produces a 500 × 12 figure, so
+quoting one was unreproducible; the 1,000 × 12 row above is measured. Reported by review,
+PR #4.)
 
 Two findings shaped the fix:
 

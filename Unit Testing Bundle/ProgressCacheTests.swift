@@ -12,6 +12,7 @@
 
 import Testing
 import Foundation
+import CoreData
 @testable import LearnWords
 
 @Suite(.serialized)
@@ -116,17 +117,68 @@ struct ProgressCacheTests {
 
     /// Another device's changes arrive without any local append, so the only safe answer is
     /// to forget everything.
+    ///
+    /// **The event is inserted behind `record`'s back**, straight through `persistence.write`.
+    /// Going through `Lexicon.record` posts `didAppendToLog`, which drops that meaning on its
+    /// own — so the assertion passed whether or not the remote observer existed, and the test
+    /// proved nothing. Reported by review, PR #4.
     @Test func aRemoteChangeDropsTheWholeCache() throws {
-        let (lexicon, set, senses) = try stocked()
+        let persistence = LWPersistence(inMemory: true)
+        let lexicon = Lexicon(persistence: persistence)
+        let set = try lexicon.addWordSet(named: "Animals", languages: ["en", "ru"])
+        try lexicon.addSenses(to: set.id, terms: [
+            [Term.Draft("bear", in: "en"), Term.Draft("медведь", in: "ru")],
+        ])
+        let senses = try lexicon.senses(in: set.id)
         let cache = ProgressCache()
-        _ = try cache.index(for: senses, in: lexicon)
 
-        // Recorded *before* the notification, so the cache cannot have seen it: this is the
-        // shape of a change that arrived from somewhere else.
-        try lexicon.record(answer(senses[0], in: set))
+        let before = try cache.index(for: senses, in: lexicon)
+        #expect(before[senses[0].id].effort == 0, "precondition: nothing practised yet")
+
+        try persistence.write { context in
+            let event = CDReviewEvent(context: context)
+            event.synset = try context.fetch(CDSynset.fetchRequest()).first
+            event.kind = ReviewEventKind.answer.rawValue
+            event.sessionID = UUID()
+            event.wordSetID = set.id
+            event.promptTermID = UUID()
+            event.task = Exercise.learning.rawValue
+            event.direction = ReviewDirection.receptive.rawValue
+            event.outcome = ReviewOutcome.correctVerbatim.rawValue
+            event.prompt = "bear"
+            event.expected = "медведь"
+            event.promptLanguage = "en"
+            event.answerLanguage = "ru"
+        }
+        // Still stale: nothing told the cache, which is the situation a remote change is.
+        #expect(try cache.index(for: senses, in: lexicon)[senses[0].id].effort == 0,
+                "precondition: an unannounced write is invisible to the cache")
+
         NotificationCenter.default.post(name: LWPersistence.storeDidChangeRemotely, object: nil)
 
         #expect(try cache.index(for: senses, in: lexicon)[senses[0].id].effort > 0)
+    }
+
+    /// The regression the review caught: `ScoringPolicy` reads the horizon slider on every
+    /// use so that moving it takes effect at once, and caching the results put it back to
+    /// doing nothing.
+    @Test func changingTheHorizonPreferenceDropsTheCache() throws {
+        let (lexicon, set, senses) = try stocked()
+        let cache = ProgressCache()
+        try lexicon.record(answer(senses[0], in: set))
+
+        let prefs = LWUserDefaults.standard
+        let horizon = prefs.maxKnownLevelPreference
+        defer { prefs.maxKnownLevelPreference = horizon }
+
+        prefs.maxKnownLevelPreference = 400
+        let atLongHorizon = try cache.index(for: senses, in: lexicon)[senses[0].id].mastery
+
+        prefs.maxKnownLevelPreference = 10
+        let atShortHorizon = try cache.index(for: senses, in: lexicon)[senses[0].id].mastery
+
+        #expect(atShortHorizon > atLongHorizon,
+                "the same memory is a bigger share of a shorter horizon — the slider must bite")
     }
 
     /// Retention decays with the clock, so yesterday's answers are yesterday's.
