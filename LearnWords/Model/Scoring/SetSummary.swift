@@ -46,12 +46,20 @@ struct SetSummary: Equatable {
 
     /// Answers already given, bucketed by how well the meaning is known **now**.
     ///
-    /// **An approximation of Anki's young/mature split, not the thing itself.** Anki buckets
-    /// each *review* by the interval in force when that review happened; this buckets every
-    /// answer for a meaning by the meaning's current stability, so once a word passes 21 days
-    /// its early struggles are counted as mature and the young bucket empties. Recoverable by
+    /// **An approximation of Anki's young/mature split, not the thing itself.** Confirmed
+    /// against `ankitects/anki`: it buckets each review by `revlog.last_interval` — the
+    /// interval the card held *before that specific review*, stored in the row — so the split
+    /// is fully historical, and a card that has since matured or been reset does not
+    /// retroactively change how its old reviews are counted. This buckets every answer for a
+    /// meaning by the meaning's *current* stability, so once a word passes 21 days its early
+    /// struggles are counted as mature and the young bucket empties. Recoverable here by
     /// replaying the log and reading stability per answer, which is more machinery than a
     /// first cut needs — recorded rather than glossed. Reported by review, PR #5.
+    ///
+    /// The *exclusions* do line up: Anki drops entries with no rating (manual reschedules,
+    /// set-due-date, reset) and no-reschedule cram reviews, counting only real graded
+    /// retrievals. Our equivalents are `.progressReset`, which `kind == .answer` filters, and
+    /// `.skipped`, excluded below for the same reason.
     struct Retention: Equatable {
         var youngCorrect = 0
         var youngTotal = 0
@@ -90,8 +98,9 @@ struct SetSummary: Equatable {
 
     /// Below this many days of stability an answer counts as *young*.
     ///
-    /// Anki's own boundary, and the one its community reports True Retention against, so a
-    /// learner who has met the number elsewhere reads this one the same way.
+    /// Anki's own boundary — `MATURE_IVL` in `rslib/src/stats/graphs/retention.rs`, verified
+    /// against the source rather than from memory — so a learner who has met the number
+    /// elsewhere reads this one the same way.
     static let matureAfterDays: Double = 21
 }
 

@@ -1642,9 +1642,14 @@ through `ScoringPolicy`. The summary **fetched the log twice** per long
 press, once inside `ProgressIndex` and once for retention; it now fetches once and replays
 into `ProgressIndex(scored:)`. And the **maturity split is an approximation of Anki's, not
 Anki's** — it buckets every answer by the meaning's *current* stability, so a well-established
-word's early struggles are counted as mature and the young bucket empties. The docstring now
-says so instead of claiming the real thing; doing it properly means reading stability per
-answer out of a replay.
+word's early struggles are counted as mature and the young bucket empties. Checked against
+`ankitects/anki` rather than asserted: `calculate_true_retention` buckets each review by
+`revlog.last_interval`, the interval the card held *before that review*, so its split is fully
+historical; the 21-day threshold is `MATURE_IVL`. Its *exclusions* match ours by principle —
+Anki counts only rated retrievals, dropping manual reschedules and no-reschedule cram reviews,
+where we drop `.progressReset` and `.skipped`. Doing the bucketing properly means reading
+stability per answer out of a replay; the docstring now says what this does rather than what
+Anki does.
 
 **Debt closed on the way:** `SetDigest.dueByExercise` had no test — flagged by the TD-49
 review, left open by the TD-53 handoff, and read by this screen. Three tests now cover it,
