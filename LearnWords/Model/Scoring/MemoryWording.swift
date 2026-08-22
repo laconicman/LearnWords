@@ -81,11 +81,20 @@ enum MemoryWording {
             : [.year]
         formatter.maximumUnitCount = 1
         formatter.unitsStyle = .full
+        // Clamped here rather than trusting each caller to have done it. The formatter
+        // *drops* a zero component and returns an empty string — not nil — for a sub-unit
+        // interval, so `??` below cannot catch it and a future caller passing 0.4 days would
+        // render a blank row. Reported by review, PR #3.
         let seconds = max(days, 1) * 86_400
         // The formatter is documented to return nil for inputs it cannot express; a bare
         // day count is a poor label but an honest one, and better than an empty row.
-        return formatter.string(from: seconds)
-            ?? String(format: NSLocalizedString("%d days", comment: "Statistics; a fallback"),
-                      Int(days.rounded()))
+        let rendered = formatter.string(from: seconds)
+        // Empty as well as nil: the documented failure is a dropped component, which yields
+        // "", and an empty duration reads as a missing row rather than as a short one.
+        guard let rendered, !rendered.isEmpty else {
+            return String(format: NSLocalizedString("%d days", comment: "Statistics; a fallback"),
+                          Int(max(days, 1).rounded()))
+        }
+        return rendered
     }
 }

@@ -173,9 +173,19 @@ struct SenseStatisticsTests {
     /// Off for a context-menu preview, which is not interactive: the row would be pure extra
     /// height, and height is the clipping problem on that path.
     @Test func aPreviewOffersNoLookupRow() {
-        let vc = screen(progress([:]))
+        let vc = screen(progress([.learning: strand()]))
 
         #expect(vc.numberOfSections(in: vc.tableView) == 4, "three exercises and the overall section")
+    }
+
+    /// A meaning with no history gets three "Not practised yet" lines and nothing else —
+    /// Effort 0% beside "none / none" is the same three numbers about nothing the
+    /// per-exercise sections already refuse to show. Reported by review, PR #3.
+    @Test func anUnpractisedMeaningGetsNoOverallSection() {
+        let vc = screen(progress([:]))
+
+        #expect(vc.numberOfSections(in: vc.tableView) == 3)
+        #expect(headers(on: vc) == ["Learning", "Dictation", "Phonetic"])
     }
 }
 

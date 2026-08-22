@@ -63,7 +63,7 @@ final class SenseStatisticsViewController: UITableViewController {
 
     @available(*, unavailable)
     required init?(coder: NSCoder) {
-        fatalError("use init(sense:progress:languages:now:onLookUp:)")
+        fatalError("use init(sense:progress:languages:now:offersLookUp:)")
     }
 
     // MARK: - The table, as one value
@@ -93,7 +93,12 @@ final class SenseStatisticsViewController: UITableViewController {
     }
 
     private func buildSections() -> [Section] {
-        Exercise.allCases.map(strandSection) + [overallSection] + lookUpSection
+        // **No overall section for a meaning with no history.** The per-exercise sections
+        // already collapse an untried exercise to one line rather than reporting 0% and "due
+        // now"; Effort 0% with "none / none" underneath was the same three numbers about
+        // nothing that rule exists to avoid. Reported by review, PR #3.
+        let overall = progress.engagedExercises.isEmpty ? [] : [overallSection]
+        return Exercise.allCases.map(strandSection) + overall + lookUpSection
     }
 
     /// One exercise: what it remembers, when it is next due, and how much spacing it has.
@@ -121,7 +126,7 @@ final class SenseStatisticsViewController: UITableViewController {
                        // The two-day gate is the half of the learned rule that a single
                        // fast answer cannot satisfy, and the only one worth explaining
                        // where it applies (TD-49).
-                       footer: strand.successfulDays < 2
+                       footer: strand.successfulDays < ScoringPolicy.defaultMinimumSuccessfulDays
                            ? NSLocalizedString("Needs successes on two separate days to count as learned.",
                                                comment: "Statistics; footer")
                            : nil,

@@ -1580,7 +1580,7 @@ receptive/productive split is the part no surveyed competitor shows. No schema c
 
 ## TD-50 resolution note (2026-08-11)
 
-Implemented, 353 tests green (340 on the seams base it sits on). No schema change, as specced.
+Implemented, 354 tests green (340 on the seams base it sits on). No schema change, as specced.
 
 **A section per exercise, which is the owner's headline ask and the shape TD-49 gave the
 data.** Memory is kept per exercise, so a word can be solid as a flashcard and untouched in
