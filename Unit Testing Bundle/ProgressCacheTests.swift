@@ -181,6 +181,23 @@ struct ProgressCacheTests {
                 "the same memory is a bigger share of a shorter horizon — the slider must bite")
     }
 
+    /// A write to an unrelated preference is not a reason to re-score the library — the
+    /// notification fires for every default in the process. Reported by review, PR #4.
+    @Test func anUnrelatedPreferenceDoesNotColdTheCache() throws {
+        let (lexicon, set, senses) = try stocked()
+        let cache = ProgressCache()
+        try lexicon.record(answer(senses[0], in: set))
+        let warm = try cache.index(for: senses, in: lexicon)
+
+        let prefs = LWUserDefaults.standard
+        let rate = prefs.utteranceRatePreference
+        defer { prefs.utteranceRatePreference = rate }
+        prefs.utteranceRatePreference = rate + 0.1
+
+        // Same values, and the same *instances* — a re-scored index would rebuild them.
+        #expect(try cache.index(for: senses, in: lexicon)[senses[0].id] == warm[senses[0].id])
+    }
+
     /// Retention decays with the clock, so yesterday's answers are yesterday's.
     @Test func theCacheDoesNotSurviveTheDayTurning() throws {
         let (lexicon, set, senses) = try stocked()

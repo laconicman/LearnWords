@@ -152,7 +152,7 @@ run — asset formats only Xcode 26 understands (TD-45), a hard link to Core Hap
     ~370 ms to score and was paying it on *every* appearance of the word list; 2,000 meanings
     cost ~1.9 s. `ProgressCache` scores each meaning once per change instead, in memory —
     dropped when the log grows for that meaning, when another device changes the store, or
-    when the day turns. No schema change, as `ProgressModel` promised. 345 tests green.
+    when the day turns. No schema change, as `ProgressModel` promised. 350 tests green.
   - Remaining: **TD-55**, recorded but not built. The rest of the batch is in flight, one
     branch each; every item's state is its heading in [TechDebt](TechDebt.md), which is
     where to look rather than here. Scope and conventions are in

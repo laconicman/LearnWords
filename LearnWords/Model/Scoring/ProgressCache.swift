@@ -70,8 +70,35 @@ final class ProgressCache {
         // turned — the exact bug that comment was written to prevent. Reported by review,
         // PR #4.
         NotificationCenter.default.addObserver(
-            self, selector: #selector(invalidateAll),
+            self, selector: #selector(scoringPreferencesMayHaveChanged),
             name: UserDefaults.didChangeNotification, object: nil)
+    }
+
+    /// The two preferences that are inputs to a score, as they were when it was computed.
+    ///
+    /// `UserDefaults.didChangeNotification` fires for *any* write anywhere in the process —
+    /// the direction toggle, the speech-rate slider, a reminder time — none of which change a
+    /// single number here. Dropping everything on all of them was correctness-safe but meant
+    /// a trip through Settings cost a full replay on the way back. Comparing first keeps the
+    /// invalidation honest and rare. Reported by review, PR #4.
+    private struct ScoringPreferences: Equatable {
+        let horizonDays: Int
+        let requiresProduction: Bool
+
+        init() {
+            let defaults = LWUserDefaults.standard
+            horizonDays = defaults.maxKnownLevelPreference
+            requiresProduction = defaults.requireProductionForLearned
+        }
+    }
+
+    private var preferences = ScoringPreferences()
+
+    @objc private func scoringPreferencesMayHaveChanged() {
+        let current = ScoringPreferences()
+        guard current != preferences else { return }
+        preferences = current
+        invalidateAll()
     }
 
     /// Scores `senses`, replaying only the ones not already known.

@@ -1598,7 +1598,7 @@ before shipping the summary, not after. Not a schema commitment.
 
 ## TD-52 resolution note (2026-08-12)
 
-Measured first, then cached. 345 tests green (was 337), no schema change.
+Measured first, then cached. 350 tests green (was 337), no schema change.
 
 ### What it cost, before
 
@@ -1646,7 +1646,12 @@ revisiting if a library ever gets large enough to feel it.
 
 *Correctness before speed.* An entry is dropped when the log grows for that meaning
 (`Lexicon.didAppendToLog`, posted by `record` and `resetProgress`), the whole cache is
-dropped when another device changes the store, and everything expires when the day turns —
+dropped when another device changes the store **or when a scoring preference changes** —
+`masteryHorizonDays` reads the horizon slider on every use so that moving it takes effect at
+once, and caching the results put it back to doing nothing until the day turned. The two
+scoring preferences are compared rather than trusting the notification, which fires for every
+default in the process: a trip through Settings to change a speech rate should not cost a full
+replay on the way back. Everything expires when the day turns —
 retention decays with the clock, so yesterday's scores answer a question nobody asked.
 `ProgressCacheTests` is about those four moments, not about speed: a stale ring tells the
 learner something untrue about their own memory, which is worse than a slow one.
