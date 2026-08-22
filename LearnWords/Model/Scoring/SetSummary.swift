@@ -147,13 +147,19 @@ extension SetSummary {
             // The forecast asks *the meaning*, not each strand: a word coming up in any
             // exercise is work arriving that day, and counting it three times would make a
             // thoroughly practised set look overwhelming.
-            // **Asked "is it due" before "when is it due".** `dueAt` is the minimum over
-            // *engaged* strands only, so a meaning answered once in Learning and never in
-            // dictation carried a Learning date and was filed on it — while the same screen
-            // showed dictation as untouched and the dictation button had it queued. Checking
-            // `isDue` first, which is true when any exercise wants it, keeps the forecast and
-            // the distribution telling the same story. Reported by review, PR #5.
-            if senseProgress.isDue {
+            // **Asked "is it due" before "when is it due"** — and asked of *every* exercise,
+            // not of `SenseProgress.isDue`.
+            //
+            // `isDue` is `strands.isEmpty || strands.values.contains(where: \.isDue)`, and
+            // `strands` holds only exercises that have been graded, so a meaning answered once
+            // in Learning and never in dictation reports `false`: its one engaged strand is
+            // not due yet, and the two untried ones are not in the dictionary to be asked.
+            // Subscripting instead returns `.untouched` for a missing strand, which *is* due —
+            // the same "any exercise" reading `ReviewSchedule.anyExerciseDueCount` uses, and
+            // the one the buttons on the practice screen act on. Reported twice by review,
+            // PR #5: the first fix read `isDue` and did nothing.
+            let isDueInAnyExercise = Exercise.allCases.contains { senseProgress[$0].isDue }
+            if isDueInAnyExercise {
                 forecast[0] += 1
             } else if let dueAt = senseProgress.dueAt {
                 let day = calendar.dateComponents([.day], from: today,

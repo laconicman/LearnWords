@@ -1589,7 +1589,7 @@ describes two opposite sets). Reference implementation is Anki's stats screen.
 
 ## TD-51 resolution note (2026-08-12)
 
-Implemented, 357 tests green (was 337). No schema change.
+Implemented, 358 tests green (was 337). No schema change.
 
 **Distribution first, averages beside it.** `SetSummary` reports, per exercise, how many
 meanings are untouched / learning / learned — plus the mean the owner asked for, printed
@@ -1632,7 +1632,13 @@ strands. Found by opening the screen on the device. Fixed, and pinned by
 everywhere else in the model a skip is excluded rather than penalised. The forecast filed a
 **partly practised** meaning on its Learning date even though its other two exercises were
 untried and would be asked at once — the same screen was calling them "untouched" in the row
-above, so `isDue` is now asked before `dueAt`. The summary **fetched the log twice** per long
+above. The first fix read `SenseProgress.isDue`, which is `strands.isEmpty ||
+strands.values.contains(where: \.isDue)` over *engaged* strands only, so it changed nothing in
+production and the test passed only because its fixture set `isDue: true` by hand. It now asks
+every exercise — `Exercise.allCases.contains { progress[$0].isDue }`, subscripting so a missing
+strand reads as `.untouched` and therefore due — which is the same "any exercise" reading
+`ReviewSchedule.anyExerciseDueCount` uses. Pinned twice: once on values, once end to end
+through `ScoringPolicy`. The summary **fetched the log twice** per long
 press, once inside `ProgressIndex` and once for retention; it now fetches once and replays
 into `ProgressIndex(scored:)`. And the **maturity split is an approximation of Anki's, not
 Anki's** — it buckets every answer by the meaning's *current* stability, so a well-established

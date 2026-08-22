@@ -15,6 +15,7 @@ import Testing
 import Foundation
 @testable import LearnWords
 
+@MainActor
 struct SetSummaryTests {
 
     private let now = Date(timeIntervalSince1970: 1_700_000_000)
@@ -41,13 +42,21 @@ struct SetSummaryTests {
                        successfulDays: engaged ? 2 : 0)
     }
 
+    /// - Parameter everyExercise: give the same strand to all three, so nothing is untouched.
+    ///   The forecast counts a meaning with *any* untried exercise as due today, which is
+    ///   correct and would otherwise swamp a test about due *dates*.
     private func progress(_ pairs: [(Sense, StrandProgress)],
                           effort: Float = 0.5,
-                          answers: [ReviewDirection: Int] = [:]) -> ProgressIndex {
+                          answers: [ReviewDirection: Int] = [:],
+                          everyExercise: Bool = false) -> ProgressIndex {
         var scored: [UUID: SenseProgress] = [:]
         for (sense, strand) in pairs {
-            scored[sense.id] = SenseProgress(strands: [.learning: strand], effort: effort,
-                                             answersByDirection: answers, isDue: strand.isDue)
+            let strands = everyExercise
+                ? Dictionary(uniqueKeysWithValues: Exercise.allCases.map { ($0, strand) })
+                : [Exercise.learning: strand]
+            scored[sense.id] = SenseProgress(strands: strands, effort: effort,
+                                             answersByDirection: answers,
+                                             isDue: strands.values.contains { $0.isDue })
         }
         return ProgressIndex(scored: scored)
     }
@@ -100,7 +109,8 @@ struct SetSummaryTests {
         let due: [Double?] = [0.1, 2.2, 2.4, 30]
         let summary = SetSummary(
             senses: words,
-            progress: progress(zip(words, due).map { ($0, strand(mastery: 0.5, dueIn: $1)) }),
+            progress: progress(zip(words, due).map { ($0, strand(mastery: 0.5, dueIn: $1)) },
+                               everyExercise: true),
             histories: [:], now: now)
 
         #expect(summary.dueForecast.count == SetSummary.forecastDays)
@@ -115,7 +125,8 @@ struct SetSummaryTests {
         let words = [sense("late"), sense("later")]
         let summary = SetSummary(
             senses: words,
-            progress: progress(zip(words, [-3.0, -40.0]).map { ($0, strand(mastery: 0.5, dueIn: $1)) }),
+            progress: progress(zip(words, [-3.0, -40.0]).map { ($0, strand(mastery: 0.5, dueIn: $1)) },
+                               everyExercise: true),
             histories: [:], now: now)
 
         #expect(summary.dueForecast[0] == 2)
@@ -142,17 +153,54 @@ struct SetSummaryTests {
     /// the meaning a week out. Reported by review, PR #5.
     @Test func aPartlyPractisedMeaningIsDueToday() {
         let word = sense("bear")
-        // Engaged and not-yet-due in Learning; dictation and phonetics never tried, which is
-        // what makes the meaning itself due.
+        // Engaged and not-yet-due in Learning; dictation and phonetics never tried.
+        //
+        // **`isDue: false`, which is what the real replay produces** — it is
+        // `strands.isEmpty || strands.values.contains(where: \.isDue)` over *engaged* strands
+        // only, so the two untried exercises are not in the dictionary to be asked. The first
+        // version of this test set `isDue: true` by hand and so passed against a fix that did
+        // nothing in production. Reported by review, PR #5.
         let partly = SenseProgress(
             strands: [.learning: strand(mastery: 0.5, dueIn: 7)],
-            effort: 0.4, answersByDirection: [.receptive: 1], isDue: true)
+            effort: 0.4, answersByDirection: [.receptive: 1], isDue: false)
         let summary = SetSummary(senses: [word],
                                  progress: ProgressIndex(scored: [word.id: partly]),
                                  histories: [:], now: now)
 
-        #expect(summary.dueNow == 1)
+        #expect(summary.dueNow == 1, "dictation and phonetics were never tried, so it is asked now")
         #expect(summary.dueForecast[7] == 0, "not filed on the one date it happens to have")
+    }
+
+    /// The same claim end to end, through `ScoringPolicy` rather than a hand-built fixture —
+    /// which is the only way to know the production path agrees. Reported by review, PR #5.
+    @Test func aPartlyPractisedMeaningIsDueTodayThroughTheRealReplay() throws {
+        let lexicon = Lexicon(persistence: LWPersistence(inMemory: true))
+        let set = try lexicon.addWordSet(named: "Animals", languages: ["en", "ru"])
+        try lexicon.addSenses(to: set.id, terms: [
+            [Term.Draft("bear", in: "en"), Term.Draft("медведь", in: "ru")],
+        ])
+        let senses = try lexicon.senses(in: set.id)
+
+        // One correct Learning answer: that strand is scheduled forward, the other two have
+        // never been asked.
+        try lexicon.record(ReviewEvent.Draft(
+            senseID: senses[0].id, sessionID: UUID(), wordSetID: set.id,
+            promptTermID: senses[0].terms[0].id, task: .learning, direction: .receptive,
+            outcome: .correctVerbatim, prompt: "bear", expected: "медведь",
+            promptLanguage: "en", answerLanguage: "ru"))
+
+        let histories = try lexicon.history(ofSenses: senses.map(\.id))
+        let policy = ScoringPolicy.default
+        let scored = senses.reduce(into: [UUID: SenseProgress]()) { result, sense in
+            result[sense.id] = policy.progress(replaying: histories[sense.id] ?? [], now: now)
+        }
+        #expect(scored[senses[0].id]?.isDue == false,
+                "precondition: the engaged-only reading says 'not due', which is the trap")
+
+        let summary = SetSummary(senses: senses, progress: ProgressIndex(scored: scored),
+                                 histories: histories, now: now)
+
+        #expect(summary.dueNow == 1)
     }
 
     /// A meaning due in three exercises is one piece of work arriving, not three.
