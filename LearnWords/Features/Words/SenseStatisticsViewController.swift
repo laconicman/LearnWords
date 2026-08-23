@@ -93,11 +93,15 @@ final class SenseStatisticsViewController: UITableViewController {
     }
 
     private func buildSections() -> [Section] {
-        // **No overall section for a meaning with no history.** The per-exercise sections
-        // already collapse an untried exercise to one line rather than reporting 0% and "due
-        // now"; Effort 0% with "none / none" underneath was the same three numbers about
-        // nothing that rule exists to avoid. Reported by review, PR #3.
-        let overall = progress.engagedExercises.isEmpty ? [] : [overallSection]
+        // **No overall section for a meaning with *nothing to report*** — which is not the
+        // same as no engaged exercise. A progress reset clears every strand's memory but
+        // deliberately keeps effort and the answer counts, as the record of work actually
+        // done; keying on `engagedExercises` hid exactly those retained totals on exactly the
+        // meanings whose history the learner had just chosen to set aside. Reported by
+        // review, PR #3.
+        let hasSomethingToReport = progress.effort > 0
+            || progress.answersByDirection.values.contains { $0 > 0 }
+        let overall = hasSomethingToReport ? [overallSection] : []
         return Exercise.allCases.map(strandSection) + overall + lookUpSection
     }
 

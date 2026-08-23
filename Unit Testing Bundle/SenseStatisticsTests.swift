@@ -182,10 +182,21 @@ struct SenseStatisticsTests {
     /// Effort 0% beside "none / none" is the same three numbers about nothing the
     /// per-exercise sections already refuse to show. Reported by review, PR #3.
     @Test func anUnpractisedMeaningGetsNoOverallSection() {
-        let vc = screen(progress([:]))
+        let vc = screen(progress([:], effort: 0, receptive: 0, productive: 0))
 
         #expect(vc.numberOfSections(in: vc.tableView) == 3)
         #expect(headers(on: vc) == ["Learning", "Dictation", "Phonetic"])
+    }
+
+    /// A reset clears every strand's memory but **keeps** effort and the answer counts, as the
+    /// record of work actually done. Keying the section on engagement hid exactly those totals
+    /// on exactly the meanings whose history was just set aside. Reported by review, PR #3.
+    @Test func aResetMeaningStillShowsTheWorkAlreadyDone() {
+        let vc = screen(progress([:], effort: 0.62, receptive: 7, productive: 3))
+
+        #expect(vc.numberOfSections(in: vc.tableView) == 4)
+        #expect(rows(inSection: 3, on: vc) == ["Effort — 62%", "Recognised — 7 answers",
+                                               "Produced — 3 answers"])
     }
 }
 

@@ -1580,7 +1580,7 @@ receptive/productive split is the part no surveyed competitor shows. No schema c
 
 ## TD-50 resolution note (2026-08-11)
 
-Implemented, 354 tests green (340 on the seams base it sits on). No schema change, as specced.
+Implemented, 355 tests green. No schema change, as specced.
 
 **A section per exercise, which is the owner's headline ask and the shape TD-49 gave the
 data.** Memory is kept per exercise, so a word can be solid as a flashcard and untouched in
@@ -1626,6 +1626,12 @@ ignored edit mode while the menu path guarded it. A sub-day wait read as "Due in
 overstating it for exactly the items closest to being forgotten — "Due later today" now. And a
 registered cell identifier nothing dequeued has gone, along with a test fixture that made a
 five-day-overdue strand report "not due".
+
+**And one the fix for another finding created.** Collapsing the overall section for a meaning
+with no *engaged* exercise also collapsed it for a **reset** one — a reset clears every
+strand's memory but deliberately keeps effort and the answer counts, as the record of work
+done, so the retained totals vanished on exactly the meanings whose history the learner had
+just chosen to set aside. Keyed on whether there is anything to report now, not on engagement.
 
 **Known, not fixed:** for a word with history in more than one exercise the context-menu
 preview is taller than iOS will show and clips — the last section's header can appear with
