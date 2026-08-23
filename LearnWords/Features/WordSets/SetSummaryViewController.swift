@@ -151,9 +151,11 @@ final class SetSummaryViewController: UITableViewController {
         bar.show(summary.dueForecast.enumerated().map { day, count in
             .init(value: count, colour: .lwAccent, label: Self.dayLabel(day))
         })
+        // `forecastDays` slots are indexed 0…n-1, so the last bar is day 13, not day 14.
+        // Reported by review, PR #5.
         let scale = caption(String(
             format: NSLocalizedString("Today to day %d", comment: "Summary axis"),
-            SetSummary.forecastDays))
+            SetSummary.forecastDays - 1))
         return cell(embedding: stack([bar, scale], spacing: 6))
     }
 

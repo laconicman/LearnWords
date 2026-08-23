@@ -1589,7 +1589,7 @@ describes two opposite sets). Reference implementation is Anki's stats screen.
 
 ## TD-51 resolution note (2026-08-12)
 
-Implemented, 358 tests green (was 337). No schema change.
+Implemented, 360 tests green (was 337). No schema change.
 
 **Distribution first, averages beside it.** `SetSummary` reports, per exercise, how many
 meanings are untouched / learning / learned — plus the mean the owner asked for, printed
@@ -1650,6 +1650,15 @@ Anki counts only rated retrievals, dropping manual reschedules and no-reschedule
 where we drop `.progressReset` and `.skipped`. Doing the bucketing properly means reading
 stability per answer out of a replay; the docstring now says what this does rather than what
 Anki does.
+
+**The ring's colour excludes untouched words.** An untouched strand reports retention 1, so
+averaging over every word in the set let a mostly-new set paint a healthy ring while its
+practised half was overdue — the warning arriving only once few words were left untouched,
+which is exactly backwards for a design whose whole premise is that colour carries the bad
+news. Checked against `ankitects/anki` rather than reasoned about: retrievability there is
+`Option`-typed, every consumer guards on `memory_state.is_some()`, and the "Card
+Retrievability" average does not increment its divisor for a new card — excluding unseen items
+is the reference behaviour. Reported by review, PR #5.
 
 **Debt closed on the way:** `SetDigest.dueByExercise` had no test — flagged by the TD-49
 review, left open by the TD-53 handoff, and read by this screen. Three tests now cover it,

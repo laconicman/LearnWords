@@ -102,6 +102,41 @@ struct SetSummaryTests {
                 "dictation was never practised, so it is not three failures")
     }
 
+    /// Untouched words report retention 1, so averaging them in let a mostly-new set paint a
+    /// healthy ring over an overdue practised half — the warning colour arriving only once few
+    /// words were left untouched, which is backwards. Anki excludes unseen cards from its
+    /// retrievability average for the same reason. Reported by review, PR #5.
+    @Test func untouchedWordsDoNotDiluteTheWarningColour() {
+        let practised = sense("practised")
+        let untouched = (0..<9).map { sense("new\($0)") }
+        var scored: [UUID: SenseProgress] = [
+            practised.id: SenseProgress(
+                strands: [.learning: strand(mastery: 0.5, retention: 0.2, dueIn: -1)],
+                effort: 0.5, answersByDirection: [:], isDue: true),
+        ]
+        for word in untouched {
+            scored[word.id] = SenseProgress(strands: [:], effort: 0,
+                                            answersByDirection: [:], isDue: true)
+        }
+        let summary = SetSummary(senses: [practised] + untouched,
+                                 progress: ProgressIndex(scored: scored),
+                                 histories: [:], now: now)
+
+        #expect(summary.distribution(for: .learning).meanRetention == 0.2,
+                "the one word anyone could forget is the one that colours the ring")
+    }
+
+    /// Nothing engaged is nothing at risk — an untouched exercise must not read as failing.
+    @Test func anExerciseWithNothingEngagedIsNotAtRisk() {
+        let words = (0..<3).map { sense("w\($0)") }
+        let summary = SetSummary(
+            senses: words,
+            progress: progress(words.map { ($0, strand(mastery: 0, engaged: false)) }),
+            histories: [:], now: now)
+
+        #expect(summary.distribution(for: .dictation).meanRetention == 1)
+    }
+
     // MARK: - The forecast
 
     @Test func theForecastCountsMeaningsOnTheDayTheyComeDue() {

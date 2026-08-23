@@ -38,9 +38,19 @@ struct SetSummary: Equatable {
 
         /// The requested averages, kept **beside** the distribution that qualifies them.
         var meanMastery: Float = 0
-        /// Mean chance of recall right now — what colours this exercise's ring. The owner's
-        /// call on TD-51's open question: rings always fill one way and colour carries the
-        /// bad news, because a reversed arc reads as an animation bug.
+        /// Mean chance of recall right now, over the **engaged** words only — what colours
+        /// this exercise's ring. The owner's call on TD-51's open question: rings always fill
+        /// one way and colour carries the bad news, because a reversed arc reads as an
+        /// animation bug.
+        ///
+        /// **Untouched words are excluded, not counted as safe.** An untouched strand reports
+        /// retention 1, so averaging over every word let a set of mostly-new words paint a
+        /// healthy ring while its practised half was overdue — the warning colour only
+        /// appearing once few words were left untouched, which is backwards. Checked against
+        /// `ankitects/anki`: retrievability is `Option`-typed there and every consumer guards
+        /// on `memory_state.is_some()`, so the "Card Retrievability" average does not
+        /// increment its divisor for a new card. Excluding them is the reference behaviour,
+        /// not an invention. Reported by review, PR #5.
         var meanRetention: Float = 1
     }
 
@@ -129,10 +139,14 @@ extension SetSummary {
             var distribution = Distribution()
             var masterySum: Float = 0
             var retentionSum: Float = 0
+            var engaged = 0
             for sense in senses {
                 let strand = progress[sense.id][exercise]
                 masterySum += strand.mastery
-                retentionSum += strand.retention
+                if strand.isEngaged {
+                    retentionSum += strand.retention
+                    engaged += 1
+                }
                 if !strand.isEngaged {
                     distribution.untouched += 1
                 } else if strand.mastery >= 1 {
@@ -142,7 +156,9 @@ extension SetSummary {
                 }
             }
             distribution.meanMastery = senses.isEmpty ? 0 : masterySum / Float(senses.count)
-            distribution.meanRetention = senses.isEmpty ? 1 : retentionSum / Float(senses.count)
+            // Nothing engaged means nothing at risk: a ring with no arc has no bad news to
+            // colour, and 0 would paint an untouched exercise as failing.
+            distribution.meanRetention = engaged == 0 ? 1 : retentionSum / Float(engaged)
             byExercise[exercise] = distribution
         }
 
