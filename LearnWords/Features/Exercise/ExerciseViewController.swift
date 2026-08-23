@@ -55,19 +55,13 @@ final class ExerciseViewController: UIViewController, ExerciseScreen {
             scope: scope)
 
         let surface: ExerciseAnswerSurface
-        let title: String
         switch exercise {
-        case .learning:
-            surface = SelfAssessedAnswerSurface()
-            title = NSLocalizedString("Learning", comment: "Exercise screen title")
-        case .dictation:
-            surface = TypedAnswerSurface()
-            title = NSLocalizedString("Dictation", comment: "Exercise screen title")
-        case .phonetics:
-            surface = SpokenAnswerSurface()
-            title = NSLocalizedString("Phonetic", comment: "Exercise screen title")
+        case .learning: surface = SelfAssessedAnswerSurface()
+        case .dictation: surface = TypedAnswerSurface()
+        case .phonetics: surface = SpokenAnswerSurface()
         }
-        return ExerciseViewController(session: session, answerSurface: surface, title: title)
+        return ExerciseViewController(session: session, answerSurface: surface,
+                                      title: exercise.title)
     }
 
     // MARK: - Views

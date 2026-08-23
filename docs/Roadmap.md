@@ -148,7 +148,9 @@ run — asset formats only Xcode 26 understands (TD-45), a hard link to Core Hap
     confirm screen TD-53 shipped, and it makes Tab natural for a macOS port. TD-53's parse
     stays, as the path for text that arrives whole. Open questions in
     [TechDebt](TechDebt.md) § TD-55.
-  - Remaining, in order: **TD-50** → **TD-52** → **TD-51** → **TD-55**, handed off in
+  - Remaining: **TD-55**, recorded but not built. The rest of the batch is in flight, one
+    branch each; every item's state is its heading in [TechDebt](TechDebt.md), which is
+    where to look rather than here. Scope and conventions are in
     [TASK-TD53-batch](TASK-TD53-batch.md) (self-contained: scope, the owner's UI asks, the
     build flag that must not be used, and the review loop). TD-50/51 also owe the settings
     switch for `requireProductionForLearned`; the slider minimum is done.

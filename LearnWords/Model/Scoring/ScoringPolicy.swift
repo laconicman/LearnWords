@@ -457,6 +457,13 @@ struct ProgressIndex {
 
     private let progress: [UUID: SenseProgress]
 
+    /// A view over values scored elsewhere — what a cache returns (TD-52), and what the set
+    /// summary is handed (TD-51). Kept next to the fetching initialiser so both shapes of
+    /// "where did these numbers come from" are visible in one place.
+    init(scored: [UUID: SenseProgress]) {
+        self.progress = scored
+    }
+
     init(lexicon: Lexicon, senses: [Sense],
          policy: ScoringPolicy = .default, now: Date = Date()) throws {
         let histories = try lexicon.history(ofSenses: senses.map(\.id))
