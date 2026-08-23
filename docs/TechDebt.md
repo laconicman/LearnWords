@@ -1648,10 +1648,12 @@ revisiting if a library ever gets large enough to feel it.
 (`Lexicon.didAppendToLog`, posted by `record` and `resetProgress`), the whole cache is
 dropped when another device changes the store **or when a scoring preference changes** —
 `masteryHorizonDays` reads the horizon slider on every use so that moving it takes effect at
-once, and caching the results put it back to doing nothing until the day turned. The two
-scoring preferences are compared rather than trusting the notification, which fires for every
-default in the process: a trip through Settings to change a speech rate should not cost a full
-replay on the way back. Everything expires when the day turns —
+once, and caching the results put it back to doing nothing until the day turned. The horizon is
+compared rather than trusting the notification, which fires for every default in the process:
+a trip through Settings to change a speech rate should not cost a full replay on the way back.
+Only the horizon, because nothing cached depends on `requireProductionForLearned` — `isLearned`
+takes it as an argument read at call time and `learnedCount` reads it live, so a stored
+`SenseProgress` is the same value whichever way that switch sits. Everything expires when the day turns —
 retention decays with the clock, so yesterday's scores answer a question nobody asked.
 `ProgressCacheTests` is about those four moments, not about speed: a stale ring tells the
 learner something untrue about their own memory, which is worse than a slow one.

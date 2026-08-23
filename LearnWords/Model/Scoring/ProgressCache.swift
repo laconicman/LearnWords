@@ -74,30 +74,29 @@ final class ProgressCache {
             name: UserDefaults.didChangeNotification, object: nil)
     }
 
-    /// The two preferences that are inputs to a score, as they were when it was computed.
+    /// The horizon, as it was when these scores were computed.
     ///
     /// `UserDefaults.didChangeNotification` fires for *any* write anywhere in the process —
-    /// the direction toggle, the speech-rate slider, a reminder time — none of which change a
-    /// single number here. Dropping everything on all of them was correctness-safe but meant
-    /// a trip through Settings cost a full replay on the way back. Comparing first keeps the
-    /// invalidation honest and rare. Reported by review, PR #4.
-    private struct ScoringPreferences: Equatable {
-        let horizonDays: Int
-        let requiresProduction: Bool
-
-        init() {
-            let defaults = LWUserDefaults.standard
-            horizonDays = defaults.maxKnownLevelPreference
-            requiresProduction = defaults.requireProductionForLearned
-        }
-    }
-
-    private var preferences = ScoringPreferences()
+    /// the direction toggle, the utterance-rate slider, a reminder time — none of which change
+    /// a single number here. Dropping everything on all of them was correctness-safe but meant
+    /// a trip through Settings cost a full replay on the way back.
+    ///
+    /// **Only the horizon is watched.** `requireProductionForLearned` was watched too, and did
+    /// not need to be: nothing cached depends on it. `isLearned` takes it as a defaulted
+    /// argument read at call time and `ProgressIndex.learnedCount` reads it live, so a stored
+    /// `SenseProgress` is the same value whichever way that switch sits — invalidating on it
+    /// forced a replay that changed no number. Reported by review, PR #4.
+    ///
+    /// The preference lives in the App-Group suite rather than `.standard`; the notification
+    /// fires for it in-process all the same, which `changingTheHorizonPreferenceDropsTheCache`
+    /// pins. Worth knowing if the preference store is ever wrapped in something that swallows
+    /// it.
+    private var horizonDays = LWUserDefaults.standard.maxKnownLevelPreference
 
     @objc private func scoringPreferencesMayHaveChanged() {
-        let current = ScoringPreferences()
-        guard current != preferences else { return }
-        preferences = current
+        let current = LWUserDefaults.standard.maxKnownLevelPreference
+        guard current != horizonDays else { return }
+        horizonDays = current
         invalidateAll()
     }
 
