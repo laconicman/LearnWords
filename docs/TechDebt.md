@@ -1660,6 +1660,14 @@ news. Checked against `ankitects/anki` rather than reasoned about: retrievabilit
 Retrievability" average does not increment its divisor for a new card — excluding unseen items
 is the reference behaviour. Reported by review, PR #5.
 
+**A reset word's two figures describe different spans, deliberately.** Retention counts
+answers given before a progress reset; the distribution beside it reflects only what survived,
+because the replay truncates at the reset marker. Review flagged the mismatch, and Anki makes
+the same split: `calculate_true_retention` scans the whole revlog and never checks
+`is_reset()`, while `reviews_for_fsrs` and `get_last_revlog_info` — the memory-state and
+training paths — break at exactly that marker. Answers given are a fact about the learner; a
+reset is a statement about the schedule. Documented rather than changed.
+
 **Debt closed on the way:** `SetDigest.dueByExercise` had no test — flagged by the TD-49
 review, left open by the TD-53 handoff, and read by this screen. Three tests now cover it,
 including that answering dictation does not quiet the flashcard queue.

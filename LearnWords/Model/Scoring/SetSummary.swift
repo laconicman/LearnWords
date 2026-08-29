@@ -70,6 +70,16 @@ struct SetSummary: Equatable {
     /// set-due-date, reset) and no-reschedule cram reviews, counting only real graded
     /// retrievals. Our equivalents are `.progressReset`, which `kind == .answer` filters, and
     /// `.skipped`, excluded below for the same reason.
+    ///
+    /// **And so does the treatment of a reset.** Retention counts answers from *before* a
+    /// progress reset, while the distribution beside it reflects only what survived — the
+    /// replay truncates at the reset marker. Those two figures therefore describe different
+    /// spans of history for a reset word, which looks like an inconsistency and is the same
+    /// split Anki makes: `calculate_true_retention` scans the whole revlog and never checks
+    /// `is_reset()`, while `reviews_for_fsrs` and `get_last_revlog_info` — the memory-state
+    /// and training paths — break at exactly that marker. Answers given are a fact about the
+    /// learner; a reset is a statement about the schedule. Verified against `ankitects/anki`
+    /// after review raised it, PR #5.
     struct Retention: Equatable {
         var youngCorrect = 0
         var youngTotal = 0

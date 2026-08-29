@@ -18,7 +18,21 @@ import Foundation
 @MainActor
 struct SetSummaryTests {
 
-    private let now = Date(timeIntervalSince1970: 1_700_000_000)
+    /// Midday GMT, deliberately. The forecast buckets by calendar day, so a `now` near
+    /// midnight lets a fractional offset land either side of it — 1_700_000_000 is 22:13 UTC,
+    /// and the day-index expectations below silently encoded a UTC+3 machine.
+    private let now = Date(timeIntervalSince1970: 1_699_963_200)
+
+    /// **Pinned to GMT, like `FSRSMemoryTests`.** The forecast buckets by calendar *day*, and
+    /// `now` here is 22:13 UTC — so with a machine calendar the fractional offsets below fall
+    /// on different days either side of midnight, and the suite passed in UTC+3 while failing
+    /// in UTC. A test about day arithmetic must not read the machine's clock settings.
+    /// Reported by review, PR #5.
+    private var calendar: Calendar {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        return calendar
+    }
 
     private func sense(_ name: String) -> Sense {
         Sense(id: UUID(), note: nil,
@@ -72,13 +86,13 @@ struct SetSummaryTests {
         let halfLearned = SetSummary(
             senses: halves,
             progress: progress(halves.map { ($0, strand(mastery: 0.5)) }),
-            histories: [:], now: now)
+            histories: [:], now: now, calendar: calendar)
         let polarised = SetSummary(
             senses: extremes,
             progress: progress(extremes.enumerated().map { index, sense in
                 (sense, index < 2 ? strand(mastery: 1) : strand(mastery: 0, engaged: false))
             }),
-            histories: [:], now: now)
+            histories: [:], now: now, calendar: calendar)
 
         let a = halfLearned.distribution(for: .learning)
         let b = polarised.distribution(for: .learning)
@@ -95,7 +109,7 @@ struct SetSummaryTests {
         let words = (0..<3).map { sense("w\($0)") }
         let summary = SetSummary(senses: words,
                                  progress: progress(words.map { ($0, strand(mastery: 1)) }),
-                                 histories: [:], now: now)
+                                 histories: [:], now: now, calendar: calendar)
 
         #expect(summary.distribution(for: .learning).learned == 3)
         #expect(summary.distribution(for: .dictation).untouched == 3,
@@ -120,7 +134,7 @@ struct SetSummaryTests {
         }
         let summary = SetSummary(senses: [practised] + untouched,
                                  progress: ProgressIndex(scored: scored),
-                                 histories: [:], now: now)
+                                 histories: [:], now: now, calendar: calendar)
 
         #expect(summary.distribution(for: .learning).meanRetention == 0.2,
                 "the one word anyone could forget is the one that colours the ring")
@@ -132,7 +146,7 @@ struct SetSummaryTests {
         let summary = SetSummary(
             senses: words,
             progress: progress(words.map { ($0, strand(mastery: 0, engaged: false)) }),
-            histories: [:], now: now)
+            histories: [:], now: now, calendar: calendar)
 
         #expect(summary.distribution(for: .dictation).meanRetention == 1)
     }
@@ -146,7 +160,7 @@ struct SetSummaryTests {
             senses: words,
             progress: progress(zip(words, due).map { ($0, strand(mastery: 0.5, dueIn: $1)) },
                                everyExercise: true),
-            histories: [:], now: now)
+            histories: [:], now: now, calendar: calendar)
 
         #expect(summary.dueForecast.count == SetSummary.forecastDays)
         #expect(summary.dueForecast[0] == 1)
@@ -162,7 +176,7 @@ struct SetSummaryTests {
             senses: words,
             progress: progress(zip(words, [-3.0, -40.0]).map { ($0, strand(mastery: 0.5, dueIn: $1)) },
                                everyExercise: true),
-            histories: [:], now: now)
+            histories: [:], now: now, calendar: calendar)
 
         #expect(summary.dueForecast[0] == 2)
         #expect(summary.dueNow == 2)
@@ -176,7 +190,7 @@ struct SetSummaryTests {
         let summary = SetSummary(
             senses: words,
             progress: progress(words.map { ($0, strand(mastery: 0, engaged: false)) }),
-            histories: [:], now: now)
+            histories: [:], now: now, calendar: calendar)
 
         #expect(summary.dueNow == 3, "a new set is all work waiting, not nothing")
         #expect(summary.dueForecast[1] == 0, "and it is waiting today, not tomorrow")
@@ -200,7 +214,7 @@ struct SetSummaryTests {
             effort: 0.4, answersByDirection: [.receptive: 1], isDue: false)
         let summary = SetSummary(senses: [word],
                                  progress: ProgressIndex(scored: [word.id: partly]),
-                                 histories: [:], now: now)
+                                 histories: [:], now: now, calendar: calendar)
 
         #expect(summary.dueNow == 1, "dictation and phonetics were never tried, so it is asked now")
         #expect(summary.dueForecast[7] == 0, "not filed on the one date it happens to have")
@@ -233,7 +247,7 @@ struct SetSummaryTests {
                 "precondition: the engaged-only reading says 'not due', which is the trap")
 
         let summary = SetSummary(senses: senses, progress: ProgressIndex(scored: scored),
-                                 histories: histories, now: now)
+                                 histories: histories, now: now, calendar: calendar)
 
         #expect(summary.dueNow == 1)
     }
@@ -248,7 +262,7 @@ struct SetSummaryTests {
             effort: 0.5, answersByDirection: [:], isDue: false)
         let summary = SetSummary(senses: [word],
                                  progress: ProgressIndex(scored: [word.id: everywhere]),
-                                 histories: [:], now: now)
+                                 histories: [:], now: now, calendar: calendar)
 
         #expect(summary.dueForecast[1] == 1)
     }
@@ -272,7 +286,7 @@ struct SetSummaryTests {
             histories: [young.id: [answer(.incorrect), answer(.correctVerbatim)],
                         mature.id: [answer(.correctVerbatim), answer(.correctVerbatim),
                                     answer(.correctVerbatim), answer(.incorrect)]],
-            now: now)
+            now: now, calendar: calendar)
 
         #expect(summary.retention.young == 0.5)
         #expect(summary.retention.mature == 0.75)
@@ -283,7 +297,7 @@ struct SetSummaryTests {
         let word = sense("bear")
         let summary = SetSummary(senses: [word],
                                  progress: progress([(word, strand(mastery: 0, engaged: false))]),
-                                 histories: [:], now: now)
+                                 histories: [:], now: now, calendar: calendar)
 
         #expect(summary.retention.young == nil)
         #expect(summary.retention.mature == nil)
@@ -297,7 +311,7 @@ struct SetSummaryTests {
         reset.outcome = nil
         let summary = SetSummary(
             senses: [word], progress: progress([(word, strand(mastery: 0.5))]),
-            histories: [word.id: [answer(.correctVerbatim), reset]], now: now)
+            histories: [word.id: [answer(.correctVerbatim), reset]], now: now, calendar: calendar)
 
         #expect(summary.retention.youngTotal == 1, "the marker is not an answer")
         #expect(summary.retention.young == 1)
@@ -309,7 +323,7 @@ struct SetSummaryTests {
         let word = sense("bear")
         let summary = SetSummary(
             senses: [word], progress: progress([(word, strand(mastery: 0.5))]),
-            histories: [word.id: [answer(.correctVerbatim), answer(.skipped)]], now: now)
+            histories: [word.id: [answer(.correctVerbatim), answer(.skipped)]], now: now, calendar: calendar)
 
         #expect(summary.retention.youngTotal == 1, "the skip is not an answer to grade")
         #expect(summary.retention.young == 1, "one attempt, one success")
@@ -323,7 +337,7 @@ struct SetSummaryTests {
             senses: words,
             progress: progress(words.map { ($0, strand(mastery: 0.5)) },
                                answers: [.receptive: 9, .productive: 1]),
-            histories: [:], now: now)
+            histories: [:], now: now, calendar: calendar)
 
         #expect(summary.answersByDirection[.receptive] == 9)
         #expect(summary.productiveShare == 0.1)
@@ -333,14 +347,14 @@ struct SetSummaryTests {
         let words = [sense("a")]
         let summary = SetSummary(senses: words,
                                  progress: progress(words.map { ($0, strand(mastery: 0)) }),
-                                 histories: [:], now: now)
+                                 histories: [:], now: now, calendar: calendar)
 
         #expect(summary.productiveShare == nil)
     }
 
     @Test func anEmptySetSummarisesToNothingRatherThanCrashing() {
         let summary = SetSummary(senses: [], progress: ProgressIndex(scored: [:]),
-                                 histories: [:], now: now)
+                                 histories: [:], now: now, calendar: calendar)
 
         #expect(summary.total == 0)
         #expect(summary.meanEffort == 0)
