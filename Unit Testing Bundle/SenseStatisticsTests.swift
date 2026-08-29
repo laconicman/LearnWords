@@ -110,7 +110,7 @@ struct SenseStatisticsTests {
         #expect(learning[0] == "Remembered for about 12 days")
         #expect(learning[1] == "Recall right now — 87%")
         #expect(learning[2] == "Due in about 3 days")
-        #expect(learning[3] == "Practised on — 4 days")
+        #expect(learning[3] == "Successful days — 4 days")
     }
 
     /// The two-day gate is the half of the learned rule a single fast answer cannot
@@ -205,6 +205,18 @@ struct SenseStatisticsTests {
 struct MemoryWordingTests {
 
     private let now = Date(timeIntervalSince1970: 1_700_000_000)
+
+    /// The unit changes at 30, 90 and 365 days; the interior values above say nothing about
+    /// what happens *at* those edges, which is where an off-by-one would live. Reported by
+    /// review, PR #3.
+    @Test func theUnitChangesExactlyWhereItSaysItDoes() {
+        #expect(MemoryWording.horizon(days: 29) == "Remembered for about 29 days")
+        #expect(MemoryWording.horizon(days: 30) == "Remembered for about 4 weeks")
+        #expect(MemoryWording.horizon(days: 89) == "Remembered for about 12 weeks")
+        #expect(MemoryWording.horizon(days: 90) == "Remembered for about 3 months")
+        #expect(MemoryWording.horizon(days: 364) == "Remembered for about 11 months")
+        #expect(MemoryWording.horizon(days: 365) == "Remembered for about 1 year")
+    }
 
     /// Approximate on purpose: stability is a fitted parameter of a model of a person, and
     /// "12.4 days" claims a precision it does not have.

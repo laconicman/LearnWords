@@ -123,7 +123,12 @@ final class SenseStatisticsViewController: UITableViewController {
         rows.append(Row(NSLocalizedString("Recall right now", comment: "Statistics"),
                         detail: percent(strand.retention)))
         rows.append(Row(MemoryWording.due(strand.dueAt, now: now)))
-        rows.append(Row(NSLocalizedString("Practised on", comment: "Statistics; days"),
+        // **"Successful days", not "Practised on".** The number is days carrying a *success*,
+        // and a strand becomes engaged on its first answer however that answer went — so a
+        // word tried once and got wrong read "Practised on — never", which is both wrong and
+        // discouraging. The label now says what the number counts, and the footer below
+        // explains why it matters. Reported by review, PR #3.
+        rows.append(Row(NSLocalizedString("Successful days", comment: "Statistics; days"),
                         detail: dayCount(strand.successfulDays)))
 
         return Section(title: exercise.title,

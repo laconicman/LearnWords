@@ -570,6 +570,23 @@
         }
       }
     },
+    "Successful days" : {
+      "comment" : "Statistics; days",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Días con acierto"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дней с успехом"
+          }
+        }
+      }
+    },
     "These are separate meanings" : {
       "comment" : "Row",
       "localizations" : {
