@@ -84,7 +84,7 @@ final class WordSetsTableViewController: UITableViewController, UIDocumentPicker
     /// `ScoringPolicy`'s mastery reaching the horizon.
     private func summary(of set: WordSet) -> String {
         let learned = (try? lexicon.senses(in: set.id))
-            .flatMap { try? ProgressIndex(lexicon: lexicon, senses: $0) }?
+            .flatMap { try? ProgressCache.shared.index(for: $0, in: lexicon) }?
             .learnedCount ?? 0
 
         return NSLocalizedString("Total ", comment: "Label total words")
