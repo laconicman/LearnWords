@@ -49,6 +49,54 @@ struct ReviewScheduleTests {
         }
     }
 
+    // MARK: - Per-exercise due counts (TD-49 review debt, closed by TD-51)
+
+    /// Since TD-49 each exercise carries its own schedule, so the count that matters is the
+    /// one for the exercise about to be started. Answering *dictation* must not quiet the
+    /// flashcard queue.
+    ///
+    /// Flagged by the review of PR #1 and left untested by the TD-53 handoff; the summary
+    /// screen reads these counts, so it is closed here.
+    @Test func answeringOneExerciseLeavesTheOthersDue() throws {
+        let lexicon = makeLexicon()
+        let set = try stock(lexicon, count: 3)
+        try practiseAll(lexicon, set, at: Date())
+
+        let digest = try #require(try ReviewSchedule(lexicon: lexicon)
+            .sets.first { $0.setID == set.id })
+
+        #expect(digest.dueCount(for: Exercise.dictation) == 0, "dictation was just answered")
+        #expect(digest.dueCount(for: Exercise.learning) == 3, "flashcards were never practised")
+        #expect(digest.dueCount(for: Exercise.phonetics) == 3)
+    }
+
+    /// `dueCount` counts only *engaged* strands, so reminders can fall silent; the chooser
+    /// needs the other number, or it reads "nothing due" beside three full queues.
+    @Test func theHeadlineCountsAnyExerciseWhileRemindersCountOnlyEngagedOnes() throws {
+        let lexicon = makeLexicon()
+        let set = try stock(lexicon, count: 3)
+        try practiseAll(lexicon, set, at: Date())
+
+        let digest = try #require(try ReviewSchedule(lexicon: lexicon)
+            .sets.first { $0.setID == set.id })
+
+        #expect(digest.dueCount == 0, "nothing engaged is waiting, so reminders stay quiet")
+        #expect(digest.anyExerciseDueCount == 3, "but every meaning has two untried exercises")
+    }
+
+    /// A date quoted about one exercise must come from that exercise.
+    @Test func eachExerciseQuotesItsOwnNextDate() throws {
+        let lexicon = makeLexicon()
+        let set = try stock(lexicon, count: 2)
+        try practiseAll(lexicon, set, at: Date())
+
+        let digest = try #require(try ReviewSchedule(lexicon: lexicon)
+            .sets.first { $0.setID == set.id })
+
+        #expect(digest.nextDueAt(for: Exercise.dictation) != nil, "answered, so it has a future date")
+        #expect(digest.nextDueAt(for: Exercise.learning) == nil, "never practised, so it is due now")
+    }
+
     // MARK: - The schedule
 
     /// A word never answered is waiting, not "not yet due".
@@ -280,9 +328,9 @@ struct SetDigestPerExerciseTests {
         let schedule = try ReviewSchedule(sets: [set], lexicon: lexicon)
         let digest = try #require(schedule.sets.first)
 
-        #expect(digest.dueCount(for: .dictation) == 0, "just answered")
-        #expect(digest.dueCount(for: .learning) == 1, "never asked as a flashcard")
-        #expect(digest.dueCount(for: .phonetics) == 1)
+        #expect(digest.dueCount(for: Exercise.dictation) == 0, "just answered")
+        #expect(digest.dueCount(for: Exercise.learning) == 1, "never asked as a flashcard")
+        #expect(digest.dueCount(for: Exercise.phonetics) == 1)
         #expect(digest.anyExerciseDueCount == 1,
                 "the headline must not read 'nothing due' while two exercises are waiting")
         #expect(digest.dueCount == 0,
@@ -300,7 +348,7 @@ struct SetDigestPerExerciseTests {
         try session.record(.correctVerbatim)
 
         let digest = try #require(try ReviewSchedule(sets: [set], lexicon: lexicon).sets.first)
-        #expect(digest.nextDueAt(for: .dictation) != nil, "answered, so it has a next date")
-        #expect(digest.nextDueAt(for: .learning) == nil, "due now, so nothing is 'upcoming'")
+        #expect(digest.nextDueAt(for: Exercise.dictation) != nil, "answered, so it has a next date")
+        #expect(digest.nextDueAt(for: Exercise.learning) == nil, "due now, so nothing is 'upcoming'")
     }
 }

@@ -1647,7 +1647,7 @@ its rows cut off. Tapping the preview opens the full screen, which is what a pre
 promises, and UIKit clamps tall previews as a matter of course. A shorter preview would mean
 a second layout, which is not worth it before TD-51 decides what a summary looks like.
 
-## TD-51 — No set-level summary
+## TD-51 — No set-level summary — **resolved (2026-08-12)**
 
 **Discharge:** a summary screen built on distribution rather than means — stacked
 untouched/learning/learned bar, a 14-day due forecast (honest forgetting, not streaks),
@@ -1655,6 +1655,92 @@ true retention split young/mature, effort totals, and the receptive/productive g
 requested averages shown *beside* the distribution, never instead of it (a mean of 0.5
 describes two opposite sets). Reference implementation is Anki's stats screen.
 [MasteryAndProgressUI](MasteryAndProgressUI.md) §3. No schema change.
+
+## TD-51 resolution note (2026-08-12)
+
+Implemented. Twenty-three new tests, 360 green when this branch was written and 386 after
+TD-50 and TD-52 merged into it. No schema change.
+
+**Distribution first, averages beside it.** `SetSummary` reports, per exercise, how many
+meanings are untouched / learning / learned — plus the mean the owner asked for, printed
+next to the distribution that qualifies it rather than instead of it. A mean of 0.5
+describes both fifty half-learned words and twenty-five mastered beside twenty-five
+untouched, and `theSameMeanDescribesTwoOppositeSets` is the first test in the file for that
+reason.
+
+**Pivoted by exercise**, which is only meaningful because TD-49 made memory per exercise: a
+set can be solid as flashcards and untouched in dictation, and one bar for the set says
+neither.
+
+**The open question is settled: rings fill one way and colour carries the bad news** (owner,
+2026-08-12). A ring running backwards for a losing set reads as an animation bug on first
+sight, and `ProgressRing` already blends toward red as retention falls — the same message
+without a new convention to learn.
+
+**True retention is computed from the log, not from the score**, because it is a statement
+about answers already given: a word answered wrong ten times and right once today scores
+exactly like one answered right once, and those are not the same learner. Split young/mature
+at 21 days of stability, Anki's own boundary.
+
+**One view for both charts.** `BarStrip` laid across is a distribution; laid along it is a
+forecast. Two views would have been two sets of rounding and two answers to what a zero
+looks like. Plain layers rather than a charting dependency — it is all rectangles, and it
+has to run at the 12.1 floor.
+
+**The gesture matches TD-50.** Long press on a word shows how that word stands; long press
+on a set shows how the set does. Trailing swipe was unavailable here for the same reason as
+there — rename and delete already own it.
+
+**What the tests did not catch.** The forecast read only `dueAt`, which is `nil` for a
+meaning never practised, so a new set reported *"Nothing due"* beside nine waiting words —
+the same lie PR #1's review found in the chooser, where `dueCount` counted only engaged
+strands. Found by opening the screen on the device. Fixed, and pinned by
+`meaningsNeverPractisedAreDueToday`.
+
+**Four things review caught.** A **skip** was counted as a wrong answer — `outcome
+.skipped.isPositive` is `false`, so passing over a question lowered the set's accuracy, while
+everywhere else in the model a skip is excluded rather than penalised. The forecast filed a
+**partly practised** meaning on its Learning date even though its other two exercises were
+untried and would be asked at once — the same screen was calling them "untouched" in the row
+above. The first fix read `SenseProgress.isDue`, which is `strands.isEmpty ||
+strands.values.contains(where: \.isDue)` over *engaged* strands only, so it changed nothing in
+production and the test passed only because its fixture set `isDue: true` by hand. It now asks
+every exercise — `Exercise.allCases.contains { progress[$0].isDue }`, subscripting so a missing
+strand reads as `.untouched` and therefore due — which is the same "any exercise" reading
+`ReviewSchedule.anyExerciseDueCount` uses. Pinned twice: once on values, once end to end
+through `ScoringPolicy`. The summary **fetched the log twice** per long
+press, once inside `ProgressIndex` and once for retention; it now fetches once and replays
+into `ProgressIndex(scored:)`. And the **maturity split is an approximation of Anki's, not
+Anki's** — it buckets every answer by the meaning's *current* stability, so a well-established
+word's early struggles are counted as mature and the young bucket empties. Checked against
+`ankitects/anki` rather than asserted: `calculate_true_retention` buckets each review by
+`revlog.last_interval`, the interval the card held *before that review*, so its split is fully
+historical; the 21-day threshold is `MATURE_IVL`. Its *exclusions* match ours by principle —
+Anki counts only rated retrievals, dropping manual reschedules and no-reschedule cram reviews,
+where we drop `.progressReset` and `.skipped`. Doing the bucketing properly means reading
+stability per answer out of a replay; the docstring now says what this does rather than what
+Anki does.
+
+**The ring's colour excludes untouched words.** An untouched strand reports retention 1, so
+averaging over every word in the set let a mostly-new set paint a healthy ring while its
+practised half was overdue — the warning arriving only once few words were left untouched,
+which is exactly backwards for a design whose whole premise is that colour carries the bad
+news. Checked against `ankitects/anki` rather than reasoned about: retrievability there is
+`Option`-typed, every consumer guards on `memory_state.is_some()`, and the "Card
+Retrievability" average does not increment its divisor for a new card — excluding unseen items
+is the reference behaviour. Reported by review, PR #5.
+
+**A reset word's two figures describe different spans, deliberately.** Retention counts
+answers given before a progress reset; the distribution beside it reflects only what survived,
+because the replay truncates at the reset marker. Review flagged the mismatch, and Anki makes
+the same split: `calculate_true_retention` scans the whole revlog and never checks
+`is_reset()`, while `reviews_for_fsrs` and `get_last_revlog_info` — the memory-state and
+training paths — break at exactly that marker. Answers given are a fact about the learner; a
+reset is a statement about the schedule. Documented rather than changed.
+
+**Debt closed on the way:** `SetDigest.dueByExercise` had no test — flagged by the TD-49
+review, left open by the TD-53 handoff, and read by this screen. Three tests now cover it,
+including that answering dictation does not quiet the flashcard queue.
 
 ## TD-52 — The progress cache ProgressModel deferred is now due — **resolved (2026-08-12)**
 
