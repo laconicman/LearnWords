@@ -159,7 +159,7 @@ run — asset formats only Xcode 26 understands (TD-45), a hard link to Core Hap
     forecast, true retention split young/mature from the log, effort, and the
     receptive/productive gap. Rings fill one way and colour carries the bad news (owner's
     call on the open question). Long press a set, as TD-50 does a word. Closes the
-    `dueByExercise` test debt from the TD-49 review. 360 tests green.
+    `dueByExercise` test debt from the TD-49 review. 386 tests green.
   - **TD-52 — done (2026-08-12).** Measured before built: a 1,000-meaning library cost
     ~370 ms to score and was paying it on *every* appearance of the word list; 2,000 meanings
     cost ~1.9 s. `ProgressCache` scores each meaning once per change instead, in memory —

@@ -1658,7 +1658,8 @@ describes two opposite sets). Reference implementation is Anki's stats screen.
 
 ## TD-51 resolution note (2026-08-12)
 
-Implemented, 360 tests green (was 337). No schema change.
+Implemented. Twenty-three new tests, 360 green when this branch was written and 386 after
+TD-50 and TD-52 merged into it. No schema change.
 
 **Distribution first, averages beside it.** `SetSummary` reports, per exercise, how many
 meanings are untouched / learning / learned — plus the mean the owner asked for, printed
