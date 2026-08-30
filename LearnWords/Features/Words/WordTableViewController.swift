@@ -398,21 +398,143 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
             .filter { $0 is UILongPressGestureRecognizer }
             .forEach(cell.removeGestureRecognizer)
 
-        let longPress = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress(_:)))
-        longPress.minimumPressDuration = 0.3
-        cell.addGestureRecognizer(longPress)
+        // **Only below iOS 13.** From 13 the same press opens a context menu, and two
+        // recognisers for one gesture means whichever fires first wins (TD-50).
+        if #available(iOS 13, *) {} else {
+            let longPress = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress(_:)))
+            longPress.minimumPressDuration = 0.3
+            cell.addGestureRecognizer(longPress)
+        }
         cell.isUserInteractionEnabled = true
+
+        // **A gesture VoiceOver cannot make.** A long press is invisible to it, and the
+        // context menu is reachable only through the rotor, so both destinations are named
+        // here as well (docs/MasteryAndProgressUI.md §2.1).
+        cell.accessibilityCustomActions = [
+            SenseAction(name: NSLocalizedString("Statistics", comment: "Context menu action"),
+                        senseID: sense.id,
+                        target: self, selector: #selector(showStatisticsForAccessibleRow(_:))),
+            SenseAction(name: String(format: NSLocalizedString("Look up %@",
+                                                               comment: "Button label; a word"),
+                                     sense.terms(in: pair.secondary).first?.text ?? ""),
+                        senseID: sense.id,
+                        target: self, selector: #selector(lookUpAccessibleRow(_:))),
+        ]
 
         return cell
     }
 
+    /// The iOS 12 path: the same press, opening the same screen.
     @objc private func handleLongPress(_ gestureRecognizer: UILongPressGestureRecognizer) {
-        guard gestureRecognizer.state == .began else { return }
+        guard gestureRecognizer.state == .began, !tableView.isEditing else { return }
         let touchPoint = gestureRecognizer.location(in: tableView)
         guard let indexPath = tableView.indexPathForRow(at: touchPoint),
-              let cell = tableView.cellForRow(at: indexPath) as? WordTableViewCell,
-              let word = cell.leftTextLabel?.text else { return }
-        lookUp(term: word, sender: self, location: touchPoint)
+              indexPath.row < rows.count else { return }
+        showStatistics(for: rows[indexPath.row])
+    }
+
+    // MARK: - Per-term statistics (TD-50)
+
+    /// Everything the log knows about one meaning, which the ring can only summarise.
+    ///
+    /// Built from the snapshot the table is already drawing rather than from a fresh fetch:
+    /// the screen is a reading of the log at the moment it was opened, and reading it twice
+    /// would let the row and its detail disagree.
+    /// - Parameter offersLookUp: `false` for a context-menu preview, which is not
+    ///   interactive — the row would be pure extra height, and height is the clipping problem
+    ///   on that path. The menu offers the action beside the preview instead.
+    private func makeStatistics(for sense: Sense,
+                                offersLookUp: Bool) -> SenseStatisticsViewController {
+        SenseStatisticsViewController(
+            sense: sense,
+            progress: progress?[sense.id] ?? .unseen,
+            languages: languages,
+            offersLookUp: offersLookUp)
+    }
+
+    private func showStatistics(for sense: Sense) {
+        navigationController?.pushViewController(
+            makeStatistics(for: sense, offersLookUp: true), animated: true)
+    }
+
+    /// An accessibility action that remembers *which meaning* it belongs to.
+    ///
+    /// Not an index path: cells are reused and rows are re-sorted by search, so a captured
+    /// position is stale the moment the table reloads while an identity is not. UIKit gives
+    /// the handler nothing but the action itself, so the action has to carry it.
+    private final class SenseAction: UIAccessibilityCustomAction {
+        let senseID: UUID
+
+        init(name: String, senseID: UUID, target: Any?, selector: Selector) {
+            self.senseID = senseID
+            super.init(name: name, target: target, selector: selector)
+        }
+    }
+
+    private func sense(of action: UIAccessibilityCustomAction) -> Sense? {
+        guard let action = action as? SenseAction else { return nil }
+        return rows.first { $0.id == action.senseID }
+    }
+
+    @objc private func showStatisticsForAccessibleRow(_ action: UIAccessibilityCustomAction) -> Bool {
+        guard let sense = sense(of: action) else { return false }
+        showStatistics(for: sense)
+        return true
+    }
+
+    @objc private func lookUpAccessibleRow(_ action: UIAccessibilityCustomAction) -> Bool {
+        guard let word = sense(of: action)?.terms(in: languages.secondary).first?.text
+        else { return false }
+        lookUp(term: word, sender: self)
+        return true
+    }
+
+    /// The platform answer for "show me more about this item" (iOS 13+), and the reason the
+    /// gesture is a long press rather than a swipe: trailing swipe is taken by rename and
+    /// delete, and a swipe acts on a row rather than inspecting it.
+    @available(iOS 13, *)
+    override func tableView(_ tableView: UITableView,
+                            contextMenuConfigurationForRowAt indexPath: IndexPath,
+                            point: CGPoint) -> UIContextMenuConfiguration? {
+        guard !tableView.isEditing else { return nil }
+        return UIContextMenuConfiguration(
+            identifier: nil,
+            // The statistics *are* the preview. Choosing this gesture over a sheet was for
+            // exactly this: it can show something, not only offer actions.
+            previewProvider: { [weak self] in
+                guard let self, indexPath.row < self.rows.count else { return nil }
+                return self.makeStatistics(for: self.rows[indexPath.row], offersLookUp: false)
+            },
+            actionProvider: { [weak self] _ in
+                guard let self, indexPath.row < self.rows.count,
+                      let word = self.rows[indexPath.row]
+                          .terms(in: self.languages.secondary).first?.text
+                else { return nil }
+                return UIMenu(title: "", children: [
+                    UIAction(title: String(format: NSLocalizedString("Look up %@",
+                                                                     comment: "Button label; a word"),
+                                           word),
+                             image: .systemImage("character.book.closed")) { [weak self] _ in
+                        guard let self else { return }
+                        lookUp(term: word, sender: self)
+                    },
+                ])
+            })
+    }
+
+    /// Tapping the preview opens the real screen, which is what a preview promises.
+    @available(iOS 13, *)
+    override func tableView(_ tableView: UITableView,
+                            willPerformPreviewActionForMenuWith configuration: UIContextMenuConfiguration,
+                            animator: UIContextMenuInteractionCommitAnimating) {
+        guard let preview = animator.previewViewController as? SenseStatisticsViewController,
+              let sense = rows.first(where: { $0.id == preview.senseID }) else { return }
+        // Not the preview instance: it was built without the lookup row, which the real
+        // screen should have. Rebuilt rather than mutated, so the two paths differ in exactly
+        // one argument.
+        animator.addCompletion { [weak self] in
+            self?.showStatistics(for: sense)
+        }
     }
 
     // MARK: - Table view delegate
