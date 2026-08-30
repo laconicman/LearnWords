@@ -307,14 +307,14 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
 
     private func reload() {
         senses = (try? library.selectedSenses()) ?? []
-        progress = try? ProgressIndex(lexicon: lexicon, senses: senses)
+        progress = try? ProgressCache.shared.index(for: senses, in: lexicon)
         if isSearching { filterRows(for: searchController.searchBar.text ?? "") }
         tableView.reloadData()
     }
 
     /// Reads one row's state back without disturbing the rest of the table.
     private func refreshRows(_ indexPaths: [IndexPath]) {
-        progress = try? ProgressIndex(lexicon: lexicon, senses: senses)
+        progress = try? ProgressCache.shared.index(for: senses, in: lexicon)
         if #available(iOS 15.0, *) {
             tableView.reconfigureRows(at: indexPaths)
         } else {

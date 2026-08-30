@@ -338,6 +338,14 @@ iOS 15 and gains Swift Concurrency, `context.perform` async and the actor-based
 confinement recorded in [Design](Design.md) — the whole list of things currently deferred
 "until the floor allows it". See TD-40 and the concurrency decision.
 
+**The floor now has a measured price** (2026-08-12). TD-52 timed the cost of scoring a
+library and every millisecond of it is *main-thread* time: ~370 ms for 1,000 meanings, ~1.9 s
+for 2,000. Reads are pinned to the main queue because `async` does not exist at 12.1 —
+`LWPersistence.write`'s own comment says so — so the alternatives are a callback twin of the
+read API (TD-56) or raising the floor and moving the whole of `Lexicon` to `context.perform`
+async, which is the same work done once and properly. This is the first item where the floor
+costs the *user* something rather than costing the project verification effort.
+
 Xcode 26 ships no simulator below iOS 15 and won't connect sub-15 devices, so the iOS 12
 branch (`AppDelegate` window + `application(_:open:)`, `UIMainStoryboardFile`) **cannot be
 run or tested** on the current toolchain. **Cost:** the legacy path can regress silently;
@@ -1648,7 +1656,7 @@ requested averages shown *beside* the distribution, never instead of it (a mean 
 describes two opposite sets). Reference implementation is Anki's stats screen.
 [MasteryAndProgressUI](MasteryAndProgressUI.md) §3. No schema change.
 
-## TD-52 — The progress cache ProgressModel deferred is now due
+## TD-52 — The progress cache ProgressModel deferred is now due — **resolved (2026-08-12)**
 
 [ProgressModel](ProgressModel.md) agreed per-word cached index values "in principle,
 mechanism negotiable", deferring the mechanism to implementation; the word list already
@@ -1656,6 +1664,113 @@ replays the log per row, and TD-51's summary would replay it for every sense in 
 every appearance. **Discharge:** measure first on a realistic library, then cache
 per-sense progress invalidated on event append and recomputed off the cell path. Decide
 before shipping the summary, not after. Not a schema commitment.
+
+## TD-52 resolution note (2026-08-12)
+
+Measured first, then cached. Thirteen new tests, 350 green when this branch was written and
+366 after TD-50 merged into it. No schema change.
+
+### What it cost, before
+
+`ProgressCostTests` seeds a library and times `ProgressIndex`, attaching each sample to the
+result bundle. One run, iPhone 17 Pro simulator / iOS 26.5, Debug, `ScoringPolicy.version` 2
+— every row below comes from that single run, and every row is produced by a case in the
+suite, so it can be reproduced:
+
+| Library | Events | Scoring one pass |
+|---|---|---|
+| 250 meanings × 12 | 3,000 | 81 ms |
+| 300 meanings × 8 | 2,400 | 67 ms |
+| 1,000 meanings × 12 | 12,000 | 369 ms |
+| 100 meanings × 100 | 10,000 | 288 ms |
+| 2,000 meanings × 20 | 40,000 | 1,860 ms |
+
+Linear in *events*, not in meanings — the 100 × 100 case costs about what 1,000 × 12 does.
+That is the good news; the bad news is the constant. The word list reloads in
+`viewDidAppear`, so a **1,000-word library paid ~370 ms every time the tab was opened**, and
+TD-51's summary would have paid it again.
+
+(An earlier draft of this note headlined "~180 ms at 500 × 12" from a run whose case has
+since been resized to 300 × 8 as the always-on guard. No test produces a 500 × 12 figure, so
+quoting one was unreproducible; the 1,000 × 12 row above is measured. Reported by review,
+PR #4.)
+
+Two findings shaped the fix:
+
+* **Release is barely faster than Debug** (161 ms vs 179 ms at 500 × 12). The cost is not
+  arithmetic waiting for an optimiser.
+* **The fetch and the replay are comparable** — 250 ms vs 222 ms at 1,000 × 12, and the
+  ratio wanders between about 1.1× and 1.4× from run to run. Neither half can be optimised
+  away, which argues for not doing the work at all when nothing has changed.
+
+### The cache
+
+`ProgressCache` keeps `SenseProgress` per meaning **in memory** and replays only what it
+does not already know, fetching the misses in one pass. A warm screen does no work.
+
+*In memory, not in the store*, because a persisted cache would have to record
+`ScoringPolicy.version`, live in the CloudKit schema, and sync — a migration and a sync
+surface for a number that is always re-derivable. `ProgressModel` said "not a schema
+commitment", and this keeps that. A cold start still pays once, which is the case worth
+revisiting if a library ever gets large enough to feel it.
+
+*Correctness before speed.* An entry is dropped when the log grows for that meaning
+(`Lexicon.didAppendToLog`, posted by `record` and `resetProgress`), the whole cache is
+dropped when another device changes the store **or when a scoring preference changes** —
+`masteryHorizonDays` reads the horizon slider on every use so that moving it takes effect at
+once, and caching the results put it back to doing nothing until the day turned. The horizon is
+compared rather than trusting the notification, which fires for every default in the process:
+a trip through Settings to change a speech rate should not cost a full replay on the way back.
+Only the horizon, because nothing cached depends on `requireProductionForLearned` — `isLearned`
+takes it as an argument read at call time and `learnedCount` reads it live, so a stored
+`SenseProgress` is the same value whichever way that switch sits. Everything expires when the day turns —
+retention decays with the clock, so yesterday's scores answer a question nobody asked.
+`ProgressCacheTests` is about those four moments, not about speed: a stale ring tells the
+learner something untrue about their own memory, which is worse than a slow one.
+
+**It is not on `Library`**, where it belongs by subject. `Library.swift` is compiled into
+the widget extension, which has no scoring layer; putting it there would drag all of scoring
+into an extension that only wants a word count. `ProgressCache.shared`, until TD-5 lands
+injection.
+
+### Left open: `ReviewSchedule` does not read through the cache
+
+Only the three per-appearance *screens* were routed through `ProgressCache`. The exercise
+chooser still calls `setDigest()`, which builds a whole `ReviewSchedule`, which constructs its
+own uncached `ProgressIndex` over the same senses on every appearance — so the chooser pays the
+full replay TD-52 measured, and now mixes freshly computed due counts with cached learned
+counts in one sentence. Reported by review, PR #4.
+
+Deliberately out of scope, because it is not a one-liner: `ReviewSchedule` pins its own `now`
+and `policy`, and the reminder scheduler uses it too. A cache keyed on neither would be
+answering a different question than the caller asked, which is exactly the class of bug a cache
+is supposed to avoid. **Decide before anything else is built on it** — the summary (TD-51)
+already computes its own index from one fetch rather than through the cache, and a third
+convention would be one too many.
+
+### On the benchmarks themselves
+
+They are opt-in — `TEST_RUNNER_LW_BENCH=1` — with one small guard left in the default suite
+to catch a per-row fetch sneaking back in. Left running by default they made
+`ExerciseScreenAppearanceTests`, which waits on a real 0.5 s animation, flaky under load.
+
+**Each measurement is an attachment**, not a `print` and not a deliberate failure. Swift
+Testing does not forward standard output to the `xcodebuild` log, and failing a test to read
+its numbers is the workaround [ST-0009](https://github.com/swiftlang/swift-evolution/blob/main/proposals/testing/0009-attachments.md)
+was written to retire — it lies in CI and has to be re-broken for every fresh reading. Each
+sample records `ScoringPolicy.version` alongside the number, so a CSV from a run under
+different scoring rules cannot be mistaken for a current one. The fetch-versus-replay ratio
+is an `Issue.record(severity: .warning)`: worth a human's glance, not worth failing CI over.
+
+```
+TEST_RUNNER_LW_BENCH=1 xcodebuild test -project LearnWords.xcodeproj -scheme LearnWords \
+  -destination 'id=<sim>' -resultBundlePath /tmp/td52.xcresult \
+  -only-testing:"Unit Testing Bundle/ProgressCostTests"
+xcrun xcresulttool export attachments --path /tmp/td52.xcresult --output-path /tmp/out
+```
+
+Note the explicit `-resultBundlePath`: picking the newest bundle out of DerivedData with
+`ls -t` is a documented way to read the wrong run, and this project has been bitten by it.
 
 ## TD-53 — Comma-separated entry creates one meaning, not several — **resolved (2026-08-11)**
 
@@ -1887,3 +2002,42 @@ elsewhere.
   than both popping.
 
 No schema change: synonyms and senses are what the model already stores.
+
+## TD-56 — Scoring the library is main-thread work (2026-08-12)
+
+TD-52 measured what replaying the review log costs and then stopped paying it twice. What it
+did **not** change is *where* the remaining pass runs: `Lexicon`'s reads are pinned to the
+main queue, so a cold `ProgressIndex` is built on the thread that draws the UI.
+
+| Library | Events | Main-thread time |
+|---|---|---|
+| 1,000 meanings × 12 | 12,000 | 369 ms |
+| 2,000 meanings × 20 | 40,000 | 1,860 ms |
+
+`ProgressCache` (TD-52, immediately above) removes the *repetition* — a warm screen does no
+work — so this is a cold-start and first-appearance cost, not a per-appearance one. It is nonetheless a hitch on
+the thread that can least afford one, and it grows with the library.
+
+**Why it is pinned.** `Lexicon.viewContext` asserts `dispatchPrecondition(.onQueue(.main))`,
+and every read is synchronous because `async` does not back-deploy below iOS 13 while the
+floor is 12.1 (see TD-8). The precondition is doing its job — it caught a test calling a read
+off the main actor during TD-52 and failed deterministically in setup rather than corrupting
+anything.
+
+**The hard part is already done.** No `Lexicon` method returns a managed object: callers get
+`Sense`, `Term`, `WordSet` and `ReviewEvent` value types, and identity crosses every boundary
+as a `UUID` that each context re-resolves — stronger than `NSManagedObjectID`, which is
+store-scoped and has a temporary/permanent state, and which CloudKit does not sync. Passing a
+managed object between queues is therefore structurally impossible here, which is exactly the
+property that makes background reads safe to add.
+
+**Discharge, at the current floor:** give `ProgressCache` a completion-handler path that
+replays the misses on a private-queue context and calls back on main. It already owns "score
+what I do not know", the screens already tolerate arriving-later data (the word list reloads
+on appearance), and no `async` is required. **Discharge, if the floor rises:** do it once and
+properly — `Lexicon` reads become `async` over `context.perform`, and the callback twin never
+gets written. Worth deciding which before building either.
+
+Not urgent: a library large enough to feel this does not exist yet, and the seed is nine
+words. Recorded now because the measurement exists now, and because it is the first concrete
+user-facing cost of the 12.1 floor.
