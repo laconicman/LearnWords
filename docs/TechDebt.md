@@ -1667,7 +1667,8 @@ before shipping the summary, not after. Not a schema commitment.
 
 ## TD-52 resolution note (2026-08-12)
 
-Measured first, then cached. 366 tests green (was 337), no schema change.
+Measured first, then cached. Thirteen new tests, 350 green when this branch was written and
+366 after TD-50 merged into it. No schema change.
 
 ### What it cost, before
 
