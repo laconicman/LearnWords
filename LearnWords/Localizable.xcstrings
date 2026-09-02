@@ -3502,6 +3502,94 @@
           }
         }
       }
+    },
+    "SuccessfulDaysGate" : {
+      "comment" : "Statistics; footer",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Needs a success on %d separate day to count as learned."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Needs successes on %d separate days to count as learned."
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Necesita un acierto en %d día distinto para contar como aprendida."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Necesita aciertos en %d días distintos para contar como aprendida."
+                }
+              }
+            }
+          }
+        },
+        "ru" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Чтобы считаться выученным, нужен успех в %d разный день."
+                }
+              },
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Чтобы считаться выученным, нужны успехи в %d разных дня."
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Чтобы считаться выученным, нужны успехи в %d разных дней."
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Чтобы считаться выученным, нужны успехи в %d разных дней."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Successful days needed" : {
+      "comment" : "setting",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Días con acierto necesarios"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нужно успешных дней"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

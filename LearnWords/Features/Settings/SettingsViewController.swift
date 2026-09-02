@@ -67,6 +67,17 @@ final class SettingsViewController: UITableViewController {
         value: Float(prefs.maxKnownLevelPreference)
     ) { [weak self] in self?.prefs.maxKnownLevelPreference = Int($0.rounded()) }
 
+    /// The other half of the learned rule, and the half a learner can feel: how many
+    /// separate days must carry a success before a meaning is called learned. The horizon
+    /// above says *how long* it should stick; this says *how much evidence* is enough.
+    private lazy var successfulDaysCell = SliderCell(
+        title: NSLocalizedString("Successful days needed", comment: "setting"),
+        minimum: Float(ScoringPolicy.minimumSuccessfulDaysRange.lowerBound),
+        maximum: Float(ScoringPolicy.minimumSuccessfulDaysRange.upperBound),
+        format: "%.0f",
+        value: Float(prefs.minimumSuccessfulDaysPreference)
+    ) { [weak self] in self?.prefs.minimumSuccessfulDaysPreference = Int($0.rounded()) }
+
     private lazy var remindersCell = SwitchCell(
         title: NSLocalizedString("Daily reminder", comment: "setting"),
         isOn: prefs.remindersEnabled
@@ -97,7 +108,7 @@ final class SettingsViewController: UITableViewController {
             (NSLocalizedString("Speech", comment: "Settings section: text-to-speech options"),
              [pitchCell, rateCell, pronounceAnswersCell, pronounceQuestionsCell]),
             (NSLocalizedString("Study", comment: "Settings section: study/learning options"),
-             [masteryHorizonCell]),
+             [masteryHorizonCell, successfulDaysCell]),
             // Both rows, always. Adding and removing a row while handing out the *same*
             // cell instances left UIKit holding a hidden cell with no index path
             // ("Unable to obtain index path for accessory"), which is noise at best and a

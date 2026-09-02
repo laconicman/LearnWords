@@ -165,6 +165,10 @@ run — asset formats only Xcode 26 understands (TD-45), a hard link to Core Hap
     cost ~1.9 s. `ProgressCache` scores each meaning once per change instead, in memory —
     dropped when the log grows for that meaning, when another device changes the store, or
     when the day turns. No schema change, as `ProgressModel` promised. 366 tests green.
+  - **TD-57 — done (2026-09-02).** The distinct-day gate was hardcoded at 2 and injectable
+    only in theory; it is now a preference, **defaulted to 5** and settable 2…10 beside the
+    horizon slider. Raising it re-opens words called learned under the old rule, which is
+    the point — `successfulDays` was always replayed from the log. 388 tests green.
   - Remaining: **TD-55**, recorded but not built. The rest of the batch is in flight, one
     branch each; every item's state is its heading in [TechDebt](TechDebt.md), which is
     where to look rather than here. Scope and conventions are in

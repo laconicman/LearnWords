@@ -59,9 +59,11 @@ struct SenseStatisticsTests {
                       isDue: true)
     }
 
-    private func screen(_ progress: SenseProgress) -> SenseStatisticsViewController {
+    private func screen(_ progress: SenseProgress,
+                        gate: Int = 2) -> SenseStatisticsViewController {
         let vc = SenseStatisticsViewController(sense: sense(), progress: progress,
-                                               languages: pair, now: now)
+                                               languages: pair, now: now,
+                                               minimumSuccessfulDays: gate)
         vc.loadViewIfNeeded()
         return vc
     }
@@ -113,14 +115,23 @@ struct SenseStatisticsTests {
         #expect(learning[3] == "Successful days — 4 days")
     }
 
-    /// The two-day gate is the half of the learned rule a single fast answer cannot
+    /// The distinct-day gate is the half of the learned rule a single fast answer cannot
     /// satisfy, and it is only worth explaining where it actually applies.
-    @Test func theTwoDayGateIsExplainedOnlyWhileItBinds() {
-        let short = screen(progress([.learning: strand(successfulDays: 1)]))
-        #expect(short.tableView(short.tableView, titleForFooterInSection: 0)
-                == "Needs successes on two separate days to count as learned.")
+    ///
+    /// **Names its own gate rather than reading the global one.** It is a preference now,
+    /// so asserting against `ScoringPolicy.default` would assert the owner's current taste
+    /// *and* race any test that writes it. What must hold is that the footer appears
+    /// exactly while the gate binds and states the number the screen was given — four here,
+    /// deliberately neither the old default nor the new. Reported by review, PR #3.
+    @Test func theGateIsExplainedOnlyWhileItBinds() {
+        let gate = 4
 
-        let spaced = screen(progress([.learning: strand(successfulDays: 2)]))
+        let short = screen(progress([.learning: strand(successfulDays: gate - 1)]), gate: gate)
+        let footer = short.tableView(short.tableView, titleForFooterInSection: 0)
+        #expect(footer?.contains("\(gate)") == true,
+                "the footer must name the gate in force, not the shipped default")
+
+        let spaced = screen(progress([.learning: strand(successfulDays: gate)]), gate: gate)
         #expect(spaced.tableView(spaced.tableView, titleForFooterInSection: 0) == nil)
     }
 

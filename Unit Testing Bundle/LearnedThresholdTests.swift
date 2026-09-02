@@ -38,7 +38,13 @@ struct LearnedThresholdTests {
     }
 
     /// A generous horizon-1 policy, so only the gate under test can hold mastery back.
-    private func policy(minimumSuccessfulDays: Int = ScoringPolicy.defaultMinimumSuccessfulDays)
+    ///
+    /// **The gate is named, not inherited from the shipped default.** These tests are about
+    /// engagement, hypercorrection and the production rule; each builds two days of evidence
+    /// because two is the smallest history in which "spaced" means anything, not because the
+    /// app ships that number. `theShippedGateIsWhatTheOwnerChose` is where the default is
+    /// pinned, so tuning it moves one expectation rather than six.
+    private func policy(minimumSuccessfulDays: Int = 2)
     -> ScoringPolicy {
         ScoringPolicy(masteryHorizonDays: 1,
                       minimumSuccessfulDays: minimumSuccessfulDays,
@@ -178,5 +184,54 @@ extension LearnedThresholdTests {
         #expect(!progress.isLearned(requireProduction: true),
                 "the meaning is not, because nothing productive was proven")
         #expect(!progress.isLearned(.dictation), "an untouched strand is never learned")
+    }
+}
+
+/// The gate as a *preference*, kept apart and serialized.
+///
+/// **These are the only tests that write `minimumSuccessfulDaysPreference`, and they must
+/// not run beside each other.** `LWUserDefaults.standard` is a singleton over the App-Group
+/// suite, so two tests mutating it in parallel see each other's values — which is exactly
+/// how the first version of this file failed: a test here set the gate to 9 and
+/// `ScoringPolicyTests`, running concurrently, found five spaced days no longer enough.
+/// Every other suite now names the gate it wants instead of inheriting this one.
+@Suite(.serialized)
+struct SuccessfulDaysPreferenceTests {
+
+
+    /// The gate the app actually ships, and the wiring that lets it be changed.
+    ///
+    /// `minimumSuccessfulDays` is read on **every use** rather than captured in `init`,
+    /// for the reason the horizon is: `ScoringPolicy.default` is a `static let`, so a
+    /// captured value would leave the slider doing nothing until the next launch. That is
+    /// the defect this test exists to catch — it fails if the read is ever moved back into
+    /// the initialiser.
+    @Test func theShippedGateIsWhatTheOwnerChose() {
+        #expect(ScoringPolicy.defaultMinimumSuccessfulDays == 5)
+        #expect(ScoringPolicy.minimumSuccessfulDaysRange == 2...10)
+
+        let prefs = LWUserDefaults.standard
+        let original = prefs.minimumSuccessfulDaysPreference
+        defer { prefs.minimumSuccessfulDaysPreference = original }
+
+        prefs.minimumSuccessfulDaysPreference = 7
+        #expect(ScoringPolicy.default.minimumSuccessfulDays == 7,
+                "the preference is read live, or the slider does nothing until relaunch")
+
+        // Out of range from an older build or another device: clamped, not obeyed.
+        prefs.minimumSuccessfulDaysPreference = 99
+        #expect(ScoringPolicy.default.minimumSuccessfulDays == 10)
+        prefs.minimumSuccessfulDaysPreference = 0
+        #expect(ScoringPolicy.default.minimumSuccessfulDays == 2)
+    }
+
+    /// A named gate still wins over the preference — a caller that says 3 means 3.
+    @Test func anInjectedGateIgnoresThePreference() {
+        let prefs = LWUserDefaults.standard
+        let original = prefs.minimumSuccessfulDaysPreference
+        defer { prefs.minimumSuccessfulDaysPreference = original }
+        prefs.minimumSuccessfulDaysPreference = 9
+
+        #expect(ScoringPolicy(minimumSuccessfulDays: 3).minimumSuccessfulDays == 3)
     }
 }
