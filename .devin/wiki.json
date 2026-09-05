@@ -1,0 +1,16 @@
+{
+  "repo_notes": [
+    {
+      "content": "SCOPE — what this repository is and is not. LearnWords is a UIKit iOS vocabulary-learning app, not a library and not a framework. The application lives under LearnWords/, with WidgetKit/, WordWidget/ and Widget/ providing home-screen widgets and ImportAsDictAction/ providing an import action extension. Much of the tree by file count is neither code nor documentation: roughly eighty PNG assets, a large number of JSON files carrying lexicon and progress data, SVGs, storyboards and string catalogues. Do not generate pages that enumerate asset catalogues or data files. Note also that two Xcode projects are present — LearnWords.xcodeproj and LearnWords-Xcode15.xcodeproj — the second being a compatibility variant rather than a separate product. The docs/ directory contains several TASK-*.md files (TASK-TD13-schema, TASK-TD16-adoption, TASK-TD53-batch, TASK-vocab-research) which are working task briefs tied to debt items, not user documentation; treat them as one topic at most.",
+      "author": "maintainer"
+    },
+    {
+      "content": "AUTHORITATIVE SOURCES, in precedence order. docs/README.md names the direction documents and states that they are authoritative over code comments where the two disagree. Design.md holds the architecture direction and decision records, Roadmap.md the priority-ordered Now/Next/Later milestones, and TechDebt.md the numbered TD-n register with a Cost and Discharge for each item plus the full feature-first reorganisation mapping. Handoff.md records the state of play after the A, B and C forks — what is proven, what is not, and what the next fork should take — and is the best single summary of current status. Enrichment.md is the TD-22 design covering how kaikki and Wiktionary data is mapped onto the lexicon, how it reaches the device, and the licence obligations that come with it. AnimationSystem.md, CloudKitSetup.md, MasteryAndProgressUI.md, ProgressModel.md, ProgressResearch.md and LexicalModelResearch.md are subsystem and research documents. The direction documents are deliberately plain Markdown kept outside the app's synchronised folders so they never affect the build; they may be promoted to a rendered DocC catalogue later.",
+      "author": "maintainer"
+    },
+    {
+      "content": "CONSTRAINTS a reader must not miss. The architecture deliberately follows a four-layer UIKit MVC — Model, Controller, Root, View — rather than an ad-hoc structure, and the wiki should describe the app in those terms rather than inventing its own layering. Separation of concerns, single source of truth, low coupling with high cohesion, dependency inversion, KISS and YAGNI are the stated principles applied throughout, and decisions in Design.md are written against them. Licence obligations attach to the enrichment data drawn from Wiktionary and kaikki and are recorded in Enrichment.md; any description of the lexicon should carry that constraint rather than presenting the data as unencumbered.",
+      "author": "maintainer"
+    }
+  ]
+}
