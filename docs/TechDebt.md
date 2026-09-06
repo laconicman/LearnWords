@@ -2025,6 +2025,50 @@ Two observations from the same review remain open and are worth keeping, neither
   CloudKit documents for it — asynchronous, so it cannot gate the synchronous store open
   directly; it would have to defer attaching the container or reopen the store afterwards.
 
+## TD-57 — The distinct-day gate was hardcoded, and set too low — **resolved (2026-09-02)**
+
+`ScoringPolicy.minimumSuccessfulDays` has been injectable since TD-49, and **nothing in
+production ever injected it**: `ScoringPolicy.default` took the constant, so the gate was 2
+for everyone with no way to change it. The Study section of Settings had exactly one row,
+the horizon slider, which says *how long* a meaning should stick while saying nothing about
+*how much evidence* is enough.
+
+**Two is a floor, not a default** (owner, 2026-09-02). It is the smallest number for which
+the word "spaced" means anything, which is why TD-49 picked it, but a learner who answers
+correctly on two days has not shown much. The shipped default is now **5**, settable 2…10
+beside the horizon.
+
+**Raising it re-opens words already called learned.** That is the intended effect, not a
+migration problem: `successfulDays` is replayed from the log and has always been counted, so
+nothing is lost and nothing needs rewriting — the same words simply stop claiming a status
+they had not earned under the new rule.
+
+**What the change actually touched, and why each part was needed.**
+
+* The preference is read on **every use**, like `masteryHorizonDays`, because
+  `ScoringPolicy.default` is a `static let` — capturing it in `init` would leave the slider
+  doing nothing until the next launch. This is the defect Devin caught on PR #4 for the
+  horizon; the same shape was avoidable here by copying the fix rather than the bug.
+* `ProgressCache` now invalidates on **either** scoring preference. It already watched the
+  horizon; a cache that ignored the new one would serve scores computed under the old gate.
+* The gate footer on the statistics screen said "two separate days" in prose. It now takes
+  the number as an **init parameter**, defaulted to the policy in force — which closes
+  Devin's PR #3 finding, left then with "there is nothing to read".
+* `Model/Settings.swift` compiles into both widget targets and `ScoringPolicy` does not, so
+  the clamp lives in the policy and the stored value stays raw. The first attempt put it in
+  `LWUserDefaults` and would not build for the widgets.
+
+**A test defect this exposed, worth recording separately.** The first green run was luck.
+`LWUserDefaults.standard` is a singleton over the App-Group suite, so the new tests writing
+`minimumSuccessfulDaysPreference` raced every suite that read the gate through
+`ScoringPolicy.default` — `ScoringPolicyTests` intermittently found five spaced days no
+longer enough because a parallel test had set the gate to 9. Fixed properly rather than by
+retry: every other suite now **names** the gate it wants (as `ScoringPolicyTests` already
+named its horizon, for exactly this reason), and the only tests that mutate the preference
+live alone in a `@Suite(.serialized)`. Verified with three consecutive full runs.
+
+388 tests green, from 386.
+
 ## TD-55 — The entry screen should have the structure, not the punctuation (owner, 2026-08-11)
 
 **Recorded, not built.** The owner's decision on 2026-08-11 was to write this down and

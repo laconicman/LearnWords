@@ -21,7 +21,10 @@ import Foundation
 struct ScoringPolicyTests {
 
     /// A fixed horizon, so a case does not depend on the machine's stored preference.
-    private let policy = ScoringPolicy(masteryHorizonDays: 20)
+    /// Both inputs named, for the same reason: these tests are about mastery arithmetic,
+    /// and a policy that read either preference would make them depend on the owner's
+    /// current settings — and on whatever a parallel test had just written.
+    private let policy = ScoringPolicy(masteryHorizonDays: 20, minimumSuccessfulDays: 2)
 
     private let day: TimeInterval = 86_400
     private let start = Date(timeIntervalSince1970: 1_800_000_000)

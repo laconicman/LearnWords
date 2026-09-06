@@ -47,11 +47,21 @@ final class SenseStatisticsViewController: UITableViewController {
     /// extra height, and height is the known clipping problem on that path.
     private let offersLookUp: Bool
 
+    /// The distinct-day gate to explain, defaulted to the one in force.
+    ///
+    /// **Told, not looked up.** It became a preference in TD-57, and a screen that read
+    /// the global while rendering could describe a gate that changed underneath it — and
+    /// gave the tests a shared mutable dependency they had no way to pin. A defaulted
+    /// parameter costs no call site and makes both problems go away.
+    private let minimumSuccessfulDays: Int
+
     init(sense: Sense,
          progress: SenseProgress,
          languages: LanguagePair,
          now: Date = Date(),
-         offersLookUp: Bool = false) {
+         offersLookUp: Bool = false,
+         minimumSuccessfulDays: Int = ScoringPolicy.default.minimumSuccessfulDays) {
+        self.minimumSuccessfulDays = minimumSuccessfulDays
         self.sense = sense
         self.progress = progress
         self.languages = languages
@@ -63,7 +73,7 @@ final class SenseStatisticsViewController: UITableViewController {
 
     @available(*, unavailable)
     required init?(coder: NSCoder) {
-        fatalError("use init(sense:progress:languages:now:offersLookUp:)")
+        fatalError("use init(sense:progress:languages:now:offersLookUp:minimumSuccessfulDays:)")
     }
 
     // MARK: - The table, as one value
@@ -135,9 +145,14 @@ final class SenseStatisticsViewController: UITableViewController {
                        // The two-day gate is the half of the learned rule that a single
                        // fast answer cannot satisfy, and the only one worth explaining
                        // where it applies (TD-49).
-                       footer: strand.successfulDays < ScoringPolicy.defaultMinimumSuccessfulDays
-                           ? NSLocalizedString("Needs successes on two separate days to count as learned.",
-                                               comment: "Statistics; footer")
+                       // **The number in force, not the shipped default.** It is settable
+                       // now, so a footer reading the constant would tell a learner who
+                       // moved the slider something the app is not doing. Reported by
+                       // review, PR #3, and left then because there was nothing to read.
+                       footer: strand.successfulDays < minimumSuccessfulDays
+                           ? String.localizedStringWithFormat(
+                               NSLocalizedString("SuccessfulDaysGate", comment: "Statistics; footer"),
+                               minimumSuccessfulDays)
                            : nil,
                        rows: rows)
     }

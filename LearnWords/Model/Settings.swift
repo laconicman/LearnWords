@@ -32,6 +32,9 @@ final class LWUserDefaults {
         "pronounceAnswersPreference": true,
         "pronounceQuestionsPreference": true,
         "maxKnownLevelPreference": 20.0,
+        // Must equal `ScoringPolicy.defaultMinimumSuccessfulDays`, which cannot be named
+        // here: this file is compiled into both widget targets and `ScoringPolicy` is not.
+        "minimumSuccessfulDaysPreference": 5.0,
         // 19:00 — after the working day, before the evening is over. Reminders are off
         // until the learner asks for them; the time only matters once they do.
         "reminderHour": 19.0,
@@ -128,6 +131,19 @@ userDefaultsGroup.set(newValue, forKey: "pronounceQuestionsPreference")
         }
     }
     
+    /// Distinct successful days a meaning needs before it counts as learned.
+    ///
+    /// Stored raw. `ScoringPolicy` owns the legal range and clamps on read — this file is
+    /// shared with the widget targets, which do not compile `ScoringPolicy`.
+    var minimumSuccessfulDaysPreference: Int {
+        get {
+            Int(userDefaultsGroup.double(forKey: "minimumSuccessfulDaysPreference").rounded())
+        }
+        set {
+            userDefaultsGroup.set(Double(newValue), forKey: "minimumSuccessfulDaysPreference")
+        }
+    }
+
     var shouldDisplayFirstUseDictionaryPrompt: Bool {
         get {
             !userDefaultsGroup.bool(forKey: dictionaryPromptDisplayed)
