@@ -1,6 +1,43 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "“%@” is already in your words" : {
+      "comment" : "Alert title; the word"
+    },
+    "%@ due now." : {
+      "comment" : "Label words due now",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ para repasar ahora."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ к повторению."
+          }
+        }
+      }
+    },
+    "%@ waiting for you." : {
+      "comment" : "Reminder body; placeholder is a word count",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ te esperan."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "%@ ждут вас."
+          }
+        }
+      }
+    },
     "%1$d learned · %2$d learning · %3$d untouched" : {
       "comment" : "Summary counts",
       "localizations" : {
@@ -31,23 +68,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$d узнано · %2$d воспроизведено"
-          }
-        }
-      }
-    },
-    "%d%% of the way in" : {
-      "comment" : "Summary effort",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%d %% del camino"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Пройдено %d %%"
           }
         }
       }
@@ -86,922 +106,6 @@
         }
       }
     },
-    "Add a word in %@" : {
-      "comment" : "Row; a language name",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Agregar palabra en %@"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Добавить слово на %@"
-          }
-        }
-      }
-    },
-    "Add another meaning" : {
-      "comment" : "Row",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Agregar otro significado"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Добавить ещё значение"
-          }
-        }
-      }
-    },
-    "Answers so far" : {
-      "comment" : "Summary section",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Respuestas hasta ahora"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ответы"
-          }
-        }
-      }
-    },
-    "Coming up" : {
-      "comment" : "Summary section",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Próximamente"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Впереди"
-          }
-        }
-      }
-    },
-    "AnswerCount" : {
-      "comment" : "Count of graded answers",
-      "localizations" : {
-        "en" : {
-          "variations" : {
-            "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%d answer"
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%d answers"
-                }
-              },
-              "zero" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "none"
-                }
-              }
-            }
-          }
-        },
-        "es" : {
-          "variations" : {
-            "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%d respuesta"
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%d respuestas"
-                }
-              },
-              "zero" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "ninguna"
-                }
-              }
-            }
-          }
-        },
-        "ru" : {
-          "variations" : {
-            "plural" : {
-              "few" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%d ответа"
-                }
-              },
-              "many" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%d ответов"
-                }
-              },
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%d ответ"
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%d ответа"
-                }
-              },
-              "zero" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "нет"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "Confirm meanings" : {
-      "comment" : "Screen title",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Confirmar significados"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Подтверждение"
-          }
-        }
-      }
-    },
-    "Day %d" : {
-      "comment" : "Summary axis",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Día %d"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "День %d"
-          }
-        }
-      }
-    },
-    "DueNowCount" : {
-      "comment" : "Count of meanings due now",
-      "localizations" : {
-        "en" : {
-          "variations" : {
-            "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%d due now"
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%d due now"
-                }
-              },
-              "zero" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Nothing due"
-                }
-              }
-            }
-          }
-        },
-        "es" : {
-          "variations" : {
-            "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%d para repasar"
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%d para repasar"
-                }
-              },
-              "zero" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Nada pendiente"
-                }
-              }
-            }
-          }
-        },
-        "ru" : {
-          "variations" : {
-            "plural" : {
-              "few" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%d к повторению"
-                }
-              },
-              "many" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%d к повторению"
-                }
-              },
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%d к повторению"
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%d к повторению"
-                }
-              },
-              "zero" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "Ничего не нужно повторять"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "Learned" : {
-      "comment" : "Summary legend",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aprendidas"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Выучено"
-          }
-        }
-      }
-    },
-    "DayCount" : {
-      "comment" : "Count of separate days practised",
-      "localizations" : {
-        "en" : {
-          "variations" : {
-            "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%d day"
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%d days"
-                }
-              },
-              "zero" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "never"
-                }
-              }
-            }
-          }
-        },
-        "es" : {
-          "variations" : {
-            "plural" : {
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%d día"
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%d días"
-                }
-              },
-              "zero" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "nunca"
-                }
-              }
-            }
-          }
-        },
-        "ru" : {
-          "variations" : {
-            "plural" : {
-              "few" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%d дня"
-                }
-              },
-              "many" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%d дней"
-                }
-              },
-              "one" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%d день"
-                }
-              },
-              "other" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "%d дня"
-                }
-              },
-              "zero" : {
-                "stringUnit" : {
-                  "state" : "translated",
-                  "value" : "ни разу"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "Due in about %@" : {
-      "comment" : "Statistics; a duration",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Toca repasar en unos %@"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Повтор примерно через %@"
-          }
-        }
-      }
-    },
-    "Due later today" : {
-      "comment" : "Statistics; a due date",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Toca repasar hoy"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Повтор сегодня"
-          }
-        }
-      }
-    },
-    "Due now" : {
-      "comment" : "Statistics; a due date",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Toca repasar ahora"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Пора повторить"
-          }
-        }
-      }
-    },
-    "Effort" : {
-      "comment" : "Statistics",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Esfuerzo"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Вложено труда"
-          }
-        }
-      }
-    },
-    "Meaning %d" : {
-      "comment" : "Section header; a number",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Significado %d"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Значение %d"
-          }
-        }
-      }
-    },
-    "Merge into the meaning above" : {
-      "comment" : "Row",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Combinar con el significado anterior"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Объединить с предыдущим значением"
-          }
-        }
-      }
-    },
-    "Mostly recognition so far — producing these words is the harder half." : {
-      "comment" : "Summary footer",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Por ahora sobre todo reconocimiento: producir estas palabras es la mitad más difícil."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Пока в основном узнавание — воспроизводить эти слова труднее."
-          }
-        }
-      }
-    },
-    "Needs a word in %@." : {
-      "comment" : "Footer; a language name",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Falta una palabra en %@."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Нужно слово на %@."
-          }
-        }
-      }
-    },
-    "Nothing answered yet" : {
-      "comment" : "Summary",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aún sin respuestas"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Пока нет ответов"
-          }
-        }
-      }
-    },
-    "Progress" : {
-      "comment" : "Screen title",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Progreso"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Прогресс"
-          }
-        }
-      }
-    },
-    "Still learning: %d%% right" : {
-      "comment" : "Summary",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "En curso: %d %% correctas"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "В работе: %d %% верных"
-          }
-        }
-      }
-    },
-    "Needs successes on two separate days to count as learned." : {
-      "comment" : "Statistics; footer",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Necesita aciertos en dos días distintos para contar como aprendido."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Чтобы считаться выученным, нужны успехи в два разных дня."
-          }
-        }
-      }
-    },
-    "Not practised yet" : {
-      "comment" : "Statistics; an exercise",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aún sin practicar"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ещё не практиковалось"
-          }
-        }
-      }
-    },
-    "Only recognised so far — producing it is the harder half." : {
-      "comment" : "Statistics; footer",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Solo reconocido por ahora: producirlo es la mitad más difícil."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Пока только узнавание — воспроизводить труднее."
-          }
-        }
-      }
-    },
-    "Overall" : {
-      "comment" : "Statistics section",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "En total"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Всего"
-          }
-        }
-      }
-    },
-    "Practised on" : {
-      "comment" : "Statistics; days",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Practicado en"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Занятий в разные дни"
-          }
-        }
-      }
-    },
-    "Produced" : {
-      "comment" : "Statistics; productive answers",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Producido"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Воспроизведение"
-          }
-        }
-      }
-    },
-    "Recall right now" : {
-      "comment" : "Statistics",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Recuerdo ahora mismo"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Вероятность вспомнить"
-          }
-        }
-      }
-    },
-    "Recognised" : {
-      "comment" : "Statistics; receptive answers",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reconocido"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Узнавание"
-          }
-        }
-      }
-    },
-    "Remembered for about %@" : {
-      "comment" : "Statistics; a duration",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Se recuerda unos %@"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Помнится около %@"
-          }
-        }
-      }
-    },
-    "Remembered for less than a day" : {
-      "comment" : "Statistics; memory strength",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Se recuerda menos de un día"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Помнится меньше суток"
-          }
-        }
-      }
-    },
-    "Statistics" : {
-      "comment" : "Context menu action",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Estadísticas"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Статистика"
-          }
-        }
-      }
-    },
-    "Successful days" : {
-      "comment" : "Statistics; days",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Días con acierto"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Дней с успехом"
-          }
-        }
-      }
-    },
-    "These are separate meanings" : {
-      "comment" : "Row",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Son significados distintos"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Это разные значения"
-          }
-        }
-      }
-    },
-    "Today" : {
-      "comment" : "Summary axis",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hoy"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Сегодня"
-          }
-        }
-      }
-    },
-    "Today to day %d" : {
-      "comment" : "Summary axis",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "De hoy al día %d"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "От сегодня до дня %d"
-          }
-        }
-      }
-    },
-    "Untouched" : {
-      "comment" : "Summary legend",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sin empezar"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Не начато"
-          }
-        }
-      }
-    },
-    "Well known: %d%% right" : {
-      "comment" : "Summary",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bien sabidas: %d %% correctas"
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Хорошо знакомые: %d %% верных"
-          }
-        }
-      }
-    },
-    "Work invested never falls, whatever a bad week does." : {
-      "comment" : "Summary caption",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "El esfuerzo invertido nunca baja, pase lo que pase en una mala semana."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Вложенный труд не убывает, какой бы ни выдалась неделя."
-          }
-        }
-      }
-    },
-    "“%@” is already in your words" : {
-      "comment" : "Alert title; the word"
-    },
-    "%@ due now." : {
-      "comment" : "Label words due now",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@ para repasar ahora."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@ к повторению."
-          }
-        }
-      }
-    },
-    "%@ waiting for you." : {
-      "comment" : "Reminder body; placeholder is a word count",
-      "localizations" : {
-        "es" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@ te esperan."
-          }
-        },
-        "ru" : {
-          "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "%@ ждут вас."
-          }
-        }
-      }
-    },
     "%d%% learned" : {
       "comment" : "progress ring",
       "localizations" : {
@@ -1015,6 +119,23 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "%d%% выучено"
+          }
+        }
+      }
+    },
+    "%d%% of the way in" : {
+      "comment" : "Summary effort",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%d %% del camino"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пройдено %d %%"
           }
         }
       }
@@ -1066,6 +187,40 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Добавить заметку"
+          }
+        }
+      }
+    },
+    "Add a word in %@" : {
+      "comment" : "Row; a language name",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agregar palabra en %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить слово на %@"
+          }
+        }
+      }
+    },
+    "Add another meaning" : {
+      "comment" : "Row",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Agregar otro significado"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Добавить ещё значение"
           }
         }
       }
@@ -1232,6 +387,112 @@
         }
       }
     },
+    "AnswerCount" : {
+      "comment" : "Count of graded answers",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d answer"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d answers"
+                }
+              },
+              "zero" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "none"
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d respuesta"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d respuestas"
+                }
+              },
+              "zero" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "ninguna"
+                }
+              }
+            }
+          }
+        },
+        "ru" : {
+          "variations" : {
+            "plural" : {
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d ответа"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d ответов"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d ответ"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d ответа"
+                }
+              },
+              "zero" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "нет"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Answers so far" : {
+      "comment" : "Summary section",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Respuestas hasta ahora"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ответы"
+          }
+        }
+      }
+    },
     "Cancel" : {
       "comment" : "AlertAction title",
       "localizations" : {
@@ -1266,6 +527,40 @@
         }
       }
     },
+    "Coming up" : {
+      "comment" : "Summary section",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Próximamente"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Впереди"
+          }
+        }
+      }
+    },
+    "Confirm meanings" : {
+      "comment" : "Screen title",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirmar significados"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Подтверждение"
+          }
+        }
+      }
+    },
     "Current set is empty. Add some words to learn." : {
       "comment" : "Message for alert for empty set to display",
       "localizations" : {
@@ -1296,6 +591,112 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Ежедневное напоминание"
+          }
+        }
+      }
+    },
+    "Day %d" : {
+      "comment" : "Summary axis",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Día %d"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "День %d"
+          }
+        }
+      }
+    },
+    "DayCount" : {
+      "comment" : "Count of separate days practised",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d day"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d days"
+                }
+              },
+              "zero" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "never"
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d día"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d días"
+                }
+              },
+              "zero" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "nunca"
+                }
+              }
+            }
+          }
+        },
+        "ru" : {
+          "variations" : {
+            "plural" : {
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d дня"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d дней"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d день"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d дня"
+                }
+              },
+              "zero" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "ни разу"
+                }
+              }
+            }
           }
         }
       }
@@ -1454,6 +855,146 @@
         }
       }
     },
+    "Due in about %@" : {
+      "comment" : "Statistics; a duration",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toca repasar en unos %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Повтор примерно через %@"
+          }
+        }
+      }
+    },
+    "Due later today" : {
+      "comment" : "Statistics; a due date",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toca repasar hoy"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Повтор сегодня"
+          }
+        }
+      }
+    },
+    "Due now" : {
+      "comment" : "Statistics; a due date",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toca repasar ahora"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пора повторить"
+          }
+        }
+      }
+    },
+    "DueNowCount" : {
+      "comment" : "Count of meanings due now",
+      "localizations" : {
+        "en" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d due now"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d due now"
+                }
+              },
+              "zero" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Nothing due"
+                }
+              }
+            }
+          }
+        },
+        "es" : {
+          "variations" : {
+            "plural" : {
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d para repasar"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d para repasar"
+                }
+              },
+              "zero" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Nada pendiente"
+                }
+              }
+            }
+          }
+        },
+        "ru" : {
+          "variations" : {
+            "plural" : {
+              "few" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d к повторению"
+                }
+              },
+              "many" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d к повторению"
+                }
+              },
+              "one" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d к повторению"
+                }
+              },
+              "other" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "%d к повторению"
+                }
+              },
+              "zero" : {
+                "stringUnit" : {
+                  "state" : "translated",
+                  "value" : "Ничего не нужно повторять"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "Edit" : {
       "comment" : "swipe action",
       "localizations" : {
@@ -1501,6 +1042,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Редактировать слово"
+          }
+        }
+      }
+    },
+    "Effort" : {
+      "comment" : "Statistics",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Esfuerzo"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вложено труда"
           }
         }
       }
@@ -1859,6 +1417,23 @@
         }
       }
     },
+    "Learned" : {
+      "comment" : "Summary legend",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aprendidas"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выучено"
+          }
+        }
+      }
+    },
     "Learned " : {
       "comment" : "Label learned words",
       "localizations" : {
@@ -2015,7 +1590,7 @@
       }
     },
     "Look up %@" : {
-      "comment" : "Button label; placeholder is a word",
+      "comment" : "Button label; a word\nButton label; placeholder is a word",
       "localizations" : {
         "es" : {
           "stringUnit" : {
@@ -2044,6 +1619,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "У вас сейчас только вот эти клавиатуры:"
+          }
+        }
+      }
+    },
+    "Meaning %d" : {
+      "comment" : "Section header; a number",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Significado %d"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Значение %d"
           }
         }
       }
@@ -2155,6 +1747,23 @@
         }
       }
     },
+    "Merge into the meaning above" : {
+      "comment" : "Row",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Combinar con el significado anterior"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Объединить с предыдущим значением"
+          }
+        }
+      }
+    },
     "Microphone access denied." : {
       "comment" : "Button title",
       "extractionState" : "stale",
@@ -2207,6 +1816,23 @@
         }
       }
     },
+    "Mostly recognition so far — producing these words is the harder half." : {
+      "comment" : "Summary footer",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Por ahora sobre todo reconocimiento: producir estas palabras es la mitad más difícil."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пока в основном узнавание — воспроизводить эти слова труднее."
+          }
+        }
+      }
+    },
     "Name of set" : {
       "localizations" : {
         "es" : {
@@ -2236,6 +1862,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Родной язык"
+          }
+        }
+      }
+    },
+    "Needs a word in %@." : {
+      "comment" : "Footer; a language name",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Falta una palabra en %@."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Нужно слово на %@."
+          }
+        }
+      }
+    },
+    "Needs successes on two separate days to count as learned." : {
+      "comment" : "Statistics; footer",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Necesita aciertos en dos días distintos para contar como aprendido."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Чтобы считаться выученным, нужны успехи в два разных дня."
           }
         }
       }
@@ -2292,6 +1952,23 @@
         }
       }
     },
+    "Not practised yet" : {
+      "comment" : "Statistics; an exercise",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aún sin practicar"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ещё не практиковалось"
+          }
+        }
+      }
+    },
     "Note" : {
       "comment" : "Meaning editor section header\nScreen title",
       "localizations" : {
@@ -2305,6 +1982,23 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Заметка"
+          }
+        }
+      }
+    },
+    "Nothing answered yet" : {
+      "comment" : "Summary",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aún sin respuestas"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пока нет ответов"
           }
         }
       }
@@ -2424,6 +2118,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "OK"
+          }
+        }
+      }
+    },
+    "Only recognised so far — producing it is the harder half." : {
+      "comment" : "Statistics; footer",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solo reconocido por ahora: producirlo es la mitad más difícil."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Пока только узнавание — воспроизводить труднее."
+          }
+        }
+      }
+    },
+    "Overall" : {
+      "comment" : "Statistics section",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En total"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Всего"
           }
         }
       }
@@ -2564,6 +2292,40 @@
         }
       }
     },
+    "Produced" : {
+      "comment" : "Statistics; productive answers",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Producido"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Воспроизведение"
+          }
+        }
+      }
+    },
+    "Progress" : {
+      "comment" : "Screen title",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Progreso"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Прогресс"
+          }
+        }
+      }
+    },
     "Pronounce answers" : {
       "comment" : "setting",
       "localizations" : {
@@ -2632,6 +2394,23 @@
         }
       }
     },
+    "Recall right now" : {
+      "comment" : "Statistics",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recuerdo ahora mismo"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вероятность вспомнить"
+          }
+        }
+      }
+    },
     "Recent" : {
       "comment" : "Section header",
       "localizations" : {
@@ -2645,6 +2424,23 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Недавние"
+          }
+        }
+      }
+    },
+    "Recognised" : {
+      "comment" : "Statistics; receptive answers",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reconocido"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Узнавание"
           }
         }
       }
@@ -2733,6 +2529,40 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Запоминается на (дней)"
+          }
+        }
+      }
+    },
+    "Remembered for about %@" : {
+      "comment" : "Statistics; a duration",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se recuerda unos %@"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Помнится около %@"
+          }
+        }
+      }
+    },
+    "Remembered for less than a day" : {
+      "comment" : "Statistics; memory strength",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se recuerda menos de un día"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Помнится меньше суток"
           }
         }
       }
@@ -3098,6 +2928,40 @@
         }
       }
     },
+    "Statistics" : {
+      "comment" : "Context menu action",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estadísticas"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Статистика"
+          }
+        }
+      }
+    },
+    "Still learning: %d%% right" : {
+      "comment" : "Summary",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En curso: %d %% correctas"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "В работе: %d %% верных"
+          }
+        }
+      }
+    },
     "Stop dictating" : {
       "comment" : "Button label",
       "localizations" : {
@@ -3167,6 +3031,23 @@
         }
       }
     },
+    "Successful days" : {
+      "comment" : "Statistics; days",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Días con acierto"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дней с успехом"
+          }
+        }
+      }
+    },
     "Suggestions" : {
       "comment" : "Section header",
       "localizations" : {
@@ -3180,6 +3061,23 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Подсказки"
+          }
+        }
+      }
+    },
+    "These are separate meanings" : {
+      "comment" : "Row",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Son significados distintos"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Это разные значения"
           }
         }
       }
@@ -3231,6 +3129,40 @@
           "stringUnit" : {
             "state" : "needs_review",
             "value" : "Пора тренироваться"
+          }
+        }
+      }
+    },
+    "Today" : {
+      "comment" : "Summary axis",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hoy"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сегодня"
+          }
+        }
+      }
+    },
+    "Today to day %d" : {
+      "comment" : "Summary axis",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De hoy al día %d"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "От сегодня до дня %d"
           }
         }
       }
@@ -3303,8 +3235,42 @@
         }
       }
     },
+    "Untouched" : {
+      "comment" : "Summary legend",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sin empezar"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не начато"
+          }
+        }
+      }
+    },
     "Use the existing word" : {
       "comment" : "AlertAction title"
+    },
+    "Well known: %d%% right" : {
+      "comment" : "Summary",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bien sabidas: %d %% correctas"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Хорошо знакомые: %d %% верных"
+          }
+        }
+      }
     },
     "Word" : {
       "comment" : "backButtonTitle",
@@ -3444,6 +3410,23 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "Work invested never falls, whatever a bad week does." : {
+      "comment" : "Summary caption",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El esfuerzo invertido nunca baja, pase lo que pase en una mala semana."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Вложенный труд не убывает, какой бы ни выдалась неделя."
           }
         }
       }
