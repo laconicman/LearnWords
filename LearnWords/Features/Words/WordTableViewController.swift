@@ -336,13 +336,15 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         if text.aproxWordCount > 1 {
             guard let set = library.selectedSet else { return }
             let pair = LanguagePair.forSet(set)
+            var summary = Lexicon.ImportSummary()
             do {
-                try lexicon.importPlainText(text, into: set.id,
-                                            first: pair.secondary, second: pair.primary)
+                summary = try lexicon.importPlainText(text, into: set.id,
+                                                      first: pair.secondary, second: pair.primary)
             } catch {
                 debugLog("Shared-text import failed: \(error)")
             }
             reload()
+            presentImportSummary(summary)
         } else {
             // Async: navigating mid-appearance-transition is unreliable.
             let word = lemmas(from: text).first ?? text

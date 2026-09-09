@@ -41,13 +41,24 @@ enum PlainText {
     /// the source said. Canonicalisation, if it ever happens, belongs where words are
     /// typed, not where they are read in bulk.
     static func parse(_ text: String) -> [Line] {
-        split(text, by: "\n" + "\u{2028}", union: .newlines).compactMap { entry in
-            guard let parts = sides(of: entry) else { return nil }
-            let first = synonyms(in: parts[0])
-            let second = synonyms(in: parts[1])
-            guard !first.isEmpty, !second.isEmpty else { return nil }
-            return Line(first: first, second: second)
-        }
+        entries(in: text).compactMap(line(from:))
+    }
+
+    /// The non-empty lines of the text, before any of them is judged a pair.
+    ///
+    /// Separate from `parse` so an import can report how many lines it could **not** read:
+    /// that count is the difference between these and the parsed ones, and without it a
+    /// file of headings is indistinguishable from a file that imported cleanly.
+    static func entries(in text: String) -> [String] {
+        split(text, by: "\n" + "\u{2028}", union: .newlines)
+    }
+
+    private static func line(from entry: String) -> Line? {
+        guard let parts = sides(of: entry) else { return nil }
+        let first = synonyms(in: parts[0])
+        let second = synonyms(in: parts[1])
+        guard !first.isEmpty, !second.isEmpty else { return nil }
+        return Line(first: first, second: second)
     }
 
     /// Every character that has ever separated the two sides of a line.
@@ -65,16 +76,23 @@ enum PlainText {
     /// hyphenated word produced three parts and the line was dropped without a word to the
     /// learner. Ordering resolves it without giving anything up:
     ///
-    /// 1. `|` then `:`, which never occur inside a word;
+    /// 1. `|` then `:`, which never occur inside a word — and whichever of the two
+    ///    appears first settles the line, so an ambiguous one is rejected rather than
+    ///    passed down to a weaker separator;
     /// 2. a dash with whitespace beside it — punctuation *between* the sides;
     /// 3. a bare dash, so `bear-медведь` still reads as it always has.
     ///
     /// A hyphenated word therefore survives whenever the line says how it is separated,
     /// which is every line this app itself writes.
     private static func sides(of entry: String) -> [String]? {
-        for separator in "|:" {
+        // **The first strong separator present decides the line, including by rejecting
+        // it.** Falling through to the next one instead let `a|b|c : d` fail on pipes and
+        // then succeed on the colon, importing "a|b|c" as a word — a line the old parser
+        // refused outright, so trying them in turn had quietly made a bad line worse
+        // rather than better. Reported by review, PR #12.
+        for separator in "|:" where entry.contains(separator) {
             let parts = split(entry, by: String(separator))
-            if parts.count == 2 { return parts }
+            return parts.count == 2 ? parts : nil
         }
 
         // Exactly one spaced dash: any more and the line is ambiguous, so fall through
@@ -132,13 +150,36 @@ extension Lexicon {
     /// guessing wrong would fuse them permanently. Reviewing and merging duplicates is a
     /// screen this app does not have yet — the TODO the old importer carried, now stated
     /// where it belongs.
+    /// What an import did, in the terms someone would ask about it.
+    ///
+    /// **A bare count of additions cannot be read.** Zero added means "the file was
+    /// already in the set" or "none of it was a word", and those want opposite responses;
+    /// both call sites used to discard even the zero, so an import that added nothing
+    /// looked exactly like one that worked. That is how TD-59 stayed hidden.
+    struct ImportSummary: Equatable {
+        /// Meanings actually added.
+        var added = 0
+        /// Lines that read as a pair but named a word the set already has.
+        var duplicates = 0
+        /// Lines that are not a pair at all — a heading, a stray blank, punctuation the
+        /// parser will not guess at.
+        var unreadable = 0
+
+        var total: Int { added + duplicates + unreadable }
+        var isEmpty: Bool { total == 0 }
+    }
+
     @discardableResult
     func importPlainText(_ text: String,
                          into setID: UUID,
                          first: String,
-                         second: String) throws -> Int {
+                         second: String) throws -> ImportSummary {
+        let entries = PlainText.entries(in: text)
         let lines = PlainText.parse(text)
-        guard !lines.isEmpty else { return 0 }
+        let unreadable = entries.count - lines.count
+        guard !lines.isEmpty else {
+            return ImportSummary(added: 0, duplicates: 0, unreadable: unreadable)
+        }
 
         // Grows as the file is read, so a word repeated *within* the text is added once.
         var seen = Set(try senses(in: setID)
@@ -153,6 +194,9 @@ extension Lexicon {
                  + line.second.map { Term.Draft($0, in: second) }
         }
 
-        return try addSenses(to: setID, terms: drafts)
+        let added = try addSenses(to: setID, terms: drafts)
+        return ImportSummary(added: added,
+                             duplicates: lines.count - drafts.count,
+                             unreadable: unreadable)
     }
 }

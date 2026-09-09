@@ -344,9 +344,10 @@ final class WordSetsTableViewController: UITableViewController, UIDocumentPicker
         do {
             let text = try String(contentsOf: fileURL, encoding: .utf8)
             let pair = LanguagePair.forSet(set)
-            try lexicon.importPlainText(text, into: set.id,
-                                        first: pair.secondary, second: pair.primary)
+            let summary = try lexicon.importPlainText(text, into: set.id,
+                                                      first: pair.secondary, second: pair.primary)
             reload()
+            presentImportSummary(summary)
         } catch {
             debugLog("Import failed: \(error)")
             let alert = UIAlertController(

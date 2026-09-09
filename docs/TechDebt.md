@@ -2113,14 +2113,29 @@ this app writes. No previously-parsing line changes meaning; the three new tests
 against the old parser and `aBareDashStillSeparatesWhenNothingElseDoes` passes against both,
 which is what makes it the regression guard.
 
-392 tests green, from 388.
+392 tests green when the parser changed, 396 with the reporting.
 
-**Still open, deliberately: the import says nothing.** `Lexicon.importPlainText` returns a
-count and both call sites discard it, so a file whose every line is malformed looks exactly
-like a successful import — `reload()` and no message. That is what made this defect survive:
-nothing ever told anyone that four lines had gone missing. A count and a skipped-line total
-would have. Recorded here rather than fixed because where it belongs — an alert, a banner,
-a line on the screen — is a design decision, not a parser one.
+**And the silence that hid it — also fixed (owner asked for it, 2026-09-10).**
+`importPlainText` returned a bare count and both call sites discarded it, so a file whose
+every line was malformed looked exactly like a successful import: `reload()` and no message.
+That is what let this defect live. A bare count would not have been enough either — zero
+added means "it was all already here" or "none of it was a word", and those want opposite
+responses. It now returns an `ImportSummary` of **added / duplicates / unreadable**, whose
+`total` accounts for every line in the file, and both paths report through one
+`presentImportSummary` so they cannot drift.
+
+Quiet on a clean import, because the list visibly grows behind the alert and a confirmation
+nobody needs is a tap nobody wanted. Anything else is the case the learner cannot see for
+themselves.
+
+**A regression the review caught, worth recording because ordering caused it.** The first
+version tried `|` then `:` and fell through when a separator produced the wrong number of
+parts — so `a|b|c : d` failed on pipes, succeeded on the colon, and imported "a|b|c" as a
+word. The old all-at-once parser rejected that line outright, so ordering had made a bad
+line *worse* rather than better. The first strong separator **present** now settles the
+line, including by rejecting it. Reported by review, PR #12.
+
+396 tests green.
 
 ## TD-55 — The entry screen should have the structure, not the punctuation (owner, 2026-08-11)
 
