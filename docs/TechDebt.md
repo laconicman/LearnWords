@@ -311,6 +311,23 @@ render on iOS 13+ and degrade to **text-only tabs on iOS 12**. Adding PNG fallba
 programmatic tab images (completing `UIImage+backport`) is future work if iOS-12 icon
 fidelity is wanted.
 
+**One control was not part of that bargain — fixed 2026-09-10.** "Text-only" assumes there
+is text. `WordInputViewController`'s dictation button is the field's `leftView`, sized to the
+minimum touch target and carrying **no title**, so a `nil` symbol left a 44pt control that
+was invisible, unlabelled and indistinguishable from the field's padding — on the
+add-a-word screen, which is the first thing a new learner uses. It still worked if you
+happened to tap it. It now falls back to a 🎤 when there is no symbol. The accent/grey/red
+state stops showing at the floor, since an emoji takes no tint; `accessibilityLabel` already
+states that in words and it was a second cue, never the only one.
+
+**And the iOS-12 icon path *is* verifiable, contrary to what TD-8's blanket claim implies.**
+Forcing `UIImage.systemImage` down its `else` branch (`if #available(iOS 13, *), false`) and
+running on a modern simulator renders exactly what iOS 12 renders for every symbol in the
+app, because that branch is what iOS 12 executes. It costs one build and needs no old
+toolchain. That is how this defect was found, and it is worth running before any release
+that claims the floor: what it cannot check is lifecycle, storyboard semantic colours and
+system-control behaviour, which still need the Xcode 15 pass.
+
 ## TD-8 — iOS 12 path is unverifiable on Xcode 26 — **confirmed against Apple's own numbers (2026-08-02)**
 
 Apple's [Xcode system requirements](https://developer.apple.com/xcode/system-requirements/)
