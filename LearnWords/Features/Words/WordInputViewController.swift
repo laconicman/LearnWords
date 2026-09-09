@@ -529,21 +529,43 @@ final class WordInputViewController: UITableViewController {
     private func updateDictationButton() {
         switch dictation {
         case .idle:
-            dictationButton.setImage(.systemImage("mic.circle.fill"), for: .normal)
+            setDictationGlyph("mic.circle.fill")
             dictationButton.tintColor = .lwAccent
             dictationButton.accessibilityLabel =
                 NSLocalizedString("Dictate", comment: "Button label")
         case .starting:
-            dictationButton.setImage(.systemImage("mic.circle.fill"), for: .normal)
+            setDictationGlyph("mic.circle.fill")
             dictationButton.tintColor = .lwTextSecondary
             dictationButton.accessibilityLabel =
                 NSLocalizedString("Starting dictation", comment: "Button label")
         case .listening:
-            dictationButton.setImage(.systemImage("mic.circle"), for: .normal)
+            setDictationGlyph("mic.circle")
             dictationButton.tintColor = .lwAnswerWrong
             dictationButton.accessibilityLabel =
                 NSLocalizedString("Stop dictating", comment: "Button label")
         }
+    }
+
+    /// The glyph, or a stand-in where SF Symbols do not exist.
+    ///
+    /// **This button is `leftView` and carries no title**, so on iOS 12 the `nil` symbol
+    /// left a 44pt control that was invisible, unlabelled and indistinguishable from the
+    /// field's padding — tappable, and therefore not dead so much as undiscoverable.
+    /// Tab icons degrading to text is the accepted trade at the floor (TD-11); a control
+    /// nobody can see is not the same bargain.
+    ///
+    /// The stand-in is an emoji rather than a tinted character because it has to say
+    /// *microphone* without a caption, and the alternative — a shape that takes the tint —
+    /// says nothing at all. The cost is that the accent/grey/red state stops showing on
+    /// iOS 12; `accessibilityLabel` already carries that state in words, and it is a
+    /// second cue rather than the only one.
+    ///
+    /// Verified by forcing the backport's iOS 12 branch on a modern simulator — the one
+    /// half of TD-8 that can be checked without the old toolchain.
+    private func setDictationGlyph(_ symbolName: String) {
+        let symbol = UIImage.systemImage(symbolName)
+        dictationButton.setImage(symbol, for: .normal)
+        dictationButton.setTitle(symbol == nil ? "\u{1F3A4}" : nil, for: .normal)
     }
 
     /// Says what went wrong, and offers Settings only when Settings is genuinely the way
