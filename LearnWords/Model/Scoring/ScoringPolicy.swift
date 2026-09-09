@@ -215,8 +215,21 @@ struct ScoringPolicy {
     static let minimumHorizonDays = 10.0
 
     /// Successful recalls on separate days before an exercise may be called learned.
-    /// Two is the smallest number for which the word "spaced" means anything.
-    static let defaultMinimumSuccessfulDays = 2
+    ///
+    /// **Five, raised from two (owner, 2026-09-02).** Two is the smallest number for which
+    /// the word "spaced" means anything at all, which is why it was the first floor — but
+    /// it is a floor, not a considered default. Five separate successful days is a real
+    /// spacing history, and the gate only ever *delays* the claim "learned": it caps
+    /// mastery at `gatedMasteryCeiling` while stability keeps accruing underneath.
+    ///
+    /// Raising it re-opens words that were called learned under the old default. That is
+    /// the intended effect rather than a migration problem — nothing is lost, because
+    /// `successfulDays` is replayed from the log and was always being counted.
+    static let defaultMinimumSuccessfulDays = 5
+
+    /// The range the settings slider offers. Below two the gate is not a spacing rule at
+    /// all; above ten it outlives most learners' patience with a single word.
+    static let minimumSuccessfulDaysRange = 2...10
 
     /// The most mastery an exercise may show while the distinct-day gate still holds it.
     ///
@@ -226,18 +239,34 @@ struct ScoringPolicy {
     /// Reported by review, PR #1.
     static let gatedMasteryCeiling = 0.75
 
+    /// Set only when a caller named one; `nil` means "follow the preference".
+    private let fixedMinimumSuccessfulDays: Int?
+
     /// Distinct successful days an exercise needs before it may be called learned.
-    /// Injectable so a test about something *else* can opt out of the gate.
-    let minimumSuccessfulDays: Int
+    ///
+    /// Read on every use, for the same reason `masteryHorizonDays` is: `ScoringPolicy`
+    /// `.default` is a `static let`, so capturing the preference in `init` would freeze
+    /// whatever it happened to be at first use and leave the slider doing nothing until
+    /// the next launch. An injected value still wins — a caller that names a gate has
+    /// made a deliberate choice.
+    var minimumSuccessfulDays: Int {
+        if let fixedMinimumSuccessfulDays { return fixedMinimumSuccessfulDays }
+        // Clamped here rather than in `LWUserDefaults`, which the widgets compile and
+        // this type they do not. A value from an older build, or synced from a device
+        // whose range differs, must not put the gate outside what the slider can express.
+        return min(max(LWUserDefaults.standard.minimumSuccessfulDaysPreference,
+                       Self.minimumSuccessfulDaysRange.lowerBound),
+                   Self.minimumSuccessfulDaysRange.upperBound)
+    }
 
     init(algorithm: FSRSAlgorithm = FSRSAlgorithm(),
          masteryHorizonDays: Double? = nil,
-         minimumSuccessfulDays: Int = ScoringPolicy.defaultMinimumSuccessfulDays,
+         minimumSuccessfulDays: Int? = nil,
          calendar: Calendar = .current) {
         self.algorithm = algorithm
         self.calendar = calendar
         self.fixedHorizonDays = masteryHorizonDays
-        self.minimumSuccessfulDays = minimumSuccessfulDays
+        self.fixedMinimumSuccessfulDays = minimumSuccessfulDays
     }
 
     // MARK: - Replaying a history

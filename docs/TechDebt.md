@@ -311,6 +311,23 @@ render on iOS 13+ and degrade to **text-only tabs on iOS 12**. Adding PNG fallba
 programmatic tab images (completing `UIImage+backport`) is future work if iOS-12 icon
 fidelity is wanted.
 
+**One control was not part of that bargain — fixed 2026-09-10.** "Text-only" assumes there
+is text. `WordInputViewController`'s dictation button is the field's `leftView`, sized to the
+minimum touch target and carrying **no title**, so a `nil` symbol left a 44pt control that
+was invisible, unlabelled and indistinguishable from the field's padding — on the
+add-a-word screen, which is the first thing a new learner uses. It still worked if you
+happened to tap it. It now falls back to a 🎤 when there is no symbol. The accent/grey/red
+state stops showing at the floor, since an emoji takes no tint; `accessibilityLabel` already
+states that in words and it was a second cue, never the only one.
+
+**And the iOS-12 icon path *is* verifiable, contrary to what TD-8's blanket claim implies.**
+Forcing `UIImage.systemImage` down its `else` branch (`if #available(iOS 13, *), false`) and
+running on a modern simulator renders exactly what iOS 12 renders for every symbol in the
+app, because that branch is what iOS 12 executes. It costs one build and needs no old
+toolchain. That is how this defect was found, and it is worth running before any release
+that claims the floor: what it cannot check is lifecycle, storyboard semantic colours and
+system-control behaviour, which still need the Xcode 15 pass.
+
 ## TD-8 — iOS 12 path is unverifiable on Xcode 26 — **confirmed against Apple's own numbers (2026-08-02)**
 
 Apple's [Xcode system requirements](https://developer.apple.com/xcode/system-requirements/)
@@ -2061,6 +2078,49 @@ Two observations from the same review remain open and are worth keeping, neither
   CloudKit documents for it — asynchronous, so it cannot gate the synchronous store open
   directly; it would have to defer attaching the container or reopen the store afterwards.
 
+## TD-57 — The distinct-day gate was hardcoded, and set too low — **resolved (2026-09-02)**
+
+`ScoringPolicy.minimumSuccessfulDays` has been injectable since TD-49, and **nothing in
+production ever injected it**: `ScoringPolicy.default` took the constant, so the gate was 2
+for everyone with no way to change it. The Study section of Settings had exactly one row,
+the horizon slider, which says *how long* a meaning should stick while saying nothing about
+*how much evidence* is enough.
+
+**Two is a floor, not a default** (owner, 2026-09-02). It is the smallest number for which
+the word "spaced" means anything, which is why TD-49 picked it, but a learner who answers
+correctly on two days has not shown much. The shipped default is now **5**, settable 2…10
+beside the horizon.
+
+**Raising it re-opens words already called learned.** That is the intended effect, not a
+migration problem: `successfulDays` is replayed from the log and has always been counted, so
+nothing is lost and nothing needs rewriting — the same words simply stop claiming a status
+they had not earned under the new rule.
+
+**What the change actually touched, and why each part was needed.**
+
+* The preference is read on **every use**, like `masteryHorizonDays`, because
+  `ScoringPolicy.default` is a `static let` — capturing it in `init` would leave the slider
+  doing nothing until the next launch. This is the defect Devin caught on PR #4 for the
+  horizon; the same shape was avoidable here by copying the fix rather than the bug.
+* `ProgressCache` now invalidates on **either** scoring preference. It already watched the
+  horizon; a cache that ignored the new one would serve scores computed under the old gate.
+* The gate footer on the statistics screen said "two separate days" in prose. It now takes
+  the number as an **init parameter**, defaulted to the policy in force — which closes
+  Devin's PR #3 finding, left then with "there is nothing to read".
+* `Model/Settings.swift` compiles into both widget targets and `ScoringPolicy` does not, so
+  the clamp lives in the policy and the stored value stays raw. The first attempt put it in
+  `LWUserDefaults` and would not build for the widgets.
+
+**A test defect this exposed, worth recording separately.** The first green run was luck.
+`LWUserDefaults.standard` is a singleton over the App-Group suite, so the new tests writing
+`minimumSuccessfulDaysPreference` raced every suite that read the gate through
+`ScoringPolicy.default` — `ScoringPolicyTests` intermittently found five spaced days no
+longer enough because a parallel test had set the gate to 9. Fixed properly rather than by
+retry: every other suite now **names** the gate it wants (as `ScoringPolicyTests` already
+named its horizon, for exactly this reason), and the only tests that mutate the preference
+live alone in a `@Suite(.serialized)`. Verified with three consecutive full runs.
+
+388 tests green, from 386.
 ## TD-58 — The context-menu previews do not share the app's visual language (owner, 2026-09-02)
 
 Long press on a word and long press on a set both open a `UIContextMenuConfiguration` whose
