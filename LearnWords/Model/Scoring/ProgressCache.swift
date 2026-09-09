@@ -92,11 +92,18 @@ final class ProgressCache {
     /// pins. Worth knowing if the preference store is ever wrapped in something that swallows
     /// it.
     private var horizonDays = LWUserDefaults.standard.maxKnownLevelPreference
+    private var successfulDaysGate = LWUserDefaults.standard.minimumSuccessfulDaysPreference
 
     @objc private func scoringPreferencesMayHaveChanged() {
-        let current = LWUserDefaults.standard.maxKnownLevelPreference
-        guard current != horizonDays else { return }
-        horizonDays = current
+        // Both inputs to `mastery`, and both live behind `ScoringPolicy.default` rather
+        // than being passed in — so a cache that ignores either goes on serving scores
+        // computed under the old setting. The horizon half was a review finding on PR #4;
+        // the gate half arrives with the slider that made it settable.
+        let horizon = LWUserDefaults.standard.maxKnownLevelPreference
+        let gate = LWUserDefaults.standard.minimumSuccessfulDaysPreference
+        guard horizon != horizonDays || gate != successfulDaysGate else { return }
+        horizonDays = horizon
+        successfulDaysGate = gate
         invalidateAll()
     }
 
