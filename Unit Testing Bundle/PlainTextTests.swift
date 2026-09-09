@@ -79,10 +79,53 @@ struct PlainTextTests {
                 == [PlainText.Line(first: ["polar bear"], second: ["полярный медведь"])])
     }
 
-    @Test func hyphenatedWordIsSkippedKnownLimitation() {
-        // FIXME parity: '-' is also a pair separator, so hyphenated words split into
-        // 3 parts and the line is skipped. Documents the known limitation.
-        #expect(PlainText.parse("well-known|известный").isEmpty)
+    /// The defect this closes, found by importing into the running app rather than by
+    /// reading the parser: `-` is both a pair separator and a character inside ordinary
+    /// words, so every hyphenated word split into three parts and the line vanished with
+    /// nothing said to the learner. Six lines went in, two came out.
+    @Test(arguments: ["well-known|известный",
+                      "well-known : известный",
+                      "well-known - известный",
+                      "well-known — известный"])
+    func aHyphenatedWordSurvivesWhenTheLineSaysHowItIsSeparated(line: String) {
+        #expect(PlainText.parse(line)
+                == [PlainText.Line(first: ["well-known"], second: ["известный"])])
+    }
+
+    /// `—` is what iOS and macOS autocorrect make of `--`, and what most pasted prose
+    /// carries. It was not a separator, so a line written on the phone could not be read
+    /// back by it.
+    @Test func anEmDashSeparatesLikeTheOtherDashes() {
+        #expect(PlainText.parse("badger — барсук")
+                == [PlainText.Line(first: ["badger"], second: ["барсук"])])
+    }
+
+    /// The ordering is not free: a bare dash must keep working, because it is the one
+    /// case that cannot be told apart from a hyphen except by trying it last.
+    @Test func aBareDashStillSeparatesWhenNothingElseDoes() {
+        #expect(PlainText.parse("bear-медведь")
+                == [PlainText.Line(first: ["bear"], second: ["медведь"])])
+    }
+
+    /// The round trip the design leans on: **anything the app can write, it must read.**
+    /// A hyphenated word can always be *typed* even when it could not be imported, so
+    /// export followed by import silently deleted it — from the app's own file.
+    @Test func aHyphenatedWordSurvivesTheAppsOwnRoundTrip() throws {
+        let lexicon = makeLexicon()
+        let set = try lexicon.addWordSet(named: "Round trip", languages: ["en", "ru"])
+        // Typed, not imported — a word that could never get in through the importer can
+        // always be entered by hand, which is exactly how one came to be exported and
+        // then lost.
+        _ = try lexicon.addSenses(to: set.id, terms: [[Term.Draft("well-known", in: "en"),
+                                                       Term.Draft("известный", in: "ru")]])
+
+        let exported = PlainText.render(try lexicon.senses(in: set.id), from: "en", to: "ru")
+        #expect(exported.contains("well-known"), "precondition: export writes it")
+
+        let empty = try lexicon.addWordSet(named: "Reimported", languages: ["en", "ru"])
+        try lexicon.importPlainText(exported, into: empty.id, first: "en", second: "ru")
+        let words = try lexicon.senses(in: empty.id).flatMap { $0.terms(in: "en") }.map(\.text)
+        #expect(words.contains("well-known"), "the app must be able to read its own file")
     }
 
     // MARK: - Importing

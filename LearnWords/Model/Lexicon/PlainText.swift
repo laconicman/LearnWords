@@ -40,17 +40,61 @@ enum PlainText {
     /// Values are whitespace-trimmed but otherwise kept verbatim: an import records what
     /// the source said. Canonicalisation, if it ever happens, belongs where words are
     /// typed, not where they are read in bulk.
-    // FIXME: remove the dash separator or handle it — a hyphenated word ("well-known")
-    // splits into three parts and is skipped. Pre-existing behaviour, kept for parity.
     static func parse(_ text: String) -> [Line] {
         split(text, by: "\n" + "\u{2028}", union: .newlines).compactMap { entry in
-            let parts = split(entry, by: "|:-–")
-            guard parts.count == 2 else { return nil }
+            guard let parts = sides(of: entry) else { return nil }
             let first = synonyms(in: parts[0])
             let second = synonyms(in: parts[1])
             guard !first.isEmpty, !second.isEmpty else { return nil }
             return Line(first: first, second: second)
         }
+    }
+
+    /// Every character that has ever separated the two sides of a line.
+    ///
+    /// `—` (em dash) is here and was not before: it is what iOS and macOS autocorrect
+    /// produce from `--` and what most pasted prose contains, so a line written on the
+    /// phone that shares this file could not be read back by it.
+    private static let dashes = "-–—"
+
+    /// The two sides of one line, or `nil` if it is not a pair.
+    ///
+    /// **Tried in order of confidence, which is the whole point.** `-` is both a pair
+    /// separator and a character inside ordinary words — "well-known", "e-mail",
+    /// "up-to-date" — and the previous version split on any of `| : - –` at once, so every
+    /// hyphenated word produced three parts and the line was dropped without a word to the
+    /// learner. Ordering resolves it without giving anything up:
+    ///
+    /// 1. `|` then `:`, which never occur inside a word;
+    /// 2. a dash with whitespace beside it — punctuation *between* the sides;
+    /// 3. a bare dash, so `bear-медведь` still reads as it always has.
+    ///
+    /// A hyphenated word therefore survives whenever the line says how it is separated,
+    /// which is every line this app itself writes.
+    private static func sides(of entry: String) -> [String]? {
+        for separator in "|:" {
+            let parts = split(entry, by: String(separator))
+            if parts.count == 2 { return parts }
+        }
+
+        // Exactly one spaced dash: any more and the line is ambiguous, so fall through
+        // rather than guess which one divides it.
+        let spaced = entry.indices.filter { index in
+            guard dashes.contains(entry[index]) else { return false }
+            let before = index > entry.startIndex
+                ? entry[entry.index(before: index)].isWhitespace : false
+            let after = entry.index(after: index) < entry.endIndex
+                ? entry[entry.index(after: index)].isWhitespace : false
+            return before || after
+        }
+        if spaced.count == 1, let index = spaced.first {
+            let left = entry[..<index].trimmingCharacters(in: .whitespaces)
+            let right = entry[entry.index(after: index)...].trimmingCharacters(in: .whitespaces)
+            if !left.isEmpty, !right.isEmpty { return [left, right] }
+        }
+
+        let parts = split(entry, by: dashes)
+        return parts.count == 2 ? parts : nil
     }
 
     /// One side of a line, split into its synonyms. Empty entries are dropped, so a

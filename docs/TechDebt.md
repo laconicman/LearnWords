@@ -2025,6 +2025,44 @@ Two observations from the same review remain open and are worth keeping, neither
   CloudKit documents for it — asynchronous, so it cannot gate the synchronous store open
   directly; it would have to defer attaching the container or reopen the store afterwards.
 
+## TD-59 — Import silently deleted hyphenated words — **resolved (2026-09-10)**
+
+Found by importing into the running app rather than by reading the parser. Six lines went
+in through the share-extension path; two came out. `well-known | известный` was dropped, and
+so was `badger — барсук`.
+
+**Two separate faults behind it.**
+
+`PlainText.parse` split on any of `| : - –` **at once** and required exactly two parts, so
+every hyphenated word — "well-known", "e-mail", "up-to-date", "self-esteem" — produced three
+and the line was discarded. The behaviour was known and carried as a `FIXME` with a test
+named `hyphenatedWordIsSkippedKnownLimitation`; what was not recorded is that it is a
+*round-trip* defect, not only an import one. A hyphenated word can always be **typed**, and
+`PlainText.render` writes it out verbatim, so exporting a set and importing it back deleted
+it — from a file the app itself wrote. `docs/Design.md` leans on "the user can always import
+the dictionary" as the reason migration can be dropped; that promise did not hold.
+
+And `—` (em dash) was not a separator at all, only `-` and `–`. It is what iOS and macOS
+autocorrect make of `--` and what most pasted prose carries, so a line typed on the phone
+could not be read back by it.
+
+**Fix: try separators in order of confidence rather than all at once.** `|` then `:`, which
+never occur inside a word; then a dash with whitespace beside it, which is punctuation
+*between* the sides; then a bare dash, so `bear-медведь` reads exactly as it always has. A
+hyphenated word survives whenever the line says how it is separated — which is every line
+this app writes. No previously-parsing line changes meaning; the three new tests fail
+against the old parser and `aBareDashStillSeparatesWhenNothingElseDoes` passes against both,
+which is what makes it the regression guard.
+
+392 tests green, from 388.
+
+**Still open, deliberately: the import says nothing.** `Lexicon.importPlainText` returns a
+count and both call sites discard it, so a file whose every line is malformed looks exactly
+like a successful import — `reload()` and no message. That is what made this defect survive:
+nothing ever told anyone that four lines had gone missing. A count and a skipped-line total
+would have. Recorded here rather than fixed because where it belongs — an alert, a banner,
+a line on the screen — is a design decision, not a parser one.
+
 ## TD-55 — The entry screen should have the structure, not the punctuation (owner, 2026-08-11)
 
 **Recorded, not built.** The owner's decision on 2026-08-11 was to write this down and
