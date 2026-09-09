@@ -82,8 +82,22 @@ final class ReminderScheduler {
     /// Called when the switch is turned on, never at launch: a permission sheet before the
     /// learner has asked for reminders is the request most likely to be denied, and a
     /// denial is close to permanent.
+    /// **Provisional, so the switch does not open a prompt** (owner, 2026-09-10).
+    /// `.provisional` is granted immediately and without asking, and reminders are
+    /// delivered quietly to Notification Center instead of alerting. The learner promotes
+    /// them from the first reminder itself — iOS offers "Keep" and "Turn Off" on it — and
+    /// a refusal there is an ordinary Settings state rather than the near-permanent denial
+    /// a declined prompt produces.
+    ///
+    /// Two consequences worth knowing. `granted` is now effectively always `true`, so
+    /// `showNotificationsRefused()` is reachable only for someone who turned reminders off
+    /// in Settings earlier. And the first reminders **do not make a sound** — that is the
+    /// bargain provisional makes, and it is why `standing` treats `.provisional` as
+    /// allowed while still checking that some presentation channel is on.
+    ///
+    /// iOS 12.0+, so it needs no availability guard at the floor.
     func requestAuthorization(completion: @escaping (Bool) -> Void) {
-        center.requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
+        center.requestAuthorization(options: [.alert, .sound, .badge, .provisional]) { granted, error in
             if let error { debugLog("Notification authorization failed: \(error)") }
             DispatchQueue.main.async { completion(granted) }
         }

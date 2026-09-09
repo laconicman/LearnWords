@@ -17,11 +17,28 @@ vocabulary.
 | App Group | `group.club.laconic.LearnWords` |
 | Team (app target) | `WEJF495R4D` |
 
-> **Watch the team.** The app, widget and share extension are signed with `WEJF495R4D`,
-> but the project-level default and the test bundle use `MW2YXY2465`. A container created
-> while the wrong team is selected produces exactly the `BadContainer` error below, and the
-> mistake is invisible in the log — it reports only that the container could not be
-> configured, not that it exists somewhere else.
+> **The two teams, named — and no longer split (2026-09-10).**
+>
+> | Team ID | Name |
+> |---|---|
+> | `WEJF495R4D` | **Paul Buktab** — this project's team |
+> | `MW2YXY2465` | RENTEL — a different organisation |
+>
+> Read out of the signing certificates on the development Mac (`OU=` is the team ID:
+> `security find-identity -v -p codesigning`, then `openssl x509 -noout -subject`), so this
+> is measured rather than remembered.
+>
+> The app, both widgets and the share extension always signed with `WEJF495R4D`. The
+> **project-level default and the test bundle** used `MW2YXY2465` — and the project-level
+> team is what Xcode's Signing & Capabilities pane shows when the *project* rather than a
+> *target* is selected, which is where an iCloud container gets created. A container made
+> from that screen lands under RENTEL, is invisible to an app signed as Paul Buktab, and
+> produces exactly the `BadContainer` error below. The log cannot tell you this: it reports
+> only that the container could not be configured, never that it exists somewhere else.
+>
+> **All twelve build configurations now use `WEJF495R4D`.** If `BadContainer` persists after
+> that, the container itself is under the wrong team and must be recreated — containers
+> cannot be moved between teams.
 
 ## Steps
 
@@ -42,7 +59,27 @@ Ticking CloudKit also adds the Push Notifications capability, which is what puts
 editing `LearnWords.entitlements` by hand: the App ID has to be updated at the same time,
 or signing breaks.
 
-### 2. Background Modes → Remote notifications
+### 2. Background Modes → Remote notifications, and the Push capability
+
+> **Both halves are needed, and only one of them was there.** `UIBackgroundModes` has
+> carried `remote-notification` for a long time; what was missing is the **Push
+> Notifications capability on the App ID**, which is what puts `aps-environment` in the
+> entitlements — and, separately, a call to `registerForRemoteNotifications()`. Added
+> 2026-09-10.
+>
+> `NSPersistentCloudKitContainer` creates its own `CKDatabaseSubscription`, so nothing here
+> writes one by hand. But CloudKit's silent pushes reach only an app that has registered
+> with APNs, so without that call the store still synced — at launch, on foregrounding and
+> on CloudKit's own schedule, never promptly.
+>
+> A silent push needs **no** user permission: it shows nothing. So registration is
+> unconditional and is not tied to the reminders prompt.
+>
+> Enable **Push Notifications** on the App ID in the portal before building to a device.
+> `aps-environment` is now in `LearnWords.entitlements`, and a device build fails to sign
+> without the matching capability — that failure is the check that this step was done.
+
+
 
 **Already done in code** — `UIBackgroundModes` contains `remote-notification` in
 `LearnWords/Info.plist`. Xcode's Background Modes capability writes the same key; adding it
@@ -122,9 +159,9 @@ BUG IN CLIENT OF CLOUDKIT: CloudKit push notifications require the
 'remote-notification' background mode in your info plist.
 ```
 
-Step 2, now fixed in the repo. Until step 1 also adds `aps-environment`, the key is
-declared but nothing is delivered — sync then happens at launch, on foregrounding and on
-CloudKit's own schedule, just not promptly.
+Step 2, now fixed in the repo, and `aps-environment` was added on 2026-09-10 along with
+the `registerForRemoteNotifications()` call that actually makes deliveries happen. If this
+line still appears, the App ID is missing the Push Notifications capability.
 
 ```
 "BadContainer" (1014); "Couldn't get container configuration from the server
@@ -225,3 +262,37 @@ WWDC:
 - [Using Core Data With CloudKit (WWDC19, 202)](https://developer.apple.com/videos/play/wwdc2019/202/) — the one to watch first; it is the introduction of `NSPersistentCloudKitContainer` and explains the model constraints by way of *why*.
 - [Sync a Core Data store with the CloudKit public database (WWDC20, 10650)](https://developer.apple.com/videos/play/wwdc2020/10650/) — public database; we use the private one, but the schema and setup discussion carries over.
 - [Optimize your use of Core Data and CloudKit (WWDC22, 10119)](https://developer.apple.com/videos/play/wwdc2022/10119/) — profiling and debugging sync, i.e. what to do when step 6 disappoints.
+
+## Entitlements: what is here, and what is deliberately not
+
+| Entitlement | State |
+|---|---|
+| `com.apple.developer.icloud-container-identifiers` | present |
+| `com.apple.developer.icloud-services` (CloudKit) | present |
+| `com.apple.security.application-groups` | present |
+| `aps-environment` | present since 2026-09-10 — silent CloudKit pushes |
+
+**Nothing else is added speculatively, and that is a rule rather than laziness.** Every
+entitlement must also exist as a capability on the App ID: a device build signs against the
+provisioning profile, and an entitlement the profile does not grant fails the build
+outright. "Add everything we might need" would therefore break signing for everyone until
+each one was also ticked in the portal.
+
+Considered and left out:
+
+* **`com.apple.developer.usernotifications.time-sensitive`** — only if reminders should be
+  able to break through Focus. That is a product decision about interruption, not a sync
+  one, and provisional authorization (below) points the other way.
+* **`com.apple.developer.icloud-container-environment`** — pins Development or Production
+  explicitly. Needed only for ad-hoc or enterprise builds; App Store and development builds
+  infer it, and setting it wrongly is a way to have a shipped app talk to a schema nobody
+  deployed.
+* **`processing` / `fetch` background modes** — these belong to TD-56 (scoring off the main
+  thread via `BGTaskScheduler`), not to push, and adding them now would declare a
+  capability nothing uses.
+
+**Provisional authorization** (`.provisional`, iOS 12+) is requested alongside
+`.alert/.sound/.badge`, so turning reminders on never opens a permission prompt: iOS grants
+quietly and delivers to Notification Center, and the learner promotes or refuses from the
+first reminder itself. This is not an entitlement — it is a runtime option — and it is
+listed here because it is the other half of "leverage push properly".
