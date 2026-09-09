@@ -708,7 +708,18 @@ the downloadable-dataset route, or make lookups explicitly user-initiated per wo
 subset for the user's language pairs; keep the fetch behind a protocol so sources can
 be added. Blocked on iteration 2+ of TD-13.
 
-## TD-20 — Exercise screens are triplicated in both code and storyboard
+## TD-20 — Exercise screens are triplicated in both code and storyboard — **resolved (2026-07-20)**
+
+**Reconciled 2026-09-02.** The register said "open" for six weeks after the work landed.
+`WordTestViewController`, `WordDictationController` and `WordPhoneticsViewController` no
+longer exist; one `ExerciseViewController` composes `ExerciseAnswerSurface`, and the sitting
+moved into `PracticeSession` (which replaced the branch's `ExerciseSession` outright — see
+its file comment for why the redesign went further than the extraction). Verified rather than
+assumed: `git cherry` reports every commit of `feature/button-design-system` as already
+present in `main`, and none of the three controllers is in the tree. That branch has been
+deleted.
+
+The original entry follows.
 
 `WordTestViewController`, `WordDictationController` and `WordPhoneticsViewController` are
 near-copies: `startRound`, `nextTapped`, `afterAnswer`, `showAnswer`, `askQuestion`,
@@ -1108,6 +1119,31 @@ untranslated (or, worse, as English marked `translated`) in between. **Discharge
 string catalogue as part of a feature's definition of done — add `es`/`ru` (or an explicit
 `needs_review`) in the same commit as the `NSLocalizedString`, and never mark a
 copy-of-source `translated`.
+
+**A third instance, and the sharpest one (owner, 2026-09-02): translations that are correct
+word-for-word and wrong as sentences.** Seen in the running app, not read off the catalogue:
+
+* `"Remembered for about %@"` renders in Russian as **"Помнится около 2 дня"**. Two separate
+  faults. *Grammatically*, `около` governs the genitive while `DateComponentsFormatter`
+  returns a nominative phrase, so no set of plural forms can repair it while the preposition
+  and the formatter output are composed by a `%@` template — the string needs recasting, not
+  retranslating. *Idiomatically*, `помнится` is read as the parenthetical "as I recall",
+  which is close to the opposite of a prediction about the future. Candidates the owner
+  raised or that follow from this: `Продержится ≈ %@`, `В памяти ещё ~%@`.
+* The same trap caught this session's own new string: `"нужны успехи в 5 разных дней"` was
+  written, shipped to the simulator, and read back as wrong. **Fixed in TD-57** by letting
+  the numeral govern the noun directly instead of sitting behind a preposition.
+* `"Successful days"` was `"Дней с успехом"`, so the row read "Дней с успехом — 1 день":
+  label and value disagreeing about what is counted. Now `"Успешных дней"`.
+
+**What this adds to the pattern above.** The existing discharge — "translate the outstanding
+keys as part of finishing a feature" — is necessary and not sufficient: every string here was
+already translated and marked `translated`. What was missing is *reading the result in the
+target language on a device*. A `%@` template that composes a preposition with formatted
+output is a structural bug that only shows up rendered, and English never reveals it because
+English does not decline. **Added discharge:** for any format string with a `%@` or `%d` in a
+prepositional phrase, drive the screen once per language — `simctl launch <udid> <bundle>
+-AppleLanguages "(ru)"` — before calling it done.
 
 **Backlog cleared (2026-07-28, second pass).** The remaining 45 source-only keys (no `ru`
 and no `es` — reminders/scheduling copy, dictation and meaning-editor strings, the `Animals`
@@ -2025,6 +2061,29 @@ Two observations from the same review remain open and are worth keeping, neither
   CloudKit documents for it — asynchronous, so it cannot gate the synchronous store open
   directly; it would have to defer attaching the container or reopen the store afterwards.
 
+## TD-58 — The context-menu previews do not share the app's visual language (owner, 2026-09-02)
+
+Long press on a word and long press on a set both open a `UIContextMenuConfiguration` whose
+*preview* is a view controller. That gesture was chosen over a sheet precisely because it can
+show something — and only one of the two does.
+
+`SetSummaryViewController` has the vocabulary: a `ProgressRing` and a stacked `BarStrip` per
+exercise, then a forecast strip. `SenseStatisticsViewController` has **none of it** — three
+sections of label/detail text, two of which typically read "Not practised yet" — even though
+the row the learner just long-pressed carries a ring of its own. The owner's words: it "does
+not even leverage the circled progress bar that should be common through the project."
+
+**Two further defects, seen by driving the simulator rather than read off the code.** Both
+previews are **clipped**: the word preview cuts off mid-"Overall", the set preview loses its
+retention and effort sections. And `WordSetsTableViewController` passes `actionProvider: nil`,
+so long-pressing a set produces a floating card with no menu at all — either it deserves
+actions or it should not be a context menu.
+
+**Discharge:** a design round, not a patch — the question is what belongs in a glance versus
+in the screen it pushes to, and that has to be answered for both previews together or they
+will drift again. Briefed in `Design-Research-Brief.md`, with the current state captured in
+`design/ref/`. See also TD-30 (the ring's Dynamic-Type size) and TD-16 (the animation system),
+which a redesign will touch.
 ## TD-59 — Import silently deleted hyphenated words — **resolved (2026-09-10)**
 
 Found by importing into the running app rather than by reading the parser. Six lines went
