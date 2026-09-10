@@ -63,24 +63,13 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         // delivered before anything is listening and the tap goes nowhere.
         UNUserNotificationCenter.current().delegate = self
 
-        // **APNs registration is what makes CloudKit sync promptly.**
-        // `NSPersistentCloudKitContainer` creates its own database subscription, but the
-        // silent pushes it asks CloudKit to send reach only an app that has registered —
-        // so without this line the store still syncs, just at launch, on foregrounding
-        // and on CloudKit's own unhurried schedule. That is what docs/CloudKitSetup.md
-        // means by "the key is declared but nothing is delivered".
-        //
-        // Unconditional, and deliberately **not** gated on notification permission: a
-        // silent push shows the learner nothing and needs no permission, so tying it to a
-        // prompt that is about *reminders* would trade sync for an unrelated answer.
-        //
-        // **Here, not in `SceneDelegate`, on every OS.** Only the *window* in this file is
-        // iOS 12's; launch, APNs and the store observers below are app-level on both life
-        // cycles, and Apple routes them to the app delegate even when scenes are enabled.
-        // A silent push can launch the app in the background with no scene connected, and
-        // UIKit may disconnect a background scene at any time — so anything that must hear
-        // a push-driven import cannot live on a scene.
-        application.registerForRemoteNotifications()
+        // **No APNs code, deliberately.** CloudKit's pushes are Core Data's to handle: Apple's
+        // guide to syncing a Core Data store with CloudKit states that no app code is needed,
+        // and the system creates the background task that imports. What sync does need is the
+        // entitlement (`aps-environment`, from the Push capability) and the
+        // `remote-notification` background mode — both present. An earlier version registered
+        // here and completed the push handler at once with `.newData`, which could only end
+        // that background time early. Reported by review, PR #14.
 
         // Reminders are rebuilt whenever the app can see fresh state: on the way to the
         // background (the freshest moment before the learner is away), on return, and when
@@ -100,6 +89,12 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         // The widgets read the same store, but WidgetKit only asks them again on their own
         // timeline — so a word added here, or an import a silent push just woke, waited out
         // the widget's 30-minute hint and whatever WidgetKit stretched that to.
+        //
+        // **Here, not in `SceneDelegate`, on every OS.** Only the *window* in this file is
+        // iOS 12's; launch and these store observers are app-level on both life cycles. A
+        // CloudKit push can wake the app in the background with no scene connected, and UIKit
+        // may disconnect a background scene at any time — so an observer that must hear a
+        // push-driven import cannot live on a scene.
         notifications.addObserver(self, selector: #selector(reloadWidgets),
                                   name: LWPersistence.storeDidChange, object: nil)
         rebuildReminders()
@@ -149,36 +144,6 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         options: [UIApplication.OpenURLOptionsKey: Any] = [:]
     ) -> Bool {
         AppRoot.handle(url, on: window)
-    }
-
-    // MARK: Remote notifications
-
-    /// CloudKit's silent push. There is nothing to *do* with it but say it arrived.
-    ///
-    /// `NSPersistentCloudKitContainer` is already listening — the delivery itself is what
-    /// wakes its import — so this exists to complete the handler contract and to report
-    /// the outcome. `.newData` rather than `.noData`, because the whole point of the push
-    /// is that another device changed something; telling iOS otherwise teaches it to
-    /// deliver ours less often.
-    func application(_ application: UIApplication,
-                     didReceiveRemoteNotification userInfo: [AnyHashable: Any],
-                     fetchCompletionHandler completionHandler:
-                        @escaping (UIBackgroundFetchResult) -> Void) {
-        debugLog("Remote notification received; a CloudKit import follows if it was ours")
-        completionHandler(.newData)
-    }
-
-    func application(_ application: UIApplication,
-                     didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        debugLog("Registered for remote notifications (\(deviceToken.count)-byte token)")
-    }
-
-    /// Logged rather than surfaced: failing to register costs the *promptness* of sync,
-    /// not sync, and there is nothing the learner could do about it. The simulator fails
-    /// here routinely, which is exactly why this must never become an alert.
-    func application(_ application: UIApplication,
-                     didFailToRegisterForRemoteNotificationsWithError error: Error) {
-        debugLog("Remote notification registration failed: \(error.localizedDescription)")
     }
 }
 

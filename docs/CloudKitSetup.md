@@ -61,19 +61,20 @@ or signing breaks.
 
 ### 2. Background Modes → Remote notifications, and the Push capability
 
-> **Both halves are needed, and only one of them was there.** `UIBackgroundModes` has
-> carried `remote-notification` for a long time; what was missing is the **Push
-> Notifications capability on the App ID**, which is what puts `aps-environment` in the
-> entitlements — and, separately, a call to `registerForRemoteNotifications()`. Added
-> 2026-09-10.
+> **The capability was the missing half; no code is.** `UIBackgroundModes` has carried
+> `remote-notification` for a long time. What was missing is the **Push Notifications
+> capability on the App ID**, which is what puts `aps-environment` in the entitlements —
+> Apple's setup guide has ticking CloudKit add it, and this project's entitlements are
+> maintained by hand, so it never arrived. Added 2026-09-10.
 >
-> `NSPersistentCloudKitContainer` creates its own `CKDatabaseSubscription`, so nothing here
-> writes one by hand. But CloudKit's silent pushes reach only an app that has registered
-> with APNs, so without that call the store still synced — at launch, on foregrounding and
-> on CloudKit's own schedule, never promptly.
->
-> A silent push needs **no** user permission: it shows nothing. So registration is
-> unconditional and is not tied to the reminders prompt.
+> **Corrected the same day.** An earlier version of this section said the app must also call
+> `registerForRemoteNotifications()` and implement the delegate handler, and that without
+> them sync was never prompt. Apple says otherwise: "You don't need to add any code to your
+> project to synchronize records across devices" (*Syncing a Core Data Store with
+> CloudKit*) — CloudKit pushes, and the system creates the background task that downloads
+> and imports. The paragraph at the end of this step was right all along. The handler that
+> briefly existed completed at once with `.newData`, which could only end that background
+> time early. Reported by review, PR #14.
 >
 > Enable **Push Notifications** on the App ID in the portal before building to a device.
 > `aps-environment` is now in `LearnWords.entitlements`, and a device build fails to sign
@@ -88,7 +89,8 @@ through the UI is equivalent and will show the existing value ticked.
 No app code is needed to receive these pushes. `NSPersistentCloudKitContainer` owns the
 subscription and the system routes the notification to it — you do not call
 `registerForRemoteNotifications()` and do not implement
-`application(_:didReceiveRemoteNotification:)`.
+`application(_:didReceiveRemoteNotification:)`. Source: Apple, *Syncing a Core Data Store
+with CloudKit* — verified 2026-09-10, after this project briefly did both.
 
 ### 3. App Group
 
@@ -159,9 +161,8 @@ BUG IN CLIENT OF CLOUDKIT: CloudKit push notifications require the
 'remote-notification' background mode in your info plist.
 ```
 
-Step 2, now fixed in the repo, and `aps-environment` was added on 2026-09-10 along with
-the `registerForRemoteNotifications()` call that actually makes deliveries happen. If this
-line still appears, the App ID is missing the Push Notifications capability.
+Step 2, fixed in the repo; `aps-environment` was added on 2026-09-10. If this line still
+appears, the App ID is missing the Push Notifications capability.
 
 ```
 "BadContainer" (1014); "Couldn't get container configuration from the server

@@ -371,6 +371,18 @@ releases that touch launch/lifecycle/URL handling, smoke-test launch + the
 `learnWords://shareaction` deep link on an iOS 12 simulator or device there. The modern-SDK
 App-Store build (Xcode 26+) and the iOS-12 verification build are two separate steps.
 
+**The Xcode 15 project is stale — found 2026-09-10.** `LearnWords-Xcode15.xcodeproj` has no
+synchronized folders (an Xcode 16 feature), so it lists sources one by one, and it lists none
+added since 2026-08-07: `ProgressCache`, `SetSummary`, `MemoryWording`, both statistics
+screens, `BarStrip`, `SenseEntry`, `Exercise+Title`. Files it *does* compile use those types —
+`WordTableViewController` calls `ProgressCache.shared` and builds a
+`SenseStatisticsViewController` — so it cannot compile as it stands. **Verified:** the
+references exist and the files are absent. **Inferred, not run:** the build failure itself.
+Its signing team and weak-link flags were brought in line with the main project anyway (PR #14),
+so a resync starts from correct settings. **Discharge:** before any iOS 12 pass, add every
+source the main project compiles, or regenerate this project from the main one — keeping it
+by hand has now failed silently for five weeks.
+
 ## TD-9 — Divergent doc copies — **resolved (2026-07-17)**
 
 Was: `docs/*.md` (current) and `LearnWords/Documentation.docc/*.md` (older, unfilled
