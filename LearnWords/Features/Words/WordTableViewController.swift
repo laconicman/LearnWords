@@ -336,15 +336,20 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         if text.aproxWordCount > 1 {
             guard let set = library.selectedSet else { return }
             let pair = LanguagePair.forSet(set)
-            var summary = Lexicon.ImportSummary()
-            do {
-                summary = try lexicon.importPlainText(text, into: set.id,
-                                                      first: pair.secondary, second: pair.primary)
-            } catch {
-                debugLog("Shared-text import failed: \(error)")
+            // A `Result`, so a thrown import cannot fall through to the summary: zero counts
+            // there say "your file had no words", which is false when the store failed.
+            let result = Result {
+                try lexicon.importPlainText(text, into: set.id,
+                                            first: pair.secondary, second: pair.primary)
             }
             reload()
-            presentImportSummary(summary)
+            switch result {
+            case .success(let summary):
+                presentImportSummary(summary)
+            case .failure(let error):
+                debugLog("Shared-text import failed: \(error)")
+                presentImportFailure(error)
+            }
         } else {
             // Async: navigating mid-appearance-transition is unreliable.
             let word = lemmas(from: text).first ?? text

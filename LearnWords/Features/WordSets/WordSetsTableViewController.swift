@@ -350,12 +350,7 @@ final class WordSetsTableViewController: UITableViewController, UIDocumentPicker
             presentImportSummary(summary)
         } catch {
             debugLog("Import failed: \(error)")
-            let alert = UIAlertController(
-                title: NSLocalizedString("IMPORT_FAIL_TITLE", comment: "Title for failed import"),
-                message: error.localizedDescription,
-                preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: ""), style: .default))
-            present(alert, animated: true)
+            presentImportFailure(error)
         }
     }
 }

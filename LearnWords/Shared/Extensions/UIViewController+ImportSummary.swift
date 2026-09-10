@@ -58,4 +58,20 @@ extension UIViewController {
         alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: ""), style: .default))
         present(alert, animated: true)
     }
+
+    /// An import that *failed*, as distinct from one that found nothing to add.
+    ///
+    /// **One presenter for both paths, for the same reason as the summary.** The file path
+    /// already showed the error; the share-extension path logged it and then fell through to
+    /// `presentImportSummary` with zero counts — so a store failure reached the learner as
+    /// "Nothing imported: nothing in the file could be read as a word", a confident wrong
+    /// answer about their file. Reported by review, PR #12.
+    func presentImportFailure(_ error: Error) {
+        let alert = UIAlertController(
+            title: NSLocalizedString("IMPORT_FAIL_TITLE", comment: "Title for failed import"),
+            message: error.localizedDescription,
+            preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: ""), style: .default))
+        present(alert, animated: true)
+    }
 }
