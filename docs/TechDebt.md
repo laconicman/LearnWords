@@ -2247,3 +2247,23 @@ gets written. Worth deciding which before building either.
 Not urgent: a library large enough to feel this does not exist yet, and the seed is nine
 words. Recorded now because the measurement exists now, and because it is the first concrete
 user-facing cost of the 12.1 floor.
+
+## TD-60 — The iOS 12–13 Today widget has had no data since before WidgetKit shipped (2026-09-10)
+
+**Verified:** `Widget/TodayViewController.swift` reads `stringArray(forKey: "Words")` from the
+App-Group defaults, and nothing in the tree writes that key — `AppConstants` labels it "Just for
+tests". `git log -S` traces the last writer to a line that was *already commented out* when
+3d275cd deleted it, the same commit whose subject promises to "keep Today extension for iOS
+12-13". **Reasoned, not seen on a device:** the Today widget on iOS 12 and 13 therefore shows an
+empty list. The store refactor did not break it; it was already dead, and the refactor was the
+moment nobody noticed.
+
+Found while checking what silent CloudKit pushes reach. The WidgetKit widget (iOS 14+) reads
+the store through `Lexicon` and is now reloaded on `LWPersistence.storeDidChange`; this one
+reads a key that no longer exists, so no reload can help it.
+
+**Not fixed:** the owner's call is that iOS 12 fixes wait for the next release, and iOS 13 shares
+the fate because the WidgetKit widget starts at 14. **Discharge:** read the store through
+`Lexicon`, as the WordWidget does — `Lexicon.swift` is already in both widget targets'
+membership lists — or have the app write a small snapshot of the current set to the App-Group
+defaults from the same `storeDidChange` hook the WidgetKit reload now uses.

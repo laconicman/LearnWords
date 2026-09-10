@@ -8,6 +8,9 @@
 
 import UIKit
 import UserNotifications
+// Weak-linked (`-weak_framework WidgetKit`): an import autolinks as a plain load, and
+// iOS 12–13 would refuse to launch — TD-46, where Core Haptics did exactly that.
+import WidgetKit
 
 @main
 final class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -70,6 +73,13 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         // Unconditional, and deliberately **not** gated on notification permission: a
         // silent push shows the learner nothing and needs no permission, so tying it to a
         // prompt that is about *reminders* would trade sync for an unrelated answer.
+        //
+        // **Here, not in `SceneDelegate`, on every OS.** Only the *window* in this file is
+        // iOS 12's; launch, APNs and the store observers below are app-level on both life
+        // cycles, and Apple routes them to the app delegate even when scenes are enabled.
+        // A silent push can launch the app in the background with no scene connected, and
+        // UIKit may disconnect a background scene at any time — so anything that must hear
+        // a push-driven import cannot live on a scene.
         application.registerForRemoteNotifications()
 
         // Reminders are rebuilt whenever the app can see fresh state: on the way to the
@@ -87,12 +97,35 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         // rebuilt from stale data in the local case (owner, DRY).
         notifications.addObserver(self, selector: rebuild,
                                   name: LWPersistence.storeDidChange, object: nil)
+        // The widgets read the same store, but WidgetKit only asks them again on their own
+        // timeline — so a word added here, or an import a silent push just woke, waited out
+        // the widget's 30-minute hint and whatever WidgetKit stretched that to.
+        notifications.addObserver(self, selector: #selector(reloadWidgets),
+                                  name: LWPersistence.storeDidChange, object: nil)
         rebuildReminders()
         return true
     }
 
     @objc private func rebuildReminders() {
         ReminderScheduler.shared.rebuild(from: Library.shared.lexicon)
+    }
+
+    /// Tells WidgetKit the library changed. `storeDidChange` covers both halves — a local
+    /// save and a CloudKit import — because both post it, on the main queue.
+    ///
+    /// **Not debounced, deliberately.** Apple: reloads requested while the containing app is
+    /// in the foreground don't count against the widget's daily budget, and that is when
+    /// local saves happen; remote imports arrive already coalesced by `deduplicateSoon`'s
+    /// two-second window, and WidgetKit coalesces across widgets besides.
+    /// (developer.apple.com/documentation/widgetkit/keeping-a-widget-up-to-date)
+    ///
+    /// `reloadAllTimelines` rather than `reloadTimelines(ofKind:)`: the kind string lives in
+    /// the widget target, which the app cannot import, so naming it here would be a copy free
+    /// to drift — and every widget in the bundle reads the same store anyway.
+    @objc private func reloadWidgets() {
+        if #available(iOS 14.0, *) {
+            WidgetCenter.shared.reloadAllTimelines()
+        }
     }
 
     // MARK: UIScene life cycle (iOS 13+)

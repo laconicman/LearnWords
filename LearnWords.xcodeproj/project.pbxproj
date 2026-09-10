@@ -686,6 +686,8 @@
 					"$(inherited)",
 					"-weak_framework",
 					CoreHaptics,
+					"-weak_framework",
+					WidgetKit,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = club.laconic.LearnWords;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -714,6 +716,8 @@
 					"$(inherited)",
 					"-weak_framework",
 					CoreHaptics,
+					"-weak_framework",
+					WidgetKit,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = club.laconic.LearnWords;
 				PRODUCT_NAME = "$(TARGET_NAME)";
