@@ -45,7 +45,7 @@ struct ExerciseScreenAppearanceTests {
 
         #expect(vc.isViewLoaded, "precondition: the screen loaded")
         #expect(vc.contentStack.alpha == 0, "precondition: the screen starts hidden")
-        try await Task.sleep(nanoseconds: 1_500_000_000)  // viewDidAppear + 0.5 s spring
+        try await waitUntil { vc.contentStack.alpha == 1 }  // viewDidAppear → askQuestion → show
         #expect(vc.contentStack.alpha == 1,
                 "\(exercise) must spring in on appearance — askQuestion must end in ExerciseTransition.show")
     }

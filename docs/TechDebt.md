@@ -1891,7 +1891,8 @@ convention would be one too many.
 
 They are opt-in — `TEST_RUNNER_LW_BENCH=1` — with one small guard left in the default suite
 to catch a per-row fetch sneaking back in. Left running by default they made
-`ExerciseScreenAppearanceTests`, which waits on a real 0.5 s animation, flaky under load.
+`ExerciseScreenAppearanceTests`, which then slept a fixed time on a real 0.5 s animation,
+flaky under load. It polls for the outcome since TD-61.
 
 **Each measurement is an attachment**, not a `print` and not a deliberate failure. Swift
 Testing does not forward standard output to the `xcodebuild` log, and failing a test to read
@@ -2247,3 +2248,48 @@ gets written. Worth deciding which before building either.
 Not urgent: a library large enough to feel this does not exist yet, and the seed is nine
 words. Recorded now because the measurement exists now, and because it is the first concrete
 user-facing cost of the 12.1 floor.
+
+## TD-61 — The animation tests slept a fixed time, and lost under load — **resolved (2026-09-10)**
+
+A full-suite run on 2026-09-10 failed in one place,
+`ExerciseTransitionTests.refreshRunsWhileContainerStaysOnScreen`: `refreshed` was still false
+and the container's alpha still 0 when the test's fixed 1.6 s sleep ended. The change under
+test passed the suite on the runs either side. Nothing was wrong with `ExerciseTransition` —
+the refresh had not happened *yet*. `refreshed` is set by the fade's completion, after a 0.02 s
+delay and a 0.5 s fade, so the sleep already allowed three times the nominal cost, and a
+simulator running the whole parallel suite took longer still.
+`ExerciseScreenAppearanceTests` had the same shape — a fixed 1.5 s for `viewDidAppear` to
+reach `show` — and TD-52 had already seen it flake while the benchmarks ran by default.
+
+**A fixed sleep bets that nothing ever delays the completion past its margin**, and that run
+lost the bet; a longer sleep raises the stake and charges it to every run that passes. Both
+positive tests now **poll for the outcome**: `waitUntil` (`Unit Testing Bundle/WaitUntil.swift`)
+checks every 20 ms and gives up after `animationTimeout`, 5 s. It only waits — the original
+`#expect`s follow unchanged, so a failure still says which half of the condition was false. A
+passing run leaves as soon as the condition holds; only a failure pays the whole 5 s.
+
+**The negative test cannot be polled.** `refreshSkippedWhenScreenIsLeftDuringDelay` has to show
+the refresh *never* runs, and until time runs out "not yet" looks exactly like "never". It
+keeps a bounded sleep, lengthened from 1.2 s to the whole `animationTimeout` — the budget a
+positive trusts an animation to finish in, against 0.8 s of scheduled delay and fade. **What
+that does not close** (reasoned, not observed): were the fade's completion ever later than
+5 s, the test would pass without the window guard having been exercised at all. A longer sleep
+narrows that and cannot remove it; removing it needs the test to see the fade finish, which
+`ExerciseTransition` does not expose. Not done here.
+
+`LearnWords-Xcode15.xcodeproj` does not get the new file. Its test target already lacks ten of
+the suites and cannot `import Testing` under Xcode 15.2, so there is nothing there to keep in
+step.
+
+**Verified, as far as it goes.** Both suites × 20 (`-test-iterations 20`, six runs per
+iteration) with 16 busy-loop processes loading the 8-core host for the whole test run: 120 of
+120 green. The same under a probe suite that held the main thread for 2 s in every iteration:
+120 of 120. One full-suite run with the standard command: 388 tests green, 4 skipped (the
+opt-in benchmarks).
+
+**Not reproduced, and still unexplained.** The old sleeps passed both of those loads as well —
+120 of 120 each — and so did a fixed 1.6 s deadline placed after a 1.2 s main-thread stall
+straight after `advance`, in the same job. None of them is what delayed the 2026-09-10 run,
+and nothing found yet does. The change rests on the reasoning above, not on a reproduction: it
+cannot say what happened, only that a delay of up to 5 s no longer fails the suite. The probes
+were temporary and are not in the tree.

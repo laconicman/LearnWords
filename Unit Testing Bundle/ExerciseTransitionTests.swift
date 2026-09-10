@@ -32,7 +32,7 @@ struct ExerciseTransitionTests {
             ExerciseTransition.show(container)
         }
 
-        try await Task.sleep(nanoseconds: 1_600_000_000)  // delay + fade + spring + margin
+        try await waitUntil { refreshed && container.alpha == 1 }
         #expect(refreshed)
         #expect(container.alpha == 1)  // show restored the container
     }
@@ -45,7 +45,10 @@ struct ExerciseTransitionTests {
         ExerciseTransition.advance(container, afterDelay: 0.3) { refreshed = true }
         container.removeFromSuperview()  // "leave the screen" during the delayed start
 
-        try await Task.sleep(nanoseconds: 1_200_000_000)
+        // Absence cannot be polled for: until time runs out, "not yet" looks exactly like
+        // "never". So this one sleeps, for the whole budget a positive test gives an
+        // animation — far past its own 0.3 s delay and 0.5 s fade.
+        try await Task.sleep(for: animationTimeout)
         #expect(!refreshed, "refresh must not run once the container left its window (TD-16 crash class)")
     }
 }
