@@ -2545,7 +2545,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Помнится около %@"
+            "value" : "В памяти ещё %@"
           }
         }
       }
@@ -2562,7 +2562,7 @@
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Помнится меньше суток"
+            "value" : "В памяти меньше суток"
           }
         }
       }
