@@ -570,7 +570,7 @@
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 9;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = MW2YXY2465;
+				DEVELOPMENT_TEAM = WEJF495R4D;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -641,7 +641,7 @@
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 9;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = MW2YXY2465;
+				DEVELOPMENT_TEAM = WEJF495R4D;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -686,6 +686,8 @@
 					"$(inherited)",
 					"-weak_framework",
 					CoreHaptics,
+					"-weak_framework",
+					WidgetKit,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = club.laconic.LearnWords;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -714,6 +716,8 @@
 					"$(inherited)",
 					"-weak_framework",
 					CoreHaptics,
+					"-weak_framework",
+					WidgetKit,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = club.laconic.LearnWords;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -776,7 +780,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = MW2YXY2465;
+				DEVELOPMENT_TEAM = WEJF495R4D;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
@@ -805,7 +809,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = MW2YXY2465;
+				DEVELOPMENT_TEAM = WEJF495R4D;
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.5;
