@@ -264,6 +264,36 @@ WWDC:
 - [Sync a Core Data store with the CloudKit public database (WWDC20, 10650)](https://developer.apple.com/videos/play/wwdc2020/10650/) — public database; we use the private one, but the schema and setup discussion carries over.
 - [Optimize your use of Core Data and CloudKit (WWDC22, 10119)](https://developer.apple.com/videos/play/wwdc2022/10119/) — profiling and debugging sync, i.e. what to do when step 6 disappoints.
 
+## The deployed schema, kept here so drift is visible
+
+`docs/CloudKitSchema-Production.ckdb` is the **Production** schema exported from the CloudKit
+Console (Console → the container → Export Schema), snapshotted 2026-09-10. It lives in the repo
+for one reason: a schema in a console is invisible to review, and a file in git diffs.
+
+**Refresh it whenever you deploy**, under the same name, so the commit shows exactly which
+record types and fields production gained. Deployment is additive and one-way — record types
+and fields already in production cannot be deleted or renamed (Apple, *Deploying an iCloud
+Container's Schema*) — which is why seeing the change before it happens is worth a file.
+
+### The drift as of this snapshot
+
+Production was deployed from the model as it stood before `f833280` (2026-08-09). Compared with
+`LearnWords.xcdatamodeld` today it is missing:
+
+| Missing from Production | Kind |
+|---|---|
+| `CD_Pronunciation` | record type |
+| `CD_Variety` | record type |
+| `CD_Language.CD_wiktionaryCode` | field |
+| `CD_Tag.CD_category` | field |
+
+**Harmless today, and a trap tomorrow.** Nothing in the app writes any of them — they exist only
+as `@NSManaged` declarations — so no export ever names them and sync is unaffected. The first
+feature that *does* write one will fail in production only, and silently, because a released app
+cannot add to the production schema. Deploy the development schema before that feature ships:
+run the app once with `-LWInitializeCloudKitSchema YES` against Development, confirm the new
+types in the Console, then Deploy Schema Changes.
+
 ## Entitlements: what is here, and what is deliberately not
 
 | Entitlement | State |
