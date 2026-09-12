@@ -149,6 +149,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				"/Localized: MainInterface.storyboard",
+				PrivacyInfo.xcprivacy,
 				TodayViewController.swift,
 			);
 			target = DA246CC81F8AA30E00A75ED1 /* Widget */;
