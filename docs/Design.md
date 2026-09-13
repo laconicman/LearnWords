@@ -458,11 +458,13 @@ two `en` rows and half a set silently disappears from practice.
 Relationships are re-pointed from the entity description rather than written out per
 entity, so a relationship added later is carried automatically.
 
-**Not done, and deliberately.** The Push Notifications capability is *not* in the
-entitlements. Without it sync still works — it runs at launch, on foregrounding, and on
-CloudKit's own schedule — it is simply not immediate. Adding `aps-environment` requires
-the capability on the App ID, so it belongs in Xcode's Signing & Capabilities where the
-App ID is updated in the same step, not in a hand-edited plist that would break signing.
+**Done, 2026-09-13** — and the reasoning above it was half wrong, so it is worth keeping
+straight. The Push Notifications capability is enabled on the App ID and `aps-environment` is
+in the entitlements. What was *not* needed is any code: Apple's guide to syncing a Core Data
+store with CloudKit states that no app code is required, and the system creates the background
+task that imports. An earlier version of this project registered for remote notifications and
+implemented the delegate handler; both were removed, because completing that handler at once
+told the system the work was finished before the import had begun.
 
 ## Decision: a write is visible to the next read, synchronously
 
