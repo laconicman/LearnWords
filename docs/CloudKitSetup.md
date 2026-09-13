@@ -267,32 +267,48 @@ WWDC:
 ## The deployed schema, kept here so drift is visible
 
 `docs/CloudKitSchema-Production.ckdb` is the **Production** schema exported from the CloudKit
-Console (Console → the container → Export Schema), snapshotted 2026-09-10. It lives in the repo
-for one reason: a schema in a console is invisible to review, and a file in git diffs.
+Console (Console → the container → Export Schema), snapshotted 2026-09-14, straight after the
+deploy below. It lives in the repo for one reason: a schema in a console is invisible to review,
+and a file in git diffs.
 
 **Refresh it whenever you deploy**, under the same name, so the commit shows exactly which
 record types and fields production gained. Deployment is additive and one-way — record types
 and fields already in production cannot be deleted or renamed (Apple, *Deploying an iCloud
 Container's Schema*) — which is why seeing the change before it happens is worth a file.
 
-### The drift as of this snapshot
+**Export with Production selected.** The `.ckdb` is a bare `DEFINE SCHEMA` block with no
+environment marker anywhere in it, so an export taken with Development selected reads exactly like
+a deploy that has already happened. The environment lives in the Console's selector at the moment
+of export and nowhere else — nothing downstream can catch the mistake.
 
-Production was deployed from the model as it stood before `f833280` (2026-08-09). Compared with
-`LearnWords.xcdatamodeld` today it is missing:
+### The deploy of 2026-09-14
 
-| Missing from Production | Kind |
+Production had been deployed from the model as it stood before `f833280` (2026-08-09), and so
+lagged `LearnWords.xcdatamodeld` by two record types and two fields. That gap is closed.
+
+| Deployed 2026-09-14 | Kind |
 |---|---|
 | `CD_Pronunciation` | record type |
 | `CD_Variety` | record type |
 | `CD_Language.CD_wiktionaryCode` | field |
 | `CD_Tag.CD_category` | field |
 
-**Harmless today, and a trap tomorrow.** Nothing in the app writes any of them — they exist only
-as `@NSManaged` declarations — so no export ever names them and sync is unaffected. The first
-feature that *does* write one will fail in production only, and silently, because a released app
-cannot add to the production schema. Deploy the development schema before that feature ships:
-run the app once with `-LWInitializeCloudKitSchema YES` against Development, confirm the new
-types in the Console, then Deploy Schema Changes.
+**How it was done, and the one step that needs hardware.** A *device* build was launched once with
+`-LWInitializeCloudKitSchema 1` — the simulator cannot do this step: it reaches
+`initializeCloudKitSchemaWithOptions` and fails with `CKAccountStatusNoAccount`, because no
+simulator carries an iCloud account. The device logged `CloudKit schema initialized`, which leaves
+*Development* matching the model; the launch argument was then removed. **Deploy Schema Changes…**
+in the Console offered exactly those four additions and nothing else — no deletions, no type
+changes, no index or permission changes — which is the only shape a deploy should ever have,
+because none of it can be taken back.
+
+**Why the gap was harmless while it lasted.** Nothing in the app writes any of the four — they
+exist only as `@NSManaged` declarations — so no export ever named them and sync was unaffected. It
+would not have stayed harmless: the first feature that *did* write one would have failed in
+production only, and silently, because a released app cannot add to the production schema.
+
+Every snapshot stays in history, so `git log -p -- docs/CloudKitSchema-Production.ckdb` is the
+deploy log — which is the whole reason the file is here.
 
 ## Entitlements: what is here, and what is deliberately not
 
@@ -302,6 +318,13 @@ types in the Console, then Deploy Schema Changes.
 | `com.apple.developer.icloud-services` (CloudKit) | present |
 | `com.apple.security.application-groups` | present |
 | `aps-environment` | present since 2026-09-10 — silent CloudKit pushes |
+
+`aps-environment` reads `development`, in the one entitlements file both configurations point at
+(`CODE_SIGN_ENTITLEMENTS` is the same path for Debug and Release). Automatic signing is expected to
+substitute `production` when an archive is signed against a distribution profile — **unverified
+here, and worth one check before the first upload**: export the archive and read it back with
+`codesign -d --entitlements :- Payload/LearnWords.app`. A `development` value shipped to the App
+Store is silent pushes that never arrive, with nothing in the app to show for it.
 
 **Nothing else is added speculatively, and that is a rule rather than laziness.** Every
 entitlement must also exist as a capability on the App ID: a device build signs against the
@@ -318,9 +341,24 @@ Considered and left out:
   explicitly. Needed only for ad-hoc or enterprise builds; App Store and development builds
   infer it, and setting it wrongly is a way to have a shipped app talk to a schema nobody
   deployed.
-* **`processing` / `fetch` background modes** — these belong to TD-56 (scoring off the main
-  thread via `BGTaskScheduler`), not to push, and adding them now would declare a
-  capability nothing uses.
+
+### Background modes are not entitlements
+
+They are listed here because this is where everyone looks for them, and finding nothing reads as a
+missing step. `UIBackgroundModes` is an **Info.plist array**: Xcode's Background Modes capability
+edits `LearnWords/Info.plist` and touches no `.entitlements` file, and no App ID capability
+corresponds to it. An entitlements file with nothing background-shaped in it is what a correctly
+configured app looks like here. (An earlier revision of this page had `fetch` and `processing` in
+the entitlements list above — wrong category, and removed.)
+
+| Mode | State |
+|---|---|
+| `remote-notification` | declared in `LearnWords/Info.plist` — the mode CloudKit's silent pushes need |
+| `fetch` | not declared, deliberately |
+| `processing` | not declared, deliberately |
+
+The reasoning, and the two changes that would each earn a second mode, are in
+[Design](Design.md) § *one background mode, and it is the one CloudKit needs*.
 
 **Provisional authorization** (`.provisional`, iOS 12+) is requested alongside
 `.alert/.sound/.badge`, so turning reminders on never opens a permission prompt: iOS grants
