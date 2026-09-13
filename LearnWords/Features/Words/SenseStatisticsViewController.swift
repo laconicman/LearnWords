@@ -55,13 +55,31 @@ final class SenseStatisticsViewController: UITableViewController {
     /// parameter costs no call site and makes both problems go away.
     private let minimumSuccessfulDays: Int
 
+    /// How much of this screen to build.
+    ///
+    /// **The preview is a glance, not a smaller copy of the screen** (TD-58). A context-menu
+    /// preview is not interactive: whatever does not fit is unreachable rather than merely
+    /// below the fold, and this screen is laid out for a full screen — four sections, two of
+    /// which usually say "Not practised yet". It was cut off mid-`Overall`, and the ring the
+    /// learner just long-pressed did not appear at all.
+    enum Presentation {
+        /// Every section, and the look-up row when it is offered.
+        case full
+        /// A ring, one line per practised exercise, and one line naming the rest.
+        case preview
+    }
+
+    private let presentation: Presentation
+
     init(sense: Sense,
          progress: SenseProgress,
          languages: LanguagePair,
          now: Date = Date(),
          offersLookUp: Bool = false,
+         presentation: Presentation = .full,
          minimumSuccessfulDays: Int = ScoringPolicy.default.minimumSuccessfulDays) {
         self.minimumSuccessfulDays = minimumSuccessfulDays
+        self.presentation = presentation
         self.sense = sense
         self.progress = progress
         self.languages = languages
@@ -73,7 +91,7 @@ final class SenseStatisticsViewController: UITableViewController {
 
     @available(*, unavailable)
     required init?(coder: NSCoder) {
-        fatalError("use init(sense:progress:languages:now:offersLookUp:minimumSuccessfulDays:)")
+        fatalError("use init(sense:progress:languages:now:offersLookUp:presentation:minimumSuccessfulDays:)")
     }
 
     // MARK: - The table, as one value
@@ -94,15 +112,19 @@ final class SenseStatisticsViewController: UITableViewController {
         /// The right-hand value, when the row is a measurement rather than a statement.
         let detail: String?
         let isAction: Bool
+        /// The preview's opening row: the ring, the word, and how long it is remembered.
+        let isRing: Bool
 
-        init(_ text: String, detail: String? = nil, isAction: Bool = false) {
+        init(_ text: String, detail: String? = nil, isAction: Bool = false, isRing: Bool = false) {
             self.text = text
             self.detail = detail
             self.isAction = isAction
+            self.isRing = isRing
         }
     }
 
     private func buildSections() -> [Section] {
+        guard presentation == .full else { return previewSections }
         // **No overall section for a meaning with *nothing to report*** — which is not the
         // same as no engaged exercise. A progress reset clears every strand's memory but
         // deliberately keeps effort and the answer counts, as the record of work actually
@@ -113,6 +135,34 @@ final class SenseStatisticsViewController: UITableViewController {
             || progress.answersByDirection.values.contains { $0 > 0 }
         let overall = hasSomethingToReport ? [overallSection] : []
         return Exercise.allCases.map(strandSection) + overall + lookUpSection
+    }
+
+    /// The glance: a ring, the exercises actually practised, and one line for the rest.
+    ///
+    /// **Untouched exercises collapse into a single line.** For a new word two of the three
+    /// sections said nothing but "Not practised yet", which is what pushed `Overall` past the
+    /// edge of the preview. Named rather than hidden, because "you have not tried dictation"
+    /// is the thing a glance should tell you.
+    private var previewSections: [Section] {
+        let engaged = Exercise.allCases.filter { progress[$0].isEngaged }
+        let untouched = Exercise.allCases.filter { !progress[$0].isEngaged }
+
+        var rows = engaged.map { exercise in
+            Row(exercise.title, detail: percent(progress[exercise].retention))
+        }
+        if !untouched.isEmpty {
+            rows.append(Row(NSLocalizedString("Not practised yet",
+                                              comment: "Statistics; an exercise"),
+                            detail: untouched.map(\.title).joined(separator: ", ")))
+        }
+        // A word nobody has practised needs one line, not two: the ring already says
+        // "Not practised yet", and repeating it under the same card reads as a stutter.
+        // Seen on the device, not in a test. TD-58.
+        guard !engaged.isEmpty else {
+            return [Section(title: nil, footer: nil, rows: [Row("", isRing: true)])]
+        }
+        return [Section(title: nil, footer: nil, rows: [Row("", isRing: true)]),
+                Section(title: nil, footer: nil, rows: rows)]
     }
 
     /// One exercise: what it remembers, when it is next due, and how much spacing it has.
@@ -237,10 +287,20 @@ final class SenseStatisticsViewController: UITableViewController {
     /// from inside a property UIKit queries *during* layout. Reported by review, PR #3.
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        let height = tableView.contentSize.height
+        let height = min(tableView.contentSize.height, Self.previewHeightCap(for: view))
         if preferredContentSize.height != height {
             preferredContentSize = CGSize(width: preferredContentSize.width, height: height)
         }
+    }
+
+    /// The most a context-menu preview may ask for.
+    ///
+    /// Asking for the full content height and letting the system decide is what produced a
+    /// preview cut off mid-section: UIKit grants what it can and the remainder is unreachable,
+    /// because a preview does not scroll. Capping makes the boundary ours — and `.preview`
+    /// builds little enough that the cap should not bind at all. Reported by the owner, TD-58.
+    static func previewHeightCap(for view: UIView) -> CGFloat {
+        (view.window?.bounds.height ?? UIScreen.main.bounds.height) * 0.6
     }
 
     // MARK: - Table view data source
@@ -261,6 +321,8 @@ final class SenseStatisticsViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let row = row(at: indexPath) else { return UITableViewCell() }
+
+        if row.isRing { return ringCell() }
 
         if row.isAction {
             let cell = tableView.dequeueReusableCell(withIdentifier: Cell.action, for: indexPath)
@@ -285,6 +347,61 @@ final class SenseStatisticsViewController: UITableViewController {
         cell.detailTextLabel?.font = .preferredFont(forTextStyle: .body)
         cell.detailTextLabel?.adjustsFontForContentSizeCategory = true
         cell.detailTextLabel?.textColor = .lwTextSecondary
+        return cell
+    }
+
+    /// The ring the learner just long-pressed, shown again with the word beside it.
+    ///
+    /// The word list draws this same ring per row, and the preview drew none — the owner's
+    /// first complaint about this screen (TD-58). `SenseProgress` carries the whole-meaning
+    /// figures, so this is the same summary the list shows, at a size worth looking at.
+    private func ringCell() -> UITableViewCell {
+        let ring = ProgressRing()
+        ring.setProgress(mastery: progress.mastery,
+                         effort: progress.effort,
+                         retention: progress.retention,
+                         animated: false)
+        ring.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            ring.widthAnchor.constraint(equalToConstant: 44),
+            ring.heightAnchor.constraint(equalToConstant: 44),
+        ])
+
+        let word = UILabel()
+        word.text = prompt
+        word.font = .preferredFont(forTextStyle: .headline)
+        word.adjustsFontForContentSizeCategory = true
+        word.textColor = .lwTextPrimary
+        word.numberOfLines = 0
+
+        let detail = UILabel()
+        detail.text = progress.engagedExercises.isEmpty
+            ? NSLocalizedString("Not practised yet", comment: "Statistics; an exercise")
+            : MemoryWording.horizon(days: progress.memory?.stability ?? 0)
+        detail.font = .preferredFont(forTextStyle: .caption1)
+        detail.adjustsFontForContentSizeCategory = true
+        detail.textColor = .lwTextSecondary
+        detail.numberOfLines = 0
+
+        let text = UIStackView(arrangedSubviews: [word, detail])
+        text.axis = .vertical
+        text.spacing = 2
+        let content = UIStackView(arrangedSubviews: [ring, text])
+        content.axis = .horizontal
+        content.spacing = 12
+        content.alignment = .center
+        content.translatesAutoresizingMaskIntoConstraints = false
+
+        let cell = UITableViewCell(style: .default, reuseIdentifier: nil)
+        cell.selectionStyle = .none
+        cell.contentView.addSubview(content)
+        let margins = cell.contentView.layoutMarginsGuide
+        NSLayoutConstraint.activate([
+            content.leadingAnchor.constraint(equalTo: margins.leadingAnchor),
+            content.trailingAnchor.constraint(equalTo: margins.trailingAnchor),
+            content.topAnchor.constraint(equalTo: margins.topAnchor, constant: 6),
+            content.bottomAnchor.constraint(equalTo: margins.bottomAnchor, constant: -6),
+        ])
         return cell
     }
 

@@ -107,7 +107,9 @@ final class WordSetsTableViewController: UITableViewController, UIDocumentPicker
     /// here too — by rename and delete — and a swipe acts on a row rather than inspecting
     /// it. Long press on a word shows how that word stands; long press on a set shows how
     /// the set does.
-    private func makeSummary(for set: WordSet) -> SetSummaryViewController? {
+    private func makeSummary(for set: WordSet,
+                             presentation: SetSummaryViewController.Presentation = .full)
+    -> SetSummaryViewController? {
         guard let senses = try? lexicon.senses(in: set.id) else { return nil }
 
         // **Fetched once, used twice.** Retention is a statement about answers already given,
@@ -126,7 +128,9 @@ final class WordSetsTableViewController: UITableViewController, UIDocumentPicker
         return SetSummaryViewController(
             summary: SetSummary(senses: senses, progress: ProgressIndex(scored: scored),
                                 histories: histories, now: now),
-            setName: set.name)
+            setName: set.name,
+            setID: set.id,
+            presentation: presentation)
     }
 
     /// An accessibility action that remembers *which set* it belongs to.
@@ -165,7 +169,7 @@ final class WordSetsTableViewController: UITableViewController, UIDocumentPicker
         let set = sets[indexPath.row]
         return UIContextMenuConfiguration(
             identifier: nil,
-            previewProvider: { [weak self] in self?.makeSummary(for: set) },
+            previewProvider: { [weak self] in self?.makeSummary(for: set, presentation: .preview) },
             actionProvider: nil)
     }
 
@@ -174,9 +178,15 @@ final class WordSetsTableViewController: UITableViewController, UIDocumentPicker
     override func tableView(_ tableView: UITableView,
                             willPerformPreviewActionForMenuWith configuration: UIContextMenuConfiguration,
                             animator: UIContextMenuInteractionCommitAnimating) {
-        guard let preview = animator.previewViewController else { return }
+        // **Rebuilt, not pushed.** Since TD-58 the preview instance holds only the exercises
+        // section, so pushing it would open a summary permanently missing its forecast,
+        // retention and effort — a tap that promises the full screen and delivers the glance
+        // again. The word path rebuilds for the same reason; there the missing piece is the
+        // look-up row. Reported by review, PR #20.
+        guard let preview = animator.previewViewController as? SetSummaryViewController,
+              let set = sets.first(where: { $0.id == preview.setID }) else { return }
         animator.addCompletion { [weak self] in
-            self?.navigationController?.pushViewController(preview, animated: true)
+            self?.showSummary(for: set)
         }
     }
 

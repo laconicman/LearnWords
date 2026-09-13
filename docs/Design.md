@@ -418,6 +418,26 @@ the stronger leg.
 and it is permanent in the deployed CloudKit schema regardless (TD-48). New writers should
 prefer a row; the attribute goes when a migration retires it.
 
+## Decision: a context-menu preview is a glance, not the screen
+
+**Decision (owner, 2026-09-13, TD-58).** The preview behind a long press builds its own, shorter
+content — it is not the pushed screen rendered smaller. Both statistics screens take a
+`Presentation` and answer `.preview` with a different set of sections.
+
+**Why it is not a sizing problem.** A context-menu preview is **not interactive**: it cannot be
+scrolled, so whatever does not fit is unreachable, not merely below the fold. Any screen laid out
+for a full screen will therefore lose its last section to a preview, however the height is
+computed. The per-word screen measured its content and asked for all of it; the set screen asked
+for nothing and took a default. Both were cut, differently.
+
+**What a glance carries:** the ring the learner just pressed, so the preview speaks the same
+visual language as the row it came from; the exercises actually practised; and one line naming
+the untouched ones rather than a section each. For a set: the rings and bars, plus *due now* —
+the only number in it anyone acts on.
+
+**And a cap.** Previews ask for at most 0.6 of the window height, so the cut, if it ever comes,
+is ours rather than the system's.
+
 ## Decision: CloudKit mirrors in the app only, and duplicates are repaired after the fact
 
 **Decision (2026-07-26, iteration 4).** The host app opens the store through

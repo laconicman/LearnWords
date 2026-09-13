@@ -27,9 +27,25 @@ final class SetSummaryViewController: UITableViewController {
     private let summary: SetSummary
     private let setName: String
 
-    init(summary: SetSummary, setName: String) {
+    /// Which set this screen describes, so a caller holding only the preview instance can find
+    /// it again — the commit path rebuilds the full screen rather than pushing the preview.
+    /// Mirrors `SenseStatisticsViewController.senseID`. Reported by review, PR #20.
+    let setID: UUID
+
+    /// How much of this screen to build. See `SenseStatisticsViewController.Presentation`;
+    /// this screen had the same defect in a worse form — it never set a preferred size at
+    /// all, so the preview took a default height and lost both *Answers so far* and
+    /// *Effort* below the fold, where a non-interactive preview cannot reach them (TD-58).
+    enum Presentation { case full, preview }
+
+    private let presentation: Presentation
+
+    init(summary: SetSummary, setName: String, setID: UUID,
+         presentation: Presentation = .full) {
+        self.presentation = presentation
         self.summary = summary
         self.setName = setName
+        self.setID = setID
         super.init(style: .grouped)
         // **The set's name, not a generic "Progress".** A preview or a pushed screen that
         // does not say which set it describes is a screen the learner has to guess at, and
@@ -38,7 +54,7 @@ final class SetSummaryViewController: UITableViewController {
     }
 
     @available(*, unavailable)
-    required init?(coder: NSCoder) { fatalError("use init(summary:setName:)") }
+    required init?(coder: NSCoder) { fatalError("use init(summary:setName:setID:presentation:)") }
 
     // MARK: - Lifecycle
 
@@ -51,18 +67,40 @@ final class SetSummaryViewController: UITableViewController {
         tableView.rowHeight = UITableView.automaticDimension
     }
 
+    /// Measured and capped, like the per-word screen. Without this the preview took the
+    /// default size and cut its last two sections off (TD-58).
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        let height = min(tableView.contentSize.height,
+                         SenseStatisticsViewController.previewHeightCap(for: view))
+        if preferredContentSize.height != height {
+            preferredContentSize = CGSize(width: preferredContentSize.width, height: height)
+        }
+    }
+
     /// Sections in the order the questions are asked: *where am I*, *what is coming*, *how
     /// am I doing*, *how hard have I worked*.
     private enum Section: Int, CaseIterable {
         case exercises, forecast, retention, effort
     }
 
+    /// **The preview keeps the distribution and drops the rest.** Rings and bars are the
+    /// part that reads at a glance; a fourteen-bar forecast, a retention split and an effort
+    /// line are for the screen a tap away. The one number worth rescuing is *due now*, which
+    /// moves to this section's footer rather than vanishing with the forecast.
+    private lazy var visibleSections: [Section] =
+        presentation == .preview ? [.exercises] : Section.allCases
+
+    private func section(at index: Int) -> Section? {
+        index < visibleSections.count ? visibleSections[index] : nil
+    }
+
     // MARK: - Data source
 
-    override func numberOfSections(in tableView: UITableView) -> Int { Section.allCases.count }
+    override func numberOfSections(in tableView: UITableView) -> Int { visibleSections.count }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        switch Section(rawValue: section) {
+        switch self.section(at: section) {
         case .exercises: return Exercise.allCases.count
         case .forecast, .retention, .effort: return 1
         case nil: return 0
@@ -70,7 +108,7 @@ final class SetSummaryViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        switch Section(rawValue: section) {
+        switch self.section(at: section) {
         case .exercises:
             return String.localizedStringWithFormat(
                 NSLocalizedString("WordCount", comment: "Count of words available"), summary.total)
@@ -82,7 +120,11 @@ final class SetSummaryViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
-        switch Section(rawValue: section) {
+        switch self.section(at: section) {
+        // In the preview the forecast is gone, so its one actionable number moves here.
+        case .exercises where presentation == .preview:
+            return String.localizedStringWithFormat(
+                NSLocalizedString("DueNowCount", comment: "Count of meanings due now"), summary.dueNow)
         case .forecast:
             return String.localizedStringWithFormat(
                 NSLocalizedString("DueNowCount", comment: "Count of meanings due now"), summary.dueNow)
@@ -99,7 +141,7 @@ final class SetSummaryViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        switch Section(rawValue: indexPath.section) {
+        switch section(at: indexPath.section) {
         case .exercises: return exerciseCell(Exercise.allCases[indexPath.row])
         case .forecast: return forecastCell()
         case .retention: return retentionCell()

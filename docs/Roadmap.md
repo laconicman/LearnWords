@@ -169,6 +169,10 @@ run — asset formats only Xcode 26 understands (TD-45), a hard link to Core Hap
     only in theory; it is now a preference, **defaulted to 5** and settable 2…10 beside the
     horizon slider. Raising it re-opens words called learned under the old rule, which is
     the point — `successfulDays` was always replayed from the log. 388 tests green.
+  - **TD-58 — done (2026-09-13).** Context-menu previews are a glance rather than the whole
+    screen: a ring and the practised exercises for a word, rings and bars plus *due now* for a
+    set, both capped so a non-scrollable preview cannot lose a section off the bottom.
+    405 tests green.
   - Remaining: **TD-55**, recorded but not built. The rest of the batch is in flight, one
     branch each; every item's state is its heading in [TechDebt](TechDebt.md), which is
     where to look rather than here. Scope and conventions are in

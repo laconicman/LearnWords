@@ -60,11 +60,16 @@ struct SenseStatisticsTests {
     }
 
     private func screen(_ progress: SenseProgress,
-                        gate: Int = 2) -> SenseStatisticsViewController {
+                        gate: Int = 2,
+                        presentation: SenseStatisticsViewController.Presentation = .full)
+    -> SenseStatisticsViewController {
         let vc = SenseStatisticsViewController(sense: sense(), progress: progress,
                                                languages: pair, now: now,
+                                               presentation: presentation,
                                                minimumSuccessfulDays: gate)
         vc.loadViewIfNeeded()
+        vc.view.frame = CGRect(x: 0, y: 0, width: 320, height: 1_000)
+        vc.view.layoutIfNeeded()
         return vc
     }
 
@@ -133,6 +138,72 @@ struct SenseStatisticsTests {
 
         let spaced = screen(progress([.learning: strand(successfulDays: gate)]), gate: gate)
         #expect(spaced.tableView(spaced.tableView, titleForFooterInSection: 0) == nil)
+    }
+
+    // MARK: - The preview (TD-58)
+
+    /// The defect: the preview was the whole screen, and a context-menu preview does not
+    /// scroll — so a new word spent two sections saying "Not practised yet" and pushed
+    /// `Overall` off the bottom, where nobody could reach it.
+    @Test func thePreviewIsShorterThanTheScreenItPreviews() {
+        let engaged = progress([.learning: strand(stability: 12, successfulDays: 4, dueIn: 3)])
+        let full = screen(engaged)
+        let preview = screen(engaged, presentation: .preview)
+
+        let fullRows = (0..<full.numberOfSections(in: full.tableView)).reduce(0) {
+            $0 + full.tableView(full.tableView, numberOfRowsInSection: $1)
+        }
+        let previewRows = (0..<preview.numberOfSections(in: preview.tableView)).reduce(0) {
+            $0 + preview.tableView(preview.tableView, numberOfRowsInSection: $1)
+        }
+        #expect(previewRows < fullRows, "a glance must be smaller than the screen it opens")
+        #expect(preview.numberOfSections(in: preview.tableView) == 2,
+                "the ring, then the exercises")
+    }
+
+    /// Untouched exercises cost a whole section each on the full screen. In a glance they are
+    /// one line — named, not hidden, because "you have not tried dictation" is worth knowing.
+    @Test func thePreviewCollapsesUntouchedExercisesIntoOneLine() {
+        let preview = screen(progress([.learning: strand(stability: 12, successfulDays: 4, dueIn: 3)]),
+                             presentation: .preview)
+        let lines = rows(inSection: 1, on: preview)
+
+        #expect(lines.count == 2, "one practised exercise, and one line for the other two")
+        #expect(lines.contains { $0.hasPrefix("Not practised yet") })
+        #expect(lines.contains { $0.contains("Dictation") && $0.contains("Phonetic") },
+                "the untouched ones are named")
+    }
+
+    /// A word with nothing practised said "Not practised yet" twice — once under the ring and
+    /// again as the collapsed line. One card, one statement. Found by long-pressing it.
+    @Test func anUntouchedWordSaysItOnce() {
+        let preview = screen(progress([:]), presentation: .preview)
+
+        #expect(preview.numberOfSections(in: preview.tableView) == 1, "the ring alone")
+        #expect(preview.tableView(preview.tableView, numberOfRowsInSection: 0) == 1)
+    }
+
+    /// The ring the learner just long-pressed, which the preview used not to show at all.
+    @Test func thePreviewOpensWithTheRing() {
+        let preview = screen(progress([.learning: strand(stability: 12, successfulDays: 4, dueIn: 3)]),
+                             presentation: .preview)
+        let cell = preview.tableView(preview.tableView, cellForRowAt: IndexPath(row: 0, section: 0))
+
+        func rings(in view: UIView) -> Int {
+            (view is ProgressRing ? 1 : 0) + view.subviews.reduce(0) { $0 + rings(in: $1) }
+        }
+        #expect(rings(in: cell.contentView) == 1)
+    }
+
+    /// Whatever the content, the preview may not ask for more than the cap — asking for the
+    /// full height is what let the system cut it wherever it liked.
+    @Test func thePreviewNeverAsksForMoreThanTheCap() {
+        let preview = screen(progress([.learning: strand(stability: 12, successfulDays: 4, dueIn: 3)]),
+                             presentation: .preview)
+        let cap = SenseStatisticsViewController.previewHeightCap(for: preview.view)
+
+        #expect(preview.preferredContentSize.height > 0, "it must ask for something")
+        #expect(preview.preferredContentSize.height <= cap)
     }
 
     @Test func aDueDateInThePastReadsAsDueNow() {
