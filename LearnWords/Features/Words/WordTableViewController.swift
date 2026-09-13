@@ -451,12 +451,15 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
     ///   interactive — the row would be pure extra height, and height is the clipping problem
     ///   on that path. The menu offers the action beside the preview instead.
     private func makeStatistics(for sense: Sense,
-                                offersLookUp: Bool) -> SenseStatisticsViewController {
+                                offersLookUp: Bool,
+                                presentation: SenseStatisticsViewController.Presentation = .full)
+    -> SenseStatisticsViewController {
         SenseStatisticsViewController(
             sense: sense,
             progress: progress?[sense.id] ?? .unseen,
             languages: languages,
-            offersLookUp: offersLookUp)
+            offersLookUp: offersLookUp,
+            presentation: presentation)
     }
 
     private func showStatistics(for sense: Sense) {
@@ -510,7 +513,8 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
             // exactly this: it can show something, not only offer actions.
             previewProvider: { [weak self] in
                 guard let self, indexPath.row < self.rows.count else { return nil }
-                return self.makeStatistics(for: self.rows[indexPath.row], offersLookUp: false)
+                return self.makeStatistics(for: self.rows[indexPath.row], offersLookUp: false,
+                                           presentation: .preview)
             },
             actionProvider: { [weak self] _ in
                 guard let self, indexPath.row < self.rows.count,

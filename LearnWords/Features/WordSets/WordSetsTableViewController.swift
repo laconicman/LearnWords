@@ -107,7 +107,9 @@ final class WordSetsTableViewController: UITableViewController, UIDocumentPicker
     /// here too — by rename and delete — and a swipe acts on a row rather than inspecting
     /// it. Long press on a word shows how that word stands; long press on a set shows how
     /// the set does.
-    private func makeSummary(for set: WordSet) -> SetSummaryViewController? {
+    private func makeSummary(for set: WordSet,
+                             presentation: SetSummaryViewController.Presentation = .full)
+    -> SetSummaryViewController? {
         guard let senses = try? lexicon.senses(in: set.id) else { return nil }
 
         // **Fetched once, used twice.** Retention is a statement about answers already given,
@@ -126,7 +128,8 @@ final class WordSetsTableViewController: UITableViewController, UIDocumentPicker
         return SetSummaryViewController(
             summary: SetSummary(senses: senses, progress: ProgressIndex(scored: scored),
                                 histories: histories, now: now),
-            setName: set.name)
+            setName: set.name,
+            presentation: presentation)
     }
 
     /// An accessibility action that remembers *which set* it belongs to.
@@ -165,7 +168,7 @@ final class WordSetsTableViewController: UITableViewController, UIDocumentPicker
         let set = sets[indexPath.row]
         return UIContextMenuConfiguration(
             identifier: nil,
-            previewProvider: { [weak self] in self?.makeSummary(for: set) },
+            previewProvider: { [weak self] in self?.makeSummary(for: set, presentation: .preview) },
             actionProvider: nil)
     }
 

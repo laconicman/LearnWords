@@ -2134,7 +2134,7 @@ named its horizon, for exactly this reason), and the only tests that mutate the 
 live alone in a `@Suite(.serialized)`. Verified with three consecutive full runs.
 
 388 tests green, from 386.
-## TD-58 — The context-menu previews do not share the app's visual language (owner, 2026-09-02)
+## TD-58 — The context-menu previews do not share the app's visual language — **resolved (2026-09-13)**
 
 Long press on a word and long press on a set both open a `UIContextMenuConfiguration` whose
 *preview* is a view controller. That gesture was chosen over a sheet precisely because it can
@@ -2209,6 +2209,41 @@ line *worse* rather than better. The first strong separator **present** now sett
 line, including by rejecting it. Reported by review, PR #12.
 
 396 tests green.
+
+## TD-58 resolution note (2026-09-13)
+
+**A preview is a glance, not a smaller copy of the screen** (owner's choice of option B). Both
+screens gained a `Presentation` — `.full` for the pushed screen, `.preview` for the context menu
+— and the preview builds different sections rather than the same ones at a different size.
+
+*Per word:* the `ProgressRing` the learner just long-pressed, the word, and how long it is
+remembered; then one line per **practised** exercise, and a single line naming the untouched
+ones. Two sections instead of four or five. The old preview spent a whole section per untouched
+exercise saying "Not practised yet", which is what pushed `Overall` off the bottom.
+
+*Per set:* the three rings and distribution bars, with **due now** moved into that section's
+footer so the one number anyone acts on survives the forecast being dropped. Retention and
+effort belong to the screen a tap away.
+
+**Both now cap what they ask for** at 0.6 of the window height. The per-word screen asked for
+its full content height and let the system decide where to cut; the set screen **never set a
+preferred size at all**, which is why it lost two of its four sections. A context-menu preview
+does not scroll, so anything past the cut is unreachable rather than merely below the fold —
+that is what made this a defect and not an aesthetic complaint.
+
+**A green suite proved nothing here, again.** The change was first wired with the set's
+`presentation` argument silently dropped — a mis-indented patch — and all 405 tests still
+passed, because they construct the screens directly and the parameter defaults to `.full`. It
+was caught by long-pressing a set in the simulator. The same shape as the "dead Save button"
+and "Nothing due beside waiting words" defects: this project's screen defects do not live where
+its tests look.
+
+405 tests green, from 398 — four for the word preview, three for the set summary screen, which
+until now had no screen tests at all.
+
+**Not done here, and still true:** `WordSetsTableViewController` passes `actionProvider: nil`,
+so a long press on a set offers a card and no actions. Worth an action or two, but it is a
+question about *what a set can do*, not about the preview.
 
 ## TD-55 — The entry screen should have the structure, not the punctuation (owner, 2026-08-11)
 
