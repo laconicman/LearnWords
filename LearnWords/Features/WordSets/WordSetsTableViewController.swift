@@ -129,6 +129,7 @@ final class WordSetsTableViewController: UITableViewController, UIDocumentPicker
             summary: SetSummary(senses: senses, progress: ProgressIndex(scored: scored),
                                 histories: histories, now: now),
             setName: set.name,
+            setID: set.id,
             presentation: presentation)
     }
 
@@ -177,9 +178,15 @@ final class WordSetsTableViewController: UITableViewController, UIDocumentPicker
     override func tableView(_ tableView: UITableView,
                             willPerformPreviewActionForMenuWith configuration: UIContextMenuConfiguration,
                             animator: UIContextMenuInteractionCommitAnimating) {
-        guard let preview = animator.previewViewController else { return }
+        // **Rebuilt, not pushed.** Since TD-58 the preview instance holds only the exercises
+        // section, so pushing it would open a summary permanently missing its forecast,
+        // retention and effort — a tap that promises the full screen and delivers the glance
+        // again. The word path rebuilds for the same reason; there the missing piece is the
+        // look-up row. Reported by review, PR #20.
+        guard let preview = animator.previewViewController as? SetSummaryViewController,
+              let set = sets.first(where: { $0.id == preview.setID }) else { return }
         animator.addCompletion { [weak self] in
-            self?.navigationController?.pushViewController(preview, animated: true)
+            self?.showSummary(for: set)
         }
     }
 

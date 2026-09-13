@@ -27,6 +27,11 @@ final class SetSummaryViewController: UITableViewController {
     private let summary: SetSummary
     private let setName: String
 
+    /// Which set this screen describes, so a caller holding only the preview instance can find
+    /// it again — the commit path rebuilds the full screen rather than pushing the preview.
+    /// Mirrors `SenseStatisticsViewController.senseID`. Reported by review, PR #20.
+    let setID: UUID
+
     /// How much of this screen to build. See `SenseStatisticsViewController.Presentation`;
     /// this screen had the same defect in a worse form — it never set a preferred size at
     /// all, so the preview took a default height and lost both *Answers so far* and
@@ -35,10 +40,12 @@ final class SetSummaryViewController: UITableViewController {
 
     private let presentation: Presentation
 
-    init(summary: SetSummary, setName: String, presentation: Presentation = .full) {
+    init(summary: SetSummary, setName: String, setID: UUID,
+         presentation: Presentation = .full) {
         self.presentation = presentation
         self.summary = summary
         self.setName = setName
+        self.setID = setID
         super.init(style: .grouped)
         // **The set's name, not a generic "Progress".** A preview or a pushed screen that
         // does not say which set it describes is a screen the learner has to guess at, and
@@ -47,7 +54,7 @@ final class SetSummaryViewController: UITableViewController {
     }
 
     @available(*, unavailable)
-    required init?(coder: NSCoder) { fatalError("use init(summary:setName:presentation:)") }
+    required init?(coder: NSCoder) { fatalError("use init(summary:setName:setID:presentation:)") }
 
     // MARK: - Lifecycle
 

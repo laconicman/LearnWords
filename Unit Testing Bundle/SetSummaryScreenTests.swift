@@ -34,10 +34,12 @@ struct SetSummaryScreenTests {
                           histories: [:], now: Date())
     }
 
+    private let setID = UUID()
+
     private func screen(_ presentation: SetSummaryViewController.Presentation)
     -> SetSummaryViewController {
         let vc = SetSummaryViewController(summary: summary(), setName: "Animals",
-                                          presentation: presentation)
+                                          setID: setID, presentation: presentation)
         vc.loadViewIfNeeded()
         vc.view.frame = CGRect(x: 0, y: 0, width: 320, height: 1_000)
         vc.view.layoutIfNeeded()
@@ -63,6 +65,15 @@ struct SetSummaryScreenTests {
 
         #expect(footer?.isEmpty == false)
         #expect(footer?.contains("4") == true, "four meanings are due")
+    }
+
+    /// The seam the commit path depends on: tapping a preview must rebuild the *full* screen,
+    /// and it can only find the set again through this identity. Pushing the preview instance
+    /// instead would open a summary permanently missing forecast, retention and effort.
+    /// Reported by review, PR #20.
+    @Test func thePreviewCarriesTheSetIdentity() {
+        #expect(screen(.preview).setID == setID)
+        #expect(screen(.full).setID == setID)
     }
 
     /// This screen never set a preferred size, so its preview took a default height and cut
