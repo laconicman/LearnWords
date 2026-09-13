@@ -131,6 +131,27 @@ rule TD-12 and ProgressModel state: don't polish a layer being replaced.
 **Cost (accepted).** Existing users lose their word sets and all progress on upgrade. The
 owner has accepted this explicitly, for themselves as well.
 
+**That cost was paid once, in 1.2.1 — and does not recur. Verified 2026-09-13.** The decision
+above is about the move *from* `UserDefaults`, which shipped in 1.2.1 (29 July 2026). Every model
+change since — `f833280` adding `Pronunciation`, `Variety`, `Tag.category` and
+`Language.wiktionaryCode` — is additive, and Core Data migrates it automatically even though the
+`.xcdatamodeld` carries a single version: the store's own schema is enough for an inferred
+lightweight migration, so no old model version has to ship.
+
+Checked two ways rather than argued. A store written with the 1.2.1-era model, holding a row,
+opens under today's model with the row intact and the default `shouldMigrateStoreAutomatically` /
+`shouldInferMappingModelAutomatically`. And the real app: a 1.2.1-era build installed on a
+simulator, two words imported, then the release candidate installed over it — 25 terms, 1 set and
+both canary words before and after, `ZPRONUNCIATION` and `ZVARIETY` added, no crash. This matters
+because `LWPersistence.configure` calls `fatalError` when the store will not open: a failed
+migration is not a silent degradation, it is every existing user crashing at launch.
+
+**What this does not license.** An *incompatible* change — renaming an attribute, changing a
+type, adding a non-optional attribute without a default — cannot be inferred, and with one model
+version in the bundle there is nothing to migrate from. Such a change needs a new model version
+added to the `.xcdatamodeld` **before** it ships, and CloudKit constrains it further: production
+record types and fields cannot be deleted or renamed at all.
+
 ## Decision: the store stays synchronous
 
 **Decision.** Persistence does **not** go async — the open question in

@@ -175,9 +175,13 @@ run — asset formats only Xcode 26 understands (TD-45), a hard link to Core Hap
     [TASK-TD53-batch](TASK-TD53-batch.md) (self-contained: scope, the owner's UI asks, the
     build flag that must not be used, and the review loop). TD-50/51 also owe the settings
     switch for `requireProductionForLearned`; the slider minimum is done.
-- **CloudKit account setup — [step-by-step](CloudKitSetup.md).** The container does not
-  exist server-side yet (`BadContainer` on device), so the app is running local-only. The
-  capability, the container and the development-schema upload are all account-side work.
+- **CloudKit account setup — [step-by-step](CloudKitSetup.md).** **Done, 2026-09-13**: the
+  container exists under team `WEJF495R4D` (Paul Buktab), Push Notifications is enabled on the
+  App ID, and a Production schema is deployed. What remains is *drift* rather than setup — that
+  schema predates `f833280`, so it has no `CD_Pronunciation` or `CD_Variety` and neither
+  `CD_Language.CD_wiktionaryCode` nor `CD_Tag.CD_category`. Harmless while nothing writes them;
+  deploy before the first feature that does. The deployed schema is snapshotted in
+  [CloudKitSchema-Production.ckdb](CloudKitSchema-Production.ckdb) so drift shows up in a diff.
 - **Two-device CloudKit verification.** Everything about sync is proven against
   constructed duplicates, not a real merge. Needs the `iCloud.club.laconic.LearnWords`
   container in team `WEJF495R4D`, and two devices on one iCloud account. Until then the
