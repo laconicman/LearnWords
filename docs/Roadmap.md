@@ -175,19 +175,21 @@ run — asset formats only Xcode 26 understands (TD-45), a hard link to Core Hap
     [TASK-TD53-batch](TASK-TD53-batch.md) (self-contained: scope, the owner's UI asks, the
     build flag that must not be used, and the review loop). TD-50/51 also owe the settings
     switch for `requireProductionForLearned`; the slider minimum is done.
-- **CloudKit account setup — [step-by-step](CloudKitSetup.md).** The container does not
-  exist server-side yet (`BadContainer` on device), so the app is running local-only. The
-  capability, the container and the development-schema upload are all account-side work.
+- **CloudKit account setup — [step-by-step](CloudKitSetup.md).** **Done, 2026-09-13**: the
+  container exists under team `WEJF495R4D` (Paul Buktab), Push Notifications is enabled on the
+  App ID, and a Production schema is deployed. What remains is *drift* rather than setup — that
+  schema predates `f833280`, so it has no `CD_Pronunciation` or `CD_Variety` and neither
+  `CD_Language.CD_wiktionaryCode` nor `CD_Tag.CD_category`. Harmless while nothing writes them;
+  deploy before the first feature that does. The deployed schema is snapshotted in
+  [CloudKitSchema-Production.ckdb](CloudKitSchema-Production.ckdb) so drift shows up in a diff.
 - **Two-device CloudKit verification.** Everything about sync is proven against
-  constructed duplicates, not a real merge. Needs the `iCloud.club.laconic.LearnWords`
-  container in team `WEJF495R4D`, and two devices on one iCloud account. Until then the
-  app degrades to a local store and logs why. **The production schema is immutable once
-  pushed — initialise it from a development build first.**
-- **Push Notifications capability**, for timely sync rather than launch/foreground/
-  CloudKit-schedule. `aps-environment` needs the capability on the App ID, so it belongs
-  in Xcode's Signing & Capabilities where the App ID updates in the same step — not in a
-  hand-edited plist. (The `remote-notification` background mode, the other half, is now in
-  `Info.plist`.)
+  constructed duplicates, not a real merge. The `iCloud.club.laconic.LearnWords` container now
+  exists under team `WEJF495R4D`, so what remains is two devices on one iCloud account. Until
+  then the app degrades to a local store and logs why. **Production record types are immutable
+  once deployed — initialise the schema from a development build first.**
+- ~~**Push Notifications capability**~~ — **done (2026-09-13).** The capability is on the App
+  ID and `aps-environment` is in the entitlements, beside the `remote-notification` background
+  mode. No app code went with it: CloudKit's pushes are Core Data's to handle.
 - **Pronunciation scoring beyond the system recogniser.** `SFSpeechRecognizer.confidence`
   is a proxy for *what* was said, not *how well* — see
   [ProgressModel](ProgressModel.md) § "Pronunciation quality". `ReviewEvent` already carries
