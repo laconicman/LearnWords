@@ -74,18 +74,43 @@ DEFINE SCHEMA
     );
 
     RECORD TYPE CD_Language (
-        CD_code                STRING QUERYABLE SEARCHABLE SORTABLE,
-        CD_code_ckAsset        ASSET,
-        CD_entityName          STRING QUERYABLE SEARCHABLE SORTABLE,
-        CD_id                  STRING QUERYABLE SEARCHABLE SORTABLE,
-        CD_moveReceipt         BYTES QUERYABLE SORTABLE,
-        CD_moveReceipt_ckAsset ASSET,
-        "___createTime"        TIMESTAMP,
-        "___createdBy"         REFERENCE,
-        "___etag"              STRING,
-        "___modTime"           TIMESTAMP,
-        "___modifiedBy"        REFERENCE,
-        "___recordID"          REFERENCE,
+        CD_code                   STRING QUERYABLE SEARCHABLE SORTABLE,
+        CD_code_ckAsset           ASSET,
+        CD_entityName             STRING QUERYABLE SEARCHABLE SORTABLE,
+        CD_id                     STRING QUERYABLE SEARCHABLE SORTABLE,
+        CD_moveReceipt            BYTES QUERYABLE SORTABLE,
+        CD_moveReceipt_ckAsset    ASSET,
+        CD_wiktionaryCode         STRING QUERYABLE SEARCHABLE SORTABLE,
+        CD_wiktionaryCode_ckAsset ASSET,
+        "___createTime"           TIMESTAMP,
+        "___createdBy"            REFERENCE,
+        "___etag"                 STRING,
+        "___modTime"              TIMESTAMP,
+        "___modifiedBy"           REFERENCE,
+        "___recordID"             REFERENCE,
+        GRANT WRITE TO "_creator",
+        GRANT CREATE TO "_icloud",
+        GRANT READ TO "_world"
+    );
+
+    RECORD TYPE CD_Pronunciation (
+        CD_audioURLString         STRING QUERYABLE SEARCHABLE SORTABLE,
+        CD_audioURLString_ckAsset ASSET,
+        CD_createdAt              TIMESTAMP QUERYABLE SORTABLE,
+        CD_entityName             STRING QUERYABLE SEARCHABLE SORTABLE,
+        CD_ipa                    STRING QUERYABLE SEARCHABLE SORTABLE,
+        CD_ipa_ckAsset            ASSET,
+        CD_modifiedAt             TIMESTAMP QUERYABLE SORTABLE,
+        CD_moveReceipt            BYTES QUERYABLE SORTABLE,
+        CD_moveReceipt_ckAsset    ASSET,
+        CD_term                   STRING QUERYABLE SEARCHABLE SORTABLE,
+        CD_variety                STRING QUERYABLE SEARCHABLE SORTABLE,
+        "___createTime"           TIMESTAMP,
+        "___createdBy"            REFERENCE,
+        "___etag"                 STRING,
+        "___modTime"              TIMESTAMP,
+        "___modifiedBy"           REFERENCE,
+        "___recordID"             REFERENCE,
         GRANT WRITE TO "_creator",
         GRANT CREATE TO "_icloud",
         GRANT READ TO "_world"
@@ -157,6 +182,8 @@ DEFINE SCHEMA
     );
 
     RECORD TYPE CD_Tag (
+        CD_category            STRING QUERYABLE SEARCHABLE SORTABLE,
+        CD_category_ckAsset    ASSET,
         CD_createdAt           TIMESTAMP QUERYABLE SORTABLE,
         CD_entityName          STRING QUERYABLE SEARCHABLE SORTABLE,
         CD_id                  STRING QUERYABLE SEARCHABLE SORTABLE,
@@ -195,6 +222,24 @@ DEFINE SCHEMA
         "___modTime"             TIMESTAMP,
         "___modifiedBy"          REFERENCE,
         "___recordID"            REFERENCE,
+        GRANT WRITE TO "_creator",
+        GRANT CREATE TO "_icloud",
+        GRANT READ TO "_world"
+    );
+
+    RECORD TYPE CD_Variety (
+        CD_entityName          STRING QUERYABLE SEARCHABLE SORTABLE,
+        CD_id                  STRING QUERYABLE SEARCHABLE SORTABLE,
+        CD_moveReceipt         BYTES QUERYABLE SORTABLE,
+        CD_moveReceipt_ckAsset ASSET,
+        CD_subtag              STRING QUERYABLE SEARCHABLE SORTABLE,
+        CD_subtag_ckAsset      ASSET,
+        "___createTime"        TIMESTAMP,
+        "___createdBy"         REFERENCE,
+        "___etag"              STRING,
+        "___modTime"           TIMESTAMP,
+        "___modifiedBy"        REFERENCE,
+        "___recordID"          REFERENCE,
         GRANT WRITE TO "_creator",
         GRANT CREATE TO "_icloud",
         GRANT READ TO "_world"

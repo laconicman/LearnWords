@@ -547,6 +547,48 @@ over-state is another device doing the work, which is why a remote change rebuil
 Deliberate: once a day is missed everything stays overdue, so a lapsed learner is reminded
 daily for two weeks and then left alone. An app that nags forever gets deleted.
 
+## Decision: one background mode, and it is the one CloudKit needs
+
+**Decision (2026-09-14).** `LearnWords/Info.plist` declares `UIBackgroundModes` =
+`remote-notification`, and nothing else. `fetch` and `processing` are not declared, and nothing
+registers work with `BGTaskScheduler`.
+
+**Background modes are not entitlements**, which is what misleads here — the app has four
+entitlements files and none of them says anything about background execution. `UIBackgroundModes`
+is an Info.plist array; Xcode's Background Modes capability edits that plist and no `.entitlements`
+file, and no App ID capability corresponds to it. Nothing is missing from the entitlements.
+
+**The one background API in the tree needs no mode.** `ReminderScheduler.rebuild` takes a task
+assertion — `beginBackgroundTask(withName:expirationHandler:)` — so its chain of async round trips
+to `UNUserNotificationCenter` survives being backgrounded halfway through, which is the difference
+between a rebuilt window and a half-rebuilt one that stays wrong until the next launch. A task
+assertion is available to every app: Apple's documentation names no background-mode prerequisite
+for it, and points at the Background Tasks framework only "for background tasks requiring more
+time". It
+extends a run already under way and can never start one, so it is not a weaker version of a
+scheduled task — it is the other thing, and neither substitutes for the other.
+
+**A mode with no handler behind it buys nothing.** `fetch` and `processing` pair with
+`BGAppRefreshTask` and `BGProcessingTask`; with nothing registered and no
+`BGTaskSchedulerPermittedIdentifiers` in the plist, the system has nothing to launch the app into,
+so declaring them changes no behaviour at all. They are not free either — an unused background mode
+is a standing App Review rejection line.
+
+**Why the reminder window does not need `fetch` today.** The obvious worry is the 14-day horizon
+above running dry while the app is never opened. The rebuild fires at launch, on
+`didEnterBackground`, on `willEnterForeground`, and on `LWPersistence.storeDidChange` — and that
+last one covers a CloudKit import, because `remote-notification` already lets a silent push wake
+the app and Core Data's own background task do the import. Running out therefore takes a fortnight
+with no launch *and* no change from any device, and the accepted cost above says that learner
+should be left alone anyway.
+
+**What would change this, and the rule for changing it.** Moving the per-launch rebuild onto a
+schedule (TD-62) earns `fetch`; fetching audio for `Pronunciation.audioURLString` — long,
+discretionary, best done plugged in and idle — earns `processing`. Declare either **in the same
+change as its handler**, never ahead of it: a mode added early is indistinguishable from a mode
+added by mistake, and the plist is the half of that pair App Review can see without running
+anything.
+
 ## Decision: practice is due-driven, with studying ahead as a deliberate choice
 
 **Decision (2026-07-27).** `PracticeSession.Scope` splits `.due` from `.everything`. The

@@ -179,13 +179,14 @@ run — asset formats only Xcode 26 understands (TD-45), a hard link to Core Hap
     [TASK-TD53-batch](TASK-TD53-batch.md) (self-contained: scope, the owner's UI asks, the
     build flag that must not be used, and the review loop). TD-50/51 also owe the settings
     switch for `requireProductionForLearned`; the slider minimum is done.
-- **CloudKit account setup — [step-by-step](CloudKitSetup.md).** **Done, 2026-09-13**: the
+- **CloudKit account setup — [step-by-step](CloudKitSetup.md).** **Done, 2026-09-14**: the
   container exists under team `WEJF495R4D` (Paul Buktab), Push Notifications is enabled on the
-  App ID, and a Production schema is deployed. What remains is *drift* rather than setup — that
-  schema predates `f833280`, so it has no `CD_Pronunciation` or `CD_Variety` and neither
-  `CD_Language.CD_wiktionaryCode` nor `CD_Tag.CD_category`. Harmless while nothing writes them;
-  deploy before the first feature that does. The deployed schema is snapshotted in
-  [CloudKitSchema-Production.ckdb](CloudKitSchema-Production.ckdb) so drift shows up in a diff.
+  App ID, and Production now matches `LearnWords.xcdatamodeld`. The drift this entry used to
+  describe — `CD_Pronunciation`, `CD_Variety`, `CD_Language.CD_wiktionaryCode`,
+  `CD_Tag.CD_category` — was deployed on 2026-09-14 from a device build: four additions, nothing
+  else. The schema is snapshotted in
+  [CloudKitSchema-Production.ckdb](CloudKitSchema-Production.ckdb) so the *next* drift shows up
+  in a diff.
 - **Two-device CloudKit verification.** Everything about sync is proven against
   constructed duplicates, not a real merge. The `iCloud.club.laconic.LearnWords` container now
   exists under team `WEJF495R4D`, so what remains is two devices on one iCloud account. Until
@@ -200,11 +201,18 @@ run — asset formats only Xcode 26 understands (TD-45), a hard link to Core Hap
   `judgmentVerdict`/`judgeID`/`judgedAt` so a better judge can re-score history. Worth
   evaluating: forced alignment against a phoneme model, on-device Foundation Models
   (iOS 26+), or a dedicated assessment service.
-- **`BGAppRefreshTaskRequest` for word-set enrichment** (owner's note, not scheduled). A
-  different scope from the CloudKit push that wakes the app for sync: periodic background
-  work to prefill terms from the enrichment corpus (TD-22) rather than to react to a
-  change. Noted so it is not confused with the reminder rebuild, which needs no scheduled
-  task — only a background-task assertion so its async steps survive suspension.
+- **`BGAppRefreshTaskRequest`: two jobs, one mode** (owner's note, not scheduled). A different
+  scope from the CloudKit push that wakes the app for sync — periodic work rather than a reaction
+  to a change. Two candidates: prefilling terms from the enrichment corpus (TD-22), and topping up
+  the reminder window so it is not rebuilt from scratch on every launch (TD-62). Neither is a
+  *correctness* gap — the reminder rebuild already survives suspension on a background-task
+  assertion, which needs no mode at all — so this is about when work happens, not whether. The
+  `fetch` background mode ships with the handler and not before it ([Design](Design.md) § *one
+  background mode, and it is the one CloudKit needs*).
+- **`BGProcessingTask` for pronunciation audio.** `Pronunciation.audioURLString` is in the
+  production schema as of 2026-09-14 and nothing writes or reads it yet. When something does,
+  fetching audio is long, discretionary and best done plugged in and idle — the `processing`
+  mode's case rather than `fetch`'s, and the second of the two changes that would earn a mode.
 - **Confirm a reminder actually arrives.** The switch is owner-confirmed to request
   permission, so the first half of the path is proven. What is still unwitnessed is the
   second: schedule → deliver → tap → land on Exercises. No automated pass can do it

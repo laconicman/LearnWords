@@ -65,11 +65,14 @@ column as the first.
 4. **Two-device retest** of the deferred seed and live refresh. Delete the app from both
    devices and reset the CloudKit Development environment first, so double-seeded
    duplicates are not mistaken for a regression.
-5. **Deploy Schema Changes** in the CloudKit Console — *after* re-running
-   `-LWInitializeCloudKitSchema 1` and confirming the exported schema still lists all
-   `CD_` types. Irreversible.
-6. **Push Notifications capability** for timely sync ([CloudKitSetup](CloudKitSetup.md)).
-   Unrelated to the local reminders above, which need no capability.
+5. ~~**Deploy Schema Changes** in the CloudKit Console.~~ **Done 2026-09-14** — a device build
+   ran `-LWInitializeCloudKitSchema 1` (the simulator cannot: no iCloud account), and the Console
+   then offered exactly four additions and nothing else. Production matches the model;
+   [CloudKitSchema-Production.ckdb](CloudKitSchema-Production.ckdb) is the snapshot.
+6. ~~**Push Notifications capability** for timely sync.~~ **Done 2026-09-13** — the capability is
+   on the App ID and `aps-environment` is in the entitlements
+   ([CloudKitSetup](CloudKitSetup.md)). Unrelated to the local reminders above, which need no
+   capability and no background mode.
 7. **TD-24** — extension `CFBundleVersion` is `1` against the app's `7`. App Store Connect
    rejects that at submission.
 

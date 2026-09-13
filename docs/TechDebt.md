@@ -2411,3 +2411,56 @@ straight after `advance`, in the same job. None of them is what delayed the 2026
 and nothing found yet does. The change rests on the reasoning above, not on a reproduction: it
 cannot say what happened, only that a delay of up to 5 s no longer fails the suite. The probes
 were temporary and are not in the tree.
+
+## TD-62 — Every launch rebuilds the reminder window, unconditionally (2026-09-14)
+
+`AppDelegate.didFinishLaunchingWithOptions` calls `rebuildReminders()`, and the same selector is
+wired to `didEnterBackground`, `willEnterForeground` and `LWPersistence.storeDidChange`. The launch
+call is **not** redundant with the foreground one — `willEnterForeground` is not posted on a cold
+launch, so nothing else covers that case — but it is unconditional. In the common case it rebuilds
+against state nothing has touched since the `didEnterBackground` rebuild that ran moments before
+the app was terminated.
+
+**What it costs, verified from the call graph.** `ReminderScheduler.rebuild` builds a
+`ReviewSchedule`, whose designated initialiser fetches the askable senses of every set and then
+constructs `ProgressIndex(lexicon:senses:policy:now:)` — the *replaying* initialiser, not
+`ProgressIndex(scored:)`. So the rebuild **bypasses `ProgressCache` entirely** and pays the full
+replay whether or not a screen has already warmed the cache. It runs on the main queue:
+`standing(completion:)` hops back to main before the schedule is built, and `Lexicon`'s reads are
+pinned there anyway (TD-56).
+
+**How much that is, borrowed rather than measured.** TD-56 timed that same replay at 369 ms for
+1,000 meanings × 12 events and 1,860 ms for 2,000 × 20 — **through `ProgressIndex`, not through
+this path**, so it is the order of magnitude and not this call's number. No measurement of the
+reminder rebuild itself exists yet; taking one is the first step of any discharge below.
+
+**Cost.** Main-thread work on the launch path, which is the one stretch of the app's life where a
+hitch is most visible, and it grows with the library.
+
+**Discharge (owner's intent, 2026-09-14): schedule it rather than doing it at each launch.** A
+`BGAppRefreshTask` keeps the window topped up while the app is not running, which demotes the
+launch-time rebuild to a fallback. That is the change that earns the `fetch` background mode — see
+[Design](Design.md) § *one background mode, and it is the one CloudKit needs* for why the mode is
+not declared ahead of its handler.
+
+Three constraints on doing it:
+
+* `BGTaskScheduler` is **iOS 13+** and the floor is 12.1 (TD-8), so it needs `#available` and iOS
+  12 keeps the launch rebuild. The launch path gets a condition, not a deletion.
+* Registration of every launch handler must complete **before the end of**
+  `didFinishLaunchingWithOptions`, and the identifier must also appear in
+  `BGTaskSchedulerPermittedIdentifiers` in `LearnWords/Info.plist`. Omitting the plist entry does
+  **not** throw: `register(forTaskWithIdentifier:using:launchHandler:)` returns `false`, a result
+  nothing obliges the caller to read, so a forgotten entry is indistinguishable from a task the
+  system simply chose never to run. The fatal mistake is the other one — registering the same
+  identifier twice kills the app (Apple, `BGTaskScheduler.register`).
+* The system decides when, and may decide never: background refresh can be off for a user
+  (`UIApplication.backgroundRefreshStatus`) and is budgeted for everyone else. This moves *when*
+  work happens; it adds no guarantee, so nothing correctness-critical may migrate behind it.
+
+**Cheaper interim, if the scheduled task is not worth its three constraints yet:** make the launch
+rebuild conditional instead of removing it. The schedule is derived, never accumulated (`Design.md`
+§ *reminders are scheduled, not fired*), so a stored fingerprint of what it was last derived from —
+the store's change token, or the review-event count and the reminder-time preference — is enough to
+skip a rebuild that would produce the identical 14 requests. Same saving on the launch path, none
+of the constraints, and it is what the scheduled version would want underneath it anyway.
