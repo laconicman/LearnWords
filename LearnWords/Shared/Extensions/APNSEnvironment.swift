@@ -9,7 +9,6 @@
 import UIKit
 import OSLog // or `os.log`?
 
-@available(iOS 14.0, *)
 extension Bundle {
     static var apnsEnvironment: APNSEnvironment {
 #if DEBUG

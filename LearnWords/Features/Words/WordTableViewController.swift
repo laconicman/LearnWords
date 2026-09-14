@@ -315,11 +315,7 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
     /// Reads one row's state back without disturbing the rest of the table.
     private func refreshRows(_ indexPaths: [IndexPath]) {
         progress = try? ProgressCache.shared.index(for: senses, in: lexicon)
-        if #available(iOS 15.0, *) {
-            tableView.reconfigureRows(at: indexPaths)
-        } else {
-            tableView.reloadRows(at: indexPaths, with: .automatic)
-        }
+        tableView.reconfigureRows(at: indexPaths)
     }
 
     // MARK: - Share-extension import (TD-3)
@@ -404,14 +400,6 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         cell.gestureRecognizers?
             .filter { $0 is UILongPressGestureRecognizer }
             .forEach(cell.removeGestureRecognizer)
-
-        // **Only below iOS 13.** From 13 the same press opens a context menu, and two
-        // recognisers for one gesture means whichever fires first wins (TD-50).
-        if #available(iOS 13, *) {} else {
-            let longPress = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress(_:)))
-            longPress.minimumPressDuration = 0.3
-            cell.addGestureRecognizer(longPress)
-        }
         cell.isUserInteractionEnabled = true
 
         // **A gesture VoiceOver cannot make.** A long press is invisible to it, and the
@@ -429,15 +417,6 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         ]
 
         return cell
-    }
-
-    /// The iOS 12 path: the same press, opening the same screen.
-    @objc private func handleLongPress(_ gestureRecognizer: UILongPressGestureRecognizer) {
-        guard gestureRecognizer.state == .began, !tableView.isEditing else { return }
-        let touchPoint = gestureRecognizer.location(in: tableView)
-        guard let indexPath = tableView.indexPathForRow(at: touchPoint),
-              indexPath.row < rows.count else { return }
-        showStatistics(for: rows[indexPath.row])
     }
 
     // MARK: - Per-term statistics (TD-50)
@@ -499,10 +478,9 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
         return true
     }
 
-    /// The platform answer for "show me more about this item" (iOS 13+), and the reason the
+    /// The platform answer for "show me more about this item", and the reason the
     /// gesture is a long press rather than a swipe: trailing swipe is taken by rename and
     /// delete, and a swipe acts on a row rather than inspecting it.
-    @available(iOS 13, *)
     override func tableView(_ tableView: UITableView,
                             contextMenuConfigurationForRowAt indexPath: IndexPath,
                             point: CGPoint) -> UIContextMenuConfiguration? {
@@ -534,7 +512,6 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
     }
 
     /// Tapping the preview opens the real screen, which is what a preview promises.
-    @available(iOS 13, *)
     override func tableView(_ tableView: UITableView,
                             willPerformPreviewActionForMenuWith configuration: UIContextMenuConfiguration,
                             animator: UIContextMenuInteractionCommitAnimating) {

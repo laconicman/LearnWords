@@ -282,14 +282,24 @@ goes async. Words/sets migrate from `UserDefaults`; **legacy progress aggregates
 (owner, 2026-07-20 — progress starts fresh from the event log; compatibility isn't worth
 the code). Apply the `ProgressResearch.md` audit (pending) before implementing the schema.
 
-## TD-7 — iOS 12 availability audit
+## TD-7 — iOS 12 availability audit — **closed by the iOS 15 floor (2026-09-14)**
 
 **Swift code: clean.** A clean build at the 12.1 floor succeeds, and Swift treats any
 unguarded newer API as a hard *error* — so a green build proves there are no unguarded
 iOS 13+ API uses. (Spot-checked: `.label`, `systemIndigo`, `UIImage(systemName:)` are all
 inside `#available`; `systemOrange` is iOS 7+.) No action needed here.
 
-## TD-11 — Storyboard has iOS 13+ UI dependencies that break on iOS 12
+**Closed (2026-09-14).** There is no iOS 12 left to audit. Forty-one live guards gated 15.0
+or lower: four went with the dual life cycle and 37 in the sweep after it, and a green build
+at 15.0 is this entry's own proof that none of them protected anything newer. Five remain,
+gating 16 and 17. The migration brief had counted 45 dead and 11 surviving by text search,
+and the gap is TD-60's lesson again: four of its 45 and seven of its 11 sit inside
+commented-out code (`SearchWordViewController`, `TranslationV` and `AvailableLanguage` are
+commented out whole), and the search never reached `WordWidget/`, where the fifth survivor
+is. Commented-out code was left as it is. The proof still covers availability only; TD-46 is
+why it says nothing about linkage.
+
+## TD-11 — Storyboard has iOS 13+ UI dependencies that break on iOS 12 — **closed by the iOS 15 floor (2026-09-14)**
 
 The compiler can't see inside `Main.storyboard`, and it hard-codes iOS 13+ features with
 **no fallbacks**, so the app *launches* on iOS 12 (dual lifecycle works) but its UI is
@@ -336,6 +346,16 @@ app, because that branch is what iOS 12 executes. It costs one build and needs n
 toolchain. That is how this defect was found, and it is worth running before any release
 that claims the floor: what it cannot check is lifecycle, storyboard semantic colours and
 system-control behaviour, which still need the Xcode 15 pass.
+
+**Closed (2026-09-14).** Nothing below iOS 13 can install the app, so nothing in the
+storyboard is unsupported anywhere it runs. What this entry built was kept rather than
+unwound: the named asset colours resolve on every OS, and the dictation button's 🎤 now stands
+in for a symbol name the running OS lacks rather than for an OS without symbols.
+`UIImage.systemImage` lost its iOS 12 branch and kept its array form, which falls back across
+names that exist only on some OS versions; the word list's reset action depends on that
+today. The eleven `.symbolset` assets were not touched: whether any still carries a name the
+system does not provide wants its own audit ([TASK-iOS15-migration](TASK-iOS15-migration.md)
+§ Phase 0), not a bulk delete.
 
 ## TD-8 — iOS 12 path is unverifiable on Xcode 26 — **confirmed against Apple's own numbers (2026-08-02)**
 
@@ -1590,7 +1610,8 @@ added as fallbacks are themselves an iOS 13 format. `UIImage.systemImage` return
 below 13 with a standing `TODO: look up in assets`, across 17 call sites. Giving iOS 12 real
 icons means PNG `.imageset`s and a backport that consults them — related to TD-45's lesson
 that a catalog is compiled by whichever toolchain opens it, and has no deployment target of
-its own. Deliberately deferred; a labels-only tab bar is legible, if plain.
+its own. Deliberately deferred; a labels-only tab bar is legible, if plain. **Moot since
+2026-09-14:** nothing below iOS 13 can install the app.
 
 ## TD-48 — The CloudKit removal window closed before anyone noticed it was open
 

@@ -10,7 +10,6 @@ import UIKit.UIContextualAction
 
 extension UIContextualAction {
 
-    @available(iOS 11.0, *)
     public convenience init(style: UIContextualAction.Style, title: String?, backgroundColor: UIColor?, image: UIImage? = nil, handler: @escaping UIContextualAction.Handler) {
         self.init(style: style, title: title, handler: handler)
         self.image = image

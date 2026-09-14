@@ -95,9 +95,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
     /// the widget target, which the app cannot import, so naming it here would be a copy free
     /// to drift — and every widget in the bundle reads the same store anyway.
     @objc private func reloadWidgets() {
-        if #available(iOS 14.0, *) {
-            WidgetCenter.shared.reloadAllTimelines()
-        }
+        WidgetCenter.shared.reloadAllTimelines()
     }
 
     // MARK: UIScene life cycle
@@ -136,11 +134,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                                 willPresent notification: UNNotification,
                                 withCompletionHandler completionHandler:
                                     @escaping (UNNotificationPresentationOptions) -> Void) {
-        if #available(iOS 14.0, *) {
-            completionHandler([.banner, .list, .sound])
-        } else {
-            completionHandler([.alert, .sound])
-        }
+        completionHandler([.banner, .list, .sound])
     }
 
     private var keyWindow: UIWindow? {

@@ -96,9 +96,7 @@ final class ExerciseViewController: UIViewController, ExerciseScreen {
 
         navigationItem.rightBarButtonItem = UIBarButtonItem(
             barButtonSystemItem: .fastForward, target: self, action: #selector(skipTapped))
-        if #available(iOS 11.0, *) {
-            navigationItem.largeTitleDisplayMode = .never
-        }
+        navigationItem.largeTitleDisplayMode = .never
 
         // The entry state ExerciseTransition.show springs out of.
         contentStack.transform = CGAffineTransform(scaleX: 0.8, y: 0.8)

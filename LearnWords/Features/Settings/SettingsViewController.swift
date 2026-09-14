@@ -197,11 +197,7 @@ final class SettingsViewController: UITableViewController {
     // MARK: - Lifecycle
 
     init() {
-        if #available(iOS 13.0, *) {
-            super.init(style: .insetGrouped)
-        } else {
-            super.init(style: .grouped)
-        }
+        super.init(style: .insetGrouped)
         title = NSLocalizedString("Settings", comment: "screen title")
     }
 
@@ -358,8 +354,7 @@ private final class SliderCell: UITableViewCell {
     }
 }
 
-/// A time of day. `UIDatePicker`'s compact style keeps it to one row on iOS 14+; below
-/// that the wheel is inline, which is what iOS 12 and 13 have always looked like.
+/// A time of day. `UIDatePicker`'s compact style keeps it to one row.
 private final class TimeCell: UITableViewCell {
 
     private let picker = UIDatePicker()
@@ -373,7 +368,7 @@ private final class TimeCell: UITableViewCell {
         textLabel?.text = title
 
         picker.datePickerMode = .time
-        if #available(iOS 13.4, *) { picker.preferredDatePickerStyle = .compact }
+        picker.preferredDatePickerStyle = .compact
         var components = DateComponents()
         components.hour = hour
         components.minute = minute

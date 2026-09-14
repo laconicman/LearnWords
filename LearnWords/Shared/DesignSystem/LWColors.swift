@@ -42,10 +42,7 @@ extension UIColor {
 
     /// The unfilled part of a progress indicator. A hint of the shape, not a second ring:
     /// it must read as absence, so it sits far below the filled arc in contrast.
-    static var lwTrack: UIColor {
-        if #available(iOS 13.0, *) { return .tertiarySystemFill }
-        return UIColor.darkGray.withAlphaComponent(0.12)
-    }
+    static var lwTrack: UIColor { .tertiarySystemFill }
 
     // MARK: - Text
 

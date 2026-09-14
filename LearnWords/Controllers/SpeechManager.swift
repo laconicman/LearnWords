@@ -22,9 +22,7 @@ final class SpeechManager /*: NSObject */ {
     
     private /* override */ init() {
         // super.init()
-        if #available(iOS 13.0, *) {
-            synthesizer.usesApplicationAudioSession = true
-        }
+        synthesizer.usesApplicationAudioSession = true
         // synthesizer.delegate = self
     }
     

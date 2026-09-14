@@ -15,11 +15,7 @@ final class LanguagePickerViewController: UITableViewController {
     init(title: String?, currentCode: String?, onSelect: @escaping (String) -> Void) {
         self.currentCode = currentCode
         self.onSelect = onSelect
-        if #available(iOS 13.0, *) {
-            super.init(style: .insetGrouped)
-        } else {
-            super.init(style: .grouped)
-        }
+        super.init(style: .insetGrouped)
         self.title = title
     }
 

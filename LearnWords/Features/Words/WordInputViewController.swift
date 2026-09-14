@@ -213,10 +213,8 @@ final class WordInputViewController: UITableViewController {
         // `.body` is the field's own text style: the glyph sits inline with the word being
         // typed, so it takes the size of that word rather than a size of its own. A text
         // style rather than a point size also keeps it tracking Dynamic Type.
-        if #available(iOS 13, *) {
-            dictationButton.setPreferredSymbolConfiguration(
-                UIImage.SymbolConfiguration(textStyle: .body), forImageIn: .normal)
-        }
+        dictationButton.setPreferredSymbolConfiguration(
+            UIImage.SymbolConfiguration(textStyle: .body), forImageIn: .normal)
         // The square is the touch target, and the padding is the difference between it and
         // the glyph — a derived gap rather than a chosen one, so it cannot drift out of step
         // with either the type scale or the target.
@@ -318,10 +316,8 @@ final class WordInputViewController: UITableViewController {
         // Sized by the same rule as the microphone opposite it — left to itself the symbol
         // renders about 50pt, twice the ⓘ on the rows below, which reads as a different
         // control rather than the same one.
-        if #available(iOS 13, *) {
-            lookUpButton.setPreferredSymbolConfiguration(
-                UIImage.SymbolConfiguration(textStyle: .body), forImageIn: .normal)
-        }
+        lookUpButton.setPreferredSymbolConfiguration(
+            UIImage.SymbolConfiguration(textStyle: .body), forImageIn: .normal)
         lookUpButton.translatesAutoresizingMaskIntoConstraints = false
         lookUpButton.setContentHuggingPriority(.required, for: .horizontal)
         lookUpButton.setContentCompressionResistancePriority(.required, for: .horizontal)

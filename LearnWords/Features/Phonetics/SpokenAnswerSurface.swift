@@ -168,13 +168,11 @@ final class SpokenAnswerSurface: NSObject, ExerciseAnswerSurface {
 
     /// The long-press menu that turns continuous listening on and off.
     private func installModeMenu() {
-        guard #available(iOS 14.0, *) else { return installLegacyModeGesture() }
         recordButton.menu = UIMenu(title: NSLocalizedString("Recognition",
                                                             comment: "Menu title"),
                                    children: [autoAction(on: true), autoAction(on: false)])
     }
 
-    @available(iOS 14.0, *)
     private func autoAction(on: Bool) -> UIAction {
         UIAction(title: on
                  ? NSLocalizedString("Listen automatically", comment: "Menu item")
@@ -183,18 +181,6 @@ final class SpokenAnswerSurface: NSObject, ExerciseAnswerSurface {
             self?.isAutomatic = on
             self?.installModeMenu()          // redraw the checkmark
         }
-    }
-
-    /// iOS 12–13 have no button menu; a long press toggles instead, and the button title
-    /// is the only affordance either way.
-    private func installLegacyModeGesture() {
-        let press = UILongPressGestureRecognizer(target: self, action: #selector(toggleAutomatic))
-        recordButton.addGestureRecognizer(press)
-    }
-
-    @objc private func toggleAutomatic(_ gesture: UILongPressGestureRecognizer) {
-        guard gesture.state == .began else { return }
-        isAutomatic.toggle()
     }
 
     private func updateRecordButton() {

@@ -14,17 +14,16 @@
 //  requirements rather than bent to fit the old one, and users re-import their dictionary.
 //  See docs/Design.md.
 //
-//  **CloudKit (iOS 13+, host app only).** Every attribute must be optional *or* have a
+//  **CloudKit (host app only).** Every attribute must be optional *or* have a
 //  runtime default, every relationship optional with an inverse, and no unique constraints.
 //  The model was believed to satisfy that from the start; it did not — every UUID was
 //  non-optional with a `defaultValueString` Core Data ignores, and the store refused to
 //  open. `PersistenceSchemaTests.modelObeysCloudKitRules` now runs the rule verbatim, with
 //  no exemptions, because an exemption is a hole with a comment in it.
 //
-//  iOS 12 keeps a purely local store, which is the correct degradation and not a bug:
-//  Legacy keeps working, sync is a modern-OS feature. So does a device whose iCloud
-//  container is missing or unprovisioned — see docs/CloudKitSetup.md for the account-side
-//  steps, which no amount of code can substitute for.
+//  A device whose iCloud container is missing or unprovisioned keeps a purely local store,
+//  which is the correct degradation and not a bug — see docs/CloudKitSetup.md for the
+//  account-side steps, which no amount of code can substitute for.
 //
 //  The **extensions do not sync**. A widget reads what the app has already pulled down;
 //  giving an extension its own mirroring engine would have it compete with the app for the
@@ -53,7 +52,8 @@ final class LWPersistence {
 
     let container: NSPersistentContainer
 
-    /// Whether this store mirrors to CloudKit. `false` in extensions and below iOS 13.
+    /// Whether this store mirrors to CloudKit. `false` in extensions, and when the CloudKit
+    /// store failed to open.
     private(set) var isSyncing = false
 
     /// The app's store, in the App Group so extensions can read it.
@@ -71,7 +71,7 @@ final class LWPersistence {
         // CloudKit is attempted, and a failure falls back to the same local store the app
         // has always used rather than refusing to launch. A provisioning mistake should
         // cost the user sync, not their vocabulary.
-        if Self.shouldSync, #available(iOS 13.0, *) {
+        if Self.shouldSync {
             let cloud = NSPersistentCloudKitContainer(name: Self.modelName,
                                                       managedObjectModel: Self.model)
             cloud.persistentStoreDescriptions = [Self.cloudKitDescription()]
@@ -110,7 +110,6 @@ final class LWPersistence {
     /// Production, where record types are immutable once deployed. Run it from Xcode with
     /// `-LWInitializeCloudKitSchema 1` in the scheme's arguments after any model change,
     /// then deploy the schema in the CloudKit Console. See docs/CloudKitSetup.md.
-    @available(iOS 13.0, *)
     private static func initializeCloudKitSchemaIfRequested(_ container: NSPersistentCloudKitContainer) {
         #if DEBUG
         guard UserDefaults.standard.bool(forKey: "LWInitializeCloudKitSchema") else { return }
@@ -132,11 +131,10 @@ final class LWPersistence {
     /// exactly what happened on the first two-device run. Seeding is a decision about a
     /// *new user*; a new *device* is not one.
     ///
-    /// The signal is `NSPersistentCloudKitContainer.eventChangedNotification` (iOS 14+),
-    /// which reports when an import finishes. The timeout is not a fallback for slow
-    /// networks but for the cases where that event never comes at all — no iCloud account,
-    /// airplane mode, iOS 13 — where waiting forever would leave a genuinely new user
-    /// staring at an empty app.
+    /// The signal is `NSPersistentCloudKitContainer.eventChangedNotification`, which
+    /// reports when an import finishes. The timeout is not a fallback for slow networks but
+    /// for the cases where that event never comes at all — no iCloud account, airplane
+    /// mode — where waiting forever would leave a genuinely new user staring at an empty app.
     func whenInitialSyncSettled(_ settled: @escaping () -> Void) {
         guard isSyncing else { return DispatchQueue.main.async(execute: settled) }
 
@@ -151,17 +149,15 @@ final class LWPersistence {
             settled()
         }
 
-        if #available(iOS 14.0, *) {
-            importObserver = NotificationCenter.default.addObserver(
-                forName: NSPersistentCloudKitContainer.eventChangedNotification,
-                object: container, queue: .main
-            ) { note in
-                let key = NSPersistentCloudKitContainer.eventNotificationUserInfoKey
-                guard let event = note.userInfo?[key]
-                        as? NSPersistentCloudKitContainer.Event,
-                      event.type == .import, event.endDate != nil else { return }
-                runOnce()
-            }
+        importObserver = NotificationCenter.default.addObserver(
+            forName: NSPersistentCloudKitContainer.eventChangedNotification,
+            object: container, queue: .main
+        ) { note in
+            let key = NSPersistentCloudKitContainer.eventNotificationUserInfoKey
+            guard let event = note.userInfo?[key]
+                    as? NSPersistentCloudKitContainer.Event,
+                  event.type == .import, event.endDate != nil else { return }
+            runOnce()
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + Self.initialSyncTimeout, execute: runOnce)
     }
@@ -182,7 +178,6 @@ final class LWPersistence {
             ?? NSPersistentStoreDescription()
     }
 
-    @available(iOS 13.0, *)
     private static func cloudKitDescription() -> NSPersistentStoreDescription {
         let description = localDescription()
         description.cloudKitContainerOptions = NSPersistentCloudKitContainerOptions(
@@ -257,7 +252,6 @@ final class LWPersistence {
     /// Uniqueness is enforced in `Lexicon`, in code, because CloudKit forbids constraints.
     /// That holds within one store and cannot hold across two, so the repair has to happen
     /// after the merge — see `StoreDeduplicator`.
-    @available(iOS 13.0, *)
     private func observeRemoteChanges() {
         remoteChangeObserver = NotificationCenter.default.addObserver(
             forName: .NSPersistentStoreRemoteChange,
@@ -325,13 +319,8 @@ final class LWPersistence {
         container.persistentStoreDescriptions.forEach {
             // Required by both CloudKit and Core Spotlight indexing.
             $0.setOption(true as NSNumber, forKey: NSPersistentHistoryTrackingKey)
-            // Remote-change notifications are iOS 13+, as is NSPersistentCloudKitContainer
-            // itself — so on iOS 12 this store is simply local. That is the correct
-            // degradation: Legacy keeps working, sync is a modern-OS feature.
-            if #available(iOS 13.0, *) {
-                $0.setOption(true as NSNumber,
-                             forKey: NSPersistentStoreRemoteChangeNotificationPostOptionKey)
-            }
+            $0.setOption(true as NSNumber,
+                         forKey: NSPersistentStoreRemoteChangeNotificationPostOptionKey)
         }
     }
 
@@ -352,10 +341,6 @@ final class LWPersistence {
         guard let description = container.persistentStoreDescriptions.first,
               description.type == NSSQLiteStoreType else { return }
 
-        // `init(forStoreWith:coordinator:)` is iOS 15+; below that the delegate exists
-        // but takes the model. iOS 12–14 therefore simply has no Spotlight entries —
-        // the same graceful degradation as the widgets and sync (TD-11 tier).
-        guard #available(iOS 15.0, *) else { return }
         let indexer = NSCoreDataCoreSpotlightDelegate(
             forStoreWith: description, coordinator: container.persistentStoreCoordinator)
         indexer.startSpotlightIndexing()

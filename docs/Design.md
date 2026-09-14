@@ -491,7 +491,9 @@ is ours rather than the system's.
 
 **Decision (2026-07-26, iteration 4).** The host app opens the store through
 `NSPersistentCloudKitContainer` on iOS 13+. Extensions and iOS 12 open the same store
-through a plain `NSPersistentContainer`.
+through a plain `NSPersistentContainer`. (Since 2026-09-14 nothing runs below iOS 15, and
+the availability check behind that split is gone: the host app always attempts CloudKit, and
+only an extension, or a CloudKit store that fails to open, gets the plain container.)
 
 **Why extensions do not sync.** A widget reads what the app has already pulled down.
 Giving an extension its own mirroring engine would have it compete with the app for the
