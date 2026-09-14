@@ -357,7 +357,7 @@ today. The eleven `.symbolset` assets were not touched: whether any still carrie
 system does not provide wants its own audit ([TASK-iOS15-migration](TASK-iOS15-migration.md)
 § Phase 0), not a bulk delete.
 
-## TD-8 — iOS 12 path is unverifiable on Xcode 26 — **confirmed against Apple's own numbers (2026-08-02)**
+## TD-8 — iOS 12 path is unverifiable on Xcode 26 — **confirmed against Apple's own numbers (2026-08-02); closed by the iOS 15 floor (2026-09-14)**
 
 Apple's [Xcode system requirements](https://developer.apple.com/xcode/system-requirements/)
 now state it outright: Xcode 26 supports **on-device debugging for iOS 15 or later**, and a
@@ -411,6 +411,14 @@ Its signing team and weak-link flags were brought in line with the main project 
 so a resync starts from correct settings. **Discharge:** before any iOS 12 pass, add every
 source the main project compiles, or regenerate this project from the main one — keeping it
 by hand has now failed silently for five weeks.
+
+**Closed (2026-09-14).** The path this entry could not verify was deleted rather than
+verified (TD-7), and `LearnWords-Xcode15.xcodeproj` went with it, together with the
+`.gitignore` exception that kept it tracked. Building that path on the one toolchain able to
+run it was the project's only purpose, and stale as it was, it was not expected to manage even
+that (inferred above, never run). The floor now
+sits inside the deployment range Apple documents for Xcode 26 (iOS 15–26.5, above), so the
+App-Store build and the build this toolchain can run are one build again.
 
 ## TD-9 — Divergent doc copies — **resolved (2026-07-17)**
 
@@ -1448,7 +1456,7 @@ be sure enough if you yet decide to use one"*):
 * The **padding around each glyph is not a number at all** — it is the difference between
   the touch target and the type-scaled symbol, so it cannot drift out of step with either.
 
-## TD-45 — Asset catalogs use formats the verification toolchain cannot read
+## TD-45 — Asset catalogs use formats the verification toolchain cannot read — **closed by the iOS 15 floor (2026-09-14)**
 
 TD-8 concluded that the App-Store build (Xcode 26) and the iOS-12 verification build
 (Xcode 15.2, Ventura) are two separate steps. This is the first thing that made that split
@@ -1522,6 +1530,14 @@ The long-term alternative is a generated project (XcodeGen, Tuist): one spec, an
 neither emits synchronized folders, a *single* generated project would open in both
 toolchains and this branch would stop existing. The trade is losing Xcode 16+ folder
 auto-membership on master in exchange for a spec to maintain. Not taken yet.
+
+**Closed (2026-09-14).** There is no second toolchain any more: the iOS 12 path is deleted
+and `LearnWords-Xcode15.xcodeproj` with it (TD-8), so a catalog is compiled by Xcode 26
+alone and the generated-project alternative has nothing left to solve. Two things this entry
+introduced now serve nothing, and are left for their own decision rather than deleted in
+passing: the single-1024 `AppIcon.appiconset` beside `AppIcon.icon`, which `306dbfa` measured
+to leave the shipped `Assets.car` byte-identical, and the untracked `Package.resolved`, which
+was untracked only because Xcode 15 could not read it.
 
 ## TD-46 — The app hard-linked Core Haptics, so iOS 12 could not launch it — **flags removed with the iOS 15 floor (2026-09-14)**
 
