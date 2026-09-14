@@ -1,6 +1,6 @@
 # Review Guidelines
 
-LearnWords is a UIKit vocabulary app on an **iOS 12.1 floor**, with a Core Data store mirrored to
+LearnWords is a UIKit vocabulary app on an **iOS 15 floor**, with a Core Data store mirrored to
 CloudKit and a scoring model replayed from an append-only review log. `docs/` is authoritative:
 where a code comment and `docs/` disagree, `docs/` wins.
 
@@ -69,14 +69,16 @@ wanted here — it buries them.
   Pass the value in with a default argument so a test can pin it.
 - Reject references to `ScoringPolicy`, `ProgressCache` or `LearnWords/Features/` from
   `LearnWords/Model/Settings.swift`, `LearnWords/Model/Lexicon/`, `LearnWords/Model/CoreData/` or
-  `LearnWords/Shared/` — those are compiled into the widgets too.
-- Require an extension build before approving such a change: it breaks `Widget`,
-  `WordWidgetExtension` or `ImportAsDictAction`, never the app target.
+  `LearnWords/Shared/` — those are compiled into the extensions too.
+- Require an extension build before approving such a change: it breaks `WordWidgetExtension` or
+  `ImportAsDictAction`, never the app target.
 - Require `-weak_framework` in `OTHER_LDFLAGS` for any `import` of a framework newer than the
-  floor (WidgetKit, Core Haptics). Swift autolinks it hard and iOS 12–13 refuse to launch before
-  any `#available` runs (TD-46).
-- Flag an icon-only control whose image comes from `UIImage.systemImage`: it returns `nil` below
-  iOS 13, leaving an invisible button. Require a title or a fallback.
+  iOS 15 floor. An `import` can autolink it as a hard load, and an older OS then refuses to launch
+  the app before any `#available` runs (TD-46). Core Haptics and WidgetKit predate the floor and
+  need no flag.
+- Flag an icon-only control whose image comes from `UIImage.systemImage`: it returns `nil` when
+  none of its names exists on the running OS, leaving an invisible button. Require a title or a
+  fallback name.
 - Flag a context-menu preview that reuses a full screen. A preview does not scroll, so anything
   past the cut is unreachable; it must build shorter content and cap `preferredContentSize`
   (TD-58).

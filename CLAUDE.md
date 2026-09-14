@@ -24,11 +24,11 @@ xcodebuild -project LearnWords.xcodeproj -scheme LearnWords -configuration Debug
   read the `.xcresult`, or a failing run looks like a passing one with less output.
 * **"N tests green" counts argument-level cases**, not the function count `xcresulttool` reports.
   A parameterised test with twelve arguments is twelve.
-* The deployment floor is **iOS 12.1** and is moving to **15.0** —
-  [TASK-iOS15-migration](docs/TASK-iOS15-migration.md). Until that lands, an API newer than the
-  floor needs `#available`, and a *framework* newer than the floor needs `-weak_framework` in
-  `OTHER_LDFLAGS` (TD-46: Swift autolinks an `import` hard, and the app then refuses to launch
-  before any `#available` can run).
+* The deployment floor is **iOS 15.0**, set once at project level and inherited by every
+  shipped target ([Design](docs/Design.md) § *the floor is iOS 15*). An API newer than the floor
+  needs `#available`, and a *framework* newer than the floor needs `-weak_framework` in
+  `OTHER_LDFLAGS` (TD-46: an `import` can autolink it as a hard load, and the app then refuses to
+  launch before any `#available` can run).
 * Targets use Xcode 16 synchronized folders with `membershipExceptions` inclusion lists (TD-2).
   Moving or deleting a shared file means updating those lists; forget one and the file silently
   leaves a target while the build stays green.
