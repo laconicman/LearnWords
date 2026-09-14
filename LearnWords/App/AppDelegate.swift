@@ -15,23 +15,11 @@ import WidgetKit
 @main
 final class AppDelegate: UIResponder, UIApplicationDelegate {
 
-    /// iOS 12 only: this delegate owns the window. On iOS 13+ it lives in `SceneDelegate`
-    /// and this stays `nil`. (See the dual-life-cycle decision in `docs/Design.md`.)
-    ///
-    /// **Built here rather than by `UIMainStoryboardFile`.** That key made UIKit instantiate
-    /// `Main.storyboard` and assign the window before any of our code ran, which meant iOS 12
-    /// never reached `AppRoot.makeRoot()` — the one place that appends the Settings tab. The
-    /// result was an app whose tab bar had four tabs on iOS 13+ and three on iOS 12, from a
-    /// "shared composition root" that one of the two life cycles silently bypassed. A root
-    /// built in two places is not a shared root; the storyboard key was the second place.
-    var window: UIWindow?
-
     func application(
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
-        // App-wide appearance. The proxies apply on every OS, and must be set before any
-        // bar is created — on iOS 12 that is a few lines below rather than in `SceneDelegate`.
+        // App-wide appearance. The proxies must be set before any bar is created.
         // A horizon stored below `ScoringPolicy.minimumHorizonDays` is raised to it once,
         // here: values from before the floor existed would otherwise sit in the defaults
         // forever while the slider drew the floor and the policy enforced it — three
@@ -46,18 +34,8 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         UITabBar.appearance().tintColor = .orange
 
         // Opens the store and seeds it on a fresh install, so no screen has to cope with
-        // an empty library. Runs for both lifecycles, and before either builds its UI.
+        // an empty library. Runs before `SceneDelegate` builds the UI.
         Library.shared.prepareForLaunch()
-
-        // iOS 12 has no scenes, so nothing else will build the window. `SceneDelegate` does
-        // exactly this on iOS 13+, through the same `AppRoot.makeRoot()`.
-        if #available(iOS 13.0, *) {} else {
-            let window = UIWindow(frame: UIScreen.main.bounds)
-            window.tintColor = .orange
-            window.rootViewController = AppRoot.makeRoot()
-            self.window = window
-            window.makeKeyAndVisible()
-        }
 
         // Must be set before launch finishes, or a notification that *started* the app is
         // delivered before anything is listening and the tap goes nowhere.
@@ -90,8 +68,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         // timeline — so a word added here, or an import a silent push just woke, waited out
         // the widget's 30-minute hint and whatever WidgetKit stretched that to.
         //
-        // **Here, not in `SceneDelegate`, on every OS.** Only the *window* in this file is
-        // iOS 12's; launch and these store observers are app-level on both life cycles. A
+        // **Here, not in `SceneDelegate`.** Launch and these store observers are app-level. A
         // CloudKit push can wake the app in the background with no scene connected, and UIKit
         // may disconnect a background scene at any time — so an observer that must hear a
         // push-driven import cannot live on a scene.
@@ -123,9 +100,8 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         }
     }
 
-    // MARK: UIScene life cycle (iOS 13+)
+    // MARK: UIScene life cycle
 
-    @available(iOS 13.0, *)
     func application(
         _ application: UIApplication,
         configurationForConnecting connectingSceneSession: UISceneSession,
@@ -133,28 +109,13 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
     ) -> UISceneConfiguration {
         UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
     }
-
-    // MARK: Custom URL scheme (iOS 12 fallback)
-
-    /// Handles `learnWords://` on iOS 12. On iOS 13+ UIKit routes URLs to
-    /// `SceneDelegate.scene(_:openURLContexts:)` instead and never calls this.
-    func application(
-        _ app: UIApplication,
-        open url: URL,
-        options: [UIApplication.OpenURLOptionsKey: Any] = [:]
-    ) -> Bool {
-        AppRoot.handle(url, on: window)
-    }
 }
 
 // MARK: - Reminders
 
 extension AppDelegate: UNUserNotificationCenterDelegate {
 
-    /// A tapped reminder lands on the Exercises tab.
-    ///
-    /// The window is found from the connected scene on iOS 13+, and from `window` on 12 —
-    /// the same dual-lifecycle split as everywhere else, kept to this one expression.
+    /// A tapped reminder lands on the Exercises tab, in the connected scene's window.
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 didReceive response: UNNotificationResponse,
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
@@ -183,11 +144,8 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     }
 
     private var keyWindow: UIWindow? {
-        if #available(iOS 13.0, *) {
-            return UIApplication.shared.connectedScenes
-                .compactMap { ($0 as? UIWindowScene)?.windows.first { $0.isKeyWindow } }
-                .first
-        }
-        return window
+        UIApplication.shared.connectedScenes
+            .compactMap { ($0 as? UIWindowScene)?.windows.first { $0.isKeyWindow } }
+            .first
     }
 }

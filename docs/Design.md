@@ -18,7 +18,13 @@ The physical layout that expresses this (feature-first folders) is planned in
 [TechDebt](TechDebt.md) TD-1 and executed as build-verified slices, because the
 project shares source files across targets (see "Target membership" below).
 
-## Decision: adopt the UIScene lifecycle
+## Decision: adopt the UIScene lifecycle — **scene-only since 2026-09-14**
+
+**The dual half is gone.** When the floor rose to iOS 15 (§ *the floor is iOS 15* below), the
+iOS 12 branch was deleted as [the path](#path-to-the-optimal-non-dual-modern-structure) planned:
+`AppDelegate` owns no window and handles no URL, and `SceneDelegate` carries no availability
+gate. What this decision rejected as "the cleaner code" is now the code; the reasoning below is
+kept for why the dual form existed at all.
 
 **Decision.** Adopt the UIScene lifecycle **as a dual lifecycle** that still supports
 iOS 12. On iOS 13+, an `@available(iOS 13.0, *)` `SceneDelegate` owns the `UIWindow`
@@ -115,14 +121,17 @@ what turns TD-56's deferred "if the floor rises, do it properly" branch into the
 
 ## Composition root
 
-`AppRoot` (`AppRoot.swift`) is the shared composition root for **both** lifecycles: it
-builds the root view controller from `Main.storyboard` (`makeRoot()`) and interprets
-`learnWords://` URLs (`handle(_:on:)`). On iOS 13+, `SceneDelegate.scene(_:willConnectTo:)`
-creates the window, sets the tint, and calls `AppRoot`; on iOS 12, `AppDelegate` owns the
-storyboard-created window and calls the same `AppRoot`. Keeping the construction in one
-place is DRY and dependency-inversion in practice, and it is where shared controllers get
-injected as the app grows. `AppDelegate` stays thin: appearance in `didFinishLaunching`,
-the `@available`-gated `configurationForConnecting`, and the iOS 12 URL fallback.
+`AppRoot` (`AppRoot.swift`) is the composition root: it builds the root view controller
+from `Main.storyboard` (`makeRoot()`) and interprets `learnWords://` URLs (`handle(_:on:)`).
+`SceneDelegate.scene(_:willConnectTo:)` creates the window, sets the tint, and calls
+`AppRoot`; `AppDelegate` calls the same `handle(_:on:)` when a reminder is tapped. Keeping
+the construction in one place is DRY and dependency-inversion in practice, and it is where
+shared controllers get injected as the app grows. `AppDelegate` stays thin and owns no
+window: app-level launch work in `didFinishLaunching`, and `configurationForConnecting`.
+
+Until 2026-09-14 `AppRoot` also served an iOS 12 life cycle, whose window `AppDelegate`
+built. Deleting that path changed nothing in `AppRoot` or in `SceneDelegate`'s use of it,
+which is what routing both through one root was for.
 
 ## Decision: persistence is `Lexicon`, and there is no protocol — **superseded (2026-07-26)**
 
@@ -981,6 +990,11 @@ rewrite:
    `UIMainStoryboardFile` from `Info.plist`; remove the `@available(iOS 13.0, *)` gate on
    `SceneDelegate`. `AppRoot` and `SceneDelegate`'s use of it stay **unchanged** — that is
    the payoff of routing both paths through `AppRoot`.
+   **Done (2026-09-14)**, with the floor at iOS 15, and it was the deletion promised here.
+   `UIMainStoryboardFile` had already gone for TD-47, and the `window?.tintColor` line had
+   become the tint on the window `AppDelegate` built; both went with that window.
+   Beyond the list, `AppDelegate`'s `keyWindow` lost its fallback to the deleted property and
+   `configurationForConnecting` its availability attribute.
 2. **Then modernize structurally** (independent of the lifecycle), per `uikit-app-structure`:
    feature-first folders (TD-1), split the single `Main.storyboard` and inject dependencies
    into view controllers via `instantiateViewController(identifier:creator:)` (TD-5), rename

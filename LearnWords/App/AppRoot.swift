@@ -2,18 +2,14 @@
 //  AppRoot.swift
 //  LearnWords
 //
-//  Shared composition root for both app life cycles. `SceneDelegate` (iOS 13+) and the
-//  `AppDelegate` fallback (iOS 12) build the same root UI and handle the same
-//  `learnWords://` deep link through here, so the two code paths can't drift.
+//  The app's composition root. `SceneDelegate` builds the root UI and handles
+//  `learnWords://` URLs through here, and `AppDelegate` routes a tapped reminder the
+//  same way, so no second path can drift from it.
 //
 
 import UIKit
 
 /// The single place that constructs the app's root UI and interprets custom-scheme URLs.
-///
-/// When the iOS 12 floor is eventually dropped (see `docs/TechDebt.md`, TD-8), the removal is
-/// mechanical: delete `AppDelegate`'s `window`/`application(_:open:)` members — `SceneDelegate`
-/// keeps calling `makeRoot()` and `handle(_:on:)` unchanged, and this file stays as-is.
 enum AppRoot {
 
     /// The initial view controller from `Main.storyboard` (the home tab bar), with

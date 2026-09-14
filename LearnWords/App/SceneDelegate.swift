@@ -2,16 +2,12 @@
 //  SceneDelegate.swift
 //  LearnWords
 //
-//  Adopts the UIScene life cycle (iOS 13+). Owns the window and the app's root view
+//  Adopts the UIScene life cycle. Owns the window and the app's root view
 //  controller — the app's composition root, per the uikit-app-structure skill.
-//
-//  This whole type is gated to iOS 13+. On iOS 12 the scene manifest is ignored and
-//  `AppDelegate` owns the window instead (see `docs/Design.md`).
 //
 
 import UIKit
 
-@available(iOS 13.0, *)
 final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
