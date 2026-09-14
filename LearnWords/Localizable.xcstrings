@@ -2792,8 +2792,8 @@
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Запоминается на (дней)"
+            "state" : "translated",
+            "value" : "В памяти (дней)"
           }
         }
       }
