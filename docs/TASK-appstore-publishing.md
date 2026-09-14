@@ -72,7 +72,9 @@ check a machine could have run before a person pressed Upload.
 
 ### Other people's work
 
-Evaluated in Phase 0; nothing below has been run.
+Nothing below has been evaluated yet; that is Phase 0's tool trial. Every behaviour described is
+**vendor-reported**: taken from the project's own README or docs, as read by the research pass on
+2026-09-14, or from the vendored `axiom-shipping` skill. None of it has been run or verified.
 
 * **fastlane.** `deliver` handles metadata as files, `snapshot` and `frameit` handle screenshots,
   and `precheck` lints metadata. `fastlane/metadata/<locale>/release_notes.txt` is the de facto
@@ -143,9 +145,12 @@ Evaluated in Phase 0; nothing below has been run.
   question for the owner, never guessed.
 * **Idempotent and diffable.** Pull the live state, diff against the repo, apply only the difference.
   A second run changes nothing.
-* **No promises the app cannot keep.** Release notes may only claim what has been verified. The first
-  draft of 1.2.2's notes left out iCloud sync for exactly that reason: two-device sync is still
-  unverified (Roadmap).
+* **No promises the app cannot keep.** Release notes may only claim what has been verified, and
+  only as far as it was verified. Sync is the example. Handoff records a word set and a word
+  syncing both ways between two devices, plus one real merge. It also leaves deferred seeding on a
+  second device and live refresh of incoming changes unverified, and nothing has been checked
+  against the Production schema deployed on 2026-09-14. The Roadmap still lists two-device
+  verification as open. The first draft of 1.2.2's notes left sync out for that reason.
 * **Low volume.** Respect API rate limits, and for any undocumented endpoint follow the etiquette
   `deepwiki-mcp` already follows.
 
@@ -229,8 +234,8 @@ locale, and they upload only after approval.
 Each produces an answer sheet: every answer with its evidence, and open questions separated out. The
 tool applies what the API covers. The owner enters the rest.
 
-**Definition of done:** for LearnWords, every questionnaire has a reviewed answer sheet, and a
-re-run after a code change flags the answers that change changed.
+**Definition of done:** for LearnWords, every questionnaire has a reviewed answer sheet. Re-running
+the sheets after a code change flags every answer that the change affects.
 
 ## Phase 4 — preflight and submission
 
