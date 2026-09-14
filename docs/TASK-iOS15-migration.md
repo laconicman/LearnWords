@@ -142,17 +142,20 @@ Each item names its own discharge in the register already; none needs new design
 
 * **TD-56 — scoring the library is main-thread work.** Measured at 369 ms for 1,000 meanings and
   1,860 ms for 2,000, on the thread that draws. The register offers two discharges and says to
-  decide which before building either. **The floor does not decide it**, and reading TD-56's *"if
-  the floor rises… `Lexicon` reads become `async` over `context.perform`"* as now-unlocked walks
-  straight into a standing rule.
+  decide which before building either. **The floor does not decide it either** — reading TD-56's
+  *"if the floor rises… `Lexicon` reads become `async` over `context.perform`"* as automatically
+  unlocked skips the question that actually matters.
 
-  **The conflict, written down so nobody has to rediscover it.** `REVIEW.md`: *"Flag any change
-  that makes `Lexicon.swift` read asynchronous: a write must be visible to the next read,
-  synchronously."* That rule guards a bug found by probing rather than reasoning
-  ([Design](Design.md) § *a write is visible to the next read, synchronously*) — a caller that
-  wrote and immediately re-read got the previous values back, so a second edit to the same field
-  appeared to do nothing at all. Every editor screen reads straight after writing; so does every
-  test.
+  **What must survive, and what merely happens to be true today.** The invariant is
+  **read-after-write visibility**: once a write returns, the next read observes it
+  ([Design](Design.md) § *a write is visible to the next read, synchronously*). It was bought by a
+  bug found through probing — a caller wrote, immediately re-read, got the previous values back,
+  and a second edit to the same field appeared to do nothing at all. Every editor screen reads
+  straight after writing; so does every test. **Synchronous reads are how that holds today, not
+  the requirement.** `REVIEW.md` said both in one breath until 2026-09-14 and so forbade the
+  improvement along with the regression; it now states the guarantee, and flags an async read only
+  when a change fails to show the guarantee still holds. Phase 1's job is to show it, or to leave
+  the reads alone.
 
   **What has to move is the scoring replay, not the read API.** The measured cost is the cold
   `ProgressIndex` build, which returns value types and never lets a managed object cross a queue —
@@ -160,11 +163,10 @@ Each item names its own discharge in the register already; none needs new design
   changes how that off-main work is **expressed** — `async` over `context.perform` instead of the
   completion-handler twin — without settling whether `Lexicon`'s own reads stay synchronous.
 
-  **The rule has already been narrowed to make room for this** (owner, 2026-09-14): `REVIEW.md`
-  now requires *read-after-write visibility* and says synchronous reads are the current mechanism
-  rather than the rule, so an async read is flagged only when a change fails to show the guarantee
-  still holds. A review rule that protects something we are not certain of turns the reviewer into
-  an echo of our assumptions, which is the opposite of what it is for.
+  **Why the rule was narrowed rather than kept** (owner, 2026-09-14): a review rule that protects
+  something we are not certain of turns the reviewer into an echo of our assumptions, which is the
+  opposite of what it is for. The certainty is the guarantee; the synchrony is an implementation
+  that has never been tested against an alternative.
 
   **The part that can be done without touching the contract, and what is unknown about it.**
   TD-56's own pre-floor discharge is the shape: *"a completion-handler path that replays the
