@@ -129,8 +129,16 @@ accepts.
 
 ## Phase 1 — what modern concurrency unlocks
 
-The floor was the only reason these were deferred. Each names its own discharge in the register
-already; none needs new design.
+**Unlocks, not requires — and nothing here is forced by the floor.** Swift Concurrency
+back-deploys only to iOS 13, so at 12.1 it was unavailable; at 15 it becomes *available*. That is
+the whole change. Core Data is untouched by this migration: no model change, no store change, and
+`viewContext` pinned to the main queue with synchronous reads stays correct and supported on every
+OS this app will run on. **Skipping this phase entirely is a legitimate outcome** — TD-56's own
+closing line is *"not urgent: a library large enough to feel this does not exist yet, and the seed
+is nine words."* An earlier draft of this brief read the floor as deciding the matter, which is
+what the review below corrected.
+
+Each item names its own discharge in the register already; none needs new design.
 
 * **TD-56 — scoring the library is main-thread work.** Measured at 369 ms for 1,000 meanings and
   1,860 ms for 2,000, on the thread that draws. The register offers two discharges and says to
