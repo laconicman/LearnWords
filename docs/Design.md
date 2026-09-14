@@ -553,6 +553,52 @@ changed.
 the answer came from printing what was actually stored across three successive writes.
 Worth remembering as the faster route when a Core Data result contradicts the code.
 
+**Where it came from, for whoever is tempted to undo it.** `64de398` (2026-07-27, fork C).
+The visible symptom was not a crash or a stale label: **editing a field twice appeared to do
+nothing the second time**, because the editor re-read the previous value and wrote it back. Two
+tests failed in a way the code did not explain, and the cause was found by printing what was
+actually stored. `ReadAfterWriteTests` in `Unit Testing Bundle/MeaningEditingTests.swift` is the
+guard — three repeated edits to one field, and a rename read back immediately.
+
+### Addendum (2026-09-14): what Swift Concurrency changes, and what it does not
+
+Asked when the floor moved to iOS 15 and TD-56's async discharge became possible. Four findings,
+in decreasing order of how comfortable they are.
+
+1. **The root cause is untouched.** A fetch still returns already-registered objects without
+   refreshing them, and `automaticallyMergesChangesFromParent` still merges on notification
+   delivery. Neither is a threading property, so `async` neither causes nor cures the stale read:
+   **the merge-before-return stays necessary exactly as it is.**
+2. **One reason in the comment expires.** The merge happens after `performAndWait` returns rather
+   than inside the did-save observer because that observer runs on the background queue, and
+   hopping to main from there while main is *blocked* on the same `performAndWait` deadlocks. With
+   `await context.perform` (iOS 15.0+, which is now the floor) the main thread **suspends rather
+   than blocks**, so that specific hazard disappears. The fix does not age; its justification
+   does, and a reader who trusts the comment after an async rewrite will be defending a deadlock
+   that can no longer happen.
+3. **Enforcement moves from the compiler to the caller — this is the real cost.** Today
+   `try lexicon.updateSense(…)` followed by a read cannot be misordered: a statement does not
+   return early. Make both `async` and the ordering still holds for anyone who writes
+   `await write(); await read()` — but `Task { try await lexicon.updateSense(…) }` followed by a
+   read is one keyword away, compiles, and reads stale. **The guarantee stops being unforgeable
+   and becomes a convention.**
+4. **And the tests stop covering what they cover now.** `ReadAfterWriteTests` would be rewritten
+   `async`, would await both calls, and would pass — while a screen that forgot to await
+   regressed. The suite would be verifying the store and no longer the discipline it can no longer
+   see. That is a worse position than today's, where the test and the call sites are the same
+   shape.
+
+Actor reentrancy is a fifth item but a *different* class, not this one: a read-modify-write
+spanning an `await` can be interleaved by another writer, which the synchronous design makes
+impossible. Worth naming so it is not mistaken for the bug above.
+
+**Conclusion.** The invariant survives Swift Concurrency; the *enforcement* does not. Any change
+that makes `Lexicon`'s reads asynchronous has to replace the enforcement rather than merely
+preserve the behaviour — and the cheapest way to keep it is not to spend it: leave the public
+reads synchronous and main-confined, and move only the internal replay off-main. That is what
+[TASK-iOS15-migration](TASK-iOS15-migration.md) § Phase 1 proposes, and why `REVIEW.md` now asks
+an async read to *show* the guarantee holds rather than banning it outright.
+
 ## Decision: reminders are scheduled, not fired
 
 **Decision (2026-07-27).** Local reminders are a **rolling 14-day window of dated

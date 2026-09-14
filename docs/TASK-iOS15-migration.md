@@ -165,8 +165,17 @@ Each item names its own discharge in the register already; none needs new design
 
   **Why the rule was narrowed rather than kept** (owner, 2026-09-14): a review rule that protects
   something we are not certain of turns the reviewer into an echo of our assumptions, which is the
-  opposite of what it is for. The certainty is the guarantee; the synchrony is an implementation
-  that has never been tested against an alternative.
+  opposite of what it is for. The certainty is the guarantee; the synchrony is an implementation.
+
+  **Read the archeology before touching this** — [Design](Design.md) § *a write is visible to the
+  next read* now carries where the rule came from (`64de398`, 2026-07-27: editing a field twice
+  appeared to do nothing the second time, found by printing what was stored) and what Swift
+  Concurrency does and does not change about it. The short version: the root cause is not a
+  threading property, so async neither causes nor cures it and the merge-before-return stays
+  necessary; but **enforcement moves from the compiler to the caller**, because
+  `Task { try await write() }` followed by a read compiles and reads stale where today's
+  statement-ordering makes that unwriteable. `ReadAfterWriteTests` would be rewritten `async`,
+  would await both calls, and would keep passing while a screen that forgot to await regressed.
 
   **The part that can be done without touching the contract, and what is unknown about it.**
   TD-56's own pre-floor discharge is the shape: *"a completion-handler path that replays the
@@ -219,18 +228,9 @@ first deliverable is the contract decision above, not code.
 ## Running this in a fresh session
 
 This brief is written to be the whole prompt. A new session needs one line — *"Do Phase 0 of
-`docs/TASK-iOS15-migration.md`"* — plus the working agreement below, because this repository has
-no `CLAUDE.md` and nothing else states it.
-
-**Working agreement.**
-
-* `docs/` is authoritative; where a code comment disagrees with `docs/`, `docs/` wins.
-* One PR per change. Devin reviews it; answer its findings on the PR before merging, briefly, and
-  treat a finding as right until shown otherwise — four of the four it raised on this brief were.
-* No AI attribution in commit messages: no `Co-Authored-By`, no "generated with".
-* Build and test with the command below. **Never** pass `CODE_SIGNING_ALLOWED=NO`.
-* Say which half of a claim is verified and which is reasoned.
-* Before ruling on a public repository's behaviour, consult its wiki rather than recalling it.
+`docs/TASK-iOS15-migration.md`"* — because `CLAUDE.md` at the repository root now carries the
+working agreement (build command, the signing flag that must never be passed, how Swift Testing
+failures hide, the PR and review loop, and the claims discipline).
 
 **Do Phase 0 as one PR, in this order**, because each step makes the next one's diff readable:
 the floor number first (the build must stay green at 15.0 before anything is deleted), then the
