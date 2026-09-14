@@ -63,11 +63,22 @@ the dual lifecycle was introduced.
    the validator reported only the app bundle because it stopped at the first failure, so a bundle
    left below the floor is **expected** to fail the next upload the same way (reasoned, not
    observed).
-2. **Delete the Today extension, `Widget/`.** It carries `MinimumOSVersion 12.1` and cannot run at
-   a 15 floor at all; Today widgets were removed from iOS after 13. Six files
-   (`TodayViewController.swift`, its storyboard, string catalogue, `Info.plist`, entitlements,
-   privacy manifest) plus its target and its `membershipExceptions` entries. **This discharges
-   TD-60 by deletion** — the widget whose data source disappeared before WidgetKit shipped.
+2. **Delete the Today extension, `Widget/`.** Three reasons, ordered by how well each is
+   established. **Verified:** the bundle carries `MinimumOSVersion 12.1`, below the new floor, so
+   it must either rise with everything else or go. **Verified (TD-60):** it has had no data since
+   before WidgetKit shipped — it reads `stringArray(forKey: "Words")` from the App-Group defaults
+   and nothing in the tree writes that key. **Documented:** `NCWidgetProviding` is deprecated in
+   favour of WidgetKit.
+
+   Note what is deliberately *not* claimed. Apple's documentation marks the protocol deprecated
+   but gives no obsoleted version, so *"a Today extension cannot run on iOS 15"* is unverified and
+   is **not** the argument — an earlier draft of this brief said exactly that and was wrong. The
+   argument is that raising this bundle to 15.0 spends work to keep a widget that displays
+   nothing, while `WordWidget` already does the job on every OS that can install this build.
+
+   Six files (`TodayViewController.swift`, its storyboard, string catalogue, `Info.plist`,
+   entitlements, privacy manifest) plus its target and its `membershipExceptions` entries.
+   **Discharges TD-60 by deletion.**
 
 **The collapse, per [Design](Design.md) § *Path to the optimal non-dual modern structure*.**
 
@@ -114,11 +125,30 @@ accepts.
 The floor was the only reason these were deferred. Each names its own discharge in the register
 already; none needs new design.
 
-* **TD-56 — scoring the library is main-thread work.** The register states both discharges and
-  says to decide which before building either. The floor has now decided: *"if the floor rises, do
-  it once and properly — `Lexicon` reads become `async` over `context.perform`, and the
-  callback twin never gets written."* Measured at 369 ms for 1,000 meanings and 1,860 ms for
-  2,000, on the thread that draws.
+* **TD-56 — scoring the library is main-thread work.** Measured at 369 ms for 1,000 meanings and
+  1,860 ms for 2,000, on the thread that draws. The register offers two discharges and says to
+  decide which before building either. **The floor does not decide it**, and reading TD-56's *"if
+  the floor rises… `Lexicon` reads become `async` over `context.perform`"* as now-unlocked walks
+  straight into a standing rule.
+
+  **The conflict, written down so nobody has to rediscover it.** `REVIEW.md`: *"Flag any change
+  that makes `Lexicon.swift` read asynchronous: a write must be visible to the next read,
+  synchronously."* That rule guards a bug found by probing rather than reasoning
+  ([Design](Design.md) § *a write is visible to the next read, synchronously*) — a caller that
+  wrote and immediately re-read got the previous values back, so a second edit to the same field
+  appeared to do nothing at all. Every editor screen reads straight after writing; so does every
+  test.
+
+  **What has to move is the scoring replay, not the read API.** The measured cost is the cold
+  `ProgressIndex` build, which returns value types and never lets a managed object cross a queue —
+  the property TD-56 itself calls *"exactly what makes background reads safe to add"*. A 15 floor
+  changes how that off-main work is **expressed** — `async` over `context.perform` instead of the
+  completion-handler twin — without settling whether `Lexicon`'s own reads stay synchronous.
+
+  **Decide that explicitly before writing code.** If the contract does change, the Design decision
+  and the `REVIEW.md` rule change with it in the same PR, with the read-after-write guarantee
+  restated in terms of the new concurrency model rather than dropped. If it does not, narrow
+  TD-56's "if the floor rises" wording, which is what misled the first draft of this brief.
 * **TD-62 — the launch rebuild.** `BGTaskScheduler` is iOS 13+, so at this floor the
   `#available` and the iOS 12 fallback path the entry warns about both disappear. See Phase 2 —
   this is the owner's first feature.
