@@ -73,8 +73,10 @@ column as the first.
    on the App ID and `aps-environment` is in the entitlements
    ([CloudKitSetup](CloudKitSetup.md)). Unrelated to the local reminders above, which need no
    capability and no background mode.
-7. **TD-24** — extension `CFBundleVersion` is `1` against the app's `7`. App Store Connect
-   rejects that at submission.
+7. ~~**TD-24** — extension `CFBundleVersion` is `1` against the app's `7`.~~ **Done** — the
+   2026-09-14 archive carries `1.2.2 / 9` on the app and all three extensions, and the upload
+   that failed on 2026-09-14 raised no version complaint. What it failed on instead was the
+   deployment target: see [TASK-iOS15-migration](TASK-iOS15-migration.md).
 
 ## Candidate forks
 

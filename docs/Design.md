@@ -40,7 +40,12 @@ deployment-target decision for why this "Legacy" app keeps it.
 Reference: Apple, *Transitioning to the UIKit scene-based life cycle*
 ([TN3187](https://developer.apple.com/documentation/technotes/tn3187-migrating-to-the-uikit-scene-based-life-cycle)).
 
-## Decision: keep the deployment target at iOS 12.1 (dual lifecycle)
+## Decision: keep the deployment target at iOS 12.1 (dual lifecycle) — **superseded (2026-09-14)**
+
+**Superseded by the decision below**, and not by a change of mind: App Store Connect refused a
+`MinimumOSVersion` of 12.1 outright. Everything this decision weighed was correct at the time and
+is kept because the *reasoning* still applies to what 15 costs — only the premise, that an iOS 12
+build could be delivered at all, has been removed.
 
 **Decision.** Keep `IPHONEOS_DEPLOYMENT_TARGET = 12.1` for the main app. Support iOS 12
 via the dual lifecycle above. Keep `UIRequiredDeviceCapabilities = arm64` (a bump from
@@ -72,6 +77,41 @@ constraint is purely *testability*, not shippability.
 **Rejected.** *iOS 15 floor / scene-only.* Cleaner and fully testable on the current
 toolchain, but drops the 2013–2014 device tier this app exists to serve. Adopted for
 the modern rewrite instead, not for Legacy.
+
+## Decision: the floor is iOS 15, because Apple stopped accepting anything lower
+
+**Decision (2026-09-14).** `IPHONEOS_DEPLOYMENT_TARGET = 15.0` for every target. The dual
+lifecycle collapses to scene-only. The plan that executes this is
+[TASK-iOS15-migration](TASK-iOS15-migration.md).
+
+**Not a choice.** Uploading 1.2.2 (9) failed with `90068`, *"This bundle is invalid. The value
+provided for the key MinimumOSVersion '12.1' is not acceptable"*, `state: FAILED`. A second,
+softer message in the same response gives Spring 2027 as the date all iOS apps must be at 15.0 or
+later. The first blocks today; the second says where this ends.
+
+**Why 15 and not the smallest number that would pass.** Apple publishes no current floor — the
+upcoming-requirements page names only the Xcode 26 / iOS 26 SDK rule — so any value between 12.1
+and 15.0 would have to be found by failed uploads, and would then have to be raised again before
+Spring 2027. And the superseded decision above already did the device arithmetic: iOS 13, 14 and
+15 share one device floor, the iPhone 6s / SE 1. Only iOS 12 reached the 2013–14 tier, and that
+tier is precisely what can no longer be delivered to.
+
+**What it costs, honestly.** The tier the Legacy floor existed to serve — iPhone 5s / 6 / 6 Plus,
+iPod touch 6, iPad Air 1, iPad mini 2–3 — keeps whatever build the store already serves it and
+receives nothing further. That is Apple's doing rather than this project's, but it is still the
+cost, and the Roadmap's entire "Now" section was written on the assumption it could be avoided.
+
+**What it does not cost: a port.** The toolchain never objected — `iPhoneOS26.5.sdk` declares
+`MinimumDeploymentTarget = 12.0` — so raising the number breaks nothing. Of 56 availability
+guards, 45 become dead branches that still compile and still behave correctly. Deleting them is
+cleanup with a green suite either side of it, not repair.
+
+**The two-app split survives with a new justification** (owner, 2026-09-14). "Legacy" can no
+longer mean *serves 2013–14 hardware*. It now means *the UIKit app on a stable floor*, and the
+modern app stays a separate future product justified by what iOS 26+ can do — on-device ML, the
+language and translation frameworks — rather than by lifecycle tidiness. **No SwiftUI rewrite
+comes with this migration.** iOS 15 is adopted for stability and for modern concurrency, which is
+what turns TD-56's deferred "if the floor rises, do it properly" branch into the one to build.
 
 ## Composition root
 
