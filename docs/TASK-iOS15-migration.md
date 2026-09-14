@@ -80,9 +80,9 @@ the dual lifecycle was introduced.
    Second, and worse, *"it displays nothing"* — **TD-60 is wrong**, and was wrong when it was
    written. `loadCurrentWordSet()` reads `Library.shared`, `selectedSet` and
    `lexicon.senses(in:)`; the `stringArray(forKey: "Words")` line TD-60 cites sits inside a
-   commented-out block eleven lines above the live read, and the live read was already there at
-   `181af42`, the commit that introduced TD-60. The fix TD-60 proposed had landed in `343b5dc`
-   a year earlier. **This widget works.**
+   commented-out block eleven lines above the live read. That read arrived in `2933f30`
+   (2026-07-26, *"move every screen onto the lexicon and delete the old store"*) — six weeks
+   before `181af42` (2026-09-10) added TD-60. **This widget works.**
 
    So this is the owner's call, not a forced deletion: the extension is functional but deprecated,
    and its distinct audience is gone.
