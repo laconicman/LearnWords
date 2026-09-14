@@ -84,8 +84,8 @@ the dual lifecycle was introduced.
    (2026-07-26, *"move every screen onto the lexicon and delete the old store"*) — six weeks
    before `181af42` (2026-09-10) added TD-60. **This widget works.**
 
-   So this is the owner's call, not a forced deletion: the extension is functional but deprecated,
-   and its distinct audience is gone.
+   **Decided: delete it** (owner, 2026-09-14). The extension is functional but deprecated, and its
+   distinct audience is gone.
 
 **The collapse, per [Design](Design.md) § *Path to the optimal non-dual modern structure*.**
 
@@ -160,10 +160,26 @@ Each item names its own discharge in the register already; none needs new design
   changes how that off-main work is **expressed** — `async` over `context.perform` instead of the
   completion-handler twin — without settling whether `Lexicon`'s own reads stay synchronous.
 
-  **Decide that explicitly before writing code.** If the contract does change, the Design decision
-  and the `REVIEW.md` rule change with it in the same PR, with the read-after-write guarantee
-  restated in terms of the new concurrency model rather than dropped. If it does not, narrow
-  TD-56's "if the floor rises" wording, which is what misled the first draft of this brief.
+  **The rule has already been narrowed to make room for this** (owner, 2026-09-14): `REVIEW.md`
+  now requires *read-after-write visibility* and says synchronous reads are the current mechanism
+  rather than the rule, so an async read is flagged only when a change fails to show the guarantee
+  still holds. A review rule that protects something we are not certain of turns the reviewer into
+  an echo of our assumptions, which is the opposite of what it is for.
+
+  **The part that can be done without touching the contract, and what is unknown about it.**
+  TD-56's own pre-floor discharge is the shape: *"a completion-handler path that replays the
+  misses on a private-queue context and calls back on main."* Done that way the public read API
+  stays synchronous and every screen keeps its guarantee, because screens still read through the
+  main context. Start with the **non-UI caller** — the reminder rebuild's `ReviewSchedule` build
+  (TD-62's work anyway, which is why these two belong in one change): it is not on a screen's
+  critical path, it already has a completion, and it already runs under a task assertion.
+
+  **Unknown, and the first thing to establish:** how much of `Lexicon`'s read surface that private
+  context has to reach. `ReviewSchedule` does not only score — it calls `lexicon.wordSets()` and
+  `lexicon.senses(in:from:to:)`, and `Lexicon.viewContext` asserts
+  `dispatchPrecondition(.onQueue(.main))`, so those reads trap off-main rather than quietly
+  misbehaving. That precondition is doing its job; it also means "move the replay off-main" is
+  larger than it sounds. Measure the split before promising the gain.
 * **TD-62 — the launch rebuild.** `BGTaskScheduler` is iOS 13+, so at this floor the
   `#available` and the iOS 12 fallback path the entry warns about both disappear. See Phase 2 —
   this is the owner's first feature.
@@ -197,6 +213,33 @@ first deliverable is the contract decision above, not code.
   That is not a consequence of this migration — Apple removed the alternative.
 * **The UIKit architecture.** Four-layer MVC, storyboards, `AppRoot` as the composition root.
   Modern concurrency is adopted; the UI framework is not replaced.
+
+## Running this in a fresh session
+
+This brief is written to be the whole prompt. A new session needs one line — *"Do Phase 0 of
+`docs/TASK-iOS15-migration.md`"* — plus the working agreement below, because this repository has
+no `CLAUDE.md` and nothing else states it.
+
+**Working agreement.**
+
+* `docs/` is authoritative; where a code comment disagrees with `docs/`, `docs/` wins.
+* One PR per change. Devin reviews it; answer its findings on the PR before merging, briefly, and
+  treat a finding as right until shown otherwise — four of the four it raised on this brief were.
+* No AI attribution in commit messages: no `Co-Authored-By`, no "generated with".
+* Build and test with the command below. **Never** pass `CODE_SIGNING_ALLOWED=NO`.
+* Say which half of a claim is verified and which is reasoned.
+* Before ruling on a public repository's behaviour, consult its wiki rather than recalling it.
+
+**Do Phase 0 as one PR, in this order**, because each step makes the next one's diff readable:
+the floor number first (the build must stay green at 15.0 before anything is deleted), then the
+Today extension, then the dual-lifecycle surface, then the guard sweep, then `REVIEW.md` and
+`.devin/wiki.json`. A guard sweep landing before the floor rises is unreviewable — every deletion
+looks arbitrary until the floor explains it.
+
+**One trap specific to this repository.** Targets use Xcode 16 synchronized folders with
+`membershipExceptions` inclusion lists (TD-2). Deleting `Widget/` means removing its target *and*
+its exception entries; a file moved or deleted without updating those lists silently leaves a
+target, and the build stays green until something needs the missing symbol.
 
 ## Verification, at every phase
 

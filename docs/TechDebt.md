@@ -2378,8 +2378,9 @@ code. Caught in review. Read the function.
 
 The extension's fate is now decided on grounds that hold rather than this one: its bundle sits at
 `MinimumOSVersion 12.1` and cannot stay below the new floor, `NCWidgetProviding` is deprecated in
-favour of WidgetKit, and the iOS 12–13 devices it was kept for can no longer install the app. See
-[TASK-iOS15-migration](TASK-iOS15-migration.md) § Phase 0.
+favour of WidgetKit, and the iOS 12–13 devices it was kept for can no longer install the app.
+**The owner's call, 2026-09-14: delete it** — see [TASK-iOS15-migration](TASK-iOS15-migration.md)
+§ Phase 0. It goes because it is deprecated and unreachable, not because it was broken.
 
 ---
 
