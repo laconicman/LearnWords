@@ -2359,17 +2359,22 @@ day it was written.** Caught in review of the iOS 15 migration brief, which had 
 file — inside a **commented-out block**, eleven lines above the live read. `widgetPerformUpdate`
 calls `loadCurrentWordSet()` and reloads the table, so the data path is whole.
 
-The live read was already present at `181af42`, the very commit that added this entry: the fix it
-recommends — *"read the store through `Lexicon`, as the WordWidget does"* — had landed in
-`343b5dc` ("Today Widget now displays current word set using common "Storage" abstraction",
-2025-09-21), nearly a year earlier. `git log -S` was run against the *commented* line and its
-result was trusted without reading what surrounded it.
+The fix this entry recommends — *"read the store through `Lexicon`, as the WordWidget does"* —
+had already landed in **`2933f30`** (2026-07-26, *"refactor(model): move every screen onto the
+lexicon and delete the old store"*), six weeks before **`181af42`** (2026-09-10) added the entry.
+`git log -S` was run against the *commented* line, and its result was trusted without reading what
+surrounded it.
 
-**The lesson, which is the reason this entry stays in the register rather than being deleted:**
-`git log -S` finds a string, not a live code path. A commented-out block answers a `-S` query
-exactly like working code, and the register's authority means a wrong entry propagates — this one
-reached a migration plan and would have justified deleting a working extension on a false premise.
-Read the function, not the grep hit.
+**The lesson, which is why this entry stays in the register rather than being deleted:** a string
+search finds text, not a live code path, and a commented-out block answers one exactly like
+working code. The register's authority then does the rest — this entry reached a migration plan
+and would have justified deleting a working extension on a false premise.
+
+**And the same trap caught the retraction.** Its first draft credited the fix to `343b5dc`
+(2025-09-21), which did repair the widget but through the older `Storage` abstraction, not
+`Lexicon`. That came from `git log -L '/loadCurrentWordSet/,+8'` — an eight-line window that lands
+entirely **inside the commented block**, so it reports whichever commit last touched the dead
+code. Caught in review. Read the function.
 
 The extension's fate is now decided on grounds that hold rather than this one: its bundle sits at
 `MinimumOSVersion 12.1` and cannot stay below the new floor, `NCWidgetProviding` is deprecated in
