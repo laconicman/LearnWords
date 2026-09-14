@@ -4,14 +4,30 @@ Priority-ordered. Rationale lives in [Design](Design.md); debt items in [TechDeb
 
 ## Now
 
-- **Ship the iOS 12 fix.** The App Store is the only route that reaches an iOS 12 device —
-  TestFlight's own minimum is far above it — and the store serves the last compatible build
-  to devices that cannot run the current one. Submitting also spends the CloudKit schema
-  deploy that TD-48's additions are waiting on, which is why they went in first.
-- **iOS 12 *behaviour* is still unverified.** Launch is proven (below); the store changed
-  completely under TD-13 and none of it has run on iOS 12. Word list, add/edit a word, all
-  three exercises, import/export, the Today widget. TD-8's toolchain works today — its value
-  decays as more code lands behind an untested boundary.
+- **Raise the floor to iOS 15 and get a build accepted.** App Store Connect refused 1.2.2 (9)
+  with `90068` — *"MinimumOSVersion '12.1' is not acceptable"*, `state: FAILED` — so there is no
+  longer any way to deliver an iOS 12 build. [TASK-iOS15-migration](TASK-iOS15-migration.md) is
+  the plan; [Design](Design.md) § *the floor is iOS 15* is the decision. The unblocking release
+  also collapses the iOS 12 surface (owner, 2026-09-14), closing TD-7, TD-8, TD-10, TD-11, TD-45
+  and TD-46 in one pass. (TD-60 is **withdrawn**, not closed — review of the brief found the entry
+  was wrong: that widget reads the live store and always did.)
+- **Then TD-56, then TD-62.** Modern concurrency is what makes iOS 15 pay for itself rather than
+  merely unblock. TD-56 comes first because it is the one with a measurement — but the floor does
+  **not** pick its discharge: `REVIEW.md` forbids making `Lexicon` reads asynchronous, and that
+  rule guards a real bug, so TD-56's first deliverable is that contract decision rather than code
+  ([TASK-iOS15-migration](TASK-iOS15-migration.md) § Phase 1). TD-62 then loses both its
+  `#available` and the iOS 12 fallback path it would otherwise have to keep.
+
+### Struck through by the refusal (2026-09-14)
+
+Kept rather than deleted, because both were correct until the morning of 2026-09-14 and the
+reasoning behind them still explains what the floor change costs.
+
+- ~~**Ship the iOS 12 fix.**~~ The App Store was the only route to an iOS 12 device, and it is
+  now closed to new builds. Those devices keep the last compatible version and receive nothing
+  further.
+- ~~**iOS 12 *behaviour* is still unverified.**~~ It remains unverified and stops mattering: the
+  path is being deleted rather than tested, and TD-8's Xcode 15.2 toolchain retires with it.
 
 ## Done (2026-08-04) — iOS 12 launches
 
@@ -238,9 +254,9 @@ run — asset formats only Xcode 26 understands (TD-45), a hard link to Core Hap
   coordination bug hiding in its size.
 - **`CSSearchableItemActionType`** — words are indexed in Spotlight, but tapping a result
   does not route into the app.
-- **TD-8 device verification** — iOS 12–14 behaviour is unverified since the store change.
-- **TD-26** — orphan collection still has no way to run; **TD-24** — extension bundle
-  versions drift from the app's, which App Store Connect rejects at submission.
+- ~~**TD-8 device verification**~~ — retired 2026-09-14 with the iOS 12 path itself.
+- **TD-26** — orphan collection still has no way to run. (**TD-24** is done: the 2026-09-14
+  archive carries `1.2.2 / 9` on the app and all three extensions.)
 - Storyboard split (TD-5) is **likely YAGNI** at this size — prefer creator-injection on the
   existing storyboard where a screen needs a dependency; revisit only if the one storyboard
   actually hurts.
@@ -330,8 +346,11 @@ visible to the next read (see [Design](Design.md)). Still open: orphan collectio
 
 ## Someday — the modern rewrite (separate app)
 
-Legacy stays iOS 12. New devices get a **from-scratch** app on a modern floor (iOS 26): no
-dual branching, async/await and `@Observable` throughout, SwiftUI embedded natively rather
-than as `@available`-gated islands. The "delete the iOS 12 surface" recipe in
-[Design → Path to the optimal non-dual modern structure](Design.md) is also how Legacy
-would collapse to scene-only if iOS 12 is ever dropped.
+**Legacy is iOS 15 now, not iOS 12** (2026-09-14), and the "delete the iOS 12 surface" recipe
+this entry held in reserve is being spent in Phase 0 of
+[TASK-iOS15-migration](TASK-iOS15-migration.md). The rewrite survives that, with a different
+justification: not a cleaner lifecycle — Legacy is about to have one — but **what iOS 26+ can
+do**, on-device ML and the language and translation frameworks, none of which back-deploys to
+15. A from-scratch app on an iOS 26 floor: async/await and `@Observable` throughout, SwiftUI
+native rather than `@available`-gated islands. Legacy stays UIKit; no SwiftUI rewrite comes with
+the floor change (owner, 2026-09-14).

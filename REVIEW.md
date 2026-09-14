@@ -35,8 +35,11 @@ wanted here — it buries them.
 - Flag any `NSManagedObject` or `CD…` type in a view controller's signature. Screens are handed
   values — `Sense`, `SenseProgress`, `SetSummary` (`docs/Design.md`, "managed objects never escape
   the store").
-- Flag any change that makes a `LearnWords/Model/Lexicon/Lexicon.swift` read asynchronous: a write
-  must be visible to the next read, synchronously.
+- Require read-after-write visibility from `LearnWords/Model/Lexicon/Lexicon.swift`: once a write
+  returns, the next read observes it (`docs/Design.md`, "a write is visible to the next read").
+- Flag an asynchronous `LearnWords/Model/Lexicon/Lexicon.swift` read **only** when the change
+  does not show how that guarantee still holds — name the caller left reading stale. Synchronous
+  reads are the current mechanism, not the rule.
 - Require `UUID` for entities referenced from elsewhere; `objectID` is for lookup rows only.
 - Reject a stored "permission granted" flag. Notification and microphone state is read at the
   point of use, never remembered.

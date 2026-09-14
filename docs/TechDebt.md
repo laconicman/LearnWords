@@ -2348,7 +2348,43 @@ Not urgent: a library large enough to feel this does not exist yet, and the seed
 words. Recorded now because the measurement exists now, and because it is the first concrete
 user-facing cost of the 12.1 floor.
 
-## TD-60 — The iOS 12–13 Today widget has had no data since before WidgetKit shipped (2026-09-10)
+## TD-60 — The iOS 12–13 Today widget has had no data since before WidgetKit shipped — **withdrawn (2026-09-14)**
+
+**Retracted in full. The widget reads the live store and always did; this entry was wrong on the
+day it was written.** Caught in review of the iOS 15 migration brief, which had repeated it.
+
+`Widget/TodayViewController.loadCurrentWordSet()` reads `Library.shared`, `selectedSet` and
+`lexicon.senses(in:)`, and maps the result into `words`. The
+`userDefaultsGroup.stringArray(forKey: "Words")` line the entry below cites is real text in the
+file — inside a **commented-out block**, eleven lines above the live read. `widgetPerformUpdate`
+calls `loadCurrentWordSet()` and reloads the table, so the data path is whole.
+
+The fix this entry recommends — *"read the store through `Lexicon`, as the WordWidget does"* —
+had already landed in **`2933f30`** (2026-07-26, *"refactor(model): move every screen onto the
+lexicon and delete the old store"*), six weeks before **`181af42`** (2026-09-10) added the entry.
+`git log -S` was run against the *commented* line, and its result was trusted without reading what
+surrounded it.
+
+**The lesson, which is why this entry stays in the register rather than being deleted:** a string
+search finds text, not a live code path, and a commented-out block answers one exactly like
+working code. The register's authority then does the rest — this entry reached a migration plan
+and would have justified deleting a working extension on a false premise.
+
+**And the same trap caught the retraction.** Its first draft credited the fix to `343b5dc`
+(2025-09-21), which did repair the widget but through the older `Storage` abstraction, not
+`Lexicon`. That came from `git log -L '/loadCurrentWordSet/,+8'` — an eight-line window that lands
+entirely **inside the commented block**, so it reports whichever commit last touched the dead
+code. Caught in review. Read the function.
+
+The extension's fate is now decided on grounds that hold rather than this one: its bundle sits at
+`MinimumOSVersion 12.1` and cannot stay below the new floor, `NCWidgetProviding` is deprecated in
+favour of WidgetKit, and the iOS 12–13 devices it was kept for can no longer install the app.
+**The owner's call, 2026-09-14: delete it** — see [TASK-iOS15-migration](TASK-iOS15-migration.md)
+§ Phase 0. It goes because it is deprecated and unreachable, not because it was broken.
+
+---
+
+**The original entry, kept for the record — its first claim is false.**
 
 **Verified:** `Widget/TodayViewController.swift` reads `stringArray(forKey: "Words")` from the
 App-Group defaults, and nothing in the tree writes that key — `AppConstants` labels it "Just for

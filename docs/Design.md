@@ -40,7 +40,12 @@ deployment-target decision for why this "Legacy" app keeps it.
 Reference: Apple, *Transitioning to the UIKit scene-based life cycle*
 ([TN3187](https://developer.apple.com/documentation/technotes/tn3187-migrating-to-the-uikit-scene-based-life-cycle)).
 
-## Decision: keep the deployment target at iOS 12.1 (dual lifecycle)
+## Decision: keep the deployment target at iOS 12.1 (dual lifecycle) — **superseded (2026-09-14)**
+
+**Superseded by the decision below**, and not by a change of mind: App Store Connect refused a
+`MinimumOSVersion` of 12.1 outright. Everything this decision weighed was correct at the time and
+is kept because the *reasoning* still applies to what 15 costs — only the premise, that an iOS 12
+build could be delivered at all, has been removed.
 
 **Decision.** Keep `IPHONEOS_DEPLOYMENT_TARGET = 12.1` for the main app. Support iOS 12
 via the dual lifecycle above. Keep `UIRequiredDeviceCapabilities = arm64` (a bump from
@@ -72,6 +77,41 @@ constraint is purely *testability*, not shippability.
 **Rejected.** *iOS 15 floor / scene-only.* Cleaner and fully testable on the current
 toolchain, but drops the 2013–2014 device tier this app exists to serve. Adopted for
 the modern rewrite instead, not for Legacy.
+
+## Decision: the floor is iOS 15, because Apple stopped accepting anything lower
+
+**Decision (2026-09-14).** `IPHONEOS_DEPLOYMENT_TARGET = 15.0` for every target. The dual
+lifecycle collapses to scene-only. The plan that executes this is
+[TASK-iOS15-migration](TASK-iOS15-migration.md).
+
+**Not a choice.** Uploading 1.2.2 (9) failed with `90068`, *"This bundle is invalid. The value
+provided for the key MinimumOSVersion '12.1' is not acceptable"*, `state: FAILED`. A second,
+softer message in the same response gives Spring 2027 as the date all iOS apps must be at 15.0 or
+later. The first blocks today; the second says where this ends.
+
+**Why 15 and not the smallest number that would pass.** Apple publishes no current floor — the
+upcoming-requirements page names only the Xcode 26 / iOS 26 SDK rule — so any value between 12.1
+and 15.0 would have to be found by failed uploads, and would then have to be raised again before
+Spring 2027. And the superseded decision above already did the device arithmetic: iOS 13, 14 and
+15 share one device floor, the iPhone 6s / SE 1. Only iOS 12 reached the 2013–14 tier, and that
+tier is precisely what can no longer be delivered to.
+
+**What it costs, honestly.** The tier the Legacy floor existed to serve — iPhone 5s / 6 / 6 Plus,
+iPod touch 6, iPad Air 1, iPad mini 2–3 — keeps whatever build the store already serves it and
+receives nothing further. That is Apple's doing rather than this project's, but it is still the
+cost, and the Roadmap's entire "Now" section was written on the assumption it could be avoided.
+
+**What it does not cost: a port.** The toolchain never objected — `iPhoneOS26.5.sdk` declares
+`MinimumDeploymentTarget = 12.0` — so raising the number breaks nothing. Of 56 availability
+guards, 45 become dead branches that still compile and still behave correctly. Deleting them is
+cleanup with a green suite either side of it, not repair.
+
+**The two-app split survives with a new justification** (owner, 2026-09-14). "Legacy" can no
+longer mean *serves 2013–14 hardware*. It now means *the UIKit app on a stable floor*, and the
+modern app stays a separate future product justified by what iOS 26+ can do — on-device ML, the
+language and translation frameworks — rather than by lifecycle tidiness. **No SwiftUI rewrite
+comes with this migration.** iOS 15 is adopted for stability and for modern concurrency, which is
+what turns TD-56's deferred "if the floor rises, do it properly" branch into the one to build.
 
 ## Composition root
 
@@ -512,6 +552,52 @@ changed.
 **Found by probing, not reasoning.** Two tests failed in a way the code did not explain;
 the answer came from printing what was actually stored across three successive writes.
 Worth remembering as the faster route when a Core Data result contradicts the code.
+
+**Where it came from, for whoever is tempted to undo it.** `64de398` (2026-07-27, fork C).
+The visible symptom was not a crash or a stale label: **editing a field twice appeared to do
+nothing the second time**, because the editor re-read the previous value and wrote it back. Two
+tests failed in a way the code did not explain, and the cause was found by printing what was
+actually stored. `ReadAfterWriteTests` in `Unit Testing Bundle/MeaningEditingTests.swift` is the
+guard — three repeated edits to one field, and a rename read back immediately.
+
+### Addendum (2026-09-14): what Swift Concurrency changes, and what it does not
+
+Asked when the floor moved to iOS 15 and TD-56's async discharge became possible. Four findings,
+in decreasing order of how comfortable they are.
+
+1. **The root cause is untouched.** A fetch still returns already-registered objects without
+   refreshing them, and `automaticallyMergesChangesFromParent` still merges on notification
+   delivery. Neither is a threading property, so `async` neither causes nor cures the stale read:
+   **the merge-before-return stays necessary exactly as it is.**
+2. **One reason in the comment expires.** The merge happens after `performAndWait` returns rather
+   than inside the did-save observer because that observer runs on the background queue, and
+   hopping to main from there while main is *blocked* on the same `performAndWait` deadlocks. With
+   `await context.perform` (iOS 15.0+, which is now the floor) the main thread **suspends rather
+   than blocks**, so that specific hazard disappears. The fix does not age; its justification
+   does, and a reader who trusts the comment after an async rewrite will be defending a deadlock
+   that can no longer happen.
+3. **Enforcement moves from the compiler to the caller — this is the real cost.** Today
+   `try lexicon.updateSense(…)` followed by a read cannot be misordered: a statement does not
+   return early. Make both `async` and the ordering still holds for anyone who writes
+   `await write(); await read()` — but `Task { try await lexicon.updateSense(…) }` followed by a
+   read is one keyword away, compiles, and reads stale. **The guarantee stops being unforgeable
+   and becomes a convention.**
+4. **And the tests stop covering what they cover now.** `ReadAfterWriteTests` would be rewritten
+   `async`, would await both calls, and would pass — while a screen that forgot to await
+   regressed. The suite would be verifying the store and no longer the discipline it can no longer
+   see. That is a worse position than today's, where the test and the call sites are the same
+   shape.
+
+Actor reentrancy is a fifth item but a *different* class, not this one: a read-modify-write
+spanning an `await` can be interleaved by another writer, which the synchronous design makes
+impossible. Worth naming so it is not mistaken for the bug above.
+
+**Conclusion.** The invariant survives Swift Concurrency; the *enforcement* does not. Any change
+that makes `Lexicon`'s reads asynchronous has to replace the enforcement rather than merely
+preserve the behaviour — and the cheapest way to keep it is not to spend it: leave the public
+reads synchronous and main-confined, and move only the internal replay off-main. That is what
+[TASK-iOS15-migration](TASK-iOS15-migration.md) § Phase 1 proposes, and why `REVIEW.md` now asks
+an async read to *show* the guarantee holds rather than banning it outright.
 
 ## Decision: reminders are scheduled, not fired
 
