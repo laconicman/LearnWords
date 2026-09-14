@@ -8,8 +8,6 @@
 
 import UIKit
 import UserNotifications
-// Weak-linked (`-weak_framework WidgetKit`): an import autolinks as a plain load, and
-// iOS 12–13 would refuse to launch — TD-46, where Core Haptics did exactly that.
 import WidgetKit
 
 @main

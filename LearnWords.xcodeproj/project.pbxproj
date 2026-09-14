@@ -583,13 +583,6 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"-weak_framework",
-					CoreHaptics,
-					"-weak_framework",
-					WidgetKit,
-				);
 				PRODUCT_BUNDLE_IDENTIFIER = club.laconic.LearnWords;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -612,13 +605,6 @@
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
-				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"-weak_framework",
-					CoreHaptics,
-					"-weak_framework",
-					WidgetKit,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = club.laconic.LearnWords;
 				PRODUCT_NAME = "$(TARGET_NAME)";

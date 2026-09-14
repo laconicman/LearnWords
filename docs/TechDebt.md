@@ -1523,7 +1523,7 @@ neither emits synchronized folders, a *single* generated project would open in b
 toolchains and this branch would stop existing. The trade is losing Xcode 16+ folder
 auto-membership on master in exchange for a spec to maintain. Not taken yet.
 
-## TD-46 — The app hard-linked Core Haptics, so iOS 12 could not launch it
+## TD-46 — The app hard-linked Core Haptics, so iOS 12 could not launch it — **flags removed with the iOS 15 floor (2026-09-14)**
 
 The first iOS 12 run after the Xcode 15.2 build went green died on a `SIGABRT` a moment
 after the launch screen, with no usable stack. The instinct was a mis-wired life cycle —
@@ -1563,6 +1563,14 @@ Tracked as KaPow debt.
 **Discharge for the register:** when adding a dependency or an `import` at this floor,
 check the link, not just the build — `otool -l <binary> | grep -A2 LC_LOAD_DYLIB` and
 confirm every named framework predates the deployment target.
+
+**Flags removed (2026-09-14).** Core Haptics is iOS 13.0+ (`CHHapticEngine`) and WidgetKit
+iOS 14.0+ (`WidgetCenter`), both below the new 15.0 floor, so a plain load is now correct and
+both `-weak_framework` flags are gone, with the `OTHER_LDFLAGS` setting that existed only to
+carry them. Verified with `otool -l` on the Debug build's `LearnWords.debug.dylib`, before and
+after: exactly two load commands changed, those two frameworks from `LC_LOAD_WEAK_DYLIB` to
+`LC_LOAD_DYLIB`. The discharge rule above is unchanged at the new floor: a framework newer
+than iOS 15 still needs the flag.
 
 ## TD-47 — The tab bar was built twice, and iOS 12 got the other one — **resolved (2026-08-04)**
 
