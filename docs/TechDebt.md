@@ -17,7 +17,7 @@ settings and/or need the `Main.storyboard` split first (TD-5). Move them once TD
 
 ## TD-2 — Shared files coupled to sibling targets via pbxproj exceptions
 
-These files are compiled into the **Widget** and/or **ImportAsDictAction** targets via
+These files are compiled into the **WordWidgetExtension** and/or **ImportAsDictAction** targets via
 `membershipExceptions` (paths relative to the synchronized root `LearnWords/`), now at
 their post-reorg paths. Since TD-13 iteration 3 the widget list is the store rather than
 the old model: `Controllers/Library.swift`, `Model/CoreData/LearnWords.xcdatamodeld`,
@@ -27,7 +27,7 @@ the old model: `Controllers/Library.swift`, `Model/CoreData/LearnWords.xcdatamod
 `Model/Lexicon/LexiconTypes.swift`, `Model/Practice/Exercise.swift`,
 `Model/Practice/LanguagePair.swift`, `Model/ReviewOutcome.swift`, `Model/Settings.swift`,
 `Shared/AppConstants.swift`, `Shared/Debug.swift`, `Shared/Extensions/String+.swift`,
-`Shared/Extensions/UserDefaults+Codable.swift` (both widget targets);
+`Shared/Extensions/UserDefaults+Codable.swift` (the widget target);
 `Shared/AppConstants.swift` (ImportAsDictAction). Note `PlainText.swift` is deliberately
 **not** in that list — it needs `Shared/General.swift`, and the widgets neither import nor
 export. **Cost:** moving any of them silently drops them from those targets
@@ -65,7 +65,7 @@ LearnWords?" dialog, which CLI can't tap; one manual run of the real share flow 
 (b) The unsigned CLI build has no App-Group entitlement, so its suite is app-container-local —
 a signing artifact only; Xcode-signed builds use the real group container.
 
-## TD-4 — Widgets: WidgetKit (iOS 14+) + legacy Today (iOS 12–13) — **implemented (2026-07-18)**
+## TD-4 — Widgets: WidgetKit (iOS 14+) + legacy Today (iOS 12–13) — **implemented (2026-07-18); Today half deleted (2026-09-14)**
 
 Decision (owner): migrate to WidgetKit **and** keep a working Today extension for the iOS
 versions WidgetKit doesn't reach. The version math: WidgetKit is iOS 14+; Today extensions
@@ -94,11 +94,20 @@ when convenient; (c) the old Today extension stays deprecated-but-working for 12
 (verification only possible per TD-8); App Store still accepts Today extensions — recheck
 at submission.
 
-## TD-4 (historical) — Deprecated Today extension (`Widget/`)
+**The Today half is deleted (2026-09-14).** Its bundle reported `MinimumOSVersion 12.1` in
+the 1.2.2 archive and could not stay below the new floor. Raising it was one build setting;
+the owner chose deletion instead ([TASK-iOS15-migration](TASK-iOS15-migration.md) § Phase 0),
+because `NCWidgetProviding` is deprecated in favour of WidgetKit and the iOS 12–13 devices it
+was kept for can no longer install the app. It went working, not broken (TD-60). The six files,
+the target and both of its `membershipExceptions` sets are gone; `WordWidgetExtension` is the
+only widget, and remaining item (c) goes with the extension.
+
+## TD-4 (historical) — Deprecated Today extension (`Widget/`) — **removed (2026-09-14)**
 
 `TodayViewController` uses `NCWidgetProviding`, deprecated since iOS 14 and unsupported
 on modern iOS. **Cost:** dead/again-un-shippable extension; App Store review risk.
-**Discharge:** migrate to WidgetKit, or remove the target.
+**Discharge:** migrate to WidgetKit, or remove the target. **Both, in the end:** WidgetKit
+arrived on 2026-07-18, and the target was removed on 2026-09-14 (TD-4 above).
 
 ## TD-5 — Storyboard-centric UI
 
@@ -273,14 +282,24 @@ goes async. Words/sets migrate from `UserDefaults`; **legacy progress aggregates
 (owner, 2026-07-20 — progress starts fresh from the event log; compatibility isn't worth
 the code). Apply the `ProgressResearch.md` audit (pending) before implementing the schema.
 
-## TD-7 — iOS 12 availability audit
+## TD-7 — iOS 12 availability audit — **closed by the iOS 15 floor (2026-09-14)**
 
 **Swift code: clean.** A clean build at the 12.1 floor succeeds, and Swift treats any
 unguarded newer API as a hard *error* — so a green build proves there are no unguarded
 iOS 13+ API uses. (Spot-checked: `.label`, `systemIndigo`, `UIImage(systemName:)` are all
 inside `#available`; `systemOrange` is iOS 7+.) No action needed here.
 
-## TD-11 — Storyboard has iOS 13+ UI dependencies that break on iOS 12
+**Closed (2026-09-14).** There is no iOS 12 left to audit. Forty-one live guards gated 15.0
+or lower: four went with the dual life cycle and 37 in the sweep after it, and a green build
+at 15.0 is this entry's own proof that none of them protected anything newer. Five remain,
+gating 16 and 17. The migration brief had counted 45 dead and 11 surviving by text search,
+and the gap is TD-60's lesson again: four of its 45 and seven of its 11 sit inside
+commented-out code (`SearchWordViewController`, `TranslationV` and `AvailableLanguage` are
+commented out whole), and the search never reached `WordWidget/`, where the fifth survivor
+is. Commented-out code was left as it is. The proof still covers availability only; TD-46 is
+why it says nothing about linkage.
+
+## TD-11 — Storyboard has iOS 13+ UI dependencies that break on iOS 12 — **closed by the iOS 15 floor (2026-09-14)**
 
 The compiler can't see inside `Main.storyboard`, and it hard-codes iOS 13+ features with
 **no fallbacks**, so the app *launches* on iOS 12 (dual lifecycle works) but its UI is
@@ -328,7 +347,17 @@ toolchain. That is how this defect was found, and it is worth running before any
 that claims the floor: what it cannot check is lifecycle, storyboard semantic colours and
 system-control behaviour, which still need the Xcode 15 pass.
 
-## TD-8 — iOS 12 path is unverifiable on Xcode 26 — **confirmed against Apple's own numbers (2026-08-02)**
+**Closed (2026-09-14).** Nothing below iOS 13 can install the app, so nothing in the
+storyboard is unsupported anywhere it runs. What this entry built was kept rather than
+unwound: the named asset colours resolve on every OS, and the dictation button's 🎤 now stands
+in for a symbol name the running OS lacks rather than for an OS without symbols.
+`UIImage.systemImage` lost its iOS 12 branch and kept its array form, which falls back across
+names that exist only on some OS versions; the word list's reset action depends on that
+today. The eleven `.symbolset` assets were not touched: whether any still carries a name the
+system does not provide wants its own audit ([TASK-iOS15-migration](TASK-iOS15-migration.md)
+§ Phase 0), not a bulk delete.
+
+## TD-8 — iOS 12 path is unverifiable on Xcode 26 — **confirmed against Apple's own numbers (2026-08-02); closed by the iOS 15 floor (2026-09-14)**
 
 Apple's [Xcode system requirements](https://developer.apple.com/xcode/system-requirements/)
 now state it outright: Xcode 26 supports **on-device debugging for iOS 15 or later**, and a
@@ -383,6 +412,14 @@ so a resync starts from correct settings. **Discharge:** before any iOS 12 pass,
 source the main project compiles, or regenerate this project from the main one — keeping it
 by hand has now failed silently for five weeks.
 
+**Closed (2026-09-14).** The path this entry could not verify was deleted rather than
+verified (TD-7), and `LearnWords-Xcode15.xcodeproj` went with it, together with the
+`.gitignore` exception that kept it tracked. Building that path on the one toolchain able to
+run it was the project's only purpose, and stale as it was, it was not expected to manage even
+that (inferred above, never run). The floor now
+sits inside the deployment range Apple documents for Xcode 26 (iOS 15–26.5, above), so the
+App-Store build and the build this toolchain can run are one build again.
+
 ## TD-9 — Divergent doc copies — **resolved (2026-07-17)**
 
 Was: `docs/*.md` (current) and `LearnWords/Documentation.docc/*.md` (older, unfilled
@@ -390,7 +427,7 @@ TEMPLATE scaffold from 1880e5d) had diverged. The obsolete `Documentation.docc` 
 was deleted; **`docs/*.md` is the single source of truth.** If a rendered DocC catalog is
 wanted later, regenerate it from `docs/` (per `repo-init`) rather than hand-maintaining two.
 
-## TD-10 — ImportAsDictAction targets iOS 14, not 12
+## TD-10 — ImportAsDictAction targets iOS 14, not 12 — **closed by the iOS 15 floor (2026-09-14)**
 
 *(Corrected 2026-07-18: an earlier version claimed the Widget target was also at 14 — wrong.
 The Widget (Today) target sets no explicit deployment target and inherits the project-level
@@ -401,6 +438,13 @@ reasonable time), so on iOS 12–13 the share-import flow is unavailable — and
 `learnWords://shareaction` deep link (TD-3) below iOS 14. **Cost:** the import feature is
 missing on the oldest devices. **Discharge (deferred by owner):** revisit once structure
 settles — either find the workaround and lower to 12.1, raise consciously, or accept as-is.
+
+**Closed (2026-09-14).** The floor is 15.0 for every target ([Design](Design.md) § *the floor
+is iOS 15*), so the extension now installs everywhere the app does, and share import and the
+`shareaction` deep link with it. The workaround was never found and is no longer wanted. The
+extension's `IPHONEOS_DEPLOYMENT_TARGET = 14` was deleted rather than raised: it inherits the
+project's value, as every shipped target now does, so the next floor change cannot leave one
+bundle behind.
 
 ---
 
@@ -1412,7 +1456,7 @@ be sure enough if you yet decide to use one"*):
 * The **padding around each glyph is not a number at all** — it is the difference between
   the touch target and the type-scaled symbol, so it cannot drift out of step with either.
 
-## TD-45 — Asset catalogs use formats the verification toolchain cannot read
+## TD-45 — Asset catalogs use formats the verification toolchain cannot read — **closed by the iOS 15 floor (2026-09-14)**
 
 TD-8 concluded that the App-Store build (Xcode 26) and the iOS-12 verification build
 (Xcode 15.2, Ventura) are two separate steps. This is the first thing that made that split
@@ -1487,7 +1531,15 @@ neither emits synchronized folders, a *single* generated project would open in b
 toolchains and this branch would stop existing. The trade is losing Xcode 16+ folder
 auto-membership on master in exchange for a spec to maintain. Not taken yet.
 
-## TD-46 — The app hard-linked Core Haptics, so iOS 12 could not launch it
+**Closed (2026-09-14).** There is no second toolchain any more: the iOS 12 path is deleted
+and `LearnWords-Xcode15.xcodeproj` with it (TD-8), so a catalog is compiled by Xcode 26
+alone and the generated-project alternative has nothing left to solve. Two things this entry
+introduced now serve nothing, and are left for their own decision rather than deleted in
+passing: the single-1024 `AppIcon.appiconset` beside `AppIcon.icon`, which `306dbfa` measured
+to leave the shipped `Assets.car` byte-identical, and the untracked `Package.resolved`, which
+was untracked only because Xcode 15 could not read it.
+
+## TD-46 — The app hard-linked Core Haptics, so iOS 12 could not launch it — **flags removed with the iOS 15 floor (2026-09-14)**
 
 The first iOS 12 run after the Xcode 15.2 build went green died on a `SIGABRT` a moment
 after the launch screen, with no usable stack. The instinct was a mis-wired life cycle —
@@ -1527,6 +1579,24 @@ Tracked as KaPow debt.
 **Discharge for the register:** when adding a dependency or an `import` at this floor,
 check the link, not just the build — `otool -l <binary> | grep -A2 LC_LOAD_DYLIB` and
 confirm every named framework predates the deployment target.
+
+**Flags removed (2026-09-14).** Core Haptics is iOS 13.0+ (`CHHapticEngine`) and WidgetKit
+iOS 14.0+ (`WidgetCenter`), both below the new 15.0 floor, so a plain load is now correct and
+both `-weak_framework` flags are gone, with the `OTHER_LDFLAGS` setting that existed only to
+carry them. Verified with `otool -l` on the Debug build's `LearnWords.debug.dylib`, before and
+after: exactly two load commands changed, those two frameworks from `LC_LOAD_WEAK_DYLIB` to
+`LC_LOAD_DYLIB`. The discharge rule above is unchanged at the new floor: a framework newer
+than iOS 15 still needs the flag.
+
+**One load command the floor moved by itself.** The Release archive at 15.0 loads
+`AVFAudio.framework` where the 12.1 build loaded `AVFoundation`. Nothing in the project asked
+for that: `AVFAudio.tbd` in the iOS 26.5 SDK carries a `$ld$previous` entry that sends those
+symbols to AVFoundation only for deployment targets below iOS 14.5, so at this floor the linker
+takes the newer install name, and the SDK places it below the floor. Of the frameworks the
+three archived bundles load, Speech and UserNotifications (iOS 10.0), SwiftUI and Core Haptics
+(13.0) and WidgetKit (14.0) were checked against Apple's availability lines, and AVFAudio against
+that stub; the rest are UIKit, Foundation, CoreFoundation, CoreGraphics, QuartzCore, CoreServices
+and CoreData.
 
 ## TD-47 — The tab bar was built twice, and iOS 12 got the other one — **resolved (2026-08-04)**
 
@@ -1574,7 +1644,8 @@ added as fallbacks are themselves an iOS 13 format. `UIImage.systemImage` return
 below 13 with a standing `TODO: look up in assets`, across 17 call sites. Giving iOS 12 real
 icons means PNG `.imageset`s and a backport that consults them — related to TD-45's lesson
 that a catalog is compiled by whichever toolchain opens it, and has no deployment target of
-its own. Deliberately deferred; a labels-only tab bar is legible, if plain.
+its own. Deliberately deferred; a labels-only tab bar is legible, if plain. **Moot since
+2026-09-14:** nothing below iOS 13 can install the app.
 
 ## TD-48 — The CloudKit removal window closed before anyone noticed it was open
 

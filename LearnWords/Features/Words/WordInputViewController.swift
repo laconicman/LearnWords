@@ -213,10 +213,8 @@ final class WordInputViewController: UITableViewController {
         // `.body` is the field's own text style: the glyph sits inline with the word being
         // typed, so it takes the size of that word rather than a size of its own. A text
         // style rather than a point size also keeps it tracking Dynamic Type.
-        if #available(iOS 13, *) {
-            dictationButton.setPreferredSymbolConfiguration(
-                UIImage.SymbolConfiguration(textStyle: .body), forImageIn: .normal)
-        }
+        dictationButton.setPreferredSymbolConfiguration(
+            UIImage.SymbolConfiguration(textStyle: .body), forImageIn: .normal)
         // The square is the touch target, and the padding is the difference between it and
         // the glyph — a derived gap rather than a chosen one, so it cannot drift out of step
         // with either the type scale or the target.
@@ -307,21 +305,19 @@ final class WordInputViewController: UITableViewController {
         inner.translatesAutoresizingMaskIntoConstraints = false
 
         // A plain view behind the stack rather than the stack's own `backgroundColor`,
-        // which `UIStackView` ignores below iOS 14 — at the 12.1 floor the slab would
-        // simply not be there, and the whole point of it is being visible.
+        // which `UIStackView` ignores below iOS 14 — at the 12.1 floor this was written for,
+        // the slab would simply not have been there, and the whole point of it is being visible.
         // The system ⓘ, which is what `.detailButton` draws on the suggestion rows below.
         // Never stretched: the text takes the width, the button takes its own.
-        // `.detailDisclosure` rather than an `info.circle` image: it is the one that still
-        // draws something at the iOS 12 floor, where `UIImage.systemImage` returns `nil`.
+        // `.detailDisclosure` rather than an `info.circle` image: it was the one that still
+        // drew something at the iOS 12 floor, where `UIImage.systemImage` returned `nil`.
         let lookUpButton = UIButton(type: .detailDisclosure)
         lookUpButton.tintColor = .lwAccent
         // Sized by the same rule as the microphone opposite it — left to itself the symbol
         // renders about 50pt, twice the ⓘ on the rows below, which reads as a different
         // control rather than the same one.
-        if #available(iOS 13, *) {
-            lookUpButton.setPreferredSymbolConfiguration(
-                UIImage.SymbolConfiguration(textStyle: .body), forImageIn: .normal)
-        }
+        lookUpButton.setPreferredSymbolConfiguration(
+            UIImage.SymbolConfiguration(textStyle: .body), forImageIn: .normal)
         lookUpButton.translatesAutoresizingMaskIntoConstraints = false
         lookUpButton.setContentHuggingPriority(.required, for: .horizontal)
         lookUpButton.setContentCompressionResistancePriority(.required, for: .horizontal)
@@ -546,7 +542,10 @@ final class WordInputViewController: UITableViewController {
         }
     }
 
-    /// The glyph, or a stand-in where SF Symbols do not exist.
+    /// The glyph, or a stand-in where the symbol does not resolve.
+    ///
+    /// Written for the iOS 12 floor, which the rest of this note describes. Since the floor
+    /// became 15 the stand-in can only show for a symbol name the running OS lacks.
     ///
     /// **This button is `leftView` and carries no title**, so on iOS 12 the `nil` symbol
     /// left a 44pt control that was invisible, unlabelled and indistinguishable from the

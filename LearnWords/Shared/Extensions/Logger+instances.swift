@@ -8,7 +8,6 @@
 
 import OSLog
 
-@available(iOS 14.0, *)
 public extension Logger {
     static let subsystem = Bundle.main.bundleIdentifier ?? "undefined"
     static let startup = Logger(subsystem: subsystem, category: "startup")

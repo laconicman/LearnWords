@@ -52,15 +52,13 @@ enum ExerciseTransition {
 
 enum ExerciseFeedback {
 
-    /// Celebration when a word first reaches the known level. No-op below iOS 13
-    /// (SF Symbols don't exist there) — same graceful degradation as the tab icons (TD-11).
+    /// Celebration when a word first reaches the known level.
     static func levelUp(on view: UIView) {
         guard !levelUpSprayImages.isEmpty else { return }
         view.kapow.spray(images: levelUpSprayImages)
     }
 
     private static let levelUpSprayImages: [UIImage] = {
-        guard #available(iOS 13.0, *) else { return [] }
         let config = UIImage.SymbolConfiguration(textStyle: .title2)
         return ["star.fill", "sparkles"].compactMap {
             UIImage(systemName: $0, withConfiguration: config)?

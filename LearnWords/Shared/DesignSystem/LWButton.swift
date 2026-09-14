@@ -6,19 +6,12 @@
 //  (gradient fill, hairline border, 5pt corners) rendered identically on every iOS
 //  version — which is why it now clashes with the system-drawn bars around it.
 //
-//  A button states its *purpose*; this control decides how that purpose looks on the
-//  OS it is running on. There is exactly one availability check, below, because every
-//  button in the app funnels through here.
-//
-//    iOS 15+   UIButton.Configuration — the system draws it, and keeps drawing it
-//              correctly as the platform moves (capsules, Liquid Glass metrics).
-//    iOS 12–14 A small corner radius. Capsules belong to a later epoch; aping them
-//              on iOS 12 would look more wrong than the flat rectangle does.
+//  A button states its *purpose*; this control decides how that purpose looks, in one
+//  place, because every button in the app funnels through here. The look is
+//  UIButton.Configuration — the system draws it, and keeps drawing it correctly as the
+//  platform moves (capsules, Liquid Glass metrics).
 //
 //  ("Purpose" rather than "role" because UIButton.role is already taken by UIKit.)
-//
-//  See docs/TechDebt.md TD-11 for the same graceful-degradation tier used by the
-//  tab icons, and docs/Design.md for the deployment-target rationale.
 //
 
 import UIKit
@@ -56,20 +49,21 @@ final class LWButton: UIButton {
     // MARK: - Theming seam
     //
     // Gradients and borders are off by default — they read as dated, and the system
-    // styles above are the point of this class. The knobs stay because the iOS 12–14
-    // renderer has to exist anyway, so honouring them costs nothing, and a future
-    // theme feature needs somewhere to land. This is a seam, not a theme *system*:
-    // no theme model, no registry, until themes are actually built (YAGNI).
+    // styles above are the point of this class. The knobs were kept while an iOS 12–14
+    // renderer had to exist anyway, so honouring them cost nothing; since the iOS 15
+    // floor, the flat renderer below exists only for them. A future theme feature needs
+    // somewhere to land. This is a seam, not a theme *system*: no theme model, no
+    // registry, until themes are actually built (YAGNI).
     //
     // Setting `startColor` or `endColor` opts a button out of the system appearance
-    // entirely, on every OS version.
+    // entirely.
 
     @IBInspectable var startColor: UIColor? { didSet { applyAppearance() } }
     @IBInspectable var endColor: UIColor? { didSet { applyAppearance() } }
     @IBInspectable var borderColor: UIColor? { didSet { applyAppearance() } }
     @IBInspectable var borderWidth: CGFloat = 0 { didSet { applyAppearance() } }
 
-    /// Corner radius used by the legacy and themed renderers.
+    /// Corner radius used by the themed renderer.
     @IBInspectable var legacyCornerRadius: CGFloat = 5 { didSet { applyAppearance() } }
 
     /// Unthemed height at the default content size category. Scales with Dynamic Type.
@@ -160,17 +154,11 @@ final class LWButton: UIButton {
             applyThemedChrome()
             return
         }
-        // The single availability branch in the app's button styling.
-        if #available(iOS 15.0, *) {
-            applySystemConfiguration()
-        } else {
-            applyLegacyChrome()
-        }
+        applySystemConfiguration()
     }
 
-    // MARK: iOS 15+
+    // MARK: System configuration
 
-    @available(iOS 15.0, *)
     private func applySystemConfiguration() {
         var config: UIButton.Configuration = purpose == .utility ? .gray() : .tinted()
 
@@ -203,12 +191,7 @@ final class LWButton: UIButton {
         configuration = config
     }
 
-    // MARK: iOS 12–14
-
-    private func applyLegacyChrome() {
-        applyFlatChrome(fill: purposeColor.withAlphaComponent(0.18),
-                        title: purpose == .utility ? .lwTextPrimary : purposeColor)
-    }
+    // MARK: Themed
 
     /// The pre-2026 look, on request: gradient fill plus border.
     private func applyThemedChrome() {
@@ -217,7 +200,7 @@ final class LWButton: UIButton {
     }
 
     private func applyFlatChrome(fill: UIColor, title: UIColor) {
-        if #available(iOS 15.0, *) { configuration = nil }
+        configuration = nil
         gradientLayer.colors = nil
         backgroundColor = fill
         setTitleColor(title, for: .normal)
@@ -250,8 +233,7 @@ final class LWButton: UIButton {
     }
 
     /// Icons carry the affirmative/negative distinction for anyone who can't rely on
-    /// the red/green pair. `nil` on iOS 12 (no SF Symbols) — text-only, the same
-    /// degradation the tab icons take (TD-11).
+    /// the red/green pair.
     private var purposeImage: UIImage? {
         switch purpose {
         case .affirmative: return .systemImage("checkmark")

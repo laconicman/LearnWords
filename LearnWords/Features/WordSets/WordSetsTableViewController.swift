@@ -161,7 +161,6 @@ final class WordSetsTableViewController: UITableViewController, UIDocumentPicker
         navigationController?.pushViewController(screen, animated: true)
     }
 
-    @available(iOS 13, *)
     override func tableView(_ tableView: UITableView,
                             contextMenuConfigurationForRowAt indexPath: IndexPath,
                             point: CGPoint) -> UIContextMenuConfiguration? {
@@ -174,7 +173,6 @@ final class WordSetsTableViewController: UITableViewController, UIDocumentPicker
     }
 
     /// Tapping the preview opens the real screen, which is what a preview promises.
-    @available(iOS 13, *)
     override func tableView(_ tableView: UITableView,
                             willPerformPreviewActionForMenuWith configuration: UIContextMenuConfiguration,
                             animator: UIContextMenuInteractionCommitAnimating) {

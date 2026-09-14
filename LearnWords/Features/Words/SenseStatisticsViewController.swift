@@ -36,7 +36,7 @@ final class SenseStatisticsViewController: UITableViewController {
     /// Whether to offer looking the word up.
     ///
     /// Offered from here because the context menu that presents this screen took the long
-    /// press that used to do it, and at the iOS 12 floor there is no menu to hang an action
+    /// press that used to do it, and at the iOS 12 floor there was no menu to hang an action
     /// on. **A flag rather than a closure**, and the presentation happens here: the closure
     /// version was handed `WordTableViewController` as the presenter, whose view UIKit has
     /// removed from the window by the time this screen is on top — so the dictionary could

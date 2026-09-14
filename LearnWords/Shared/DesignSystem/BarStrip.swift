@@ -11,7 +11,7 @@
 //  disagree about what a zero looks like.
 //
 //  Drawn with plain layers rather than a charting dependency: the whole thing is rectangles,
-//  it has to run at the iOS 12 floor, and a chart library would be the largest thing in the
+//  it had to run at the iOS 12 floor, and a chart library would be the largest thing in the
 //  app by some margin.
 //
 
@@ -133,13 +133,8 @@ final class BarStrip: UIView {
     private func addBar(_ frame: CGRect, colour: UIColor) {
         let bar = CALayer()
         bar.frame = frame
-        // Resolved the same way `ProgressRing` does — a `CGColor` is a fixed colour, and
-        // `resolvedColor(with:)` does not exist at the 12.1 floor.
-        if #available(iOS 13.0, *) {
-            bar.backgroundColor = colour.resolvedColor(with: traitCollection).cgColor
-        } else {
-            bar.backgroundColor = colour.cgColor
-        }
+        // Resolved the same way `ProgressRing` does — a `CGColor` is a fixed colour.
+        bar.backgroundColor = colour.resolvedColor(with: traitCollection).cgColor
         bar.cornerRadius = min(2, frame.height / 2)
         layer.addSublayer(bar)
         bars.append(bar)

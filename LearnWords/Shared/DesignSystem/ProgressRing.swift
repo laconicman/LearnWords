@@ -174,10 +174,7 @@ final class ProgressRing: UIView {
     /// `CGColor` cannot follow light/dark on its own — it has to be re-resolved whenever
     /// the traits change, which is what `traitCollectionDidChange` below is for.
     private func resolved(_ color: UIColor) -> CGColor {
-        if #available(iOS 13.0, *) {
-            return color.resolvedColor(with: traitCollection).cgColor
-        }
-        return color.cgColor
+        color.resolvedColor(with: traitCollection).cgColor
     }
 
     private func applyColors() {
@@ -197,8 +194,7 @@ final class ProgressRing: UIView {
 
     override func traitCollectionDidChange(_ previous: UITraitCollection?) {
         super.traitCollectionDidChange(previous)
-        if #available(iOS 13.0, *),
-           traitCollection.hasDifferentColorAppearance(comparedTo: previous) {
+        if traitCollection.hasDifferentColorAppearance(comparedTo: previous) {
             applyColors()
         }
         if traitCollection.preferredContentSizeCategory != previous?.preferredContentSizeCategory {

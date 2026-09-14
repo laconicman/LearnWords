@@ -32,33 +32,31 @@ func lookUp(term: String, sender: UIViewController, location: CGPoint? = nil) {
         // Set the presentation style to .pageSheet or .formSheet
     dictionaryViewController.modalPresentationStyle = .pageSheet
         
-    if #available(iOS 15.0, *) {
-        if let sheet = dictionaryViewController.sheetPresentationController {
-            if #available(iOS 16.0, *) {
-                sheet.detents = [
-                    .medium(),
-                    .custom(identifier: .init("custom")) { context in
-                        return context.maximumDetentValue - 44
-                    },
-                    .large()
-                ]
-            } else {
-                sheet.detents = [
-                    .medium(),
-                    .large()
-                ]
-            }
-            
-            if #available(iOS 16.0, *) {
-                sheet.selectedDetentIdentifier = sheet.detents.first(where: { $0.identifier.rawValue == "custom" })?.identifier ?? .large
-            } else {
-                sheet.selectedDetentIdentifier = .large
-            }
-
-            // Show a grabber at the top of the sheet
-            sheet.prefersGrabberVisible = true
-            
+    if let sheet = dictionaryViewController.sheetPresentationController {
+        if #available(iOS 16.0, *) {
+            sheet.detents = [
+                .medium(),
+                .custom(identifier: .init("custom")) { context in
+                    return context.maximumDetentValue - 44
+                },
+                .large()
+            ]
+        } else {
+            sheet.detents = [
+                .medium(),
+                .large()
+            ]
         }
+
+        if #available(iOS 16.0, *) {
+            sheet.selectedDetentIdentifier = sheet.detents.first(where: { $0.identifier.rawValue == "custom" })?.identifier ?? .large
+        } else {
+            sheet.selectedDetentIdentifier = .large
+        }
+
+        // Show a grabber at the top of the sheet
+        sheet.prefersGrabberVisible = true
+
     } /* else { // Not needed if we don't use `popover` `modalPresentationStyle`.
         // A safeguard for iPad issues with `present`
         // This was just an experiment with popover controller and it works fine on iOS

@@ -21,8 +21,9 @@
 //
 //  **Threading.** Reads run on the view context (main queue); writes run on a
 //  private-queue context via `LWPersistence.write`, which the view context merges
-//  automatically. Synchronous throughout: Swift Concurrency back-deploys only to iOS 13
-//  and this app's floor is 12.1.
+//  automatically. Synchronous throughout: forced while the floor was 12.1, where Swift
+//  Concurrency could not be used, and kept at 15 until TD-56 decides otherwise (see the
+//  note at the top of `LWPersistence`).
 //
 
 import CoreData

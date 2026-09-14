@@ -57,8 +57,3 @@ coverage.xml
 *.log
 .env
 .env.*
-### Xcode 15.2 verification project (this branch only) ###
-# .gitignore excludes *.xcodeproj; LearnWords.xcodeproj predates that rule and is
-# tracked, so the exclusion never bit. The legacy project is a new path, so it needs
-# an explicit exception or it would be silently untracked.
-!LearnWords-Xcode15.xcodeproj/

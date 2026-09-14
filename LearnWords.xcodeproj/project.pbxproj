@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		DA246CD61F8AA30E00A75ED1 /* Widget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = DA246CC91F8AA30E00A75ED1 /* Widget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		DA58C03C2ED481E000B4A733 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = DA58C03B2ED481E000B4A733 /* AppIcon.icon */; };
 		DAA16D7224B60673003C28FD /* ImportAsDictAction.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = DAA16D6624B60673003C28FD /* ImportAsDictAction.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		DACAF0DE300C000300DC9410 /* KaPow in Frameworks */ = {isa = PBXBuildFile; productRef = DACAF0DE300C000200DC9410 /* KaPow */; };
@@ -18,13 +17,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		DA246CD41F8AA30E00A75ED1 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = DA246CA81F8A6E5E00A75ED1 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = DA246CC81F8AA30E00A75ED1;
-			remoteInfo = Widget;
-		};
 		DA329630300AA1B200A0413A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = DA246CA81F8A6E5E00A75ED1 /* Project object */;
@@ -54,7 +46,6 @@
 			dstPath = "";
 			dstSubfolder = PlugIns;
 			files = (
-				DA246CD61F8AA30E00A75ED1 /* Widget.appex in Embed Foundation Extensions */,
 				DAA16D7224B60673003C28FD /* ImportAsDictAction.appex in Embed Foundation Extensions */,
 				DACDF175300B672D00DC9410 /* WordWidgetExtension.appex in Embed Foundation Extensions */,
 			);
@@ -64,7 +55,6 @@
 
 /* Begin PBXFileReference section */
 		DA246CB01F8A6E5E00A75ED1 /* LearnWords.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LearnWords.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		DA246CC91F8AA30E00A75ED1 /* Widget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = Widget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA32962C300AA1B200A0413A /* Unit Testing Bundle.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Unit Testing Bundle.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA58C03B2ED481E000B4A733 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIcon.icon; sourceTree = "<group>"; };
 		DAA16D6624B60673003C28FD /* ImportAsDictAction.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ImportAsDictAction.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -114,45 +104,12 @@
 			);
 			target = DA246CAF1F8A6E5E00A75ED1 /* LearnWords */;
 		};
-		DADB609330083110002A71A8 /* Exceptions for "LearnWords" folder in "Widget" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Controllers/Library.swift,
-				Model/CoreData/LearnWords.xcdatamodeld,
-				Model/CoreData/LWPersistence.swift,
-				Model/CoreData/ManagedObjects.swift,
-				Model/CoreData/StoreDeduplicator.swift,
-				Model/Lexicon/LanguageCode.swift,
-				Model/Lexicon/Lexicon.swift,
-				Model/Lexicon/LexiconSeed.swift,
-				Model/Lexicon/LexiconTypes.swift,
-				Model/Lexicon/TermUsage.swift,
-				Model/Practice/Exercise.swift,
-				Model/Practice/LanguagePair.swift,
-				Model/ReviewOutcome.swift,
-				Model/Settings.swift,
-				Shared/AppConstants.swift,
-				Shared/Debug.swift,
-				"Shared/Extensions/String+.swift",
-				"Shared/Extensions/UserDefaults+Codable.swift",
-			);
-			target = DA246CC81F8AA30E00A75ED1 /* Widget */;
-		};
 		DADB609430083110002A71A8 /* Exceptions for "LearnWords" folder in "ImportAsDictAction" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Shared/AppConstants.swift,
 			);
 			target = DAA16D6524B60673003C28FD /* ImportAsDictAction */;
-		};
-		DADB609E3008312C002A71A8 /* Exceptions for "Widget" folder in "Widget" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				"/Localized: MainInterface.storyboard",
-				PrivacyInfo.xcprivacy,
-				TodayViewController.swift,
-			);
-			target = DA246CC81F8AA30E00A75ED1 /* Widget */;
 		};
 		DADB60AF3008312E002A71A8 /* Exceptions for "ImportAsDictAction" folder in "ImportAsDictAction" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
@@ -186,19 +143,10 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				DADB609230083110002A71A8 /* Exceptions for "LearnWords" folder in "LearnWords" target */,
-				DADB609330083110002A71A8 /* Exceptions for "LearnWords" folder in "Widget" target */,
 				DADB609430083110002A71A8 /* Exceptions for "LearnWords" folder in "ImportAsDictAction" target */,
 				DACDF1F0300B9ABC00DC9410 /* Exceptions for "LearnWords" folder in "WordWidgetExtension" target */,
 			);
 			path = LearnWords;
-			sourceTree = "<group>";
-		};
-		DADB609B3008312B002A71A8 /* Widget */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				DADB609E3008312C002A71A8 /* Exceptions for "Widget" folder in "Widget" target */,
-			);
-			path = Widget;
 			sourceTree = "<group>";
 		};
 		DADB60A83008312D002A71A8 /* ImportAsDictAction */ = {
@@ -216,11 +164,6 @@
 			isa = PBXFrameworksBuildPhase;
 			files = (
 				DACAF0DE300C000300DC9410 /* KaPow in Frameworks */,
-			);
-		};
-		DA246CC61F8AA30E00A75ED1 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			files = (
 			);
 		};
 		DA329629300AA1B200A0413A /* Frameworks */ = {
@@ -249,7 +192,6 @@
 				DA58C03B2ED481E000B4A733 /* AppIcon.icon */,
 				DADCA5F92F82AF7B00AC0C2A /* PrivacyInfo.xcprivacy */,
 				DADB60643008310F002A71A8 /* LearnWords */,
-				DADB609B3008312B002A71A8 /* Widget */,
 				DADB60A83008312D002A71A8 /* ImportAsDictAction */,
 				DA32962D300AA1B200A0413A /* Unit Testing Bundle */,
 				DACDF14D300B662A00DC9410 /* WidgetKit */,
@@ -263,7 +205,6 @@
 			isa = PBXGroup;
 			children = (
 				DA246CB01F8A6E5E00A75ED1 /* LearnWords.app */,
-				DA246CC91F8AA30E00A75ED1 /* Widget.appex */,
 				DAA16D6624B60673003C28FD /* ImportAsDictAction.appex */,
 				DA32962C300AA1B200A0413A /* Unit Testing Bundle.xctest */,
 				DACDF166300B672C00DC9410 /* WordWidgetExtension.appex */,
@@ -295,7 +236,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				DA246CD51F8AA30E00A75ED1 /* PBXTargetDependency */,
 				DAA16D7124B60673003C28FD /* PBXTargetDependency */,
 				DACDF174300B672D00DC9410 /* PBXTargetDependency */,
 			);
@@ -309,21 +249,6 @@
 			productName = LearnWords;
 			productReference = DA246CB01F8A6E5E00A75ED1 /* LearnWords.app */;
 			productType = "com.apple.product-type.application";
-		};
-		DA246CC81F8AA30E00A75ED1 /* Widget */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = DA246CD71F8AA30E00A75ED1 /* Build configuration list for PBXNativeTarget "Widget" */;
-			buildPhases = (
-				DA246CC51F8AA30E00A75ED1 /* Sources */,
-				DA246CC61F8AA30E00A75ED1 /* Frameworks */,
-				DA246CC71F8AA30E00A75ED1 /* Resources */,
-			);
-			buildRules = (
-			);
-			name = Widget;
-			productName = Widget;
-			productReference = DA246CC91F8AA30E00A75ED1 /* Widget.appex */;
-			productType = "com.apple.product-type.app-extension";
 		};
 		DA32962B300AA1B200A0413A /* Unit Testing Bundle */ = {
 			isa = PBXNativeTarget;
@@ -402,15 +327,6 @@
 							};
 						};
 					};
-					DA246CC81F8AA30E00A75ED1 = {
-						CreatedOnToolsVersion = 9.0;
-						LastSwiftMigration = 1240;
-						SystemCapabilities = {
-							com.apple.ApplicationGroups.iOS = {
-								enabled = 1;
-							};
-						};
-					};
 					DA32962B300AA1B200A0413A = {
 						CreatedOnToolsVersion = 26.6;
 						TestTargetID = DA246CAF1F8A6E5E00A75ED1;
@@ -442,7 +358,6 @@
 			projectRoot = "";
 			targets = (
 				DA246CAF1F8A6E5E00A75ED1 /* LearnWords */,
-				DA246CC81F8AA30E00A75ED1 /* Widget */,
 				DAA16D6524B60673003C28FD /* ImportAsDictAction */,
 				DA32962B300AA1B200A0413A /* Unit Testing Bundle */,
 				DACDF165300B672C00DC9410 /* WordWidgetExtension */,
@@ -456,11 +371,6 @@
 			files = (
 				DA58C03C2ED481E000B4A733 /* AppIcon.icon in Resources */,
 				DADCA5FA2F82AF7B00AC0C2A /* PrivacyInfo.xcprivacy in Resources */,
-			);
-		};
-		DA246CC71F8AA30E00A75ED1 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			files = (
 			);
 		};
 		DA32962A300AA1B200A0413A /* Resources */ = {
@@ -486,11 +396,6 @@
 			files = (
 			);
 		};
-		DA246CC51F8AA30E00A75ED1 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			files = (
-			);
-		};
 		DA329628300AA1B200A0413A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			files = (
@@ -509,11 +414,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		DA246CD51F8AA30E00A75ED1 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = DA246CC81F8AA30E00A75ED1 /* Widget */;
-			targetProxy = DA246CD41F8AA30E00A75ED1 /* PBXContainerItemProxy */;
-		};
 		DA329631300AA1B200A0413A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = DA246CAF1F8A6E5E00A75ED1 /* LearnWords */;
@@ -589,7 +489,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MARKETING_VERSION = 1.2.2;
 				MTL_ENABLE_DEBUG_INFO = YES;
@@ -654,7 +554,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MARKETING_VERSION = 1.2.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
@@ -683,13 +583,6 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"-weak_framework",
-					CoreHaptics,
-					"-weak_framework",
-					WidgetKit,
-				);
 				PRODUCT_BUNDLE_IDENTIFIER = club.laconic.LearnWords;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -713,60 +606,9 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					"-weak_framework",
-					CoreHaptics,
-					"-weak_framework",
-					WidgetKit,
-				);
 				PRODUCT_BUNDLE_IDENTIFIER = club.laconic.LearnWords;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
-		DA246CD81F8AA30E00A75ED1 /* Debug configuration for PBXNativeTarget "Widget" */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = Widget/Widget.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = WEJF495R4D;
-				INFOPLIST_FILE = Widget/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = club.laconic.LearnWords.Widget;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		DA246CD91F8AA30E00A75ED1 /* Release configuration for PBXNativeTarget "Widget" */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = Widget/Widget.entitlements;
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = WEJF495R4D;
-				INFOPLIST_FILE = Widget/Info.plist;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = club.laconic.LearnWords.Widget;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -839,7 +681,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = WEJF495R4D;
 				INFOPLIST_FILE = ImportAsDictAction/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -867,7 +708,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = WEJF495R4D;
 				INFOPLIST_FILE = ImportAsDictAction/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -900,7 +740,6 @@
 				INFOPLIST_FILE = WordWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = WordWidget;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Paul. All rights reserved.";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -938,7 +777,6 @@
 				INFOPLIST_FILE = WordWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = WordWidget;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Paul. All rights reserved.";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -973,14 +811,6 @@
 			buildConfigurations = (
 				DA246CC31F8A6E5E00A75ED1 /* Debug configuration for PBXNativeTarget "LearnWords" */,
 				DA246CC41F8A6E5E00A75ED1 /* Release configuration for PBXNativeTarget "LearnWords" */,
-			);
-			defaultConfigurationName = Release;
-		};
-		DA246CD71F8AA30E00A75ED1 /* Build configuration list for PBXNativeTarget "Widget" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				DA246CD81F8AA30E00A75ED1 /* Debug configuration for PBXNativeTarget "Widget" */,
-				DA246CD91F8AA30E00A75ED1 /* Release configuration for PBXNativeTarget "Widget" */,
 			);
 			defaultConfigurationName = Release;
 		};
