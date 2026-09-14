@@ -150,7 +150,10 @@ Nothing below has been evaluated yet; that is Phase 0's tool trial. Every behavi
   syncing both ways between two devices, plus one real merge. It also leaves deferred seeding on a
   second device and live refresh of incoming changes unverified, and nothing has been checked
   against the Production schema deployed on 2026-09-14. The Roadmap still lists two-device
-  verification as open. The first draft of 1.2.2's notes left sync out for that reason.
+  verification as open. The first draft of 1.2.2's notes left sync out for that reason. The two
+  documents also contradict each other. The Roadmap says no real merge has occurred, in text from
+  `62156a9` (2026-07-27 00:17). Handoff records one, in `a58a2e3`, sixteen hours later. The
+  Roadmap line is probably stale (reasoned from the ordering), but that is for the owner to settle.
 * **Low volume.** Respect API rate limits, and for any undocumented endpoint follow the etiquette
   `deepwiki-mcp` already follows.
 
@@ -203,6 +206,8 @@ The need of the day, done so it never has to be done by hand again.
   unverified feature. Output goes through a PR like any doc.
 * **A linter,** in the `laconic-review lint` sense. It checks limits, locale completeness, leftover
   placeholders and bullet formatting, and flags claims naming features the register marks unverified.
+  It needs **one** authority for "verified". Before it can rely on the docs, reconcile the places that
+  disagree, starting with sync (Principles), or name a single source the others defer to.
 * **Publishing:** the owner pastes the text, or runs the adopted tool with their own key.
 
 **Definition of done:** 1.2.2's What's New lives in the repo for every listing locale and passes the
