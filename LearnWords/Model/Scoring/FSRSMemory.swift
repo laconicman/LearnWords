@@ -12,7 +12,7 @@
 //
 //  **Why a port and not the package** — this reverses `ProgressModel.md`'s "adopt the
 //  official Swift package". Its `Package.swift` declares `.iOS(.v14)` and builds with
-//  `StrictConcurrency=complete`; this app's floor is 12.1. What we actually need is the
+//  `StrictConcurrency=complete`; this app's floor was 12.1 then. What we actually need is the
 //  pure state transition (`nextState`), which is ~80 lines of arithmetic. The scheduler
 //  around it — learning steps, fuzzing, interval ordering, card lifecycle — is Anki's
 //  review-queue problem, not ours.

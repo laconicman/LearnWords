@@ -11,7 +11,7 @@
 //  disagree about what a zero looks like.
 //
 //  Drawn with plain layers rather than a charting dependency: the whole thing is rectangles,
-//  it has to run at the iOS 12 floor, and a chart library would be the largest thing in the
+//  it had to run at the iOS 12 floor, and a chart library would be the largest thing in the
 //  app by some margin.
 //
 

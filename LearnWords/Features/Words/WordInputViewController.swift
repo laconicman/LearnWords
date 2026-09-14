@@ -305,12 +305,12 @@ final class WordInputViewController: UITableViewController {
         inner.translatesAutoresizingMaskIntoConstraints = false
 
         // A plain view behind the stack rather than the stack's own `backgroundColor`,
-        // which `UIStackView` ignores below iOS 14 — at the 12.1 floor the slab would
-        // simply not be there, and the whole point of it is being visible.
+        // which `UIStackView` ignores below iOS 14 — at the 12.1 floor this was written for,
+        // the slab would simply not have been there, and the whole point of it is being visible.
         // The system ⓘ, which is what `.detailButton` draws on the suggestion rows below.
         // Never stretched: the text takes the width, the button takes its own.
-        // `.detailDisclosure` rather than an `info.circle` image: it is the one that still
-        // draws something at the iOS 12 floor, where `UIImage.systemImage` returns `nil`.
+        // `.detailDisclosure` rather than an `info.circle` image: it was the one that still
+        // drew something at the iOS 12 floor, where `UIImage.systemImage` returned `nil`.
         let lookUpButton = UIButton(type: .detailDisclosure)
         lookUpButton.tintColor = .lwAccent
         // Sized by the same rule as the microphone opposite it — left to itself the symbol
@@ -542,7 +542,10 @@ final class WordInputViewController: UITableViewController {
         }
     }
 
-    /// The glyph, or a stand-in where SF Symbols do not exist.
+    /// The glyph, or a stand-in where the symbol does not resolve.
+    ///
+    /// Written for the iOS 12 floor, which the rest of this note describes. Since the floor
+    /// became 15 the stand-in can only show for a symbol name the running OS lacks.
     ///
     /// **This button is `leftView` and carries no title**, so on iOS 12 the `nil` symbol
     /// left a 44pt control that was invisible, unlabelled and indistinguishable from the

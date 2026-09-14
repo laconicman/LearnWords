@@ -4,9 +4,11 @@
 //
 //  The Core Data stack (TD-13).
 //
-//  Deliberately **synchronous**. Swift Concurrency back-deploys only to iOS 13, so at this
-//  app's 12.1 floor `async`/`await` cannot be used at all — which settles the "does the
-//  store go async" question in docs/TASK-TD13-schema.md: it cannot, while Legacy exists.
+//  Deliberately **synchronous**. Swift Concurrency back-deploys only to iOS 13, so at the
+//  12.1 floor this was written for `async`/`await` could not be used at all — which settled
+//  the "does the store go async" question in docs/TASK-TD13-schema.md. At 15 the question is
+//  open again, as TD-56; docs/Design.md § "a write is visible to the next read" says what an
+//  asynchronous store would have to keep.
 //  Reads happen on the view context; writes go through `performAndWait` on a background
 //  context so the UI never blocks on disk.
 //
@@ -361,9 +363,9 @@ final class LWPersistence {
 
     /// Runs `work` on a private-queue context and saves if it made changes.
     ///
-    /// Synchronous by necessity (see the note at the top) — `performAndWait` is the
-    /// pre-concurrency way to stay on the right queue, and what lets every call site read
-    /// and write without an `await` the 12.1 floor cannot express.
+    /// Synchronous (see the note at the top) — `performAndWait` is the pre-concurrency way
+    /// to stay on the right queue, and what lets every call site read and write without an
+    /// `await`.
     func write(_ work: (NSManagedObjectContext) throws -> Void) throws {
         let context = container.newBackgroundContext()
         context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy

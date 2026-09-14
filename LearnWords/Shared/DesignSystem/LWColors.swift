@@ -10,14 +10,14 @@
 //    `UIColor(red: 0, green: 0.7, blue: 0, alpha: 1)` for a correct answer, repeated in
 //    all three controllers. A fixed RGB triple cannot adapt to dark mode, and the three
 //    copies were free to drift. The system colours below are adaptive and iOS 7+, so
-//    they work at the 12.1 floor where `.label` and friends do not.
+//    they worked at the 12.1 floor, where `.label` and friends did not.
 //
 //  * **One source of truth per meaning.** `answerCorrect` is the same green
 //    `LWButton.Purpose.affirmative` paints the "Know" button with, so the button a
 //    learner presses and the answer text that follows agree by construction.
 //
 //  Text colours stay as named asset colours (TD-11) — those carry explicit Any/Dark
-//  appearances and predate the semantic UIColors on our deployment target.
+//  appearances and predated the semantic UIColors on the old 12.1 deployment target.
 //
 
 import UIKit
