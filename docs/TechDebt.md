@@ -2348,7 +2348,37 @@ Not urgent: a library large enough to feel this does not exist yet, and the seed
 words. Recorded now because the measurement exists now, and because it is the first concrete
 user-facing cost of the 12.1 floor.
 
-## TD-60 — The iOS 12–13 Today widget has had no data since before WidgetKit shipped (2026-09-10)
+## TD-60 — The iOS 12–13 Today widget has had no data since before WidgetKit shipped — **withdrawn (2026-09-14)**
+
+**Retracted in full. The widget reads the live store and always did; this entry was wrong on the
+day it was written.** Caught in review of the iOS 15 migration brief, which had repeated it.
+
+`Widget/TodayViewController.loadCurrentWordSet()` reads `Library.shared`, `selectedSet` and
+`lexicon.senses(in:)`, and maps the result into `words`. The
+`userDefaultsGroup.stringArray(forKey: "Words")` line the entry below cites is real text in the
+file — inside a **commented-out block**, eleven lines above the live read. `widgetPerformUpdate`
+calls `loadCurrentWordSet()` and reloads the table, so the data path is whole.
+
+The live read was already present at `181af42`, the very commit that added this entry: the fix it
+recommends — *"read the store through `Lexicon`, as the WordWidget does"* — had landed in
+`343b5dc` ("Today Widget now displays current word set using common "Storage" abstraction",
+2025-09-21), nearly a year earlier. `git log -S` was run against the *commented* line and its
+result was trusted without reading what surrounded it.
+
+**The lesson, which is the reason this entry stays in the register rather than being deleted:**
+`git log -S` finds a string, not a live code path. A commented-out block answers a `-S` query
+exactly like working code, and the register's authority means a wrong entry propagates — this one
+reached a migration plan and would have justified deleting a working extension on a false premise.
+Read the function, not the grep hit.
+
+The extension's fate is now decided on grounds that hold rather than this one: its bundle sits at
+`MinimumOSVersion 12.1` and cannot stay below the new floor, `NCWidgetProviding` is deprecated in
+favour of WidgetKit, and the iOS 12–13 devices it was kept for can no longer install the app. See
+[TASK-iOS15-migration](TASK-iOS15-migration.md) § Phase 0.
+
+---
+
+**The original entry, kept for the record — its first claim is false.**
 
 **Verified:** `Widget/TodayViewController.swift` reads `stringArray(forKey: "Words")` from the
 App-Group defaults, and nothing in the tree writes that key — `AppConstants` labels it "Just for

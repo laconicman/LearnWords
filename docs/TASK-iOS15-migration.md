@@ -63,22 +63,29 @@ the dual lifecycle was introduced.
    the validator reported only the app bundle because it stopped at the first failure, so a bundle
    left below the floor is **expected** to fail the next upload the same way (reasoned, not
    observed).
-2. **Delete the Today extension, `Widget/`.** Three reasons, ordered by how well each is
-   established. **Verified:** the bundle carries `MinimumOSVersion 12.1`, below the new floor, so
-   it must either rise with everything else or go. **Verified (TD-60):** it has had no data since
-   before WidgetKit shipped — it reads `stringArray(forKey: "Words")` from the App-Group defaults
-   and nothing in the tree writes that key. **Documented:** `NCWidgetProviding` is deprecated in
-   favour of WidgetKit.
+2. **The Today extension, `Widget/`, must stop being at 12.1 — and deleting it is the cheaper
+   of the two ways.** What is **forced** is only that its bundle cannot stay below the floor; it
+   currently reports `MinimumOSVersion 12.1` (verified in the 1.2.2 archive). Raising it is one
+   build setting. Deleting it is six files (`TodayViewController.swift`, its storyboard, string
+   catalogue, `Info.plist`, entitlements, privacy manifest) plus the target and its
+   `membershipExceptions` entries.
 
-   Note what is deliberately *not* claimed. Apple's documentation marks the protocol deprecated
-   but gives no obsoleted version, so *"a Today extension cannot run on iOS 15"* is unverified and
-   is **not** the argument — an earlier draft of this brief said exactly that and was wrong. The
-   argument is that raising this bundle to 15.0 spends work to keep a widget that displays
-   nothing, while `WordWidget` already does the job on every OS that can install this build.
+   **The case for deleting:** `NCWidgetProviding` is deprecated in favour of WidgetKit
+   (documented), the iOS 12–13 devices this extension was kept for can no longer install the app
+   at all, and `WordWidget` already covers everything that can.
 
-   Six files (`TodayViewController.swift`, its storyboard, string catalogue, `Info.plist`,
-   entitlements, privacy manifest) plus its target and its `membershipExceptions` entries.
-   **Discharges TD-60 by deletion.**
+   **Two claims this brief made and withdraws.** First, *"Today widgets were removed from iOS
+   after 13"* — Apple marks the protocol deprecated but gives no obsoleted version, so whether a
+   legacy Today widget still surfaces on iOS 15+ is **unverified**, and it is not the argument.
+   Second, and worse, *"it displays nothing"* — **TD-60 is wrong**, and was wrong when it was
+   written. `loadCurrentWordSet()` reads `Library.shared`, `selectedSet` and
+   `lexicon.senses(in:)`; the `stringArray(forKey: "Words")` line TD-60 cites sits inside a
+   commented-out block eleven lines above the live read, and the live read was already there at
+   `181af42`, the commit that introduced TD-60. The fix TD-60 proposed had landed in `343b5dc`
+   a year earlier. **This widget works.**
+
+   So this is the owner's call, not a forced deletion: the extension is functional but deprecated,
+   and its distinct audience is gone.
 
 **The collapse, per [Design](Design.md) § *Path to the optimal non-dual modern structure*.**
 
@@ -153,11 +160,13 @@ already; none needs new design.
   `#available` and the iOS 12 fallback path the entry warns about both disappear. See Phase 2 —
   this is the owner's first feature.
 * **TD-43 — opening the microphone blocks the main queue**, and **TD-40 — main-queue confinement
-  is checked, not proved.** Both are shapes that `async`/actors address directly; both should be
-  re-read after TD-56 lands, because TD-56 may change what they even mean.
+  is checked, not proved.** Both are shapes `async` and actors address directly, and both should
+  be re-read once TD-56 lands — not because TD-56 makes `Lexicon` async, which is the open
+  question above, but because whatever it settles about where store work runs is the same question
+  these two ask.
 
-Do TD-56 first. It is the one with a measurement, it is the one every screen pays for, and the
-other three read cleaner once `Lexicon` is async.
+Do TD-56 first: it is the one with a measurement, and it is the one every screen pays for. Its
+first deliverable is the contract decision above, not code.
 
 ## Phase 2 — features, owner-ordered
 

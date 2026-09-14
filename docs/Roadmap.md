@@ -8,12 +8,15 @@ Priority-ordered. Rationale lives in [Design](Design.md); debt items in [TechDeb
   with `90068` — *"MinimumOSVersion '12.1' is not acceptable"*, `state: FAILED` — so there is no
   longer any way to deliver an iOS 12 build. [TASK-iOS15-migration](TASK-iOS15-migration.md) is
   the plan; [Design](Design.md) § *the floor is iOS 15* is the decision. The unblocking release
-  also collapses the iOS 12 surface (owner, 2026-09-14), closing TD-7, TD-8, TD-10, TD-11,
-  TD-45, TD-46 and TD-60 in one pass.
+  also collapses the iOS 12 surface (owner, 2026-09-14), closing TD-7, TD-8, TD-10, TD-11, TD-45
+  and TD-46 in one pass. (TD-60 is **withdrawn**, not closed — review of the brief found the entry
+  was wrong: that widget reads the live store and always did.)
 - **Then TD-56, then TD-62.** Modern concurrency is what makes iOS 15 pay for itself rather than
-  merely unblock: TD-56's deferred *"if the floor rises, do it once and properly"* branch becomes
-  the one to build, and TD-62's scheduled refresh loses both its `#available` and the iOS 12
-  fallback path it would otherwise have to keep.
+  merely unblock. TD-56 comes first because it is the one with a measurement — but the floor does
+  **not** pick its discharge: `REVIEW.md` forbids making `Lexicon` reads asynchronous, and that
+  rule guards a real bug, so TD-56's first deliverable is that contract decision rather than code
+  ([TASK-iOS15-migration](TASK-iOS15-migration.md) § Phase 1). TD-62 then loses both its
+  `#available` and the iOS 12 fallback path it would otherwise have to keep.
 
 ### Struck through by the refusal (2026-09-14)
 
