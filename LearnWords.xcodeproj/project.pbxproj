@@ -589,7 +589,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MARKETING_VERSION = 1.2.2;
 				MTL_ENABLE_DEBUG_INFO = YES;
@@ -654,7 +654,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MARKETING_VERSION = 1.2.2;
 				MTL_ENABLE_DEBUG_INFO = NO;
@@ -839,7 +839,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = WEJF495R4D;
 				INFOPLIST_FILE = ImportAsDictAction/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -867,7 +866,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = WEJF495R4D;
 				INFOPLIST_FILE = ImportAsDictAction/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -900,7 +898,6 @@
 				INFOPLIST_FILE = WordWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = WordWidget;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Paul. All rights reserved.";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -938,7 +935,6 @@
 				INFOPLIST_FILE = WordWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = WordWidget;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Paul. All rights reserved.";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

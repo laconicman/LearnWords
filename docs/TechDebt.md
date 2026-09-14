@@ -390,7 +390,7 @@ TEMPLATE scaffold from 1880e5d) had diverged. The obsolete `Documentation.docc` 
 was deleted; **`docs/*.md` is the single source of truth.** If a rendered DocC catalog is
 wanted later, regenerate it from `docs/` (per `repo-init`) rather than hand-maintaining two.
 
-## TD-10 — ImportAsDictAction targets iOS 14, not 12
+## TD-10 — ImportAsDictAction targets iOS 14, not 12 — **closed by the iOS 15 floor (2026-09-14)**
 
 *(Corrected 2026-07-18: an earlier version claimed the Widget target was also at 14 — wrong.
 The Widget (Today) target sets no explicit deployment target and inherits the project-level
@@ -401,6 +401,13 @@ reasonable time), so on iOS 12–13 the share-import flow is unavailable — and
 `learnWords://shareaction` deep link (TD-3) below iOS 14. **Cost:** the import feature is
 missing on the oldest devices. **Discharge (deferred by owner):** revisit once structure
 settles — either find the workaround and lower to 12.1, raise consciously, or accept as-is.
+
+**Closed (2026-09-14).** The floor is 15.0 for every target ([Design](Design.md) § *the floor
+is iOS 15*), so the extension now installs everywhere the app does, and share import and the
+`shareaction` deep link with it. The workaround was never found and is no longer wanted. The
+extension's `IPHONEOS_DEPLOYMENT_TARGET = 14` was deleted rather than raised: it inherits the
+project's value, as every shipped target now does, so the next floor change cannot leave one
+bundle behind.
 
 ---
 
