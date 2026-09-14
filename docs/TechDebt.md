@@ -17,7 +17,7 @@ settings and/or need the `Main.storyboard` split first (TD-5). Move them once TD
 
 ## TD-2 — Shared files coupled to sibling targets via pbxproj exceptions
 
-These files are compiled into the **Widget** and/or **ImportAsDictAction** targets via
+These files are compiled into the **WordWidgetExtension** and/or **ImportAsDictAction** targets via
 `membershipExceptions` (paths relative to the synchronized root `LearnWords/`), now at
 their post-reorg paths. Since TD-13 iteration 3 the widget list is the store rather than
 the old model: `Controllers/Library.swift`, `Model/CoreData/LearnWords.xcdatamodeld`,
@@ -27,7 +27,7 @@ the old model: `Controllers/Library.swift`, `Model/CoreData/LearnWords.xcdatamod
 `Model/Lexicon/LexiconTypes.swift`, `Model/Practice/Exercise.swift`,
 `Model/Practice/LanguagePair.swift`, `Model/ReviewOutcome.swift`, `Model/Settings.swift`,
 `Shared/AppConstants.swift`, `Shared/Debug.swift`, `Shared/Extensions/String+.swift`,
-`Shared/Extensions/UserDefaults+Codable.swift` (both widget targets);
+`Shared/Extensions/UserDefaults+Codable.swift` (the widget target);
 `Shared/AppConstants.swift` (ImportAsDictAction). Note `PlainText.swift` is deliberately
 **not** in that list — it needs `Shared/General.swift`, and the widgets neither import nor
 export. **Cost:** moving any of them silently drops them from those targets
@@ -65,7 +65,7 @@ LearnWords?" dialog, which CLI can't tap; one manual run of the real share flow 
 (b) The unsigned CLI build has no App-Group entitlement, so its suite is app-container-local —
 a signing artifact only; Xcode-signed builds use the real group container.
 
-## TD-4 — Widgets: WidgetKit (iOS 14+) + legacy Today (iOS 12–13) — **implemented (2026-07-18)**
+## TD-4 — Widgets: WidgetKit (iOS 14+) + legacy Today (iOS 12–13) — **implemented (2026-07-18); Today half deleted (2026-09-14)**
 
 Decision (owner): migrate to WidgetKit **and** keep a working Today extension for the iOS
 versions WidgetKit doesn't reach. The version math: WidgetKit is iOS 14+; Today extensions
@@ -94,11 +94,20 @@ when convenient; (c) the old Today extension stays deprecated-but-working for 12
 (verification only possible per TD-8); App Store still accepts Today extensions — recheck
 at submission.
 
-## TD-4 (historical) — Deprecated Today extension (`Widget/`)
+**The Today half is deleted (2026-09-14).** Its bundle reported `MinimumOSVersion 12.1` in
+the 1.2.2 archive and could not stay below the new floor. Raising it was one build setting;
+the owner chose deletion instead ([TASK-iOS15-migration](TASK-iOS15-migration.md) § Phase 0),
+because `NCWidgetProviding` is deprecated in favour of WidgetKit and the iOS 12–13 devices it
+was kept for can no longer install the app. It went working, not broken (TD-60). The six files,
+the target and both of its `membershipExceptions` sets are gone; `WordWidgetExtension` is the
+only widget, and remaining item (c) goes with the extension.
+
+## TD-4 (historical) — Deprecated Today extension (`Widget/`) — **removed (2026-09-14)**
 
 `TodayViewController` uses `NCWidgetProviding`, deprecated since iOS 14 and unsupported
 on modern iOS. **Cost:** dead/again-un-shippable extension; App Store review risk.
-**Discharge:** migrate to WidgetKit, or remove the target.
+**Discharge:** migrate to WidgetKit, or remove the target. **Both, in the end:** WidgetKit
+arrived on 2026-07-18, and the target was removed on 2026-09-14 (TD-4 above).
 
 ## TD-5 — Storyboard-centric UI
 

@@ -5,9 +5,9 @@
 //  Created by Paul Buktab on 7/18/26.
 //  Copyright © 2026 Paul. All rights reserved.
 //
-//  WidgetKit home-screen widget (iOS 14+): shows words from the selected set, read from
-//  the shared App-Group Core Data store via `Lexicon`. iOS 12–13 are served by the legacy
-//  Today extension (`Widget` target) instead — see docs/Design.md (TD-4).
+//  WidgetKit home-screen widget: shows words from the selected set, read from the shared
+//  App-Group Core Data store via `Lexicon`. The app's only widget since the legacy Today
+//  extension was deleted with the iOS 12 floor (docs/TechDebt.md, TD-4).
 //
 //  The widget **reads only**. It never seeds and never writes: an extension that created
 //  data would race the app for the same store to no purpose.
@@ -59,8 +59,8 @@ struct Provider: TimelineProvider {
         completion(Timeline(entries: [entry], policy: .after(next)))
     }
 
-    /// Reads the selected set from the shared App-Group store (the same data the app and
-    /// the legacy Today extension use), shuffled so each refresh shows new words.
+    /// Reads the selected set from the shared App-Group store (the same data the app
+    /// uses), shuffled so each refresh shows new words.
     ///
     /// Synonyms are joined rather than given a row each — four rows of screen are better
     /// spent on four meanings.

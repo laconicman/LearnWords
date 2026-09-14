@@ -985,7 +985,8 @@ rewrite:
    feature-first folders (TD-1), split the single `Main.storyboard` and inject dependencies
    into view controllers via `instantiateViewController(identifier:creator:)` (TD-5), rename
    `…Manager` → `…Controller` for shared controllers, and replace the deprecated Today
-   extension with WidgetKit (TD-4).
+   extension with WidgetKit (TD-4 — done: WidgetKit since 2026-07-18, the Today extension
+   deleted 2026-09-14).
 3. **Modern rewrite (separate app).** A fresh, iOS-26-floor app for new devices — no dual
    branching, free to adopt async/await, `@Observable`, and Liquid Glass throughout, and to
    embed SwiftUI natively (`swiftui-uikit-interop`) rather than as `@available`-gated islands.
@@ -993,7 +994,7 @@ rewrite:
 ## Target membership (why the reorg is staged, not bulk)
 
 The Xcode project uses **synchronized folders** (`PBXFileSystemSynchronizedRootGroup`,
-Xcode 16). Several app files are shared into the **Widget** and **ImportAsDictAction**
+Xcode 16). Several app files are shared into the **WordWidgetExtension** and **ImportAsDictAction**
 targets via `membershipExceptions` in `project.pbxproj`
 (`WordsModel.swift`, `Storage.swift`, `Settings.swift`, `AppConstants.swift`,
 `String+.swift`, `UserDefaults+Codable.swift`, `Debug.swift`). Moving any of those
