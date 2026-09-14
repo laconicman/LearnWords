@@ -11,6 +11,13 @@ Priority-ordered. Rationale lives in [Design](Design.md); debt items in [TechDeb
   also collapses the iOS 12 surface (owner, 2026-09-14), closing TD-7, TD-8, TD-10, TD-11, TD-45
   and TD-46 in one pass. (TD-60 is **withdrawn**, not closed — review of the brief found the entry
   was wrong: that widget reads the live store and always did.)
+  **Phase 0's code is done (2026-09-14):** every target builds at 15.0; the Today extension, the
+  iOS 12 life cycle, 41 dead availability guards, both weak-link flags and the Xcode 15 project are
+  gone; those six entries are closed in the register; 407 tests green. A clean Release archive
+  reports `MinimumOSVersion 15.0` in all three bundles. **What is left is the upload**, which only
+  the owner can make, and one question before it: the archive still says 1.2.2 (9), the build
+  number the refused upload carried, and whether App Store Connect takes that number twice after a
+  failed validation is unverified.
 - **Then TD-56, then TD-62.** Modern concurrency is what makes iOS 15 pay for itself rather than
   merely unblock. TD-56 comes first because it is the one with a measurement — but the floor does
   **not** pick its discharge: `REVIEW.md` forbids making `Lexicon` reads asynchronous, and that

@@ -1588,6 +1588,16 @@ after: exactly two load commands changed, those two frameworks from `LC_LOAD_WEA
 `LC_LOAD_DYLIB`. The discharge rule above is unchanged at the new floor: a framework newer
 than iOS 15 still needs the flag.
 
+**One load command the floor moved by itself.** The Release archive at 15.0 loads
+`AVFAudio.framework` where the 12.1 build loaded `AVFoundation`. Nothing in the project asked
+for that: `AVFAudio.tbd` in the iOS 26.5 SDK carries a `$ld$previous` entry that sends those
+symbols to AVFoundation only for deployment targets below iOS 14.5, so at this floor the linker
+takes the newer install name, and the SDK places it below the floor. Of the frameworks the
+three archived bundles load, Speech and UserNotifications (iOS 10.0), SwiftUI and Core Haptics
+(13.0) and WidgetKit (14.0) were checked against Apple's availability lines, and AVFAudio against
+that stub; the rest are UIKit, Foundation, CoreFoundation, CoreGraphics, QuartzCore, CoreServices
+and CoreData.
+
 ## TD-47 — The tab bar was built twice, and iOS 12 got the other one — **resolved (2026-08-04)**
 
 On an iPad running iOS 12 the app showed **three** tabs — "Набор слов", "Элемент",
