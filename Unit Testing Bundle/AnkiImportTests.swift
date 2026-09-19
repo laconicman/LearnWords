@@ -167,4 +167,24 @@ struct AnkiImportTests {
     func textWithoutAnAnkiHeaderIsLeftToPlainText(_ text: String) {
         #expect(AnkiText.read(text) == nil)
     }
+
+    /// The app's *own* plain-text export must still restore when its first word is spelled
+    /// like a directive. `render` writes `#deck : колода` — a space before the colon, which a
+    /// directive never has. Reported by review, PR #29: the detector once trimmed that space,
+    /// read the line as a header, and restored nothing.
+    @Test(arguments: ["#separator", "#html", "#notetype", "#deck", "#columns", "#if matches",
+                      "#tags column", "#guid column", "#notetype column", "#deck column"])
+    func aPlainTextExportStartingWithADirectiveShapedWordRestores(_ word: String) throws {
+        let lexicon = makeLexicon()
+        let set = try lexicon.addWordSet(named: "Odd", languages: ["en", "ru"])
+        _ = try lexicon.addSense(to: set.id, terms: [Term.Draft(word, in: "en"),
+                                                     Term.Draft("слово", in: "ru")])
+        let file = PlainText.render(try lexicon.senses(in: set.id), from: "en", to: "ru")
+        #expect(AnkiText.read(file) == nil, "read as Anki: \(file)")
+
+        let copy = try lexicon.addWordSet(named: "Copy", languages: ["en", "ru"])
+        let summary = try lexicon.importText(file, into: copy.id, first: "en", second: "ru")
+        #expect(summary == .init(added: 1, duplicates: 0, unreadable: 0))
+        #expect(try pairs(lexicon, copy) == ["\(word) = слово"])
+    }
 }

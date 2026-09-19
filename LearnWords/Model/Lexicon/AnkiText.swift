@@ -195,6 +195,18 @@ extension AnkiText {
         var rest = Substring(text)
         if rest.first == "\u{FEFF}" { rest = rest.dropFirst() }
 
+        // **The first line decides, and it is compared untrimmed.** `PlainText.render` writes
+        // `word : translation` — always a space before the colon — while a directive never has
+        // one. So `#deck : колода`, a plain-text export of a set whose first word is `#deck`,
+        // is not mistaken for the `#deck:` directive. Trimming the key here once swallowed that
+        // line as a header and restored nothing from the app's own export. Reported by review,
+        // PR #29.
+        guard rest.first == "#",
+              let firstColon = rest.firstIndex(of: ":"),
+              !rest[..<firstColon].contains(where: \.isNewline),
+              directives.contains(rest[rest.index(after: rest.startIndex)..<firstColon].lowercased())
+        else { return nil }
+
         var header: [String: Substring] = [:]
         while rest.first == "#" {
             let end = rest.firstIndex(where: \.isNewline) ?? rest.endIndex
@@ -205,7 +217,6 @@ extension AnkiText {
             }
             rest = end == rest.endIndex ? rest[end...] : rest[rest.index(after: end)...]
         }
-        guard header.keys.contains(where: directives.contains) else { return nil }
 
         let records = self.records(in: rest, separator: separator(from: header["separator"]))
 
