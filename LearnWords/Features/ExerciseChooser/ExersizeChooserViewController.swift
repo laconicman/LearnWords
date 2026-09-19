@@ -21,7 +21,7 @@ class ExersizeChooserViewController: UIViewController {
         // preference defaults to *off*, so assigning it in `viewDidAppear` showed the one and
         // then flipped to the other on first launch. This screen is the preference's only
         // writer, so reading it once is enough.
-        includeLeanedWords.isOn = LWUserDefaults.standard.includeLearnedWords
+        includeLeanedWords.isOn = storedIncludeLearnedWords()
         ScrollableContent.wrap(contentStack,
                                insets: UIEdgeInsets(top: 20, left: 16, bottom: 20, right: 16),
                                fillsScreen: false)
@@ -39,6 +39,11 @@ class ExersizeChooserViewController: UIViewController {
 
     @IBOutlet weak var directionOfExercises: LWButton!
     @IBOutlet weak var includeLeanedWords: UISwitch!
+
+    /// Where the switch's first state comes from — a property with a default rather than a
+    /// read of `LWUserDefaults` in `viewDidLoad`, so a test can pin it (REVIEW.md). A property,
+    /// not an initialiser argument, because the storyboard builds this screen.
+    var storedIncludeLearnedWords: () -> Bool = { LWUserDefaults.standard.includeLearnedWords }
 
     /// One row that names the current direction and swaps it on tap.
     ///
