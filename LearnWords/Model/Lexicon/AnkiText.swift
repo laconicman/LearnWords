@@ -195,28 +195,29 @@ extension AnkiText {
         var rest = Substring(text)
         if rest.first == "\u{FEFF}" { rest = rest.dropFirst() }
 
-        // **The first line decides, and it is compared untrimmed.** `PlainText.render` writes
-        // `word : translation` — always a space before the colon — while a directive never has
-        // one. So `#deck : колода`, a plain-text export of a set whose first word is `#deck`,
-        // is not mistaken for the `#deck:` directive. Trimming the key here once swallowed that
-        // line as a header and restored nothing from the app's own export. Reported by review,
-        // PR #29.
-        guard rest.first == "#",
-              let firstColon = rest.firstIndex(of: ":"),
-              !rest[..<firstColon].contains(where: \.isNewline),
-              directives.contains(rest[rest.index(after: rest.startIndex)..<firstColon].lowercased())
-        else { return nil }
-
+        // The header is the whole leading run of `#` lines, as Anki reads it: unknown keys are
+        // discarded, not fatal, so a file that opens with `#generated:tool` before
+        // `#separator:tab` is still Anki. Checking only the first line once sent such a file to
+        // `PlainText`, which imported its headers as words. Reported by review, PR #29.
+        //
+        // **What makes it Anki is compared untrimmed.** `PlainText.render` writes
+        // `word : translation` — always a space before the colon — and a directive never has one.
+        // So `#deck : колода`, the plain export of a set whose first word is `#deck`, is not read
+        // as the `#deck:` directive; trimming that space once swallowed the app's own export.
+        // Keys are trimmed only afterwards, for reading values, as Anki reads them.
         var header: [String: Substring] = [:]
+        var isAnki = false
         while rest.first == "#" {
             let end = rest.firstIndex(where: \.isNewline) ?? rest.endIndex
             let line = rest[rest.index(after: rest.startIndex)..<end]
             if let colon = line.firstIndex(of: ":") {
+                if directives.contains(line[..<colon].lowercased()) { isAnki = true }
                 let key = line[..<colon].trimmingCharacters(in: .whitespaces).lowercased()
                 header[key] = line[line.index(after: colon)...]
             }
             rest = end == rest.endIndex ? rest[end...] : rest[rest.index(after: end)...]
         }
+        guard isAnki else { return nil }
 
         let records = self.records(in: rest, separator: separator(from: header["separator"]))
 

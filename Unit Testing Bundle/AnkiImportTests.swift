@@ -168,6 +168,30 @@ struct AnkiImportTests {
         #expect(AnkiText.read(text) == nil)
     }
 
+    /// Anki discards unknown header keys rather than stopping at them, so a directive later in
+    /// the leading run still makes the file Anki. Reported by review, PR #29, with this file.
+    @Test func anUnknownHeaderBeforeARecognisedOneIsStillAnki() throws {
+        let read = try read("#generated:tool\n#separator:tab\nfox\tлиса\n")
+        #expect(read == .init(lines: [.init(first: ["fox"], second: ["лиса"])], unreadable: 0))
+    }
+
+    /// Two directive-shaped words in a row — the whole leading run is `#` lines, and none of
+    /// them is a directive, because `render` put a space before every colon.
+    @Test func aPlainTextExportOpeningWithSeveralDirectiveShapedWordsRestores() throws {
+        let lexicon = makeLexicon()
+        let set = try lexicon.addWordSet(named: "Odd", languages: ["en", "ru"])
+        for word in ["#deck", "#html", "#separator"] {
+            _ = try lexicon.addSense(to: set.id, terms: [Term.Draft(word, in: "en"),
+                                                         Term.Draft("слово", in: "ru")])
+        }
+        let file = PlainText.render(try lexicon.senses(in: set.id), from: "en", to: "ru")
+        #expect(AnkiText.read(file) == nil, "read as Anki: \(file)")
+
+        let copy = try lexicon.addWordSet(named: "Copy", languages: ["en", "ru"])
+        let summary = try lexicon.importText(file, into: copy.id, first: "en", second: "ru")
+        #expect(summary == .init(added: 3, duplicates: 0, unreadable: 0))
+    }
+
     /// The app's *own* plain-text export must still restore when its first word is spelled
     /// like a directive. `render` writes `#deck : колода` — a space before the colon, which a
     /// directive never has. Reported by review, PR #29: the detector once trimmed that space,
