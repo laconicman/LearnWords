@@ -175,6 +175,32 @@ struct AnkiImportTests {
         #expect(read == .init(lines: [.init(first: ["fox"], second: ["лиса"])], unreadable: 0))
     }
 
+    /// `#deck:колода` is a valid plain-text pair *and* a valid directive. The body settles it:
+    /// these rows do not split on a tab, so this is plain text with three meanings. Reported by
+    /// review, PR #29, with this file.
+    @Test func aDirectiveShapedPairIsPlainTextWhenTheBodyIsNotDelimited() throws {
+        let text = "#topic : тема\n#deck:колода\nfox : лиса\n"
+        #expect(AnkiText.read(text) == nil)
+
+        let lexicon = makeLexicon()
+        let set = try lexicon.addWordSet(named: "Plain", languages: ["en", "ru"])
+        let summary = try lexicon.importText(text, into: set.id, first: "en", second: "ru")
+        #expect(summary == .init(added: 3, duplicates: 0, unreadable: 0))
+    }
+
+    /// An export of an empty set is a header and nothing else. It must stay Anki: read as plain
+    /// text, `#separator:tab` and the rest would each become a word — the original bug.
+    @Test func anExportOfAnEmptySetImportsNothingRatherThanItsHeader() throws {
+        let lexicon = makeLexicon()
+        let empty = try lexicon.addWordSet(named: "Empty", languages: ["en", "ru"])
+        let file = AnkiText.render([], from: "en", to: "ru", deck: empty.name)
+        #expect(try read(file) == .init(lines: [], unreadable: 0))
+
+        let summary = try lexicon.importText(file, into: empty.id, first: "en", second: "ru")
+        #expect(summary.isEmpty, "summary: \(summary)")
+        #expect(try lexicon.senses(in: empty.id).isEmpty)
+    }
+
     /// Two directive-shaped words in a row — the whole leading run is `#` lines, and none of
     /// them is a directive, because `render` put a space before every colon.
     @Test func aPlainTextExportOpeningWithSeveralDirectiveShapedWordsRestores() throws {

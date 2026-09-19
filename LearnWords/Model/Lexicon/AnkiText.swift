@@ -221,6 +221,16 @@ extension AnkiText {
 
         let records = self.records(in: rest, separator: separator(from: header["separator"]))
 
+        // **A directive in the header is necessary, not sufficient.** `#deck:колода` is also a
+        // valid plain-text pair — plain text accepts a colon without spaces — so the header alone
+        // cannot tell `#topic : тема\n#deck:колода\nfox : лиса` (three plain meanings) from an
+        // Anki file. The body can: an Anki body is delimited by its separator and a plain one is
+        // not. So a file none of whose rows splits into fields is plain text after all. A file
+        // with no rows stays Anki — read as plain text, its header would become words, which is
+        // the bug this reader was written for. Third edge of this detector found by review,
+        // PR #29; the first two were deciding by the first line alone, and by any line at all.
+        guard records.isEmpty || records.contains(where: { $0.count >= 2 }) else { return nil }
+
         // Markup this reader would have to undo, on the strength of escaping rules nobody here
         // has read from source. Guessing would put `<b>` into words — the same class of fault
         // this reader exists to remove — so every row is reported instead of imported. This
