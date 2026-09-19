@@ -7,8 +7,13 @@
 //
 //  Separate from `PlainText` on purpose. `PlainText` is *ours* and is symmetric — `parse`
 //  and `render` are inverses, which is what makes "the user can always import the
-//  dictionary" true (docs/Design.md). This one is **export only**: it implements a foreign
-//  application's contract, and nothing here reads it back.
+//  dictionary" true (docs/Design.md). This one implements a foreign application's contract.
+//
+//  It was export-only until 2026-09-18, and that was the bug: the import button accepts any
+//  text file, so a learner who exported Anki and imported the file again had it read as
+//  `PlainText`, which split every `#key:value` header on its colon and added both halves as
+//  words, while every real row was unreadable. `read`, at the bottom, reads the file back —
+//  the reader half of the same contract, verified against the same source.
 //
 //  ## The contract
 //
@@ -145,5 +150,160 @@ enum AnkiText {
     private static func headerValue(_ value: String) -> String {
         value.split(whereSeparator: { $0.isNewline || $0 == "\t" })
             .joined(separator: " ")
+    }
+}
+
+// MARK: - Reading it back
+
+extension AnkiText {
+
+    /// Header keys Anki's importer recognises. A file is read as Anki only when it opens with
+    /// one of them; anything else is left to `PlainText`.
+    private static let directives: Set<String> = [
+        "separator", "html", "notetype", "deck", "columns", "if matches",
+        "tags column", "guid column", "notetype column", "deck column",
+    ]
+
+    /// The directives that name a metadata column. Exactly these four, 1-based, removed
+    /// before the remaining fields are mapped (`ankitects/anki`, `csv/metadata.rs`, consulted
+    /// 2026-09-18: https://deepwiki.com/search/for-ankis-csvtext-note-importe_13ad9374-44a7-466a-a6c1-b9d547db01e1).
+    private static let metadataColumns: [String] = [
+        "tags column", "guid column", "notetype column", "deck column",
+    ]
+
+    /// The separator names Anki accepts, case-insensitively. A literal character is also
+    /// accepted, and is handled before this table is consulted.
+    private static let separatorNames: [String: Character] = [
+        "tab": "\t", "comma": ",", "semicolon": ";", "space": " ", "pipe": "|", "colon": ":",
+    ]
+
+    /// Reads a file of the shape `render` writes back into lines, or `nil` when the text does
+    /// not open with an Anki header — so a plain-text file is never mistaken for one.
+    ///
+    /// Follows Anki's own reader, so a file means the same here as there: the header is the
+    /// contiguous run of `#` lines at the top and nothing later; a later unquoted row starting
+    /// with `#` is a comment; fields are RFC 4180; metadata columns are removed before the
+    /// first two remaining fields are taken as front and back.
+    ///
+    /// **Not read: the note, the tags and the GUID.** The note shares the front field on a
+    /// line of its own and is split off rather than kept — left in, "bear\nthe animal" would
+    /// be added as a new word, and re-importing a set into itself would stop being a no-op.
+    /// That matches `PlainText`, which carries no notes either. Deduplication stays by word,
+    /// as for `PlainText`; the GUID could make it by meaning, which would be a change to
+    /// what an import *means* rather than to how a file is read.
+    static func read(_ text: String) -> PlainText.Read? {
+        var rest = Substring(text)
+        if rest.first == "\u{FEFF}" { rest = rest.dropFirst() }
+
+        var header: [String: Substring] = [:]
+        while rest.first == "#" {
+            let end = rest.firstIndex(where: \.isNewline) ?? rest.endIndex
+            let line = rest[rest.index(after: rest.startIndex)..<end]
+            if let colon = line.firstIndex(of: ":") {
+                let key = line[..<colon].trimmingCharacters(in: .whitespaces).lowercased()
+                header[key] = line[line.index(after: colon)...]
+            }
+            rest = end == rest.endIndex ? rest[end...] : rest[rest.index(after: end)...]
+        }
+        guard header.keys.contains(where: directives.contains) else { return nil }
+
+        let records = self.records(in: rest, separator: separator(from: header["separator"]))
+
+        // Markup this reader would have to undo, on the strength of escaping rules nobody here
+        // has read from source. Guessing would put `<b>` into words — the same class of fault
+        // this reader exists to remove — so every row is reported instead of imported. This
+        // app never writes such a file; it takes Anki's own "include HTML" export to make one.
+        if header["html"]?.trimmingCharacters(in: .whitespaces).lowercased() == "true" {
+            return PlainText.Read(lines: [], unreadable: records.count)
+        }
+
+        let excluded = Set(metadataColumns.compactMap { header[$0] }
+            .compactMap { Int($0.trimmingCharacters(in: .whitespaces)) })
+        var lines: [PlainText.Line] = []
+        var unreadable = 0
+        for record in records {
+            let fields = record.enumerated()
+                .filter { !excluded.contains($0.offset + 1) }
+                .map(\.element)
+            guard fields.count >= 2 else { unreadable += 1; continue }
+            let words = fields[0].split(whereSeparator: \.isNewline).first.map(String.init) ?? ""
+            let first = PlainText.synonyms(in: words)
+            let second = PlainText.synonyms(
+                in: fields[1].split(whereSeparator: \.isNewline).joined(separator: ","))
+            guard !first.isEmpty, !second.isEmpty else { unreadable += 1; continue }
+            lines.append(PlainText.Line(first: first, second: second))
+        }
+        return PlainText.Read(lines: lines, unreadable: unreadable)
+    }
+
+    /// The separator a `#separator:` value names. Tab when absent or unrecognised: it is what
+    /// `render` writes, and the delimiter Anki's own detection tries first.
+    private static func separator(from value: Substring?) -> Character {
+        guard let value else { return "\t" }
+        // A literal, checked before trimming — a literal tab or space *is* whitespace.
+        if value.count == 1, let literal = value.first { return literal }
+        return separatorNames[value.trimmingCharacters(in: .whitespaces).lowercased()] ?? "\t"
+    }
+
+    /// Splits the body into records the way Anki's reader does.
+    ///
+    /// A quoted field may hold the separator, a doubled quote or a newline; an unquoted record
+    /// starting with `#` is a comment; a blank line is nothing at all, not an unreadable row.
+    /// Newlines are matched with `isNewline` rather than `"\n"`, because Swift reads `\r\n` as
+    /// one `Character` and a file from Windows would otherwise be one enormous record.
+    private static func records(in body: Substring, separator: Character) -> [[String]] {
+        var records: [[String]] = []
+        var fields: [String] = []
+        var field = ""
+        var started = false     // this field has begun, even if only with an opening quote
+        var quoted = false
+        var comment = false
+
+        func endRecord() {
+            fields.append(field)
+            if fields.contains(where: { !$0.isEmpty }) { records.append(fields) }
+            fields = []
+            field = ""
+            started = false
+        }
+
+        var index = body.startIndex
+        while index < body.endIndex {
+            let character = body[index]
+            index = body.index(after: index)
+
+            if comment {
+                if character.isNewline { comment = false }
+                continue
+            }
+            if quoted {
+                if character != "\"" {
+                    field.append(character)
+                } else if index < body.endIndex, body[index] == "\"" {
+                    field.append("\"")
+                    index = body.index(after: index)
+                } else {
+                    quoted = false
+                }
+                continue
+            }
+            if character == "#", fields.isEmpty, !started {
+                comment = true
+            } else if character == "\"", !started {
+                quoted = true
+                started = true
+            } else if character == separator {
+                fields.append(field)
+                field = ""
+                started = false
+            } else if character.isNewline {
+                endRecord()
+            } else {
+                field.append(character)
+                started = true
+            }
+        }
+        if started || !fields.isEmpty { endRecord() }
+        return records
     }
 }

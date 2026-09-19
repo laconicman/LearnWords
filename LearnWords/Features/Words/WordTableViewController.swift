@@ -335,7 +335,7 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
             // A `Result`, so a thrown import cannot fall through to the summary: zero counts
             // there say "your file had no words", which is false when the store failed.
             let result = Result {
-                try lexicon.importPlainText(text, into: set.id,
+                try lexicon.importText(text, into: set.id,
                                             first: pair.secondary, second: pair.primary)
             }
             reload()

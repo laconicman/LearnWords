@@ -924,7 +924,7 @@ grade — the same split Anki draws between `type` and `ease`.
 **Rejected.** *Deleting the events.* It is the obvious implementation and it is wrong:
 history is the only record of work done, and the log is append-only by design.
 
-## Decision: two export formats, and only one of them comes back
+## Decision: two export formats, and only one of them comes back — **amended (2026-09-18): both come back**
 
 **Decision (2026-07-27).** `PlainText` stays the app's own format and is **symmetric** —
 `parse` and `render` are inverses, which is what makes "the user can always import the
@@ -932,6 +932,25 @@ dictionary" a real answer to dropping migration. `AnkiText` is **export only**: 
 implements a foreign application's contract, and nothing reads it back. The export button
 asks which, because neither is the obvious default and a single button would have to
 silently pick one.
+
+**Amended 2026-09-18: `AnkiText` reads its own export back.** "Export only" was a scope
+decision, and it missed that the import button accepts *any* text file. With `PlainText` as the
+only parser, re-importing an Anki export split every `#key:value` header on its colon and added
+both halves as words — `#separator` / `tab`, `#html` / `false`, seven in all — while every real
+row, being tab-separated, was unreadable. The owner found it by doing the obvious thing: export
+"Animals" as Anki, import it again. `Lexicon.importText` now lets the file decide: one that opens
+with an Anki header directive is read by `AnkiText.read`, anything else by `PlainText`.
+
+The reader is the other half of the contract below, checked against the same source
+([DeepWiki consult](https://deepwiki.com/search/for-ankis-csvtext-note-importe_13ad9374-44a7-466a-a6c1-b9d547db01e1),
+2026-09-18): the header is only the contiguous `#` run at the top; `#separator:` takes
+`Tab`/`Comma`/`Semicolon`/`Space`/`Pipe`/`Colon` case-insensitively or a literal character;
+exactly four `… column:` directives name 1-based metadata columns removed before mapping. Two
+things are deliberately **not** read. The disambiguation note is split off the front rather
+than kept — left in, it would make a new word and re-importing a set into itself would stop
+being a no-op. And a `#html:true` file is reported as unreadable rather than imported: the
+consult could not quote Anki's escaping rules from source, and guessing at markup would put
+`<b>` into words, the same class of fault this fixes. This app never writes such a file.
 
 **Why the contract was read from source rather than the manual.** The Anki manual documents
 the import *dialog*; what matters is what the parser does. Checked against `ankitects/anki`

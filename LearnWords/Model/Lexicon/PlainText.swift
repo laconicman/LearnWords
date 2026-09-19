@@ -12,8 +12,10 @@
 //  screen, which is how the two paths stay one behaviour.
 //
 //  Parsing and rendering are pure functions over text: no store, no UIKit, directly
-//  testable. Putting words *into* the store is `Lexicon.importPlainText`, below, because
-//  deduplication needs to see what is already there.
+//  testable. Putting words *into* the store is `Lexicon.importText`, below, because
+//  deduplication needs to see what is already there. That entry point also reads the app's
+//  own Anki export back (`AnkiText.read`), so a user who exports one format and imports it
+//  again gets their words rather than its header.
 //
 
 import Foundation
@@ -32,6 +34,20 @@ enum PlainText {
     struct Line: Equatable {
         var first: [String]
         var second: [String]
+    }
+
+    /// Everything an import needs from a file: the pairs it held, and how many of its
+    /// entries were **not** pairs. Both formats answer in these terms, so the import that
+    /// consumes them — deduplication, the summary — is one code path.
+    struct Read: Equatable {
+        var lines: [Line]
+        var unreadable: Int
+    }
+
+    /// Reads the app's own format.
+    static func read(_ text: String) -> Read {
+        let lines = parse(text)
+        return Read(lines: lines, unreadable: entries(in: text).count - lines.count)
     }
 
     /// Splits text into meanings. Lines that do not yield exactly two non-empty sides are
@@ -117,7 +133,7 @@ enum PlainText {
 
     /// One side of a line, split into its synonyms. Empty entries are dropped, so a
     /// trailing comma is a typo rather than a blank word.
-    private static func synonyms(in side: String) -> [String] {
+    static func synonyms(in side: String) -> [String] {
         side.split(separator: synonymSeparator)
             .map { $0.trimmingCharacters(in: .whitespaces) }
             .filter { !$0.isEmpty }
@@ -169,14 +185,21 @@ extension Lexicon {
         var isEmpty: Bool { total == 0 }
     }
 
+    /// Adds the meanings in `text` to a set: the app's plain format, or its own Anki export.
+    ///
+    /// **Which format is decided by the file, not the caller.** An Anki export opens with its
+    /// `#separator:` header; anything else is read as `PlainText`. Before `AnkiText` could read,
+    /// importing one of its files here split every `#key:value` header on its colon and added
+    /// both halves as words — `#separator` / `tab`, `#html` / `false` — while every real row,
+    /// being tab-separated, was unreadable. Reported by the owner, 2026-09-18.
     @discardableResult
-    func importPlainText(_ text: String,
-                         into setID: UUID,
-                         first: String,
-                         second: String) throws -> ImportSummary {
-        let entries = PlainText.entries(in: text)
-        let lines = PlainText.parse(text)
-        let unreadable = entries.count - lines.count
+    func importText(_ text: String,
+                    into setID: UUID,
+                    first: String,
+                    second: String) throws -> ImportSummary {
+        let read = AnkiText.read(text) ?? PlainText.read(text)
+        let lines = read.lines
+        let unreadable = read.unreadable
         guard !lines.isEmpty else {
             return ImportSummary(added: 0, duplicates: 0, unreadable: unreadable)
         }

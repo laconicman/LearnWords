@@ -7,8 +7,9 @@
 //  says which clause it protects. Getting one wrong produces a file that imports *quietly*
 //  wrong, which is the failure mode worth testing against.
 //
-//  Export only: there is no `parse` to round-trip against, so the tests read the file the
-//  way Anki's reader would.
+//  These read the file the way Anki's reader would, independently of `AnkiText.read` — so an
+//  exporter bug and a matching reader bug cannot cancel out. Reading the export back into the
+//  app is `AnkiImportTests`.
 //
 
 import Testing
