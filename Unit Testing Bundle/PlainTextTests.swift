@@ -140,7 +140,7 @@ struct PlainTextTests {
         #expect(exported.contains("well-known"), "precondition: export writes it")
 
         let empty = try lexicon.addWordSet(named: "Reimported", languages: ["en", "ru"])
-        try lexicon.importPlainText(exported, into: empty.id, first: "en", second: "ru")
+        try lexicon.importText(exported, into: empty.id, first: "en", second: "ru")
         let words = try lexicon.senses(in: empty.id).flatMap { $0.terms(in: "en") }.map(\.text)
         #expect(words.contains("well-known"), "the app must be able to read its own file")
     }
@@ -151,7 +151,7 @@ struct PlainTextTests {
         let lexicon = makeLexicon()
         let set = try lexicon.addWordSet(named: "Animals", languages: ["en", "ru"])
 
-        let summary = try lexicon.importPlainText("bear|медведь\nfox|лиса",
+        let summary = try lexicon.importText("bear|медведь\nfox|лиса",
                                                   into: set.id, first: "en", second: "ru")
 
         #expect(summary == Lexicon.ImportSummary(added: 2, duplicates: 0, unreadable: 0))
@@ -165,7 +165,7 @@ struct PlainTextTests {
         let lexicon = makeLexicon()
         let set = try lexicon.addWordSet(named: "Animals", languages: ["en", "ru"])
 
-        #expect(try lexicon.importPlainText("fox, reynard | лиса, лисица",
+        #expect(try lexicon.importText("fox, reynard | лиса, лисица",
                                             into: set.id, first: "en", second: "ru").added == 1)
 
         let sense = try #require(try lexicon.senses(in: set.id).first)
@@ -185,7 +185,7 @@ struct PlainTextTests {
         try lexicon.addSense(to: set.id, terms: [Term.Draft("bear", in: "en"),
                                                  Term.Draft("медведь", in: "ru")])
 
-        let summary = try lexicon.importPlainText("""
+        let summary = try lexicon.importText("""
         otter | выдра
         well-known | известный
         bear | мишка
@@ -204,7 +204,7 @@ struct PlainTextTests {
                                                  Term.Draft("лис", in: "ru")])
 
         // "fox" is new but "reynard" is not — merging would be a guess.
-        #expect(try lexicon.importPlainText("fox, reynard | лиса, лисица",
+        #expect(try lexicon.importText("fox, reynard | лиса, лисица",
                                             into: set.id, first: "en", second: "ru").added == 0)
     }
 
@@ -216,7 +216,7 @@ struct PlainTextTests {
 
         // Same word, a different translation — two meanings would be a guess, so it is
         // left alone rather than merged.
-        let summary = try lexicon.importPlainText("bear|мишка\nfox|лиса",
+        let summary = try lexicon.importText("bear|мишка\nfox|лиса",
                                                 into: set.id, first: "en", second: "ru")
 
         #expect(summary.added == 1)
@@ -227,7 +227,7 @@ struct PlainTextTests {
         let lexicon = makeLexicon()
         let set = try lexicon.addWordSet(named: "Animals", languages: ["en", "ru"])
 
-        let summary = try lexicon.importPlainText("bear|медведь\nBEAR|мишка",
+        let summary = try lexicon.importText("bear|медведь\nBEAR|мишка",
                                                 into: set.id, first: "en", second: "ru")
 
         #expect(summary.added == 1, "the same word twice in one file is one meaning")
@@ -240,14 +240,14 @@ struct PlainTextTests {
         let set = try lexicon.addWordSet(named: "Animals", languages: ["en", "ru"])
         let text = (1...50).map { "word\($0)|слово\($0)" }.joined(separator: "\n")
 
-        #expect(try lexicon.importPlainText(text, into: set.id, first: "en", second: "ru").added == 50)
+        #expect(try lexicon.importText(text, into: set.id, first: "en", second: "ru").added == 50)
         #expect(try lexicon.wordSet(set.id)?.languages == ["en", "ru"])
     }
 
     @Test func importIntoAMissingSetThrows() throws {
         let lexicon = makeLexicon()
         #expect(throws: (any Error).self) {
-            try lexicon.importPlainText("bear|медведь", into: UUID(), first: "en", second: "ru")
+            try lexicon.importText("bear|медведь", into: UUID(), first: "en", second: "ru")
         }
     }
 
@@ -286,7 +286,7 @@ struct PlainTextTests {
                                                  Term.Draft("лиса", in: "ru")])
 
         let text = PlainText.render(try lexicon.senses(in: set.id), from: "en", to: "ru")
-        #expect(try lexicon.importPlainText(text, into: set.id, first: "en", second: "ru").added == 0)
+        #expect(try lexicon.importText(text, into: set.id, first: "en", second: "ru").added == 0)
         #expect(try lexicon.senses(in: set.id).count == 2)
     }
 
@@ -303,7 +303,7 @@ struct PlainTextTests {
 
         let destination = makeLexicon()
         let copy = try destination.addWordSet(named: "Animals", languages: ["en", "ru"])
-        #expect(try destination.importPlainText(text, into: copy.id,
+        #expect(try destination.importText(text, into: copy.id,
                                                 first: "en", second: "ru").added == 1)
 
         let sense = try #require(try destination.senses(in: copy.id).first)

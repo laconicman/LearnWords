@@ -2571,3 +2571,32 @@ rebuild conditional instead of removing it. The schedule is derived, never accum
 the store's change token, or the review-event count and the reminder-time preference — is enough to
 skip a rebuild that would produce the identical 14 requests. Same saving on the launch path, none
 of the constraints, and it is what the scheduled version would want underneath it anyway.
+
+## TD-63 — Re-importing an Anki export added its header as words — **resolved (2026-09-18)**
+
+**Reported by the owner:** export "Animals" as Anki, import the file into the same app, and the
+set gains words named `#separator`, `#html`, `#notetype` — "not even doubling".
+
+**Reproduced before fixing, with a trace of every line** (`AnkiImportTests`). The import button
+accepts any text file, and `PlainText` was the only parser. It split each of the seven header
+lines on its colon — `#separator:tab` into `#separator` / `tab` — and added all seven as
+meanings, while each of the three real rows was unreadable: tab is not a `PlainText` separator,
+and the GUID's four dashes defeat the dash fallback. The summary the learner saw read *7 added,
+3 unreadable*. That is why it was "not even doubling": the junk went in and the words did not.
+
+**The cause was a decision, not a slip.** `AnkiText` was export-only by design
+([Design](Design.md) § *two export formats*), and the design never asked what the import button
+would do with the other format. A single fallback parser behind an any-file picker will read a
+foreign format *somehow* — and "somehow" here meant silently, and into the learner's data.
+
+**Discharge.** `AnkiText.read` is the reader half of the contract, and `Lexicon.importText`
+(renamed from `importPlainText`, which it no longer only is) lets the file choose its parser.
+Re-importing a set into itself is now a no-op — *0 added, 3 duplicates, 0 unreadable* — and an
+export restores every meaning, synonyms included, into an empty set.
+
+**Not done, and why.** The disambiguation note, tags and GUID are not imported. The note is split
+off the front so it cannot become part of a word; carrying it into the new meaning needs
+`Lexicon.addSenses` to accept notes, which `PlainText` never needed. The GUID could make
+deduplication *by meaning* rather than by word — a change to what an import means, so not made
+in a bug fix. And an `#html:true` file is reported as unreadable rather than imported, because
+Anki's escaping rules could not be quoted from source and a guess would put markup into words.
