@@ -207,18 +207,18 @@ extension AnkiText {
         // Keys are trimmed only afterwards, for reading values, as Anki reads them.
         var header: [String: Substring] = [:]
         var isAnki = false
-        var opensWithDirective: Bool?
+        var opensWithSeparator: Bool?
         while rest.first == "#" {
             let end = rest.firstIndex(where: \.isNewline) ?? rest.endIndex
             let line = rest[rest.index(after: rest.startIndex)..<end]
             if let colon = line.firstIndex(of: ":") {
                 let untrimmed = line[..<colon].lowercased()
                 if directives.contains(untrimmed) { isAnki = true }
-                if opensWithDirective == nil { opensWithDirective = directives.contains(untrimmed) }
+                if opensWithSeparator == nil { opensWithSeparator = untrimmed == "separator" }
                 let key = line[..<colon].trimmingCharacters(in: .whitespaces).lowercased()
                 header[key] = line[line.index(after: colon)...]
-            } else if opensWithDirective == nil {
-                opensWithDirective = false
+            } else if opensWithSeparator == nil {
+                opensWithSeparator = false
             }
             rest = end == rest.endIndex ? rest[end...] : rest[rest.index(after: end)...]
         }
@@ -228,21 +228,25 @@ extension AnkiText {
 
         // **Two signals, because four rounds of review proved one is never enough.**
         //
-        // 1. *The file opens with a directive* — `#separator:tab` on the first line. Every file
-        //    this app and Anki itself write does, and `PlainText.render` cannot: it always puts a
-        //    space before its colon, so `#deck : колода` is a word pair, not the `#deck:`
-        //    directive. That settles it alone, including for a file whose rows carry one field.
+        // 1. *The file opens with `#separator:`* — the one directive that says how to read the
+        //    body, which is why it alone is conclusive: a file whose rows carry a single field
+        //    is still Anki when it opens this way. Every file this app and Anki itself write
+        //    does, and `PlainText.render` cannot: it always puts a space before its colon, so
+        //    `#separator : разделитель` is a word pair, not this directive. A directive that
+        //    does *not* declare the delimiter — `#deck:Animals` — settles nothing, because it is
+        //    equally a plain-text pair, and `#deck:Animals\nfox:лиса` is two meanings.
         // 2. *Otherwise* a directive anywhere in the leading `#` run makes it Anki only if the
         //    body is delimited by the declared separator. This admits a foreign header before
         //    `#separator:` while leaving `#topic : тема\n#deck:колода\nfox : лиса` — three plain
         //    meanings, of which the second is also a valid directive — as plain text.
         //
-        // **A knowingly accepted ambiguity.** A hand-written plain file whose *first* line is
-        // `#separator:colon` is byte-for-byte an Anki file with a colon separator; nothing can
-        // tell them apart, and this reads it as Anki. The cost is one meaning in a file no
-        // exporter here produces; the alternative costs the header-as-words bug this reader
-        // exists to prevent.
-        if opensWithDirective != true {
+        // **A knowingly accepted ambiguity, and it is narrow.** A hand-written plain file whose
+        // *first* line is `#separator:colon` is byte-for-byte an Anki file with a colon
+        // separator; nothing can tell them apart, and this reads it as Anki, costing that line.
+        // The cost the other way is the header-as-words bug this reader exists to prevent. The
+        // matching gap: an Anki file that opens with some *other* directive and has single-field
+        // rows is read as plain text. No exporter here writes one.
+        if opensWithSeparator != true {
             guard records.isEmpty || records.contains(where: { $0.count >= 2 }) else { return nil }
         }
 

@@ -202,6 +202,18 @@ struct AnkiImportTests {
         #expect(try lexicon.senses(in: set.id).isEmpty, "the header must not become words")
     }
 
+    /// Only `#separator:` says how to read the body, so only it is conclusive. `#deck:Animals`
+    /// is equally a plain-text pair, and this file is two meanings. Reported by review, PR #29.
+    @Test func anOpeningDirectiveThatDeclaresNoDelimiterDoesNotMakeItAnki() throws {
+        let text = "#deck:Animals\nfox:лиса\n"
+        #expect(AnkiText.read(text) == nil)
+
+        let lexicon = makeLexicon()
+        let set = try lexicon.addWordSet(named: "Plain", languages: ["en", "ru"])
+        let summary = try lexicon.importText(text, into: set.id, first: "en", second: "ru")
+        #expect(summary == .init(added: 2, duplicates: 0, unreadable: 0))
+    }
+
     /// A `#` line with no colon at all is still part of the header run — a comment some
     /// exporters put first. The file is Anki on the strength of the directive below it and a
     /// tab-delimited body, not of its first line.
