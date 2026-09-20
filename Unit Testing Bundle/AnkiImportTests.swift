@@ -127,11 +127,21 @@ struct AnkiImportTests {
         #expect(try read(file).lines == [.init(first: ["say \"hi\""], second: ["привет\tвсем"])])
     }
 
-    @Test(arguments: [("tab", "\t"), ("Tab", "\t"), ("comma", ","), ("PIPE", "|"),
-                      ("semicolon", ";"), (";", ";"), (" Colon ", ":")])
+    @Test(arguments: [("tab", "\t"), ("Tab", "\t"), ("comma", ","), ("semicolon", ";"),
+                      (";", ";")])
     func theSeparatorDirective(_ value: String, _ separator: String) throws {
         let file = "#separator:\(value)\nfox\(separator)лиса\n"
         #expect(try read(file).lines == [.init(first: ["fox"], second: ["лиса"])])
+    }
+
+    /// The spellings plain text also uses need a second directive before they decide the format
+    /// — on their own they are as likely to be a plain pair. Reported by review, PR #29.
+    @Test(arguments: [("PIPE", "|"), (" Colon ", ":"), ("space", " ")])
+    func theSeparatorDirectiveNamingAPlainSpelling(_ value: String, _ separator: String) throws {
+        #expect(AnkiText.read("#separator:\(value)\nfox\(separator)лиса\n") == nil,
+                "a lone \(value) directive should not settle the format")
+        let corroborated = "#separator:\(value)\n#html:false\nfox\(separator)лиса\n"
+        #expect(try read(corroborated).lines == [.init(first: ["fox"], second: ["лиса"])])
     }
 
     /// Metadata columns are removed before fields are mapped, wherever they sit — here the
@@ -235,12 +245,24 @@ struct AnkiImportTests {
         #expect(try read(file).lines == [.init(first: ["fox"], second: ["лиса"])])
     }
 
-    /// A file opening `#separator:colon` is byte-for-byte an Anki file with a colon separator,
-    /// whatever its author meant, and is read as one. The knowingly accepted cost: a hand-written
-    /// plain file that opens exactly so loses that first line as a meaning. Reported by review,
-    /// PR #29; nothing here can tell the two apart, and the alternative is the header-as-words bug.
-    @Test func aFileOpeningWithTheSeparatorDirectiveIsAnkiEvenWhenItCouldBePlainText() throws {
-        let read = try read("#separator:colon\nfox:лиса\nbear:медведь\n")
+    /// `colon`, `pipe` and `space` are plain text's own separators, so a body splitting on one
+    /// is no evidence at all. A lone such directive is a plain-text pair: this file is two
+    /// meanings, not an Anki file that loses one. Reported by review, PR #29.
+    @Test(arguments: ["colon", "pipe", "space"])
+    func aLoneSeparatorDirectiveNamingAPlainSeparatorIsPlainText(_ value: String) throws {
+        let text = "#separator:\(value)\nfox : лиса\n"
+        #expect(AnkiText.read(text) == nil)
+
+        let lexicon = makeLexicon()
+        let set = try lexicon.addWordSet(named: "Plain", languages: ["en", "ru"])
+        let summary = try lexicon.importText(text, into: set.id, first: "en", second: "ru")
+        #expect(summary == .init(added: 2, duplicates: 0, unreadable: 0))
+    }
+
+    /// A real Anki file delimited that way carries a header block, and a second directive is
+    /// enough to corroborate the first.
+    @Test func aCorroboratedNonTabSeparatorIsAnki() throws {
+        let read = try read("#separator:colon\n#html:false\nfox:лиса\nbear:медведь\n")
         #expect(read.lines == [.init(first: ["fox"], second: ["лиса"]),
                                .init(first: ["bear"], second: ["медведь"])])
     }

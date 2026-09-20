@@ -171,6 +171,11 @@ extension AnkiText {
         "tags column", "guid column", "notetype column", "deck column",
     ]
 
+    /// Delimiters `PlainText` reads as dividing a line, plus the space that flanks a dash. A
+    /// file declaring one of these is ambiguous by construction — both readers parse its body —
+    /// so the directive needs corroboration before it decides the format.
+    private static let plainTextSeparators: Set<Character> = [":", "|", "-", "–", "—", " "]
+
     /// The separator names Anki accepts, case-insensitively. A literal character is also
     /// accepted, and is handled before this table is consulted.
     private static let separatorNames: [String: Character] = [
@@ -206,42 +211,48 @@ extension AnkiText {
         // as the `#deck:` directive; trimming that space once swallowed the app's own export.
         // Keys are trimmed only afterwards, for reading values, as Anki reads them.
         var header: [String: Substring] = [:]
-        var isAnki = false
-        var declaresSeparator = false
+        var declared: Set<String> = []
         while rest.first == "#" {
             let end = rest.firstIndex(where: \.isNewline) ?? rest.endIndex
             let line = rest[rest.index(after: rest.startIndex)..<end]
             if let colon = line.firstIndex(of: ":") {
                 let untrimmed = line[..<colon].lowercased()
-                if directives.contains(untrimmed) { isAnki = true }
-                if untrimmed == "separator" { declaresSeparator = true }
+                if directives.contains(untrimmed) { declared.insert(untrimmed) }
                 let key = line[..<colon].trimmingCharacters(in: .whitespaces).lowercased()
                 header[key] = line[line.index(after: colon)...]
             }
             rest = end == rest.endIndex ? rest[end...] : rest[rest.index(after: end)...]
         }
-        guard isAnki else { return nil }
+        guard !declared.isEmpty else { return nil }
 
         let records = self.records(in: rest, separator: separator(from: header["separator"]))
 
         // **Two signals, because four rounds of review proved one is never enough.**
         //
-        // 1. *`#separator:` appears in the run* — the one directive that says how to read the
-        //    body, and it says so wherever it sits, so position is irrelevant. It is conclusive
-        //    on its own: a file carrying single-field rows is still Anki when it declares its
-        //    delimiter. Every file this app and Anki itself write declares one, and
-        //    `PlainText.render` cannot: it always puts a space before its colon, so
-        //    `#separator : разделитель` is a word pair, not this directive.
-        // 2. *Otherwise* a directive in the run makes it Anki only if the body is delimited by
-        //    the default separator. A directive that declares no delimiter settles nothing,
-        //    because it is equally a plain-text pair: `#deck:Animals\nfox:лиса` is two meanings,
-        //    and `#topic : тема\n#deck:колода\nfox : лиса` is three.
+        // 1. *`#separator:` declares a delimiter plain text does not use* — tab above all, and
+        //    equally comma or semicolon. Conclusive wherever it sits in the run, and even when a
+        //    row is malformed: nothing else writes files delimited that way.
+        // 2. *`#separator:` declares one of plain text's own* — `:`, `|`, a dash, or the space
+        //    that sits beside one. Then "the body splits on it" is no evidence at all, because
+        //    both readers fit: `#separator:colon\nfox : лиса` is two perfectly good plain
+        //    meanings, and reading it as Anki costs the first. A second directive settles it —
+        //    a real Anki file carries a header block, not one lone line.
+        // 3. *No `#separator:` at all* — a directive in the run makes it Anki only if the body
+        //    splits on the default tab. A directive that declares no delimiter settles nothing,
+        //    being equally a plain-text pair: `#deck:Animals\nfox:лиса` is two meanings and
+        //    `#topic : тема\n#deck:колода\nfox : лиса` is three.
         //
-        // **One knowingly accepted ambiguity.** A hand-written plain file whose leading lines
-        // include `#separator:colon` is byte-for-byte an Anki file with a colon separator;
-        // nothing can tell them apart, and this reads it as Anki, costing those lines. The cost
-        // the other way is the header-as-words bug this reader exists to prevent.
-        if !declaresSeparator {
+        // **What is left, knowingly.** A hand-made Anki file that declares one of plain text's
+        // separators and carries no other directive reads as plain text, so its header becomes a
+        // meaning. That costs little, and it is the cheaper side of the trade: when the delimiter
+        // is one plain text already knows, both readers make the same meanings of the body, and
+        // only the header line differs.
+        if declared.contains("separator") {
+            let declaredSeparator = separator(from: header["separator"])
+            guard !plainTextSeparators.contains(declaredSeparator) || declared.count >= 2 else {
+                return nil
+            }
+        } else {
             guard records.isEmpty || records.contains(where: { $0.count >= 2 }) else { return nil }
         }
 
