@@ -219,6 +219,60 @@ struct SenseEntryScreenTests {
                 "the practised pair is filled, so the meaning is storable")
     }
 
+    // MARK: - The word being defined
+
+    /// Every accessibility label in a view tree, which is how the pinned slab announces itself:
+    /// its inner stack is one element labelled "caption: term".
+    private func accessibilityLabels(in view: UIView) -> [String] {
+        (view.accessibilityLabel.map { [$0] } ?? [])
+            + view.subviews.flatMap { accessibilityLabels(in: $0) }
+    }
+
+    private func pushedInput(afterTapping row: Int, inSection section: Int,
+                             of proposals: [SenseEntry]) throws -> WordInputViewController {
+        let vc = screen(proposals)
+        let navigation = UINavigationController(rootViewController: vc)
+        tapRow(row, inSection: section, on: vc)
+        let input = try #require(navigation.topViewController as? WordInputViewController,
+                                 "the row has to push the word input screen")
+        input.view.frame = CGRect(x: 0, y: 0, width: 390, height: 800)
+        input.view.layoutIfNeeded()
+        return input
+    }
+
+    /// Editing a word must pin the word being defined — the meaning's word in the other
+    /// practised language — with its dictionary ⓘ beside it.
+    ///
+    /// It did not: this screen pushed `WordInputViewController` without a context, so every
+    /// second screen reached through "Confirm meanings" lost the lookup TD-44 had added to the
+    /// word list's own second step. Reported by the owner, 2026-09-20.
+    @Test func editingAWordPinsTheWordBeingDefined() throws {
+        // Section 0 rows: fox, Add a word in English, лиса, лисица, Add a word in Russian.
+        let input = try pushedInput(afterTapping: 2, inSection: 0, of: synonymous)
+        let labels = accessibilityLabels(in: input.view)
+
+        #expect(labels.contains("Word in English: fox"), "the slab is missing: \(labels)")
+        #expect(labels.contains("Look up fox"), "no lookup beside it: \(labels)")
+    }
+
+    /// Adding a word to a meaning pins it too — the same screen, reached the other way.
+    @Test func addingAWordToAMeaningPinsTheWordBeingDefined() throws {
+        let input = try pushedInput(afterTapping: 4, inSection: 0, of: synonymous)
+        let labels = accessibilityLabels(in: input.view)
+
+        #expect(labels.contains("Word in English: fox"), "the slab is missing: \(labels)")
+    }
+
+    /// A brand-new meaning defines nothing yet, so there is nothing to pin and no ⓘ to offer.
+    @Test func addingAMeaningPinsNothing() throws {
+        let vc = screen(synonymous)
+        let trailing = vc.numberOfSections(in: vc.tableView) - 1
+        let input = try pushedInput(afterTapping: 0, inSection: trailing, of: synonymous)
+
+        #expect(!accessibilityLabels(in: input.view).contains { $0.hasPrefix("Word in ") },
+                "a new meaning has no word to pin")
+    }
+
     // MARK: - Adding without a comma
 
     /// The owner's *"make commas less necessary"*, end to end: a third meaning arrives from

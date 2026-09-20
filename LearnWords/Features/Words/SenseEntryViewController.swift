@@ -313,7 +313,8 @@ final class SenseEntryViewController: UITableViewController {
     private func editWord(at index: Int, in language: String, ofMeaning meaning: Int) {
         push(language: language,
              initialText: proposals[meaning].words(in: language)[index],
-             title: NSLocalizedString("Edit word", comment: "Screen title")) { [weak self] entered in
+             title: NSLocalizedString("Edit word", comment: "Screen title"),
+             context: definedWord(whenEditingIn: language, ofMeaning: meaning)) { [weak self] entered in
             guard let self, self.proposals.indices.contains(meaning) else { return }
             // A comma typed *here* adds synonyms to this meaning. It cannot split: the row
             // being edited belongs to a meaning the learner has already laid out, and the
@@ -337,7 +338,8 @@ final class SenseEntryViewController: UITableViewController {
     private func addWord(in language: String, toMeaning meaning: Int) {
         push(language: language,
              initialText: "",
-             title: NSLocalizedString("Add word", comment: "Screen title")) { [weak self] entered in
+             title: NSLocalizedString("Add word", comment: "Screen title"),
+             context: definedWord(whenEditingIn: language, ofMeaning: meaning)) { [weak self] entered in
             guard let self, self.proposals.indices.contains(meaning) else { return }
             self.proposals[meaning].terms
                 .append(contentsOf: SenseEntry.words(in: entered).map { Term.Draft($0, in: language) })
@@ -364,13 +366,39 @@ final class SenseEntryViewController: UITableViewController {
         }
     }
 
+    /// The word the pushed screen is defining: this meaning's word in the *other* practised
+    /// language, which is what pins the slab and its dictionary ⓘ (TD-44).
+    ///
+    /// **Why this screen had neither.** `WordInputViewController` is the same screen the word
+    /// list pushes for step two, and the slab exists only when a context is passed. The word
+    /// list passes one; this screen never did, so every second screen reached through
+    /// "Confirm meanings" — edit a word, add a word — silently lost the lookup that TD-44 had
+    /// added. Reported by the owner, 2026-09-20.
+    ///
+    /// `nil` when there is nothing to pin: a meaning with no word yet in the other language,
+    /// and every brand-new meaning.
+    private func definedWord(whenEditingIn language: String,
+                             ofMeaning meaning: Int) -> WordInputViewController.Context? {
+        guard proposals.indices.contains(meaning),
+              let other = practisedLanguages.first(where: {
+                  $0 != language && !proposals[meaning].words(in: $0).isEmpty
+              })
+        else { return nil }
+        return WordInputViewController.Context(
+            caption: String(format: NSLocalizedString("Word in %@", comment: "Caption; a language"),
+                            LanguageCode.displayName(other)),
+            term: proposals[meaning].words(in: other).joined(separator: ", "))
+    }
+
     private func push(language: String,
                       initialText: String,
                       title: String,
+                      context: WordInputViewController.Context? = nil,
                       onCommit: @escaping (String) -> Void) {
         let screen = WordInputViewController(
             .add(language: language),
             initialText: initialText,
+            context: context,
             title: title,
             existingUsages: existingUsages.map { lookUp in { typed in lookUp(typed, language) } },
             onCommit: onCommit)
