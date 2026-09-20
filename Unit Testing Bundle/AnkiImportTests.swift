@@ -202,6 +202,19 @@ struct AnkiImportTests {
         #expect(try lexicon.senses(in: set.id).isEmpty, "the header must not become words")
     }
 
+    /// `#separator:` declares the delimiter wherever it sits, so a header line before it cannot
+    /// cost the file its format — even when every row is malformed. Reported by review, PR #29.
+    @Test func aSeparatorAfterAnotherHeaderStillProtectsTheHeaderFromBeingImported() throws {
+        let file = "#html:false\n#separator:tab\nfox\n"
+        #expect(try read(file) == .init(lines: [], unreadable: 1))
+
+        let lexicon = makeLexicon()
+        let set = try lexicon.addWordSet(named: "Animals", languages: ["en", "ru"])
+        let summary = try lexicon.importText(file, into: set.id, first: "en", second: "ru")
+        #expect(summary == .init(added: 0, duplicates: 0, unreadable: 1))
+        #expect(try lexicon.senses(in: set.id).isEmpty, "the header must not become words")
+    }
+
     /// Only `#separator:` says how to read the body, so only it is conclusive. `#deck:Animals`
     /// is equally a plain-text pair, and this file is two meanings. Reported by review, PR #29.
     @Test func anOpeningDirectiveThatDeclaresNoDelimiterDoesNotMakeItAnki() throws {

@@ -207,18 +207,16 @@ extension AnkiText {
         // Keys are trimmed only afterwards, for reading values, as Anki reads them.
         var header: [String: Substring] = [:]
         var isAnki = false
-        var opensWithSeparator: Bool?
+        var declaresSeparator = false
         while rest.first == "#" {
             let end = rest.firstIndex(where: \.isNewline) ?? rest.endIndex
             let line = rest[rest.index(after: rest.startIndex)..<end]
             if let colon = line.firstIndex(of: ":") {
                 let untrimmed = line[..<colon].lowercased()
                 if directives.contains(untrimmed) { isAnki = true }
-                if opensWithSeparator == nil { opensWithSeparator = untrimmed == "separator" }
+                if untrimmed == "separator" { declaresSeparator = true }
                 let key = line[..<colon].trimmingCharacters(in: .whitespaces).lowercased()
                 header[key] = line[line.index(after: colon)...]
-            } else if opensWithSeparator == nil {
-                opensWithSeparator = false
             }
             rest = end == rest.endIndex ? rest[end...] : rest[rest.index(after: end)...]
         }
@@ -228,25 +226,22 @@ extension AnkiText {
 
         // **Two signals, because four rounds of review proved one is never enough.**
         //
-        // 1. *The file opens with `#separator:`* — the one directive that says how to read the
-        //    body, which is why it alone is conclusive: a file whose rows carry a single field
-        //    is still Anki when it opens this way. Every file this app and Anki itself write
-        //    does, and `PlainText.render` cannot: it always puts a space before its colon, so
-        //    `#separator : разделитель` is a word pair, not this directive. A directive that
-        //    does *not* declare the delimiter — `#deck:Animals` — settles nothing, because it is
-        //    equally a plain-text pair, and `#deck:Animals\nfox:лиса` is two meanings.
-        // 2. *Otherwise* a directive anywhere in the leading `#` run makes it Anki only if the
-        //    body is delimited by the declared separator. This admits a foreign header before
-        //    `#separator:` while leaving `#topic : тема\n#deck:колода\nfox : лиса` — three plain
-        //    meanings, of which the second is also a valid directive — as plain text.
+        // 1. *`#separator:` appears in the run* — the one directive that says how to read the
+        //    body, and it says so wherever it sits, so position is irrelevant. It is conclusive
+        //    on its own: a file carrying single-field rows is still Anki when it declares its
+        //    delimiter. Every file this app and Anki itself write declares one, and
+        //    `PlainText.render` cannot: it always puts a space before its colon, so
+        //    `#separator : разделитель` is a word pair, not this directive.
+        // 2. *Otherwise* a directive in the run makes it Anki only if the body is delimited by
+        //    the default separator. A directive that declares no delimiter settles nothing,
+        //    because it is equally a plain-text pair: `#deck:Animals\nfox:лиса` is two meanings,
+        //    and `#topic : тема\n#deck:колода\nfox : лиса` is three.
         //
-        // **A knowingly accepted ambiguity, and it is narrow.** A hand-written plain file whose
-        // *first* line is `#separator:colon` is byte-for-byte an Anki file with a colon
-        // separator; nothing can tell them apart, and this reads it as Anki, costing that line.
-        // The cost the other way is the header-as-words bug this reader exists to prevent. The
-        // matching gap: an Anki file that opens with some *other* directive and has single-field
-        // rows is read as plain text. No exporter here writes one.
-        if opensWithSeparator != true {
+        // **One knowingly accepted ambiguity.** A hand-written plain file whose leading lines
+        // include `#separator:colon` is byte-for-byte an Anki file with a colon separator;
+        // nothing can tell them apart, and this reads it as Anki, costing those lines. The cost
+        // the other way is the header-as-words bug this reader exists to prevent.
+        if !declaresSeparator {
             guard records.isEmpty || records.contains(where: { $0.count >= 2 }) else { return nil }
         }
 
