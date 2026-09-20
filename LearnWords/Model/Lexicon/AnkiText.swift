@@ -207,13 +207,18 @@ extension AnkiText {
         // Keys are trimmed only afterwards, for reading values, as Anki reads them.
         var header: [String: Substring] = [:]
         var isAnki = false
+        var opensWithDirective: Bool?
         while rest.first == "#" {
             let end = rest.firstIndex(where: \.isNewline) ?? rest.endIndex
             let line = rest[rest.index(after: rest.startIndex)..<end]
             if let colon = line.firstIndex(of: ":") {
-                if directives.contains(line[..<colon].lowercased()) { isAnki = true }
+                let untrimmed = line[..<colon].lowercased()
+                if directives.contains(untrimmed) { isAnki = true }
+                if opensWithDirective == nil { opensWithDirective = directives.contains(untrimmed) }
                 let key = line[..<colon].trimmingCharacters(in: .whitespaces).lowercased()
                 header[key] = line[line.index(after: colon)...]
+            } else if opensWithDirective == nil {
+                opensWithDirective = false
             }
             rest = end == rest.endIndex ? rest[end...] : rest[rest.index(after: end)...]
         }
@@ -221,15 +226,25 @@ extension AnkiText {
 
         let records = self.records(in: rest, separator: separator(from: header["separator"]))
 
-        // **A directive in the header is necessary, not sufficient.** `#deck:колода` is also a
-        // valid plain-text pair — plain text accepts a colon without spaces — so the header alone
-        // cannot tell `#topic : тема\n#deck:колода\nfox : лиса` (three plain meanings) from an
-        // Anki file. The body can: an Anki body is delimited by its separator and a plain one is
-        // not. So a file none of whose rows splits into fields is plain text after all. A file
-        // with no rows stays Anki — read as plain text, its header would become words, which is
-        // the bug this reader was written for. Third edge of this detector found by review,
-        // PR #29; the first two were deciding by the first line alone, and by any line at all.
-        guard records.isEmpty || records.contains(where: { $0.count >= 2 }) else { return nil }
+        // **Two signals, because four rounds of review proved one is never enough.**
+        //
+        // 1. *The file opens with a directive* — `#separator:tab` on the first line. Every file
+        //    this app and Anki itself write does, and `PlainText.render` cannot: it always puts a
+        //    space before its colon, so `#deck : колода` is a word pair, not the `#deck:`
+        //    directive. That settles it alone, including for a file whose rows carry one field.
+        // 2. *Otherwise* a directive anywhere in the leading `#` run makes it Anki only if the
+        //    body is delimited by the declared separator. This admits a foreign header before
+        //    `#separator:` while leaving `#topic : тема\n#deck:колода\nfox : лиса` — three plain
+        //    meanings, of which the second is also a valid directive — as plain text.
+        //
+        // **A knowingly accepted ambiguity.** A hand-written plain file whose *first* line is
+        // `#separator:colon` is byte-for-byte an Anki file with a colon separator; nothing can
+        // tell them apart, and this reads it as Anki. The cost is one meaning in a file no
+        // exporter here produces; the alternative costs the header-as-words bug this reader
+        // exists to prevent.
+        if opensWithDirective != true {
+            guard records.isEmpty || records.contains(where: { $0.count >= 2 }) else { return nil }
+        }
 
         // Markup this reader would have to undo, on the strength of escaping rules nobody here
         // has read from source. Guessing would put `<b>` into words — the same class of fault

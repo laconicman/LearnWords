@@ -188,6 +188,38 @@ struct AnkiImportTests {
         #expect(summary == .init(added: 3, duplicates: 0, unreadable: 0))
     }
 
+    /// An Anki file whose rows carry a single field is still Anki: it opens with a directive.
+    /// Read as plain text its header would become words — the bug this reader exists for — so
+    /// the rows are reported unreadable instead. Reported by review, PR #29.
+    @Test func anAnkiFileWithSingleFieldRowsReportsThemRatherThanImportingItsHeader() throws {
+        let file = "#separator:tab\n#notetype:Basic\nfox\nbear\n"
+        #expect(try read(file) == .init(lines: [], unreadable: 2))
+
+        let lexicon = makeLexicon()
+        let set = try lexicon.addWordSet(named: "Animals", languages: ["en", "ru"])
+        let summary = try lexicon.importText(file, into: set.id, first: "en", second: "ru")
+        #expect(summary == .init(added: 0, duplicates: 0, unreadable: 2))
+        #expect(try lexicon.senses(in: set.id).isEmpty, "the header must not become words")
+    }
+
+    /// A `#` line with no colon at all is still part of the header run — a comment some
+    /// exporters put first. The file is Anki on the strength of the directive below it and a
+    /// tab-delimited body, not of its first line.
+    @Test func aCommentedFirstHeaderLineDoesNotDecideTheFormat() throws {
+        let file = "# exported by a tool\n#separator:tab\n#html:false\nfox\tлиса\n"
+        #expect(try read(file).lines == [.init(first: ["fox"], second: ["лиса"])])
+    }
+
+    /// A file opening `#separator:colon` is byte-for-byte an Anki file with a colon separator,
+    /// whatever its author meant, and is read as one. The knowingly accepted cost: a hand-written
+    /// plain file that opens exactly so loses that first line as a meaning. Reported by review,
+    /// PR #29; nothing here can tell the two apart, and the alternative is the header-as-words bug.
+    @Test func aFileOpeningWithTheSeparatorDirectiveIsAnkiEvenWhenItCouldBePlainText() throws {
+        let read = try read("#separator:colon\nfox:лиса\nbear:медведь\n")
+        #expect(read.lines == [.init(first: ["fox"], second: ["лиса"]),
+                               .init(first: ["bear"], second: ["медведь"])])
+    }
+
     /// An export of an empty set is a header and nothing else. It must stay Anki: read as plain
     /// text, `#separator:tab` and the rest would each become a word — the original bug.
     @Test func anExportOfAnEmptySetImportsNothingRatherThanItsHeader() throws {
