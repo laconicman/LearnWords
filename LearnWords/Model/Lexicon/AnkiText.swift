@@ -171,10 +171,17 @@ extension AnkiText {
         "tags column", "guid column", "notetype column", "deck column",
     ]
 
-    /// Delimiters `PlainText` reads as dividing a line, plus the space that flanks a dash. A
-    /// file declaring one of these is ambiguous by construction — both readers parse its body —
-    /// so the directive needs corroboration before it decides the format.
-    private static let plainTextSeparators: Set<Character> = [":", "|", "-", "–", "—", " "]
+    /// Delimiters `PlainText` reads as dividing a line. A file declaring one of these is
+    /// ambiguous by construction — both readers parse its body — so the directive needs
+    /// corroboration before it decides the format.
+    ///
+    /// **A space is not one of them**, though it looked like one: `sides(of:)` tries `|` and `:`,
+    /// then a dash *flanked* by whitespace, then a bare dash. Whitespace never divides a line by
+    /// itself, so `fox лиса` is dropped rather than paired — which makes a declared space
+    /// conclusive, like a comma or a semicolon. Listing it here sent valid space-delimited Anki
+    /// files to `PlainText`, where the header became a meaning and every row was unreadable.
+    /// Reported by review, PR #29.
+    private static let plainTextSeparators: Set<Character> = [":", "|", "-", "–", "—"]
 
     /// The separator names Anki accepts, case-insensitively. A literal character is also
     /// accepted, and is handled before this table is consulted.

@@ -128,7 +128,7 @@ struct AnkiImportTests {
     }
 
     @Test(arguments: [("tab", "\t"), ("Tab", "\t"), ("comma", ","), ("semicolon", ";"),
-                      (";", ";")])
+                      (";", ";"), ("space", " ")])
     func theSeparatorDirective(_ value: String, _ separator: String) throws {
         let file = "#separator:\(value)\nfox\(separator)лиса\n"
         #expect(try read(file).lines == [.init(first: ["fox"], second: ["лиса"])])
@@ -136,7 +136,7 @@ struct AnkiImportTests {
 
     /// The spellings plain text also uses need a second directive before they decide the format
     /// — on their own they are as likely to be a plain pair. Reported by review, PR #29.
-    @Test(arguments: [("PIPE", "|"), (" Colon ", ":"), ("space", " ")])
+    @Test(arguments: [("PIPE", "|"), (" Colon ", ":"), ("-", "-")])
     func theSeparatorDirectiveNamingAPlainSpelling(_ value: String, _ separator: String) throws {
         #expect(AnkiText.read("#separator:\(value)\nfox\(separator)лиса\n") == nil,
                 "a lone \(value) directive should not settle the format")
@@ -245,10 +245,19 @@ struct AnkiImportTests {
         #expect(try read(file).lines == [.init(first: ["fox"], second: ["лиса"])])
     }
 
-    /// `colon`, `pipe` and `space` are plain text's own separators, so a body splitting on one
+    /// A space is *not* one of plain text's separators — `sides(of:)` needs `|`, `:` or a dash,
+    /// so whitespace alone never divides a line and `fox лиса` is dropped. That premise is
+    /// asserted here, because it is what makes a declared space conclusive. Reported by review,
+    /// PR #29, after listing the space as shared broke space-delimited Anki files.
+    @Test func aSpaceNeverDividesAPlainTextLine() {
+        #expect(PlainText.parse("fox лиса").isEmpty)
+        #expect(PlainText.parse("fox - лиса").count == 1, "a dash with spaces still divides")
+    }
+
+    /// `colon`, `pipe` and the dashes are plain text's own separators, so a body splitting on one
     /// is no evidence at all. A lone such directive is a plain-text pair: this file is two
     /// meanings, not an Anki file that loses one. Reported by review, PR #29.
-    @Test(arguments: ["colon", "pipe", "space"])
+    @Test(arguments: ["colon", "pipe"])
     func aLoneSeparatorDirectiveNamingAPlainSeparatorIsPlainText(_ value: String) throws {
         let text = "#separator:\(value)\nfox : лиса\n"
         #expect(AnkiText.read(text) == nil)
@@ -257,6 +266,18 @@ struct AnkiImportTests {
         let set = try lexicon.addWordSet(named: "Plain", languages: ["en", "ru"])
         let summary = try lexicon.importText(text, into: set.id, first: "en", second: "ru")
         #expect(summary == .init(added: 2, duplicates: 0, unreadable: 0))
+    }
+
+    /// The trade this makes, stated so it is a decision and not a surprise: because a declared
+    /// space is conclusive, a *plain* file that declares one — which needs the word `#separator`
+    /// as its first term — has its rows split on every space, so `fox : лиса` yields `fox` and
+    /// `:`. No exporter here writes such a file, and the alternative broke every genuine
+    /// space-delimited Anki file. Reported by review, PR #29.
+    @Test func aDeclaredSpaceIsConclusiveEvenWhereThatCosts() throws {
+        #expect(try read("#separator:space\nfox лиса\n").lines
+                == [.init(first: ["fox"], second: ["лиса"])])
+        #expect(try read("#separator:space\nfox : лиса\n").lines
+                == [.init(first: ["fox"], second: [":"])], "the accepted cost")
     }
 
     /// A real Anki file delimited that way carries a header block, and a second directive is
