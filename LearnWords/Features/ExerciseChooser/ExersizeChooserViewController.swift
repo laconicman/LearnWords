@@ -17,6 +17,11 @@ class ExersizeChooserViewController: UIViewController {
         directionOfExercises.setImage(.systemImage("arrow.left.arrow.right"), for: .normal)
         // Before the storyboard's placeholder title can show.
         showDirection()
+        // Also before the first frame. The storyboard draws this switch *on* and the stored
+        // preference defaults to *off*, so assigning it in `viewDidAppear` showed the one and
+        // then flipped to the other on first launch. This screen is the preference's only
+        // writer, so reading it once is enough.
+        includeLeanedWords.isOn = storedIncludeLearnedWords()
         ScrollableContent.wrap(contentStack,
                                insets: UIEdgeInsets(top: 20, left: 16, bottom: 20, right: 16),
                                fillsScreen: false)
@@ -29,17 +34,16 @@ class ExersizeChooserViewController: UIViewController {
         if viewIfLoaded?.window != nil { showSetSummary() }
     }
 
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        showDirection()
-        includeLeanedWords.isOn = LWUserDefaults.standard.includeLearnedWords
-    }
-
     @IBOutlet weak var contentStack: UIStackView!
     @IBOutlet weak var numberOfWordsInSet: UILabel!
 
     @IBOutlet weak var directionOfExercises: LWButton!
     @IBOutlet weak var includeLeanedWords: UISwitch!
+
+    /// Where the switch's first state comes from — a property with a default rather than a
+    /// read of `LWUserDefaults` in `viewDidLoad`, so a test can pin it (REVIEW.md). A property,
+    /// not an initialiser argument, because the storyboard builds this screen.
+    var storedIncludeLearnedWords: () -> Bool = { LWUserDefaults.standard.includeLearnedWords }
 
     /// One row that names the current direction and swaps it on tap.
     ///
@@ -83,6 +87,9 @@ class ExersizeChooserViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        // The practised set can change on another tab, so the direction is re-read on every
+        // return — before the screen shows, not after, or the old direction flashes first.
+        showDirection()
         showSetSummary()
     }
 

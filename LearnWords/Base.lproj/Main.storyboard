@@ -320,7 +320,7 @@
         <!--Exercises-->
         <scene sceneID="xzu-Km-yX7">
             <objects>
-                <viewController id="die-Zg-gg1" customClass="ExersizeChooserViewController" customModule="LearnWords" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="ExerciseChooser" id="die-Zg-gg1" customClass="ExersizeChooserViewController" customModule="LearnWords" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="JBd-Uv-RUe">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
