@@ -62,6 +62,33 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
 
         navigationItem.rightBarButtonItems?.insert(editButtonItem, at: 0)
         checkInstalledLocales()
+
+        // **Double tap looks a word up** (owner, 2026-09-18) — so a long press means one thing,
+        // statistics. The gesture research rejected double tap for *inspection*
+        // (docs/MasteryAndProgressUI.md §2.1) on three counts, and each is answered here rather
+        // than waved through:
+        // - *It fights the single tap.* A recognizer that waits to rule out a second tap delays
+        //   every single tap — and a single tap speaks the word, which must feel immediate. So
+        //   nothing waits: the first tap of a double tap speaks and reveals as usual, and the
+        //   second opens the dictionary. Its touches are cancelled, so it does not toggle back.
+        // - *It is undiscoverable.* The statistics screen keeps its "Look up" row, so a learner
+        //   who never finds the gesture still reaches the dictionary from the long press.
+        // - *VoiceOver claims double tap for activation.* The cell's custom actions already
+        //   name "Look up", which is how VoiceOver reaches it.
+        let lookUpGesture = UITapGestureRecognizer(target: self,
+                                                   action: #selector(lookUpDoubleTappedRow(_:)))
+        lookUpGesture.numberOfTapsRequired = 2
+        lookUpGesture.delaysTouchesEnded = false
+        tableView.addGestureRecognizer(lookUpGesture)
+    }
+
+    @objc private func lookUpDoubleTappedRow(_ gesture: UITapGestureRecognizer) {
+        guard gesture.state == .ended, !tableView.isEditing,
+              let indexPath = tableView.indexPathForRow(at: gesture.location(in: tableView)),
+              indexPath.row < rows.count,
+              let word = rows[indexPath.row].terms(in: languages.secondary).first?.text
+        else { return }
+        lookUp(term: word, sender: self)
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -481,6 +508,12 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
     /// The platform answer for "show me more about this item", and the reason the
     /// gesture is a long press rather than a swipe: trailing swipe is taken by rename and
     /// delete, and a swipe acts on a row rather than inspecting it.
+    ///
+    /// **Statistics only — no actions.** "Look up" used to sit under the preview because a
+    /// long press had been the lookup gesture before it was this one (TD-50). On iOS 26 that
+    /// label was the only solid thing on screen when a word had no practice yet, and the owner
+    /// read the whole gesture as "shows a dictionary lookup" (2026-09-18). Lookup moved to a
+    /// double tap; the statistics screen the preview opens still has it as a row.
     override func tableView(_ tableView: UITableView,
                             contextMenuConfigurationForRowAt indexPath: IndexPath,
                             point: CGPoint) -> UIContextMenuConfiguration? {
@@ -494,21 +527,7 @@ final class WordTableViewController: UITableViewController, UISearchResultsUpdat
                 return self.makeStatistics(for: self.rows[indexPath.row], offersLookUp: false,
                                            presentation: .preview)
             },
-            actionProvider: { [weak self] _ in
-                guard let self, indexPath.row < self.rows.count,
-                      let word = self.rows[indexPath.row]
-                          .terms(in: self.languages.secondary).first?.text
-                else { return nil }
-                return UIMenu(title: "", children: [
-                    UIAction(title: String(format: NSLocalizedString("Look up %@",
-                                                                     comment: "Button label; a word"),
-                                           word),
-                             image: .systemImage("character.book.closed")) { [weak self] _ in
-                        guard let self else { return }
-                        lookUp(term: word, sender: self)
-                    },
-                ])
-            })
+            actionProvider: nil)
     }
 
     /// Tapping the preview opens the real screen, which is what a preview promises.

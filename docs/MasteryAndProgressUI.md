@@ -120,6 +120,18 @@ existing gestures:
 | Right-to-left swipe | ❌ **Already taken** — the sets screen uses trailing swipe for rename/delete (and fork C's bug came from exactly that path). Swipe actions are for *acting on* a row, not inspecting it. |
 | Double tap | ❌ Not an iOS idiom for inspection (it means zoom in Maps/Photos, and VoiceOver claims it for activation). Undiscoverable, and it fights the single tap. |
 
+**Update (owner, 2026-09-18): double tap now looks a word up — not inspection, which stays on
+the long press.** The long press had carried "Look up" as its one menu action, a leftover from
+when a long press *was* the lookup gesture. On iOS 26 that label was the only solid thing under
+the finger when a word had no practice yet, and the owner read the gesture as "shows a
+dictionary lookup instead of statistics". So each gesture now means one thing: long press →
+statistics, double tap → dictionary. The three objections above still apply to lookup and are
+answered, not waived — *fights the single tap*: nothing waits for a second tap, so a single tap
+stays immediate; a double tap's first tap speaks and reveals as usual and its second opens the
+dictionary without toggling back (verified on the iOS 26.5 simulator). *Undiscoverable*: the
+statistics screen keeps its "Look up" row, one tap past the long press. *VoiceOver*: the cell's
+custom actions already include "Look up".
+
 **iOS 12 floor:** `UIContextMenuInteraction` is iOS 13+. Fallback is a
 `UILongPressGestureRecognizer` presenting the same content as a sheet — same gesture, less
 polish, so the mental model is identical across versions. Whatever the fallback, add
