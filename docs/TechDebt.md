@@ -2600,3 +2600,32 @@ off the front so it cannot become part of a word; carrying it into the new meani
 deduplication *by meaning* rather than by word — a change to what an import means, so not made
 in a bug fix. And an `#html:true` file is reported as unreadable rather than imported, because
 Anki's escaping rules could not be quoted from source and a guess would put markup into words.
+
+## TD-64 — The synthesiser's silence was guessed, so speech was cut off — **resolved (2026-09-24)**
+
+**Reported by the owner:** in Phonetics the spoken prompt is truncated, and the same cut
+happens elsewhere — a correct answer's reveal is interrupted 0.1 s in by the next
+question's prompt.
+
+**The cause was a missing half of the API, not a slip.** `AVSpeechSynthesizer` reports
+utterance ends through its delegate, and the delegate was commented out. Without it
+`isProcessing` asked `synthesizer.isSpeaking` — true only while audio is actually going —
+so an utterance queued behind a playing one had nothing left to start it once the first
+ended, and auto-listen opened the microphone on a fixed 1.2 s timer, which switches the
+session to `.playAndRecord` and truncates whatever is still being said.
+
+**Discharge.** The delegate is wired: `current` records the utterance in flight (a late
+`didCancel` for one already replaced is ignored), `processQueue` drains what
+`immediately: false` queued, and `whenSilent` runs whatever must not interrupt speech —
+the microphone opening — at real silence rather than a guessed delay. The next prompt
+queues behind the reveal. A stale wait from a question already answered is fenced by a
+generation counter. And because a queue exists, it needs an owner: `speak` tags each
+utterance, `viewDidDisappear` calls `cancelSpeech(ownedBy:)`, and a queued prompt can no
+longer arrive over the screen the learner went back to — another caller's speech keeps
+playing. `SpeechSilenceTests` drive the real synthesiser (begin/finish are its own
+delegate reports, and the debounce clock is injected rather than slept through); the
+sound itself wants an ear, as TD-38 already records.
+
+**Checked against current docs:** `AVSpeechSynthesizer` has no async API even on iOS 26 —
+the delegate remains the mechanism. The newer surface is on the recognition side
+(`SpeechTranscriber`/`SpeechAnalyzer`, iOS 26+), not here.
