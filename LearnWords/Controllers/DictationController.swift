@@ -73,6 +73,10 @@ final class DictationController {
         let isFinal: Bool
         /// Mean segment confidence. `nil` while partial.
         let confidence: Float?
+        /// The recogniser's other ranked readings of the same utterance, in confidence
+        /// order, `text` excluded. A near-miss can be the right answer when the engine
+        /// confuses similar-sounding words — the best guess is not the only guess.
+        let alternatives: [String]
     }
 
     static let shared = DictationController()
@@ -302,7 +306,10 @@ final class DictationController {
                     : nil
                 onTranscription(Heard(text: result.bestTranscription.formattedString,
                                       isFinal: isFinal,
-                                      confidence: confidence))
+                                      confidence: confidence,
+                                      alternatives: result.transcriptions.dropFirst()
+                                          .map(\.formattedString)
+                                          .filter { !$0.isEmpty }))
             }
 
             guard error != nil || isFinal else { return }

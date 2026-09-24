@@ -2629,3 +2629,13 @@ sound itself wants an ear, as TD-38 already records.
 **Checked against current docs:** `AVSpeechSynthesizer` has no async API even on iOS 26 —
 the delegate remains the mechanism. The newer surface is on the recognition side
 (`SpeechTranscriber`/`SpeechAnalyzer`, iOS 26+), not here.
+
+## TD-65 — A match credited to an N-best alternative is not persisted (2026-09-25)
+
+`SpokenAnswerSurface.matchedReading` can credit an alternative transcription, but the
+event's `response` keeps only the recogniser's best reading — which is right: it is the
+record of what was believed said. The credited reading evaporates, though, so a later
+judge cannot see *why* a `correctJudged` passed (Devin Review on PR #33). The fix is a
+schema field — the alternatives list, or a credited-response field — on the append-only
+log; deliberate, not inline. Related: the near-miss judge ladder (ProgressModel §R5)
+will want the alternatives kept anyway when real re-judging lands.
