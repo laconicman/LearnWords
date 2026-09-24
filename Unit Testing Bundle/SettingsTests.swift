@@ -66,6 +66,28 @@ struct SettingsViewControllerTests {
         #expect(vc.tableView(table, numberOfRowsInSection: 3) == 2)
     }
 
+    /// The row count proves the cell exists, not that it is wired: flipping the real
+    /// switch must write the preference, and the switch must start where the
+    /// preference left it.
+    @Test func theRequireProductionSwitchWritesItsPreference() {
+        let prefs = LWUserDefaults.standard
+        let saved = prefs.requireProductionForLearned
+        defer { prefs.requireProductionForLearned = saved }
+        prefs.requireProductionForLearned = false
+
+        let vc = SettingsViewController()
+        vc.loadViewIfNeeded()
+        let table = vc.tableView!
+        let cell = vc.tableView(table, cellForRowAt: IndexPath(row: 2, section: 2))
+        let toggle = cell.accessoryView as? UISwitch
+        #expect(toggle?.isOn == false, "precondition: the switch starts where the pref is")
+
+        toggle?.setOn(true, animated: false)
+        toggle?.sendActions(for: .valueChanged)
+        #expect(prefs.requireProductionForLearned == true,
+                "flipping the switch must write requireProductionForLearned")
+    }
+
     @Test func languageNameResolvesCodesAndFallsBack() {
         #expect(SettingsViewController.languageName(for: "ru-RU") == "Russian")
         #expect(SettingsViewController.languageName(for: "xx-XX") == "xx-XX")
