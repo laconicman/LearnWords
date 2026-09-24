@@ -2619,8 +2619,12 @@ session to `.playAndRecord` and truncates whatever is still being said.
 `immediately: false` queued, and `whenSilent` runs whatever must not interrupt speech —
 the microphone opening — at real silence rather than a guessed delay. The next prompt
 queues behind the reveal. A stale wait from a question already answered is fenced by a
-generation counter. `SpeechSilenceTests` drive the real synthesiser; the sound itself
-wants an ear, as TD-38 already records.
+generation counter. And because a queue exists, it needs an owner: `speak` tags each
+utterance, `viewDidDisappear` calls `cancelSpeech(ownedBy:)`, and a queued prompt can no
+longer arrive over the screen the learner went back to — another caller's speech keeps
+playing. `SpeechSilenceTests` drive the real synthesiser (begin/finish are its own
+delegate reports, and the debounce clock is injected rather than slept through); the
+sound itself wants an ear, as TD-38 already records.
 
 **Checked against current docs:** `AVSpeechSynthesizer` has no async API even on iOS 26 —
 the delegate remains the mechanism. The newer surface is on the recognition side

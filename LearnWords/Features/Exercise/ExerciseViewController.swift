@@ -114,7 +114,10 @@ final class ExerciseViewController: UIViewController, ExerciseScreen {
         navigationController?.hidesBarsOnTap = false
         // The sitting is over, or the learner walked away. Either way nothing on this
         // screen may keep running — `willLeaveCurrentQuestion` only fires *between*
-        // questions, so it never runs for the last one.
+        // questions, so it never runs for the last one. Speech this screen asked for
+        // (a reveal still playing, a next prompt still queued) is cancelled by owner;
+        // another screen's speech keeps playing.
+        SpeechManager.shared.cancelSpeech(ownedBy: self)
         surface.detach()
     }
 
@@ -199,7 +202,8 @@ final class ExerciseViewController: UIViewController, ExerciseScreen {
             // 0.1 s later when the next question arrives, and interrupting it read as the
             // pronunciation being cut off.
             SpeechManager.shared.speak(promptLabel.attributedText!,
-                                       language: languages.promptLanguage, immediately: false)
+                                       language: languages.promptLanguage, immediately: false,
+                                       owner: self)
         }
         surface.prepareForQuestion()
         ExerciseTransition.show(contentStack)
@@ -257,7 +261,7 @@ final class ExerciseViewController: UIViewController, ExerciseScreen {
 
         if LWUserDefaults.standard.pronounceAnswersPreference {
             SpeechManager.shared.speak(NSAttributedString(string: text),
-                                       language: languages.answerLanguage)
+                                       language: languages.answerLanguage, owner: self)
         }
     }
 
@@ -291,6 +295,6 @@ final class ExerciseViewController: UIViewController, ExerciseScreen {
     @objc private func listenTapped() {
         surface.willLeaveCurrentQuestion()
         guard let text = promptLabel.attributedText else { return }
-        SpeechManager.shared.speak(text, language: languages.promptLanguage)
+        SpeechManager.shared.speak(text, language: languages.promptLanguage, owner: self)
     }
 }
