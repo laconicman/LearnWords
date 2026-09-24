@@ -399,6 +399,11 @@ struct ScoringPolicy {
             // the verdict reaching `ReviewEvent`.
             return .hard
 
+        case .correctAided:
+            // The answer was heard before it was produced — cued, not free, recall.
+            // Positive, but the weakest that still counts: never Good or Easy.
+            return .hard
+
         case .correctVerbatim:
             // Exact, and quick enough to look like recall rather than reconstruction.
             return wasFluent(event) ? .easy : .good

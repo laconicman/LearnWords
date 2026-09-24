@@ -214,6 +214,8 @@ struct ScoringPolicyTests {
         #expect(policy.grade(for: answer(.incorrect)) == .again)
         #expect(policy.grade(for: answer(.selfAssessedForgot)) == .again)
         #expect(policy.grade(for: answer(.correctJudged)) == .hard)
+        #expect(policy.grade(for: answer(.correctAided)) == .hard,
+                "cued recall earns no more than a judged near-miss")
         #expect(policy.grade(for: answer(.selfAssessedKnown)) == .good)
         #expect(policy.grade(for: answer(.skipped)) == nil)
     }

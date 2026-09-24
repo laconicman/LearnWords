@@ -57,4 +57,43 @@ struct ExerciseScreenAppearanceTests {
         #expect(TypedAnswerSurface().accessoryButton == nil)
         #expect(SpokenAnswerSurface().accessoryButton != nil)
     }
+
+    /// The button-to-session half of "Listen marks the answer aided": the real button,
+    /// its real target-action, and the screen's own sitting — only the synthesiser's
+    /// output is not asserted.
+    @Test func listenButtonMarksItsQuestionAided() async throws {
+        let prefs = LWUserDefaults.standard
+        let pronounce = prefs.pronounceQuestionsPreference
+        prefs.pronounceQuestionsPreference = false  // keep the test silent
+        defer { prefs.pronounceQuestionsPreference = pronounce }
+
+        let lexicon = Lexicon(persistence: LWPersistence(inMemory: true))
+        let set = try lexicon.addWordSet(named: "Animals", languages: ["en", "ru"])
+        try lexicon.addSense(to: set.id, terms: [Term.Draft("bear", in: "en"),
+                                                 Term.Draft("медведь", in: "ru")])
+
+        let vc = try ExerciseViewController.make(.dictation, in: set, lexicon: lexicon)
+        let window = UIWindow(frame: UIScreen.main.bounds)
+        window.rootViewController = UINavigationController(rootViewController: vc)
+        window.isHidden = false  // viewDidAppear → askQuestion deals the first question
+        defer { window.isHidden = true }
+        window.layoutIfNeeded()
+
+        try await waitUntil { vc.session.current != nil }
+        #expect(vc.session.current != nil, "precondition: a question is in flight")
+        #expect(vc.session.currentWasAided == false, "precondition: nothing aided yet")
+
+        // A tap only marks when the synthesiser accepts the utterance — a debounced one
+        // plays nothing and marks nothing, which is what a real learner's second tap is
+        // for. Another suite's speech can sit inside the window, so retry past it.
+        var attempts = 0
+        while !vc.session.currentWasAided, attempts < 5 {
+            vc.listenButton.sendActions(for: .touchUpInside)
+            attempts += 1
+            if !vc.session.currentWasAided {
+                try await Task.sleep(nanoseconds: 900_000_000)
+            }
+        }
+        #expect(vc.session.currentWasAided)
+    }
 }

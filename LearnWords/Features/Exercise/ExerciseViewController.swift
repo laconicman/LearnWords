@@ -25,7 +25,7 @@ final class ExerciseViewController: UIViewController, ExerciseScreen {
     // MARK: - Construction
 
     private let surface: ExerciseAnswerSurface
-    private let session: PracticeSession
+    let session: PracticeSession
 
     init(session: PracticeSession, answerSurface: ExerciseAnswerSurface, title: String) {
         self.session = session
@@ -294,7 +294,14 @@ final class ExerciseViewController: UIViewController, ExerciseScreen {
 
     @objc private func listenTapped() {
         surface.willLeaveCurrentQuestion()
-        guard let text = promptLabel.attributedText else { return }
-        SpeechManager.shared.speak(text, language: languages.promptLanguage, owner: self)
+        guard let question else { return }
+        // The button is for hearing the answer to learn and repeat it — so it speaks the
+        // answer in its own language, and the answer that follows is aided evidence. A
+        // tap the debounce swallows plays nothing, so it must not mark anything either.
+        if SpeechManager.shared.speak(NSAttributedString(string: question.expected),
+                                      language: languages.answerLanguage,
+                                      owner: self) {
+            session.markAided()
+        }
     }
 }
