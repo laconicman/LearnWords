@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import NaturalLanguage
 import UIKit
 
 func haptic(feedback: UINotificationFeedbackGenerator.FeedbackType) {
@@ -166,14 +167,34 @@ func match3(pattern: String, answer: String, language: String, delimiters: Strin
     // let patternComponents = pattern.components(separatedBy: CharacterSet(charactersIn: delimiters)).compactMap({$0.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)})
     func filterLexicalClasses(phrase: String, lang: String, classes: [String] = ["Determiner", "Particle",  /* "Other", "Preposition","OtherWord"*/]) -> [String] {
         var phraseWordsClassified = [String]()
+        let orthography = NSOrthography.defaultOrthography(forLanguage: lang)
+        
+        // Lemmatise each kept token: "mice" should still match "mouse". NLTagger
+        // because the .lemma scheme can return nil tags, which the String
+        // convenience wrapper of enumerateLinguisticTags force-unwraps into a
+        // trap. Where no lemma is known the surface form stands.
+        let lemmaTagger = NLTagger(tagSchemes: [.lemma])
+        lemmaTagger.string = phrase
+        lemmaTagger.setLanguage(NLLanguage(rawValue: lang),
+                                range: phrase.startIndex..<phrase.endIndex)
+        var lemmas = [Range<String.Index>: String]()
+        lemmaTagger.enumerateTags(in: phrase.startIndex..<phrase.endIndex,
+                                  unit: .word,
+                                  scheme: .lemma,
+                                  options: [.omitWhitespace, .omitPunctuation]) { tag, tokenRange in
+            if let tag {
+                lemmas[tokenRange] = tag.rawValue
+            }
+            return true
+        }
         
         phrase.enumerateLinguisticTags(in: phrase.startIndex..<phrase.endIndex,
                                        scheme: NSLinguisticTagScheme.nameTypeOrLexicalClass.rawValue,
-                                       orthography: NSOrthography.defaultOrthography(forLanguage: lang),
+                                       orthography: orthography,
                                        invoking: { (tag, tokenRange, QRange, stop) in
             if !classes.contains(tag) {
                 
-                let word = String(phrase[tokenRange])
+                let word = lemmas[tokenRange] ?? String(phrase[tokenRange])
                 phraseWordsClassified.append(word)}
             //print("\(String(describing: phraseWordsClassified.last)): \(tag) t2: \(phrase[QRange])")
         })

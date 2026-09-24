@@ -146,12 +146,16 @@ indexes + ring.
 A pluggable protocol, availability-laddered:
 
 1. **Today**: `match3` (already the de-facto judge in Dictation) → recorded as
-   `.correctJudged` with `judge: "match3/v1"`.
-2. **iOS 12 floor**: Damerau-Levenshtein edit distance + lemma comparison (`NLTagger`,
-   iOS 12+).
-3. **iOS 13/14+**: semantic near-miss via `NLEmbedding` cosine similarity — word
-   embeddings need iOS 13, sentence embeddings iOS 14 (audit correction: this step is
-   *not* available at the iOS 12 floor).
+   `.correctJudged` with `judge: "match3/v1"`. *2026-09-25: match3 now lemmatises
+   tokens (`NLTagger .lemma`) before intersecting — inflected forms of the right
+   lexeme match. When judgment recording lands, the lemmatised matcher is a different
+   vintage: record it `"match3/v2"`, or the log cannot tell which matching ran.*
+2. **At the floor** (iOS 15): Damerau-Levenshtein edit distance. The lemma half of
+   this rung landed early, inside match3 itself (see the note above).
+3. **At the floor** (iOS 15): semantic near-miss via `NLEmbedding` cosine similarity —
+   word embeddings need iOS 13, sentence embeddings iOS 14, so both are below the floor
+   and no `#available` is needed. (The old "iOS 13/14+" annotation was written under
+   the pre-TD-46 iOS 12 floor.)
 4. **iOS 26+**: Apple **Foundation Models** on-device judging ("was the user close?" with a
    graded verdict) — gated `#available`, async post-hoc: the event is stored immediately
    with the cheap verdict, the FM verdict *attaches* when computed. `judge` + `version`
