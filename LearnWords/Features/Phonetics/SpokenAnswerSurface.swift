@@ -151,25 +151,45 @@ final class SpokenAnswerSurface: NSObject, ExerciseAnswerSurface {
     private func consider(_ heard: DictationController.Heard) {
         recognizedLabel.text = heard.text
         guard !hasAnswered, let screen, let question = screen.question else { return }
-        guard question.answers.contains(where: {
-            match3(pattern: $0.text, answer: heard.text,
-                   language: screen.languages.answerLanguage, delimiters: ",; ")
-        }) else { return }
+        guard let credited = Self.matchedReading(in: heard,
+                                                 answers: question.answers.map(\.text),
+                                                 language: screen.languages.answerLanguage)
+        else { return }
 
         hasAnswered = true
         DictationController.shared.stop()
         dictation = .idle
 
-        // Clearly pronounced *and* an exact match reads as verbatim; anything the
-        // recogniser was unsure of stays judged. The threshold is a first guess, recorded
-        // in docs/ProgressModel.md so it can be revised against real logs rather than taste.
+        // Clearly pronounced *and* an exact match on the *best* guess reads as verbatim;
+        // an alternative reading stays judged — the recogniser preferred another.
+        // The threshold is a first guess, recorded in docs/ProgressModel.md so it can be
+        // revised against real logs rather than taste.
         let exact = question.answers.contains {
-            $0.text.compare(heard.text, options: [.caseInsensitive, .diacriticInsensitive])
+            $0.text.compare(credited.text, options: [.caseInsensitive, .diacriticInsensitive])
                 == .orderedSame
         }
         let confident = (heard.confidence ?? 0) >= Self.confidentPronunciation
-        screen.answer(exact && confident ? .correctVerbatim : .correctJudged,
-                      response: heard.text)
+        screen.answer(exact && confident && credited.isBest ? .correctVerbatim : .correctJudged,
+                      response: credited.text)
+    }
+
+    /// The first reading of the utterance that answers the question: the recogniser's best
+    /// guess wins, and only then are the alternatives tried, in its confidence order.
+    /// `isBest` records which it was — an answer the recogniser ranked second is matched
+    /// evidence but never verbatim.
+    static func matchedReading(in heard: DictationController.Heard,
+                               answers: [String], language: String)
+        -> (text: String, isBest: Bool)? {
+        func hits(_ reading: String) -> Bool {
+            answers.contains {
+                match3(pattern: $0, answer: reading, language: language, delimiters: ",; ")
+            }
+        }
+        if hits(heard.text) { return (heard.text, true) }
+        for candidate in heard.alternatives where hits(candidate) {
+            return (candidate, false)
+        }
+        return nil
     }
 
     /// Mean segment confidence at or above which a spoken answer counts as verbatim.
