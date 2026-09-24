@@ -43,6 +43,11 @@ final class SpokenAnswerSurface: NSObject, ExerciseAnswerSurface {
     /// had been dismissed — leaving the recording indicator lit over an unrelated screen.
     private var isDetached = false
 
+    /// Bumped whenever the question changes. A `whenSilent` wait queued for one question
+    /// can outlive it — the answer reveal is speech too — and would otherwise fire inside
+    /// the *next* question, whose `hasAnswered` was just reset.
+    private var questionGeneration = 0
+
     /// Keeps listening across questions instead of waiting for a tap each time.
     ///
     /// Offered as a long-press menu on the record button rather than a second control: the
@@ -71,12 +76,16 @@ final class SpokenAnswerSurface: NSObject, ExerciseAnswerSurface {
 
     func prepareForQuestion() {
         hasAnswered = false
-        // In automatic mode the next question starts listening on its own. A short delay so
-        // the prompt has been spoken before the microphone opens, or the synthesiser's own
-        // voice is the first thing recognised.
+        // In automatic mode the next question starts listening on its own — once the prompt
+        // has actually finished. A fixed delay bet on the prompt being short: opening the
+        // microphone switches the session to `.playAndRecord` and cut a long word off
+        // mid-syllable, and `whenSilent` knows the real end rather than guessing at 1.2 s.
         if isAutomatic {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) { [weak self] in
-                guard let self, !self.isDetached, self.isAutomatic,
+            questionGeneration += 1
+            let generation = questionGeneration
+            SpeechManager.shared.whenSilent { [weak self] in
+                guard let self, self.questionGeneration == generation,
+                      !self.isDetached, self.isAutomatic,
                       !self.hasAnswered, self.dictation == .idle else { return }
                 self.recordButtonTapped()
             }
@@ -96,12 +105,14 @@ final class SpokenAnswerSurface: NSObject, ExerciseAnswerSurface {
     /// Recording holds `.playAndRecord`; give playback back before anything speaks or the
     /// screen moves on. Delegated, so this knowledge exists once.
     func willLeaveCurrentQuestion() {
+        questionGeneration += 1
         DictationController.shared.stop()
         dictation = .idle
     }
 
     func detach() {
         isDetached = true
+        questionGeneration += 1
         DictationController.shared.stop()
         dictation = .idle
     }

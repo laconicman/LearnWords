@@ -9,21 +9,40 @@
 
 import AVFoundation
 
-final class SpeechManager /*: NSObject */ {
+final class SpeechManager: NSObject {
     static let shared = SpeechManager()
     
     private let synthesizer = AVSpeechSynthesizer()
     private var utteranceQueue = [AVSpeechUtterance]()
-    private var isProcessing: Bool { // Maybe call it `isSpeaking`.
-        synthesizer.isSpeaking || synthesizer.isPaused
-    }
+
+    /// The utterance handed to the synthesiser and not yet finished or cancelled.
+    ///
+    /// **Our own record, not `synthesizer.isSpeaking`.** Asking the synthesiser meant a
+    /// queued utterance never played — nothing called `processQueue` again once the first one
+    /// ended — so every caller had to interrupt, and the next question's prompt cut the
+    /// revealed answer off mid-word. Knowing which utterance is ours also lets a cancel
+    /// that arrives late, for one already replaced, be told apart from the end of the
+    /// current one.
+    private var current: AVSpeechUtterance?
+    private var isProcessing: Bool { current != nil }
+
+    /// Waiting for silence; see `whenSilent`.
+    private var whenSilentActions: [() -> Void] = []
+
+    /// Called as each utterance is handed to the synthesiser. For tests, which need to see
+    /// that a queued word is played rather than dropped; nothing in the app sets it.
+    var onUtteranceStarted: ((AVSpeechUtterance) -> Void)?
+
     /// This is used for trolling (or debouncing) tts requests.
     private var latestTTSRequestDate: Date?
     
-    private /* override */ init() {
-        // super.init()
+    /// Internal rather than private so tests can have an instance of their own: `speak`
+    /// drops a request within 0.8 s of the previous one, and on `shared` that interval
+    /// depends on whatever another suite spoke last. The app uses `shared`.
+    override init() {
+        super.init()
         synthesizer.usesApplicationAudioSession = true
-        // synthesizer.delegate = self
+        synthesizer.delegate = self
     }
     
     func speak(_ utteranceString: NSAttributedString, language: String, immediately: Bool = true, rate: Float = Float(LWUserDefaults.standard.utteranceRatePreference), pitchMultiplier: Float = Float(LWUserDefaults.standard.pitchMultiplierPreference)) {
@@ -58,7 +77,7 @@ final class SpeechManager /*: NSObject */ {
         utterance.postUtteranceDelay = 0.1
         
         if immediately {
-            stopSpeaking()
+            interrupt()
         }
         
         // Add to queue
@@ -81,9 +100,38 @@ final class SpeechManager /*: NSObject */ {
         _ = AVSpeechSynthesisVoice(language: language)
     }
 
+    /// Runs `action` once nothing is being spoken or waiting to be: at once when the
+    /// synthesiser is silent, otherwise when the last queued utterance finishes or is stopped.
+    ///
+    /// **Why anything waits.** Opening the microphone switches the shared audio session to
+    /// `.playAndRecord`, and a word still being spoken is cut off by it. Phonetics used to
+    /// open it on a fixed 1.2 s timer after the prompt started, which is shorter than a
+    /// two-word prompt at a slow speech rate.
+    ///
+    /// Always called back on the main queue.
+    func whenSilent(_ action: @escaping () -> Void) {
+        guard isProcessing else { return action() }
+        whenSilentActions.append(action)
+    }
+
     func stopSpeaking() {
-        synthesizer.stopSpeaking(at: .immediate)
+        interrupt()
+        becameSilent()
+    }
+
+    /// Stops what is playing and drops what is queued, without announcing silence — the
+    /// caller is about to speak again, and a microphone waiting on `whenSilent` must not
+    /// open in the gap.
+    private func interrupt() {
         utteranceQueue.removeAll()
+        current = nil
+        synthesizer.stopSpeaking(at: .immediate)
+    }
+
+    private func becameSilent() {
+        let actions = whenSilentActions
+        whenSilentActions.removeAll()
+        actions.forEach { $0() }
     }
 
     /// The synthesizer runs on the app's shared audio session (`usesApplicationAudioSession`),
@@ -99,24 +147,33 @@ final class SpeechManager /*: NSObject */ {
     }
     
     private func processQueue() {
-        guard !utteranceQueue.isEmpty else { return }
+        guard !utteranceQueue.isEmpty else { return becameSilent() }
         let utterance = utteranceQueue.removeFirst()
+        current = utterance
+        onUtteranceStarted?(utterance)
         synthesizer.speak(utterance)
+    }
+
+    /// The end of an utterance, finished or cancelled. One that was already replaced by a
+    /// newer `speak` is ignored: its cancel arrives after the new one has started.
+    fileprivate func utteranceEnded(_ utterance: AVSpeechUtterance) {
+        guard utterance === current else { return }
+        current = nil
+        processQueue()
     }
 }
 
-//// MARK: - AVSpeechSynthesizerDelegate
-//extension SpeechManager: AVSpeechSynthesizerDelegate {
-//    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
-//        // Wait a small delay before processing next item for stability
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
-//            self?.processQueue()
-//        }
-//    }
-//    
-//    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didCancel utterance: AVSpeechUtterance) {
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
-//            self?.processQueue()
-//        }
-//    }
-//}
+// MARK: - AVSpeechSynthesizerDelegate
+
+extension SpeechManager: AVSpeechSynthesizerDelegate {
+    // Apple does not say which queue these arrive on, and everything they touch is
+    // main-confined — so they hop there.
+
+    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
+        DispatchQueue.main.async { self.utteranceEnded(utterance) }
+    }
+
+    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didCancel utterance: AVSpeechUtterance) {
+        DispatchQueue.main.async { self.utteranceEnded(utterance) }
+    }
+}

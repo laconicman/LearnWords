@@ -195,8 +195,11 @@ final class ExerciseViewController: UIViewController, ExerciseScreen {
         noteLabel.isHidden = question.note == nil
 
         if LWUserDefaults.standard.pronounceQuestionsPreference {
+            // Queued, not interrupting: a correct answer's reveal is still being spoken
+            // 0.1 s later when the next question arrives, and interrupting it read as the
+            // pronunciation being cut off.
             SpeechManager.shared.speak(promptLabel.attributedText!,
-                                       language: languages.promptLanguage)
+                                       language: languages.promptLanguage, immediately: false)
         }
         surface.prepareForQuestion()
         ExerciseTransition.show(contentStack)
