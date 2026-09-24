@@ -169,8 +169,12 @@ final class SpokenAnswerSurface: NSObject, ExerciseAnswerSurface {
                 == .orderedSame
         }
         let confident = (heard.confidence ?? 0) >= Self.confidentPronunciation
+        // `response` is the log's record of what was said, so it keeps the recogniser's
+        // best reading even when an alternative is what matched — recording the
+        // alternative would write an apparently-exact answer and erase the disagreement
+        // the log exists to preserve (raised by review, PR #33).
         screen.answer(exact && confident && credited.isBest ? .correctVerbatim : .correctJudged,
-                      response: credited.text)
+                      response: heard.text)
     }
 
     /// The first reading of the utterance that answers the question: the recogniser's best
