@@ -62,7 +62,7 @@ final class PracticeSession {
     /// The learner heard the answer before producing it. Marks the *next* record, and is
     /// reset when the question changes — it is about what the learner did, not what was
     /// asked, so it lives here rather than on `Question`.
-    private var currentWasAided = false
+    private(set) var currentWasAided = false
 
     private(set) var current: Question?
     private(set) var completed = 0

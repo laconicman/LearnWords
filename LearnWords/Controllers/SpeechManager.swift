@@ -50,12 +50,16 @@ final class SpeechManager: NSObject {
         synthesizer.delegate = self
     }
     
-    func speak(_ utteranceString: NSAttributedString, language: String, immediately: Bool = true, rate: Float = Float(LWUserDefaults.standard.utteranceRatePreference), pitchMultiplier: Float = Float(LWUserDefaults.standard.pitchMultiplierPreference), owner: AnyObject? = nil) {
+    /// - Returns: whether the utterance was accepted. A call inside the debounce
+    ///   window is dropped silently, so callers whose action depends on speech
+    ///   actually playing (Listen marks the answer aided) check this.
+    @discardableResult
+    func speak(_ utteranceString: NSAttributedString, language: String, immediately: Bool = true, rate: Float = Float(LWUserDefaults.standard.utteranceRatePreference), pitchMultiplier: Float = Float(LWUserDefaults.standard.pitchMultiplierPreference), owner: AnyObject? = nil) -> Bool {
 
         // Guard against too frequent calls to `synthesizer`.
         // Any frequent calls to `synthesizer` including stopping it cause it stop generating speech but no errors are emited.
         let currentDate = now()
-        guard currentDate.timeIntervalSince(latestTTSRequestDate ?? .distantPast) > 0.8 else { return }
+        guard currentDate.timeIntervalSince(latestTTSRequestDate ?? .distantPast) > 0.8 else { return false }
         latestTTSRequestDate = currentDate
 
         ensureAudioSession()
@@ -92,6 +96,7 @@ final class SpeechManager: NSObject {
         if !isProcessing {
             processQueue()
         }
+        return true
     }
     
     /// Readies the synthesiser so the first utterance is not the one that pays for it.

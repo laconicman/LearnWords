@@ -22,6 +22,18 @@ struct SpeechManagerTests {
         #expect(category == .playback,
                 "speak() must set up the shared session — it was silent until Phonetics did it")
     }
+
+    /// The debounce guards the synthesiser from rapid-fire requests; callers that act on
+    /// speech playing (Listen marks the answer aided) read the return value. A second
+    /// call microseconds later is rejected whether or not the first was — if the first
+    /// was dropped, some still-earlier request is what both are debouncing against.
+    @Test func aSpeakInsideTheDebounceWindowIsRejected() {
+        SpeechManager.shared.speak(NSAttributedString(string: "bear"), language: "en-US")
+        let insideWindow = SpeechManager.shared.speak(NSAttributedString(string: "медведь"),
+                                                    language: "ru")
+        #expect(insideWindow == false,
+                "a request microseconds after the previous one must be dropped, not played")
+    }
 }
 
 /// Nothing may start while a word is still being spoken: not the microphone, which cuts it

@@ -25,7 +25,7 @@ final class ExerciseViewController: UIViewController, ExerciseScreen {
     // MARK: - Construction
 
     private let surface: ExerciseAnswerSurface
-    private let session: PracticeSession
+    let session: PracticeSession
 
     init(session: PracticeSession, answerSurface: ExerciseAnswerSurface, title: String) {
         self.session = session

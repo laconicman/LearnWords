@@ -103,7 +103,10 @@ final class SpokenAnswerSurface: NSObject, ExerciseAnswerSurface {
     }
 
     /// Recording holds `.playAndRecord`; give playback back before anything speaks or the
-    /// screen moves on. Delegated, so this knowledge exists once.
+    /// screen moves on. Delegated, so this knowledge exists once. Interrupting a question
+    /// (Listen, an answer, a skip) also kills the pending auto-listen: without it the timer
+    /// can open the microphone while the synthesiser is speaking the answer, and grade the
+    /// app's own voice as the learner's.
     func willLeaveCurrentQuestion() {
         questionGeneration += 1
         DictationController.shared.stop()
