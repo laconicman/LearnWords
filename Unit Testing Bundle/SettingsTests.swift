@@ -41,7 +41,7 @@ struct SettingsViewControllerTests {
         #expect(vc.numberOfSections(in: table) == 4)
         #expect(vc.tableView(table, numberOfRowsInSection: 0) == 2)  // languages
         #expect(vc.tableView(table, numberOfRowsInSection: 1) == 4)  // pitch, rate, 2 toggles
-        #expect(vc.tableView(table, numberOfRowsInSection: 2) == 2)  // horizon, successful days
+        #expect(vc.tableView(table, numberOfRowsInSection: 2) == 3)  // horizon, days, production
         #expect(vc.tableView(table, numberOfRowsInSection: 3) == 2)  // switch + time
     }
 
