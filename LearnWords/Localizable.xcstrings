@@ -1681,6 +1681,23 @@
         }
       }
     },
+    "Learned only after producing it" : {
+      "comment" : "setting",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aprendida solo tras producirla"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Выучено только после воспроизведения"
+          }
+        }
+      }
+    },
     "Learned: " : {
       "comment" : "Label learned words",
       "localizations" : {

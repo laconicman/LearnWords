@@ -78,6 +78,14 @@ final class SettingsViewController: UITableViewController {
         value: Float(prefs.minimumSuccessfulDaysPreference)
     ) { [weak self] in self?.prefs.minimumSuccessfulDaysPreference = Int($0.rounded()) }
 
+    /// The third clause of the learned rule (TD-49): a meaning only counts once it has
+    /// been *produced* — typed or spoken — not merely recognised. Off by default; it is
+    /// the stricter setting and a real increase in work.
+    private lazy var requireProductionCell = SwitchCell(
+        title: NSLocalizedString("Learned only after producing it", comment: "setting"),
+        isOn: prefs.requireProductionForLearned
+    ) { [weak self] in self?.prefs.requireProductionForLearned = $0 }
+
     private lazy var remindersCell = SwitchCell(
         title: NSLocalizedString("Daily reminder", comment: "setting"),
         isOn: prefs.remindersEnabled
@@ -108,7 +116,7 @@ final class SettingsViewController: UITableViewController {
             (NSLocalizedString("Speech", comment: "Settings section: text-to-speech options"),
              [pitchCell, rateCell, pronounceAnswersCell, pronounceQuestionsCell]),
             (NSLocalizedString("Study", comment: "Settings section: study/learning options"),
-             [masteryHorizonCell, successfulDaysCell]),
+             [masteryHorizonCell, successfulDaysCell, requireProductionCell]),
             // Both rows, always. Adding and removing a row while handing out the *same*
             // cell instances left UIKit holding a hidden cell with no index path
             // ("Unable to obtain index path for accessory"), which is noise at best and a
