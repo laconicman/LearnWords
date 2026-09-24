@@ -29,6 +29,11 @@ enum ReviewOutcome: String {
     /// Between verbatim and self-assessed in weight — owner-confirmed, ProgressModel Q1.
     case correctJudged
 
+    /// Correct, but the learner heard the answer first (the Listen button). Cued recall —
+    /// real evidence, weaker than free retrieval; ProgressModel's rule is that a path like
+    /// this is a distinct outcome, not a silent downgrade of another one.
+    case correctAided
+
     /// The "know" button, tapped after the answer was revealed. Real self-graded
     /// retrieval in the Anki sense, but the weakest positive evidence.
     case selfAssessedKnown
@@ -53,7 +58,7 @@ enum ReviewOutcome: String {
     /// this enum (ProgressModel: weights live in code, recomputed across the whole log).
     var isPositive: Bool {
         switch self {
-        case .correctVerbatim, .correctJudged, .selfAssessedKnown:
+        case .correctVerbatim, .correctJudged, .correctAided, .selfAssessedKnown:
             return true
         case .incorrect, .selfAssessedForgot, .skipped:
             return false

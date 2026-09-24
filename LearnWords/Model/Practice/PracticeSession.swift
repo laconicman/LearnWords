@@ -59,6 +59,11 @@ final class PracticeSession {
     /// When the current question was put on screen — the start of the latency clock.
     private var askedAt: Date?
 
+    /// The learner heard the answer before producing it. Marks the *next* record, and is
+    /// reset when the question changes — it is about what the learner did, not what was
+    /// asked, so it lives here rather than on `Question`.
+    private var currentWasAided = false
+
     private(set) var current: Question?
     private(set) var completed = 0
 
@@ -179,6 +184,7 @@ final class PracticeSession {
         guard !queue.isEmpty else {
             current = nil
             askedAt = nil
+            currentWasAided = false
             return nil
         }
         let sense = queue.removeFirst()
@@ -193,10 +199,19 @@ final class PracticeSession {
         let question = Question(sense: sense, promptTerm: promptTerm, answers: answers)
         current = question
         askedAt = Date()
+        currentWasAided = false
         return question
     }
 
     // MARK: - Answering
+
+    /// The learner asked to hear the answer (the Listen button). Nothing is written yet —
+    /// the mark lands on whatever outcome this question is answered with, so an aided
+    /// success stays distinguishable from an unaided one in the log.
+    func markAided() {
+        guard current != nil else { return }
+        currentWasAided = true
+    }
 
     /// Records an answer to the current question and moves past it.
     ///
@@ -206,6 +221,12 @@ final class PracticeSession {
     @discardableResult
     func record(_ outcome: ReviewOutcome, response: String? = nil) throws -> Question? {
         guard let question = current else { return nil }
+
+        // Hearing the answer first is still evidence, but weaker: cued recall is not free
+        // recall, and the log keeps them distinct rather than silently mixing the grades.
+        // A miss needs no mark — having heard the answer and still failed is already the
+        // worst evidence there is.
+        let outcome = currentWasAided && outcome.isPositive ? .correctAided : outcome
 
         try lexicon.record(ReviewEvent.Draft(
             senseID: question.sense.id,

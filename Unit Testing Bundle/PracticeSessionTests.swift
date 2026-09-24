@@ -238,6 +238,72 @@ struct PracticeSessionTests {
         #expect(try lexicon.history(ofSession: session.id).isEmpty)
     }
 
+    /// The Listen button: the answer was heard before it was produced, so the log keeps a
+    /// distinct outcome — cued recall is not free recall, and collapsing them would be
+    /// unrecoverable once written.
+    @Test func hearingTheAnswerFirstMarksTheAnswerAided() throws {
+        let lexicon = makeLexicon()
+        let set = try stock(lexicon, count: 1)
+        let session = try start(lexicon, set)
+
+        let question = try #require(session.nextQuestion())
+        session.markAided()
+        try session.record(.correctVerbatim)
+
+        let event = try #require(try lexicon.history(ofSense: question.sense.id).first)
+        #expect(event.outcome == .correctAided)
+        #expect(event.outcome?.isPositive == true, "aided is still an answer")
+    }
+
+    @Test func aidNeitherSoftensAMissNorInventsAnAnswer() throws {
+        let lexicon = makeLexicon()
+        let set = try stock(lexicon, count: 2)
+        let session = try start(lexicon, set)
+
+        _ = try #require(session.nextQuestion())
+        session.markAided()
+        try session.record(.incorrect, response: "wolf")
+
+        _ = try #require(session.nextQuestion())
+        session.markAided()
+        try session.skip()
+
+        let events = try lexicon.history(ofSession: session.id)
+        #expect(events.map(\.outcome) == [.incorrect, .skipped],
+                "a miss and a pass are already as weak as they come — the aid adds nothing")
+    }
+
+    @Test func theAidMarkDoesNotLeakIntoTheNextQuestion() throws {
+        let lexicon = makeLexicon()
+        let set = try stock(lexicon, count: 2)
+        let session = try start(lexicon, set)
+
+        _ = try #require(session.nextQuestion())
+        session.markAided()
+        try session.record(.correctVerbatim)
+
+        _ = try #require(session.nextQuestion())
+        try session.record(.correctVerbatim)
+
+        let events = try lexicon.history(ofSession: session.id)
+        #expect(events.map(\.outcome) == [.correctAided, .correctVerbatim],
+                "the second question was answered unaided and must say so")
+    }
+
+    @Test func markingWithNoQuestionInFlightIsInert() throws {
+        let lexicon = makeLexicon()
+        let set = try stock(lexicon, count: 1)
+        let session = try start(lexicon, set)
+
+        session.markAided()
+        let question = try #require(session.nextQuestion())
+        try session.record(.correctVerbatim)
+
+        let event = try #require(try lexicon.history(ofSense: question.sense.id).first)
+        #expect(event.outcome == .correctVerbatim,
+                "a tap before the sitting began must not pre-mark the first question")
+    }
+
     // MARK: - Negative evidence never erases positive
 
     /// ProgressModel R1, now structural rather than a scoring rule: a wrong answer

@@ -71,6 +71,7 @@ backfilled into an append-only log.
 **Outcome taxonomy** (R1 + R2 explicit in the data, not inferred from the task):
 
 - Positive: `.correctVerbatim` · `.correctJudged` (matcher/AI said close enough) ·
+  `.correctAided` (heard the answer first — cued, not free, recall; the Listen button) ·
   `.selfAssessedKnown` (the "know" button — weakest positive evidence)
 - Negative: `.incorrect` (wrong answer given) · `.selfAssessedForgot` (the "forgot" button)
 - Neutral: `.skipped` (today's `skiped` counter)
@@ -107,6 +108,7 @@ grades Again/Hard/Good/Easy):
 |---|---|
 | `.incorrect`, `.selfAssessedForgot` | Again |
 | `.correctJudged` | Hard (verdict below ~0.9), else Good |
+| `.correctAided` | Hard — the answer was heard before it was produced |
 | `.correctVerbatim` | Good; Easy when `latencyMS` is fast |
 | `.selfAssessedKnown` | Good (post-reveal self-grade — Anki-equivalent; per-user calibration may scale its weight later) |
 | `.skipped` | not fed to the scheduler (exposure, not retrieval) |
