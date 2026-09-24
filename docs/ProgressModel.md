@@ -146,9 +146,12 @@ indexes + ring.
 A pluggable protocol, availability-laddered:
 
 1. **Today**: `match3` (already the de-facto judge in Dictation) → recorded as
-   `.correctJudged` with `judge: "match3/v1"`.
-2. **iOS 12 floor**: Damerau-Levenshtein edit distance + lemma comparison (`NLTagger`,
-   iOS 12+).
+   `.correctJudged` with `judge: "match3/v1"`. *2026-09-25: match3 now lemmatises
+   tokens (`NLTagger .lemma`) before intersecting — inflected forms of the right
+   lexeme match. When judgment recording lands, the lemmatised matcher is a different
+   vintage: record it `"match3/v2"`, or the log cannot tell which matching ran.*
+2. **iOS 12 floor**: Damerau-Levenshtein edit distance. The lemma half of this rung
+   landed early, inside match3 itself (see the note above).
 3. **iOS 13/14+**: semantic near-miss via `NLEmbedding` cosine similarity — word
    embeddings need iOS 13, sentence embeddings iOS 14 (audit correction: this step is
    *not* available at the iOS 12 floor).
