@@ -1,8 +1,10 @@
 # LearnWords 1.3.0 — "What's New" for App Store Connect
 
 Verification state at drafting: full signed suite green (423/0, 4 disabled perf
-measurements), Release archive builds signed for device, `1.3.0` (build 10) > 1.2.2 (build 9).
-Device pass per `docs/DeviceTestPlan.md`: pass criteria §§1–4 + 6.1 + 7.1–7.4 + 9.1.
+measurements), Release archive + store-export proven (`1.3.0` build 10 > 1.2.2 build 9).
+The device pass is **pending**: an informal run happened and was "definitely better", but
+`docs/DeviceTestPlan.md`'s pass criteria (§§1–4 + 6.1 + 7.1–7.4 + 9.1) still need a
+recorded pass before submission.
 
 ## English (App Store "What's New", ≤4000 chars)
 
