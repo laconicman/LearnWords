@@ -19,58 +19,73 @@ import Testing
 import AVFoundation
 @testable import LearnWords
 
-@MainActor
-@Suite(.serialized)
-struct AudioSessionHandoffTests {
+/// Nested under SpeechSuite so its shared-audio-session pokes cannot overlap the
+/// speech suites' utterances — a `.serialized` trait on this suite alone would still
+/// let it run in parallel with them.
+extension SpeechSuite {
+    @MainActor
+    struct AudioSessionHandoffTests {
 
-    private var session: AVAudioSession { .sharedInstance() }
+        private var session: AVAudioSession { .sharedInstance() }
 
-    /// The whole contract in one line: after dictation, playback owns the session.
-    @Test func releasingHandsTheSessionToPlayback() {
-        DictationController.shared.releaseSessionToPlayback()
-        #expect(session.category == .playback)
-    }
+        /// The whole contract in one line: after dictation, playback owns the session.
+        @Test func releasingHandsTheSessionToPlayback() {
+            DictationController.shared.releaseSessionToPlayback()
+            #expect(session.category == .playback)
+        }
 
-    /// The specific shape of the bug: never `.playAndRecord` left behind, because that is
-    /// the category `SpeechManager.ensureAudioSession` treats as "already fine" and
-    /// declines to reactivate.
-    @Test func recordingCategoryIsNeverLeftBehind() throws {
-        // Put the session where a recording round would have left it.
-        try session.setCategory(.playAndRecord, mode: .default, options: [])
-        #expect(session.category == .playAndRecord, "precondition")
+        /// The specific shape of the bug: never `.playAndRecord` left behind, because that is
+        /// the category `SpeechManager.ensureAudioSession` treats as "already fine" and
+        /// declines to reactivate.
+        @Test func recordingCategoryIsNeverLeftBehind() throws {
+            // Put the session where a recording round would have left it.
+            try session.setCategory(.playAndRecord, mode: .default, options: [])
+            #expect(session.category == .playAndRecord, "precondition")
 
-        DictationController.shared.stop()
+            DictationController.shared.stop()
 
-        #expect(session.category != .playAndRecord,
-                "leaving .playAndRecord is TD-15: the synthesiser's guard skips it and never reactivates")
-        #expect(session.category == .playback)
-    }
+            #expect(session.category != .playAndRecord,
+                    "leaving .playAndRecord is TD-15: the synthesiser's guard skips it and never reactivates")
+            #expect(session.category == .playback)
+        }
 
-    /// `stop` is called from `viewWillDisappear` and from `willLeaveCurrentQuestion`
-    /// whether or not anything was recording, so it must be safe when idle — and must
-    /// still perform the handoff, since an early return was the original defect.
-    @Test func stoppingWhenNothingIsRecordingStillHandsTheSessionBack() throws {
-        try session.setCategory(.playAndRecord, mode: .default, options: [])
-        #expect(!DictationController.shared.isRecording, "precondition: nothing to stop")
+        /// `stop` is called from `viewWillDisappear` and from `willLeaveCurrentQuestion`
+        /// whether or not anything was recording, so it must be safe when idle — and must
+        /// still perform the handoff, since an early return was the original defect.
+        @Test func stoppingWhenNothingIsRecordingStillHandsTheSessionBack() throws {
+            try session.setCategory(.playAndRecord, mode: .default, options: [])
+            #expect(!DictationController.shared.isRecording, "precondition: nothing to stop")
 
-        DictationController.shared.stop()
+            DictationController.shared.stop()
 
-        #expect(session.category == .playback)
-    }
+            #expect(session.category == .playback)
+        }
 
-    @Test func releasingTwiceIsHarmless() {
-        DictationController.shared.releaseSessionToPlayback()
-        DictationController.shared.releaseSessionToPlayback()
-        #expect(session.category == .playback)
-    }
+        @Test func releasingTwiceIsHarmless() {
+            DictationController.shared.releaseSessionToPlayback()
+            DictationController.shared.releaseSessionToPlayback()
+            #expect(session.category == .playback)
+        }
 
-    /// The other half of the contract, asserted from `SpeechManager`'s side: once the
-    /// session is `.playback`, its guard is satisfied and it leaves the session alone —
-    /// which is only correct because the release above also *activated* it.
-    @Test func speechManagerAcceptsTheStateDictationLeavesBehind() {
-        DictationController.shared.releaseSessionToPlayback()
-        // `ensureAudioSession` is private; this asserts the condition it guards on, which
-        // is the coupling that matters and the one that silently broke.
-        #expect(session.category == .playback || session.category == .playAndRecord)
+        /// The other half of the contract, asserted from `SpeechManager`'s side: the
+        /// whole handoff-to-speech path must run on the session dictation left behind.
+        /// `didStart` proves the synthesiser accepted and began the utterance — no more:
+        /// whether the buffers were audible is exactly what a test process cannot see
+        /// (silence is not an exception), so audibility stays with the device plan
+        /// (§1.1) and TD-38. What this adds over the category check is the end-to-end
+        /// exercise — a future `speak` that refused or stalled on post-dictation state
+        /// fails here, where a category assertion alone would pass.
+        @Test func speechManagerAcceptsTheStateDictationLeavesBehind() async throws {
+            defer { SpeechManager.shared.stopSpeaking() }
+            var began = false
+            SpeechManager.shared.onUtteranceBegan = { _ in began = true }
+            defer { SpeechManager.shared.onUtteranceBegan = nil }
+
+            DictationController.shared.releaseSessionToPlayback()
+            SpeechManager.shared.speak(NSAttributedString(string: "bear"), language: "en-US")
+
+            try await waitUntil({ began }, budget: speechTimeout)
+            #expect(began, "the synthesiser never started — the session was left inactive (TD-15)")
+        }
     }
 }
