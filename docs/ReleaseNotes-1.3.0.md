@@ -53,7 +53,7 @@ Plus a corrected Russian label for the "In memory (days)" slider.
 | Unit suite (simulator, iPhone 17 Pro, iOS 26.5) | 424 passed / 0 failed / 4 skipped | `/tmp/lw-final4.xcresult`, run on the release branch including the speech-test stabilization |
 | Release archive + App Store export | Signed `.ipa` produced, distribution profile, `get-task-allow=false`, version 1.3.0 (10) | `xcodebuild archive` + `xcodebuild -exportArchive` |
 | Compile warnings | Deprecation warnings resolved (`MobileCoreServices`, `kUTTypeText`, old picker init). One remaining: `SpeechManager.synthesizer` non-Sendable stored property — architectural, tracked | Clean Release build log |
-| On-device pass | **Partial.** Informal pass by the owner on 2026-09-27 — "definitely better, worth publishing" — but the scripted scenarios in `docs/DeviceTestPlan.md` §§1–4, 6.1, 7.1–7.4, 9.1 were not all walked through. That list remains the formal record of what full device validation means for this tag. | Owner report |
+| On-device pass | **Partial.** Informal owner pass on 2026-09-27 — "definitely better, worth publishing". Confirmed at scenario level: speech playback flow, dictation & microphone, Listen/aided (DeviceTestPlan §§1–4). **Not exercised:** import picker (§9.1 — the only proof of the new picker init), persistence/CloudKit (§6.1), interruptions/backgrounding (§7.1–7.4), reminders (§5). The formal submission gate is therefore met for §§1–4 and consciously waived for the rest — an owner call, not a completed checklist. | Owner report |
 
 ## Known limitations carried into the release
 
