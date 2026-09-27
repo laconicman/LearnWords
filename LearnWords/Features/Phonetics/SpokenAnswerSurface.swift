@@ -27,7 +27,8 @@ final class SpokenAnswerSurface: NSObject, ExerciseAnswerSurface {
     /// What the microphone is doing, not what has been asked of it — the same distinction
     /// word entry needed (TD-42). "Stop recognition" appeared about a second before there
     /// was anything to stop.
-    private var dictation: DictationController.Activity = .idle {
+    /// Internal so tests can place and observe the mic state the button reflects.
+    var dictation: DictationController.Activity = .idle {
         didSet { updateRecordButton() }
     }
 
@@ -45,8 +46,19 @@ final class SpokenAnswerSurface: NSObject, ExerciseAnswerSurface {
 
     /// Bumped whenever the question changes. A `whenSilent` wait queued for one question
     /// can outlive it — the answer reveal is speech too — and would otherwise fire inside
-    /// the *next* question, whose `hasAnswered` was just reset.
-    private var questionGeneration = 0
+    /// the *next* question, whose `hasAnswered` was just reset. Read internally so tests
+    /// can hand `consider` the generation a session was opened in.
+    private(set) var questionGeneration = 0
+
+    /// Final results already judged on this question. The **first** attempt must match
+    /// the recogniser's best reading; its ranked alternatives count only on retries —
+    /// the first try tests whether the learner can hit the canonical pronunciation, a
+    /// retry is forgiving because the point of it is recovery (owner call, 2026-09-27).
+    /// Only `isFinal` results count: a partial is still mid-utterance, not an attempt.
+    /// A cancelled task can still deliver one late final; `consider` drops results
+    /// whose session opened before the current `questionGeneration`, so a straggler
+    /// can neither credit nor spend the strict attempt of the next question.
+    private var completedAttempts = 0
 
     /// Keeps listening across questions instead of waiting for a tap each time.
     ///
@@ -76,6 +88,7 @@ final class SpokenAnswerSurface: NSObject, ExerciseAnswerSurface {
 
     func prepareForQuestion() {
         hasAnswered = false
+        completedAttempts = 0
         // In automatic mode the next question starts listening on its own — once the prompt
         // has actually finished. A fixed delay bet on the prompt being short: opening the
         // microphone switches the session to `.playAndRecord` and cut a long word off
@@ -130,11 +143,12 @@ final class SpokenAnswerSurface: NSObject, ExerciseAnswerSurface {
         }
 
         dictation = .starting
+        let generation = questionGeneration
         DictationController.shared.start(
             language: screen?.languages.answerLanguage ?? "en",
             onListening: { [weak self] in self?.dictation = .listening },
             onTranscription: { [weak self] heard in
-                self?.consider(heard)
+                self?.consider(heard, session: generation)
             },
             onFailure: { [weak self] failure in
                 self?.dictation = .idle
@@ -151,13 +165,32 @@ final class SpokenAnswerSurface: NSObject, ExerciseAnswerSurface {
     /// until the result is final, so a match on a *partial* is deliberately taken at the
     /// weaker grade rather than waited on: making the learner hold still for the final
     /// result to earn a better mark would be a worse exercise than a slightly cautious one.
-    private func consider(_ heard: DictationController.Heard) {
+    /// Internal rather than private so tests can drive the attempt gate without a
+    /// microphone (the `matchedReading` tests cover matching; this path covers *when*
+    /// alternatives are consulted).
+    ///
+    /// `session` is the `questionGeneration` the delivering session was opened in: a
+    /// cancelled recognition task can still deliver one last result, and it belongs to
+    /// the question that was on screen when it started — a straggler must not grade,
+    /// repaint, or spend the strict attempt of the question that came after.
+    func consider(_ heard: DictationController.Heard, session generation: Int) {
+        guard generation == questionGeneration else { return }
         recognizedLabel.text = heard.text
         guard !hasAnswered, let screen, let question = screen.question else { return }
+        defer { if heard.isFinal { completedAttempts += 1 } }
         guard let credited = Self.matchedReading(in: heard,
                                                  answers: question.answers.map(\.text),
-                                                 language: screen.languages.answerLanguage)
-        else { return }
+                                                 language: screen.languages.answerLanguage,
+                                                 allowAlternatives: completedAttempts > 0)
+        else {
+            // A final already ended the controller's session (its callback stops on
+            // `isFinal`): leaving `.listening` here showed "Stop recognition" over a
+            // dead recording, and the retry took two taps — one to clear the stale
+            // state, one to actually start. Partials keep the session alive; only a
+            // final hands the button back.
+            if heard.isFinal { dictation = .idle }
+            return
+        }
 
         hasAnswered = true
         DictationController.shared.stop()
@@ -183,9 +216,11 @@ final class SpokenAnswerSurface: NSObject, ExerciseAnswerSurface {
     /// The first reading of the utterance that answers the question: the recogniser's best
     /// guess wins, and only then are the alternatives tried, in its confidence order.
     /// `isBest` records which it was — an answer the recogniser ranked second is matched
-    /// evidence but never verbatim.
+    /// evidence but never verbatim. `allowAlternatives` is false on a question's first
+    /// attempt: that one is graded on the best reading alone.
     static func matchedReading(in heard: DictationController.Heard,
-                               answers: [String], language: String)
+                               answers: [String], language: String,
+                               allowAlternatives: Bool)
         -> (text: String, isBest: Bool)? {
         func hits(_ reading: String) -> Bool {
             answers.contains {
@@ -193,6 +228,7 @@ final class SpokenAnswerSurface: NSObject, ExerciseAnswerSurface {
             }
         }
         if hits(heard.text) { return (heard.text, true) }
+        guard allowAlternatives else { return nil }
         for candidate in heard.alternatives where hits(candidate) {
             return (candidate, false)
         }
