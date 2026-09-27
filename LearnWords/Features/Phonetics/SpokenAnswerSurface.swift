@@ -27,7 +27,8 @@ final class SpokenAnswerSurface: NSObject, ExerciseAnswerSurface {
     /// What the microphone is doing, not what has been asked of it — the same distinction
     /// word entry needed (TD-42). "Stop recognition" appeared about a second before there
     /// was anything to stop.
-    private var dictation: DictationController.Activity = .idle {
+    /// Internal so tests can place and observe the mic state the button reflects.
+    var dictation: DictationController.Activity = .idle {
         didSet { updateRecordButton() }
     }
 
@@ -45,19 +46,18 @@ final class SpokenAnswerSurface: NSObject, ExerciseAnswerSurface {
 
     /// Bumped whenever the question changes. A `whenSilent` wait queued for one question
     /// can outlive it — the answer reveal is speech too — and would otherwise fire inside
-    /// the *next* question, whose `hasAnswered` was just reset.
-    private var questionGeneration = 0
+    /// the *next* question, whose `hasAnswered` was just reset. Read internally so tests
+    /// can hand `consider` the generation a session was opened in.
+    private(set) var questionGeneration = 0
 
     /// Final results already judged on this question. The **first** attempt must match
     /// the recogniser's best reading; its ranked alternatives count only on retries —
     /// the first try tests whether the learner can hit the canonical pronunciation, a
     /// retry is forgiving because the point of it is recovery (owner call, 2026-09-27).
     /// Only `isFinal` results count: a partial is still mid-utterance, not an attempt.
-    ///
-    /// Known edge (DeepWiki pass): a cancelled recognition task can still deliver one
-    /// late final. If it lands after `prepareForQuestion` has reset this counter it
-    /// spends the new question's strict attempt — rare, and the failure is leniency,
-    /// not punishment. The principled fix is a per-session token on `Heard`; deferred.
+    /// A cancelled task can still deliver one late final; `consider` drops results
+    /// whose session opened before the current `questionGeneration`, so a straggler
+    /// can neither credit nor spend the strict attempt of the next question.
     private var completedAttempts = 0
 
     /// Keeps listening across questions instead of waiting for a tap each time.
@@ -143,11 +143,12 @@ final class SpokenAnswerSurface: NSObject, ExerciseAnswerSurface {
         }
 
         dictation = .starting
+        let generation = questionGeneration
         DictationController.shared.start(
             language: screen?.languages.answerLanguage ?? "en",
             onListening: { [weak self] in self?.dictation = .listening },
             onTranscription: { [weak self] heard in
-                self?.consider(heard)
+                self?.consider(heard, session: generation)
             },
             onFailure: { [weak self] failure in
                 self?.dictation = .idle
@@ -167,7 +168,13 @@ final class SpokenAnswerSurface: NSObject, ExerciseAnswerSurface {
     /// Internal rather than private so tests can drive the attempt gate without a
     /// microphone (the `matchedReading` tests cover matching; this path covers *when*
     /// alternatives are consulted).
-    func consider(_ heard: DictationController.Heard) {
+    ///
+    /// `session` is the `questionGeneration` the delivering session was opened in: a
+    /// cancelled recognition task can still deliver one last result, and it belongs to
+    /// the question that was on screen when it started — a straggler must not grade,
+    /// repaint, or spend the strict attempt of the question that came after.
+    func consider(_ heard: DictationController.Heard, session generation: Int) {
+        guard generation == questionGeneration else { return }
         recognizedLabel.text = heard.text
         guard !hasAnswered, let screen, let question = screen.question else { return }
         defer { if heard.isFinal { completedAttempts += 1 } }
@@ -175,7 +182,15 @@ final class SpokenAnswerSurface: NSObject, ExerciseAnswerSurface {
                                                  answers: question.answers.map(\.text),
                                                  language: screen.languages.answerLanguage,
                                                  allowAlternatives: completedAttempts > 0)
-        else { return }
+        else {
+            // A final already ended the controller's session (its callback stops on
+            // `isFinal`): leaving `.listening` here showed "Stop recognition" over a
+            // dead recording, and the retry took two taps — one to clear the stale
+            // state, one to actually start. Partials keep the session alive; only a
+            // final hands the button back.
+            if heard.isFinal { dictation = .idle }
+            return
+        }
 
         hasAnswered = true
         DictationController.shared.stop()

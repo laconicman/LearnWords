@@ -104,9 +104,9 @@ struct SpokenAnswerAttemptGateTests {
 
     @MainActor @Test func aRetryCreditsAnAlternativeTheFirstAttemptRefused() {
         let (surface, screen) = makeSurface()
-        surface.consider(heard("box", alternatives: ["fox"]))
+        surface.consider(heard("box", alternatives: ["fox"]), session: surface.questionGeneration)
         #expect(screen.answered.isEmpty, "the first attempt wants the best reading")
-        surface.consider(heard("box", alternatives: ["fox"]))
+        surface.consider(heard("box", alternatives: ["fox"]), session: surface.questionGeneration)
         #expect(screen.answered.count == 1)
         #expect(screen.answered.first?.0 == .correctJudged)
         #expect(screen.answered.first?.1 == "box",
@@ -116,28 +116,60 @@ struct SpokenAnswerAttemptGateTests {
     @MainActor @Test func aPartialDoesNotSpendTheStrictAttempt() {
         let (surface, screen) = makeSurface()
         // A partial mid-utterance is still part of the first attempt, not a new one.
-        surface.consider(heard("box", alternatives: ["fox"], isFinal: false))
-        surface.consider(heard("box", alternatives: ["fox"], isFinal: true))
+        surface.consider(heard("box", alternatives: ["fox"], isFinal: false), session: surface.questionGeneration)
+        surface.consider(heard("box", alternatives: ["fox"], isFinal: true), session: surface.questionGeneration)
         #expect(screen.answered.isEmpty, "the first *final* is still the first attempt")
-        surface.consider(heard("box", alternatives: ["fox"], isFinal: true))
+        surface.consider(heard("box", alternatives: ["fox"], isFinal: true), session: surface.questionGeneration)
         #expect(screen.answered.count == 1)
     }
 
     @MainActor @Test func aNewQuestionStartsStrictAgain() {
         let (surface, screen) = makeSurface()
-        surface.consider(heard("box", alternatives: ["fox"]))
+        surface.consider(heard("box", alternatives: ["fox"]), session: surface.questionGeneration)
         #expect(screen.answered.isEmpty)
         // The sitting moves on; the next question's first attempt is strict again.
         surface.prepareForQuestion()
         screen.answered.removeAll()
-        surface.consider(heard("box", alternatives: ["fox"]))
+        surface.consider(heard("box", alternatives: ["fox"]), session: surface.questionGeneration)
         #expect(screen.answered.isEmpty)
     }
 
     @MainActor @Test func theBestGuessIsCreditedOnTheFirstAttempt() {
         let (surface, screen) = makeSurface()
-        surface.consider(heard("fox"))
+        surface.consider(heard("fox"), session: surface.questionGeneration)
         #expect(screen.answered.count == 1)
+    }
+
+    /// Devin Review #37: the recognition callback stops the session on `isFinal`,
+    /// so a missed final must hand the record button back — leaving `.listening`
+    /// showed "Stop" over a dead recording and the retry took two taps.
+    @MainActor @Test func aMissedFinalFreesTheRecordButton() {
+        let (surface, screen) = makeSurface()
+        surface.dictation = .listening
+        surface.consider(heard("box", alternatives: ["fox"], isFinal: false),
+                         session: surface.questionGeneration)
+        #expect(surface.dictation == .listening, "a partial leaves the session open")
+        surface.consider(heard("box", alternatives: ["fox"], isFinal: true),
+                         session: surface.questionGeneration)
+        #expect(screen.answered.isEmpty)
+        #expect(surface.dictation == .idle,
+                "the session is over; the button must read record, not stop")
+    }
+
+    /// Devin Review #37 + DeepWiki: a cancelled task can still deliver one late
+    /// final. It belongs to the question that was open when its session started —
+    /// it must not grade the new question nor spend its strict first attempt.
+    @MainActor @Test func aStragglerFromAnOlderSessionIsIgnored() {
+        let (surface, screen) = makeSurface()
+        // A session opened at generation N-1 reporting into generation N.
+        surface.consider(heard("fox"), session: surface.questionGeneration - 1)
+        #expect(screen.answered.isEmpty, "a stale result cannot answer the question")
+        surface.consider(heard("box", alternatives: ["fox"]),
+                         session: surface.questionGeneration - 1)
+        surface.consider(heard("box", alternatives: ["fox"]),
+                         session: surface.questionGeneration)
+        #expect(screen.answered.isEmpty,
+                "the straggler must not spend the strict attempt either")
     }
 }
 
