@@ -9,7 +9,7 @@
 //
 
 import UIKit
-import MobileCoreServices
+import UniformTypeIdentifiers
 
 final class WordSetsTableViewController: UITableViewController, UIDocumentPickerDelegate {
 
@@ -276,8 +276,8 @@ final class WordSetsTableViewController: UITableViewController, UIDocumentPicker
                 // A new set covers the languages the user is studying; adding a word in a
                 // third language widens it on its own.
                 let pair = LanguagePair.current
-                try? self.lexicon.addWordSet(named: name,
-                                             languages: [pair.primary, pair.secondary])
+                _ = try? self.lexicon.addWordSet(named: name,
+                                                 languages: [pair.primary, pair.secondary])
                 self.reload()
             }
         ac.addAction(submit)
@@ -338,8 +338,8 @@ final class WordSetsTableViewController: UITableViewController, UIDocumentPicker
     // MARK: - Import
 
     @IBAction func importFromFile(_ sender: UIBarButtonItem) {
-        let picker = UIDocumentPickerViewController(documentTypes: [kUTTypeText as String],
-                                                    in: .import)
+        let picker = UIDocumentPickerViewController(forOpeningContentTypes: [UTType.text],
+                                                    asCopy: true)
         picker.delegate = self
         picker.modalPresentationStyle = .formSheet
         present(picker, animated: true)
