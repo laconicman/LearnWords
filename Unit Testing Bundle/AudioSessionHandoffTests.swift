@@ -68,10 +68,13 @@ extension SpeechSuite {
         }
 
         /// The other half of the contract, asserted from `SpeechManager`'s side: the
-        /// synthesiser must actually start on the session dictation left behind. A
-        /// category check alone is not the contract — a `.playback` session that was
-        /// never activated passes it while rendering silence (the TD-15 shape again),
-        /// so this waits for the synthesiser's own `didStart` report.
+        /// whole handoff-to-speech path must run on the session dictation left behind.
+        /// `didStart` proves the synthesiser accepted and began the utterance — no more:
+        /// whether the buffers were audible is exactly what a test process cannot see
+        /// (silence is not an exception), so audibility stays with the device plan
+        /// (§1.1) and TD-38. What this adds over the category check is the end-to-end
+        /// exercise — a future `speak` that refused or stalled on post-dictation state
+        /// fails here, where a category assertion alone would pass.
         @Test func speechManagerAcceptsTheStateDictationLeavesBehind() async throws {
             defer { SpeechManager.shared.stopSpeaking() }
             var began = false
