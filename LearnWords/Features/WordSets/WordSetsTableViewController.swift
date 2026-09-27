@@ -338,11 +338,18 @@ final class WordSetsTableViewController: UITableViewController, UIDocumentPicker
     // MARK: - Import
 
     @IBAction func importFromFile(_ sender: UIBarButtonItem) {
+        let picker = makeImportPicker()
+        picker.modalPresentationStyle = .formSheet
+        present(picker, animated: true)
+    }
+
+    /// Split from the action so a test can check what the button builds — presenting
+    /// the picker needs its remote document-browser service, which a test host aborts on.
+    func makeImportPicker() -> UIDocumentPickerViewController {
         let picker = UIDocumentPickerViewController(forOpeningContentTypes: [UTType.text],
                                                     asCopy: true)
         picker.delegate = self
-        picker.modalPresentationStyle = .formSheet
-        present(picker, animated: true)
+        return picker
     }
 
     func documentPicker(_ controller: UIDocumentPickerViewController,

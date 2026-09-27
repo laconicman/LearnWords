@@ -83,8 +83,16 @@ status bar wherever a scenario touches the microphone; it is ground truth for "i
 | 8.1 | Cold-launch with the real library | No visible stall (reminder rebuild + progress index — TD-62/TD-56 territory; record the time) |
 | 8.2 | Long sitting (30+ questions) | No growing lag in question transitions — a leak in surface/speech teardown shows here |
 
+## 9. Files in and out
+
+| # | Steps | Expected |
+|---|-------|----------|
+| 9.1 | Sets → import (toolbar) → pick a plain-text file | Document browser opens (this is the only proof of the iOS-14 picker init — a test host aborts presenting it); file imports; words appear |
+| 9.2 | Sets → export → plain text; re-import the same file | Round-trips cleanly — the file LearnWords writes is the file it reads |
+| 9.3 | Sets → export → Anki; import that file back | Imports as Anki format, not as the app's own header format (TD-63's regression class) |
+
 ---
 
-**Pass criteria for 1.3.0 submission:** every scenario in §§1–4 plus 6.1, 7.1–7.4. §5–8 are
-advisory unless a scenario fails — then it becomes a blocker by definition. Record results
-against the tag (`1.3.0`) in the release notes.
+**Pass criteria for 1.3.0 submission:** every scenario in §§1–4 plus 6.1, 7.1–7.4, and 9.1. §5–8
+and 9.2–9.3 are advisory unless a scenario fails — then it becomes a blocker by definition.
+Record results against the tag (`1.3.0`) in the release notes.
