@@ -11,11 +11,17 @@
 /// returns as soon as its condition holds, so only a failure pays all of it.
 let animationTimeout: Duration = .seconds(5)
 
-/// Polls `condition` every 20 ms until it holds or `animationTimeout` passes. It only waits —
+/// Waits on real `AVSpeechSynthesizer` playback get a wider berth: utterances land in the
+/// simulator's single speechsynthesisd queue, and its latency is the machine's, not the
+/// test's — two short words that take ~2.3 s idle have been seen to need over 5 s under
+/// load, while a pass still returns as soon as the delegate reports.
+let speechTimeout: Duration = .seconds(20)
+
+/// Polls `condition` every 20 ms until it holds or `budget` passes. It only waits —
 /// assert afterwards, so a failure still reports which part of the condition was false.
 @MainActor
-func waitUntil(_ condition: () -> Bool) async throws {
-    let deadline = ContinuousClock.now + animationTimeout
+func waitUntil(_ condition: () -> Bool, budget: Duration = animationTimeout) async throws {
+    let deadline = ContinuousClock.now + budget
     while !condition(), ContinuousClock.now < deadline {
         try await Task.sleep(for: .milliseconds(20))
     }
