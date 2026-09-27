@@ -2639,3 +2639,12 @@ judge cannot see *why* a `correctJudged` passed (Devin Review on PR #33). The fi
 schema field — the alternatives list, or a credited-response field — on the append-only
 log; deliberate, not inline. Related: the near-miss judge ladder (ProgressModel §R5)
 will want the alternatives kept anyway when real re-judging lands.
+
+## TD-66 — A failed "new set" tap reports nothing (2026-09-27)
+
+`WordSetsTableViewController` adds a set with `_ = try? lexicon.addWordSet(...)`: a
+store failure leaves the list unchanged and the learner tapping "Add" again for no
+visible reason. The discard was made explicit when the deprecation warnings were
+cleared — the silence itself is older (Devin Review on PR #39). The fix is the same
+alert the import path already shows on failure; small, just not part of a
+deprecation pass.
