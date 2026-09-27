@@ -1,0 +1,25 @@
+# Feeds `gh release create --generate-notes` and the web "Generate release notes"
+# button: merged PRs are sectioned by label. A PR with no matching label lands in
+# "Other changes" — the conventional-commit title is still its changelog line.
+changelog:
+  exclude:
+    labels:
+      - duplicate
+      - invalid
+      - wontfix
+  categories:
+    - title: Features
+      labels:
+        - enhancement
+    - title: Fixes
+      labels:
+        - bug
+    - title: Maintenance
+      labels:
+        - techdebt
+        - documentation
+        - chore
+        - dependencies
+    - title: Other changes
+      labels:
+        - "*"
