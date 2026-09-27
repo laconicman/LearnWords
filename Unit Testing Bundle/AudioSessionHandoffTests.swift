@@ -67,14 +67,22 @@ extension SpeechSuite {
             #expect(session.category == .playback)
         }
 
-        /// The other half of the contract, asserted from `SpeechManager`'s side: once the
-        /// session is `.playback`, its guard is satisfied and it leaves the session alone —
-        /// which is only correct because the release above also *activated* it.
-        @Test func speechManagerAcceptsTheStateDictationLeavesBehind() {
+        /// The other half of the contract, asserted from `SpeechManager`'s side: the
+        /// synthesiser must actually start on the session dictation left behind. A
+        /// category check alone is not the contract — a `.playback` session that was
+        /// never activated passes it while rendering silence (the TD-15 shape again),
+        /// so this waits for the synthesiser's own `didStart` report.
+        @Test func speechManagerAcceptsTheStateDictationLeavesBehind() async throws {
+            defer { SpeechManager.shared.stopSpeaking() }
+            var began = false
+            SpeechManager.shared.onUtteranceBegan = { _ in began = true }
+            defer { SpeechManager.shared.onUtteranceBegan = nil }
+
             DictationController.shared.releaseSessionToPlayback()
-            // `ensureAudioSession` is private; this asserts the condition it guards on, which
-            // is the coupling that matters and the one that silently broke.
-            #expect(session.category == .playback || session.category == .playAndRecord)
+            SpeechManager.shared.speak(NSAttributedString(string: "bear"), language: "en-US")
+
+            try await waitUntil({ began }, budget: speechTimeout)
+            #expect(began, "the synthesiser never started — the session was left inactive (TD-15)")
         }
     }
 }
