@@ -48,6 +48,18 @@ final class SpokenAnswerSurface: NSObject, ExerciseAnswerSurface {
     /// the *next* question, whose `hasAnswered` was just reset.
     private var questionGeneration = 0
 
+    /// Final results already judged on this question. The **first** attempt must match
+    /// the recogniser's best reading; its ranked alternatives count only on retries —
+    /// the first try tests whether the learner can hit the canonical pronunciation, a
+    /// retry is forgiving because the point of it is recovery (owner call, 2026-09-27).
+    /// Only `isFinal` results count: a partial is still mid-utterance, not an attempt.
+    ///
+    /// Known edge (DeepWiki pass): a cancelled recognition task can still deliver one
+    /// late final. If it lands after `prepareForQuestion` has reset this counter it
+    /// spends the new question's strict attempt — rare, and the failure is leniency,
+    /// not punishment. The principled fix is a per-session token on `Heard`; deferred.
+    private var completedAttempts = 0
+
     /// Keeps listening across questions instead of waiting for a tap each time.
     ///
     /// Offered as a long-press menu on the record button rather than a second control: the
@@ -76,6 +88,7 @@ final class SpokenAnswerSurface: NSObject, ExerciseAnswerSurface {
 
     func prepareForQuestion() {
         hasAnswered = false
+        completedAttempts = 0
         // In automatic mode the next question starts listening on its own — once the prompt
         // has actually finished. A fixed delay bet on the prompt being short: opening the
         // microphone switches the session to `.playAndRecord` and cut a long word off
@@ -151,12 +164,17 @@ final class SpokenAnswerSurface: NSObject, ExerciseAnswerSurface {
     /// until the result is final, so a match on a *partial* is deliberately taken at the
     /// weaker grade rather than waited on: making the learner hold still for the final
     /// result to earn a better mark would be a worse exercise than a slightly cautious one.
-    private func consider(_ heard: DictationController.Heard) {
+    /// Internal rather than private so tests can drive the attempt gate without a
+    /// microphone (the `matchedReading` tests cover matching; this path covers *when*
+    /// alternatives are consulted).
+    func consider(_ heard: DictationController.Heard) {
         recognizedLabel.text = heard.text
         guard !hasAnswered, let screen, let question = screen.question else { return }
+        defer { if heard.isFinal { completedAttempts += 1 } }
         guard let credited = Self.matchedReading(in: heard,
                                                  answers: question.answers.map(\.text),
-                                                 language: screen.languages.answerLanguage)
+                                                 language: screen.languages.answerLanguage,
+                                                 allowAlternatives: completedAttempts > 0)
         else { return }
 
         hasAnswered = true
@@ -183,9 +201,11 @@ final class SpokenAnswerSurface: NSObject, ExerciseAnswerSurface {
     /// The first reading of the utterance that answers the question: the recogniser's best
     /// guess wins, and only then are the alternatives tried, in its confidence order.
     /// `isBest` records which it was — an answer the recogniser ranked second is matched
-    /// evidence but never verbatim.
+    /// evidence but never verbatim. `allowAlternatives` is false on a question's first
+    /// attempt: that one is graded on the best reading alone.
     static func matchedReading(in heard: DictationController.Heard,
-                               answers: [String], language: String)
+                               answers: [String], language: String,
+                               allowAlternatives: Bool)
         -> (text: String, isBest: Bool)? {
         func hits(_ reading: String) -> Bool {
             answers.contains {
@@ -193,6 +213,7 @@ final class SpokenAnswerSurface: NSObject, ExerciseAnswerSurface {
             }
         }
         if hits(heard.text) { return (heard.text, true) }
+        guard allowAlternatives else { return nil }
         for candidate in heard.alternatives where hits(candidate) {
             return (candidate, false)
         }

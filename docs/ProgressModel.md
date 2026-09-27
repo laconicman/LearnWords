@@ -274,6 +274,14 @@ would be a worse exercise. So a spoken answer is graded `.correctVerbatim` only 
 final result both matches exactly and clears a confidence bar (0.85, a first guess recorded
 here so it can be revised against real logs rather than taste); otherwise `.correctJudged`.
 
+**Alternatives count on retries only (2026-09-27).** A question's first attempt is graded
+on the recogniser's best reading alone; the ranked `transcriptions` are consulted from the
+second attempt on. This is the owner's call on grading strictness, not a consequence of the
+scheduling rule above — that rule governs which *events* feed FSRS (a retry within one
+question writes no extra event either way), while this gate governs which *reading* may end
+the question: "close and would be understood in real speech" rescues a retry but does not
+excuse the first try.
+
 **What this does not measure.** Confidence is the recogniser's certainty about *what was
 said*, not about *how well it was said*. A heavy accent that the recogniser nonetheless
 resolves scores high; a clear speaker using an unexpected word scores low. It is a usable
