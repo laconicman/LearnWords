@@ -1,8 +1,9 @@
 # Release notes — 1.3.0 (build 10)
 
-Draft App Store "What's New" text plus the validation record for this release. The What's New
+App Store "What's New" text plus the validation record for this release. The What's New
 blocks fit Apple's 4,000-character limit and are written to be pasted into App Store Connect
-(`en-US` and `ru`).
+(`en-US`, `ru` and `es` — the three shipped localisations). 1.3.0 (build 10) was tagged on
+2026-09-27 and is live on the App Store as of 2026-09-29.
 
 ## What's New — en-US
 
@@ -45,6 +46,25 @@ Plus a corrected Russian label for the "In memory (days)" slider.
 • Поиск слова работает и на экране подтверждения значений.
 
 Плюс исправленная подпись слайдера «В памяти (дней)».
+
+## What's New — es
+
+La práctica de pronunciación es más justa y más tranquila:
+
+• El micrófono espera ahora un silencio real en lugar de una pausa fija: las indicaciones terminan de hablar antes de que se abra la grabación, y la siguiente pregunta espera a que se revele la respuesta en lugar de cortarla.
+• El primer intento hablado se sigue juzgando por la mejor lectura del reconocedor, pero los reintentos también aceptan sus alternativas cercanas, así que un casi acierto que una conversación real admitiría cuenta.
+• «Escuchar» pronuncia la respuesta que buscabas — y la marca honestamente como asistida, para que pese lo que corresponde en tu progreso.
+
+Escritura y repaso:
+
+• Las respuestas escritas se comparan por su forma de diccionario: «mice» vale por «mouse», «went» por «go», «кошки» por «кошка».
+• Nuevo en Ajustes: contar una palabra como aprendida solo tras producirla, no solo reconocerla.
+• Doble toque sobre una palabra de la lista para consultarla; una pulsación larga muestra sus estadísticas.
+
+Importación:
+
+• Un archivo Anki — incluso exportado por el propio LearnWords — se reimporta correctamente, y los archivos de texto cuyos encabezados o separadores confundían la detección de formato vuelven a restaurarse.
+• La consulta de palabras funciona también en la pantalla de confirmación de significados.
 
 ## Validation record
 
