@@ -1,74 +1,85 @@
-# LearnWords 1.3.0 — "What's New" for App Store Connect
+# Release notes — 1.3.0 (build 10)
 
-Verification state at drafting: full signed suite green (423/0, 4 disabled perf
-measurements), Release archive + store-export proven (`1.3.0` build 10 > 1.2.2 build 9).
-The device pass is **pending**: an informal run happened and was "definitely better", but
-`docs/DeviceTestPlan.md`'s pass criteria (§§1–4 + 6.1 + 7.1–7.4 + 9.1) still need a
-recorded pass before submission.
+App Store "What's New" text plus the validation record for this release. The What's New
+blocks fit Apple's 4,000-character limit and are written to be pasted into App Store Connect
+(`en-US`, `ru` and `es` — the three shipped localisations). 1.3.0 (build 10) was tagged on
+2026-09-27 and is live on the App Store as of 2026-09-29.
 
-## English (App Store "What's New", ≤4000 chars)
+## What's New — en-US
 
-```
-Dictation got a proper ear, and matching got fairer.
+Pronunciation practice is fairer and calmer:
 
-• The microphone now waits until the app finishes speaking — prompts are no
-  longer cut off mid-word, and listening opens only after real silence.
-• "Listen" speaks the answer you were reaching for — and honestly marks it as
-  aided, so it counts a little less than an unaided one.
-• Pronunciation is graded the way a listener would hear it: the first attempt
-  still needs the recogniser's best match, but a retry may succeed on a close
-  second or third reading — no more endless retries when you would have been
-  understood all along.
-• Typed answers match by dictionary form: "mice" counts for "mouse", "went"
-  for "go", "кошки" for "кошка".
-• Double-tap a word to look it up; a long press still opens its statistics.
-• Imports read files more honestly: an Anki export — including one made by
-  LearnWords itself — imports back cleanly.
-• New in Settings: count a word as learned only after producing it, not just
-  recognising it.
-```
+• The microphone now waits for real silence instead of a fixed pause — prompts finish speaking before recording opens, and the next question queues behind the answer reveal instead of cutting it off.
+• Your first spoken attempt is still judged against the recognizer's best reading — but retries also credit its close alternatives, so a near-miss that real conversation would accept counts.
+• The Listen button speaks the answer and marks the attempt as aided, so it weighs appropriately in your progress.
 
-## Русский (App Store «Что нового», ≤4000 символов)
+Typing and review:
 
-```
-Диктант научился слушать, а проверка стала честнее.
+• Typed answers match inflected forms — "went" counts for "go", and Russian case forms count for the dictionary word.
+• New setting: a word counts as learned only after you produce it, not just recognize it.
+• Double-tap a word in the list to look it up; a long press shows its statistics.
 
-• Микрофон теперь ждёт, пока приложение договорит слово — подсказки не
-  обрезаются на полуслове, и диктовка начинается после настоящей паузы.
-• «Слушать» произносит ответ, который вы ищете, — и честно помечает его как
-  подсказанный, так что он засчитывается чуть слабее.
-• Произношение оценивается как в живой речи: первая попытка по-прежнему
-  требует лучшего варианта распознавания, но повторная засчитывается и по
-  второму-третьему варианту — конец бесконечным попыткам, когда вас и так
-  поняли бы.
-• Ответы сопоставляются по начальной форме: «mice» засчитывается за «mouse»,
-  «went» за «go», «кошки» за «кошка».
-• Двойное касание по слову открывает словарную статью; долгое нажатие —
-  статистику.
-• Импорт стал аккуратнее: файл Anki — в том числе выгруженный самим
-  LearnWords — импортируется обратно корректно.
-• Новое в настройках: считать слово выученным только после воспроизведения,
-  а не просто узнавания.
-```
+Import:
 
-## Spanish (optional — App Store es localisation exists)
+• LearnWords' own Anki exports import back correctly, and plain-text files whose headers or separators confused format detection restore again.
+• Word lookup now works on the confirm-meanings screen too.
 
-```
-El dictado aprendió a escuchar, y la corrección es más justa.
+Plus a corrected Russian label for the "In memory (days)" slider.
 
-• El micrófono espera a que la app termine de hablar: las indicaciones ya no
-  se cortan a mitad de palabra y la escucha solo se abre tras un silencio real.
-• «Escuchar» pronuncia la respuesta que buscabas — y la marca honestamente
-  como asistida, así que cuenta algo menos.
-• La pronunciación se evalúa como la oiría un interlocutor: el primer intento
-  sigue exigiendo la mejor lectura del reconocedor, pero un reintento puede
-  valer con la segunda o tercera lectura.
-• Las respuestas escritas se comparan por su forma de diccionario: «mice»
-  vale por «mouse», «went» por «go», «кошки» por «кошка».
-• Doble toque sobre una palabra para consultarla; pulsación larga para sus
-  estadísticas.
-• Importación más fiable: un archivo Anki — incluso exportado por el propio
-  LearnWords — se reimporta correctamente.
-• Nuevo en Ajustes: contar una palabra como aprendida solo tras producirla,
-  no solo reconocerla.
-```
+## What's New — ru
+
+Произношение стало честнее и спокойнее:
+
+• Микрофон ждёт настоящей тишины, а не фиксированной паузы — вопрос договаривает до конца, а следующий встаёт в очередь за ответом, не обрывая его.
+• Первая попытка по-прежнему сравнивается с лучшим вариантом распознавателя — но повторные попытки учитывают и близкие альтернативы, так что почти верный ответ, понятный в живой речи, засчитывается.
+• Кнопка «Слушать» озвучивает ответ и помечает попытку как «с подсказкой» — она учитывается в прогрессе соответственно.
+
+Ввод и повторение:
+
+• Напечатанные ответы учитывают формы слова — «went» засчитывается за «go», а падежные формы — за словарное слово.
+• Новая настройка: слово считается выученным только после того, как вы воспроизвели его сами, а не просто узнали.
+• Двойное касание по слову в списке открывает словарь; долгое нажатие — статистику.
+
+Импорт:
+
+• Экспорт в Anki корректно импортируется обратно; текстовые файлы, чьи заголовки или разделители сбивали определение формата, восстанавливаются.
+• Поиск слова работает и на экране подтверждения значений.
+
+Плюс исправленная подпись слайдера «В памяти (дней)».
+
+## What's New — es
+
+La práctica de pronunciación es más justa y más tranquila:
+
+• El micrófono espera ahora un silencio real en lugar de una pausa fija: las indicaciones terminan de hablar antes de que se abra la grabación, y la siguiente pregunta espera a que se revele la respuesta en lugar de cortarla.
+• El primer intento hablado se sigue juzgando por la mejor lectura del reconocedor, pero los reintentos también aceptan sus alternativas cercanas, así que un casi acierto que una conversación real admitiría cuenta.
+• «Escuchar» pronuncia la respuesta que buscabas — y la marca honestamente como asistida, para que pese lo que corresponde en tu progreso.
+
+Escritura y repaso:
+
+• Las respuestas escritas se comparan por su forma de diccionario: «mice» vale por «mouse», «went» por «go», «кошки» por «кошка».
+• Nuevo en Ajustes: contar una palabra como aprendida solo tras producirla, no solo reconocerla.
+• Doble toque sobre una palabra de la lista para consultarla; una pulsación larga muestra sus estadísticas.
+
+Importación:
+
+• Un archivo Anki — incluso exportado por el propio LearnWords — se reimporta correctamente, y los archivos de texto cuyos encabezados o separadores confundían la detección de formato vuelven a restaurarse.
+• La consulta de palabras funciona también en la pantalla de confirmación de significados.
+
+## Validation record
+
+| Check | Result | Evidence |
+|-------|--------|----------|
+| Unit suite (simulator, iPhone 17 Pro, iOS 26.5) | 424 passed / 0 failed / 4 skipped | `/tmp/lw-final4.xcresult`, run on the release branch including the speech-test stabilization |
+| Release archive + App Store export | Signed `.ipa` produced, distribution profile, `get-task-allow=false`, version 1.3.0 (10) | `xcodebuild archive` + `xcodebuild -exportArchive` |
+| Compile warnings | Deprecation warnings resolved (`MobileCoreServices`, `kUTTypeText`, old picker init). One remaining: `SpeechManager.synthesizer` non-Sendable stored property — architectural, tracked | Clean Release build log |
+| On-device pass | **Partial.** Informal owner pass on 2026-09-27 — "definitely better, worth publishing". Confirmed at scenario level: speech playback flow, dictation & microphone, Listen/aided (DeviceTestPlan §§1–4). **Not exercised:** import picker (§9.1 — the only proof of the new picker init), persistence/CloudKit (§6.1), interruptions/backgrounding (§7.1–7.4), reminders (§5). The formal submission gate is therefore met for §§1–4 and consciously waived for the rest — an owner call, not a completed checklist. | Owner report |
+
+## Known limitations carried into the release
+
+- `correctAided` events written by 1.3.0 decode to nil on ≤1.2.2 — a second device on an older
+  build silently un-grades them (not wrong, just ungraded). Safe forward, worth knowing if two
+  devices share one iCloud account.
+- TD-65: the review log does not record which recognizer reading matched or on which attempt —
+  retry leniency is invisible to future analysis until that's added.
+- TD-66: a failed "new set" tap reports nothing to the user.
