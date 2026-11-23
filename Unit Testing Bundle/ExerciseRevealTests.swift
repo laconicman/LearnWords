@@ -225,6 +225,10 @@ struct ExerciseRevealTests {
         try await waitUntil { vc.synonymsLabel.isHidden && vc.transcriptionLabel.isHidden }
         #expect(vc.session.current?.sense.id != firstSense,
                 "precondition: the sitting advanced to the second question")
+        // waitUntil only waits — a label left visible with cleared text would time
+        // it out silently, so the hidden state itself is asserted, not assumed.
+        #expect(vc.synonymsLabel.isHidden)
+        #expect(vc.transcriptionLabel.isHidden)
         #expect(vc.synonymsLabel.text == nil)
         #expect(vc.transcriptionLabel.text == nil)
     }
