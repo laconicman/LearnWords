@@ -27,6 +27,11 @@ final class ExerciseViewController: UIViewController, ExerciseScreen {
     private let surface: ExerciseAnswerSurface
     let session: PracticeSession
 
+    /// Whether the reveal footnotes the answer's transcription (TD-36) — a property with
+    /// a default rather than a read of `LWUserDefaults` while rendering, so a test can
+    /// pin it (REVIEW.md). Evaluated per reveal, like the pronunciation preferences.
+    var showsTranscription: () -> Bool = { LWUserDefaults.standard.showTranscriptionPreference }
+
     init(session: PracticeSession, answerSurface: ExerciseAnswerSurface, title: String) {
         self.session = session
         self.surface = answerSurface
@@ -290,8 +295,7 @@ final class ExerciseViewController: UIViewController, ExerciseScreen {
         synonymsLabel.text = others.isEmpty ? nil : others
         synonymsLabel.isHidden = others.isEmpty
 
-        let transcription = LWUserDefaults.standard.showTranscriptionPreference
-            ? question.expectedTranscription : nil
+        let transcription = showsTranscription() ? question.expectedTranscription : nil
         transcriptionLabel.text = transcription
         transcriptionLabel.isHidden = transcription == nil
     }

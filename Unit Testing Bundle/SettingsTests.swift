@@ -88,6 +88,26 @@ struct SettingsViewControllerTests {
                 "flipping the switch must write requireProductionForLearned")
     }
 
+    /// Same wiring check for TD-36's transcription switch — the last row of Study.
+    @Test func theShowTranscriptionSwitchWritesItsPreference() {
+        let prefs = LWUserDefaults.standard
+        let saved = prefs.showTranscriptionPreference
+        defer { prefs.showTranscriptionPreference = saved }
+        prefs.showTranscriptionPreference = false
+
+        let vc = SettingsViewController()
+        vc.loadViewIfNeeded()
+        let table = vc.tableView!
+        let cell = vc.tableView(table, cellForRowAt: IndexPath(row: 3, section: 2))
+        let toggle = cell.accessoryView as? UISwitch
+        #expect(toggle?.isOn == false, "precondition: the switch starts where the pref is")
+
+        toggle?.setOn(true, animated: false)
+        toggle?.sendActions(for: .valueChanged)
+        #expect(prefs.showTranscriptionPreference == true,
+                "flipping the switch must write showTranscriptionPreference")
+    }
+
     @Test func languageNameResolvesCodesAndFallsBack() {
         #expect(SettingsViewController.languageName(for: "ru-RU") == "Russian")
         #expect(SettingsViewController.languageName(for: "xx-XX") == "xx-XX")
