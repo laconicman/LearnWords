@@ -810,8 +810,9 @@ they are. Migration is mechanical, which is the point of having drawn the bounda
 
 **Decision (owner, 2026-08-01).** Removing a word from its last set **deletes** the meaning.
 Meanings stranded by other paths are collected at launch, whether or not they carry history.
-*(Correction, 2026-11-23: the launch-time sweep is designed but not yet wired —
-`deleteOrphanedSenses` has no production caller. See [TechDebt](TechDebt.md) § TD-26.)*
+*(Wired 2026-11-24: `Library.prepareForLaunch` runs the sweep once per launch — between
+the decision and the wiring, `deleteOrphanedSenses` had no production caller.
+See [TechDebt](TechDebt.md) § TD-26.)*
 
 **What this reverses.** The earlier rule kept them, reasoning that a review history is
 evidence of work done and the effort index must not fall because a set was reorganised. The
@@ -890,7 +891,8 @@ reachable only through a CloudKit merge.
 the same meaning as "Animals", sharing one history rather than forking it, is the obvious
 next feature and the many-to-many is what makes it possible. The collector is eight lines
 run once per launch — a small, visible price for a model that can say what it means
-*(once wired; it has no production caller yet — TD-26)*.
+*(wired from `Library.prepareForLaunch` 2026-11-24 — it had no production caller before
+then, TD-26)*.
 
 ~~**But decide deliberately, and decide now.**~~ *(Superseded — see the decision above. The
 deploy this sentence planned around had already happened; the choice was settled by it, on
