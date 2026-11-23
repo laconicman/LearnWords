@@ -275,8 +275,8 @@ run — asset formats only Xcode 26 understands (TD-45), a hard link to Core Hap
 - ~~**TD-8 device verification**~~ — retired 2026-09-14 with the iOS 12 path itself.
 - ~~**TD-26** — orphan collection still has no way to run.~~ Resolved 2026-08-01: removal
   deletes a meaning its last set let go of, and `deleteOrphanedSenses` collects what other
-  paths strand (register § TD-26 — but the collector has no production caller yet; the
-  launch sweep Design describes is unwired). (**TD-24** is done: the 2026-09-14 archive
+  paths strand (register § TD-26 — the launch sweep Design describes is wired from
+  `Library.prepareForLaunch` since 2026-11-24). (**TD-24** is done: the 2026-09-14 archive
   carries `1.2.2 / 9` on the app and all three extensions.)
 - Storyboard split (TD-5) is **likely YAGNI** at this size — prefer creator-injection on the
   existing storyboard where a screen needs a dependency; revisit only if the one storyboard

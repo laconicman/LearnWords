@@ -1020,11 +1020,20 @@ screen to look words up by *word* rather than by set.
 set was the last one holding the meaning; `deleteOrphanedSenses` collects what other paths
 strand and no longer spares those with history.
 
-**Residual (found 2026-11-23).** This entry previously claimed `Library.prepareForLaunch`
-runs the collector once per launch — it does not. `deleteOrphanedSenses` has no production
-caller; only tests invoke it, so meanings stranded by paths other than last-set removal
-still accumulate. Wiring the launch sweep is open work, small enough to fold into any
-nearby change.
+**Residual (found 2026-11-23, discharged 2026-11-24).** This entry previously claimed
+`Library.prepareForLaunch` runs the collector once per launch — it did not.
+`deleteOrphanedSenses` had no production caller; only tests invoked it, so meanings
+stranded by paths other than last-set removal accumulated. `prepareForLaunch` now runs
+the sweep on every launch, history or not, matching the Design decision (issue #57) —
+inside `whenInitialSyncSettled`, so it never judges a store CloudKit has not yet had a
+first chance to fill.
+
+**Known residual (PR #59 review).** That signal is not proof the import finished: it
+fires on the first import event or an 8 s timeout, and during a large first sync a
+meaning can arrive before the set holding it — `sets.@count == 0` would then be a false
+orphan whose deletion would mirror back to CloudKit. The sweep is held to the same
+standard seeding is; closing the gap needs evidence the last membership was actually
+removed, recorded when it happens, rather than a count of local links.
 
 ## TD-27 — Constraint break from the system dictionary's own navigation bar
 

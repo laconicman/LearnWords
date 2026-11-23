@@ -79,12 +79,19 @@ final class Library {
     /// would fuse sets a user deliberately named alike. The fix is not to create the second
     /// one.
     ///
+    /// The orphan sweep waits for the same signal (TD-26; docs/Design.md § *a meaning
+    /// nothing can reach is deleted*): once per launch, history or not — but never before
+    /// the first import settles, because a meaning can arrive before the set holding it,
+    /// and `sets.@count == 0` on a half-delivered store is not proof of orphanhood.
+    /// Deleting there would mirror the loss to CloudKit.
+    ///
     /// Nothing blocks: the app opens on whatever is already local, and the set appears when
     /// it arrives. That is what syncing is supposed to look like.
     func prepareForLaunch() {
-        if selectExistingSet() { return }
         persistence.whenInitialSyncSettled { [weak self] in
-            guard let self, !self.selectExistingSet() else { return }
+            guard let self else { return }
+            self.collectOrphanedSenses()
+            guard !self.selectExistingSet() else { return }
             self.seed()
         }
     }
@@ -104,6 +111,14 @@ final class Library {
             }
         } catch {
             debugLog("Library could not seed the lexicon: \(error)")
+        }
+    }
+
+    private func collectOrphanedSenses() {
+        do {
+            try lexicon.deleteOrphanedSenses()
+        } catch {
+            debugLog("Library could not collect orphaned senses: \(error)")
         }
     }
 }
