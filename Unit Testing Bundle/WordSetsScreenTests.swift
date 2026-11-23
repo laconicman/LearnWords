@@ -53,7 +53,8 @@ struct WordSetsScreenTests {
         try await waitUntil { vc.presentedViewController != nil }
         let alert = saveFailureAlert(on: vc)
         #expect(alert != nil, "a write the store refused must say so")
-        #expect(alert?.message?.isEmpty == false, "the store's own account is the message")
+        #expect(alert?.message == NSLocalizedString("LEXICON_NOT_FOUND", comment: ""),
+                "the alert carries the store's account, not a generic failure")
         #expect(vc.tableView.numberOfRows(inSection: 0) == 0,
                 "the list shows what the store holds, not what the tap assumed")
     }
