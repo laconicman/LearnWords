@@ -183,6 +183,14 @@ userDefaultsGroup.set(newValue, forKey: "pronounceQuestionsPreference")
         set { userDefaultsGroup.set(newValue, forKey: "requireProductionForLearned") }
     }
 
+    /// Whether the exercise reveal shows the answer's transcription under the other
+    /// correct answers (TD-36). Off by default: the footnote is already supplementary,
+    /// and a phonetic respelling is noise until a learner has asked for it.
+    var showTranscriptionPreference: Bool {
+        get { userDefaultsGroup.bool(forKey: "showTranscriptionPreference") }
+        set { userDefaultsGroup.set(newValue, forKey: "showTranscriptionPreference") }
+    }
+
     /// Whether the learner wants to be reminded. Off until they say otherwise — the
     /// permission sheet is asked for at the switch, not at launch.
     var remindersEnabled: Bool {

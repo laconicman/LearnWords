@@ -40,6 +40,15 @@ final class PracticeSession {
         /// correct, they simply are not the one shown.
         var expected: String { answers.first?.text ?? "" }
 
+        /// The correct answers other than the one revealed — the meaning's remaining
+        /// synonyms in the answer language, shown as a footnote under the reveal
+        /// (TD-36). `answers` arrives sorted by text, so this is deterministic.
+        var otherAnswers: [Term] { Array(answers.dropFirst()) }
+
+        /// The shown answer's transcription, when its term carries one — the opt-in
+        /// footnote under the reveal (TD-36).
+        var expectedTranscription: String? { answers.first?.transcription }
+
         /// Disambiguation to show when the prompt alone is ambiguous ("bear — the animal").
         var note: String? { sense.note }
     }

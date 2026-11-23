@@ -41,7 +41,7 @@ struct SettingsViewControllerTests {
         #expect(vc.numberOfSections(in: table) == 4)
         #expect(vc.tableView(table, numberOfRowsInSection: 0) == 2)  // languages
         #expect(vc.tableView(table, numberOfRowsInSection: 1) == 4)  // pitch, rate, 2 toggles
-        #expect(vc.tableView(table, numberOfRowsInSection: 2) == 3)  // horizon, days, production
+        #expect(vc.tableView(table, numberOfRowsInSection: 2) == 4)  // horizon, days, production, transcription
         #expect(vc.tableView(table, numberOfRowsInSection: 3) == 2)  // switch + time
     }
 
@@ -86,6 +86,26 @@ struct SettingsViewControllerTests {
         toggle?.sendActions(for: .valueChanged)
         #expect(prefs.requireProductionForLearned == true,
                 "flipping the switch must write requireProductionForLearned")
+    }
+
+    /// Same wiring check for TD-36's transcription switch — the last row of Study.
+    @Test func theShowTranscriptionSwitchWritesItsPreference() {
+        let prefs = LWUserDefaults.standard
+        let saved = prefs.showTranscriptionPreference
+        defer { prefs.showTranscriptionPreference = saved }
+        prefs.showTranscriptionPreference = false
+
+        let vc = SettingsViewController()
+        vc.loadViewIfNeeded()
+        let table = vc.tableView!
+        let cell = vc.tableView(table, cellForRowAt: IndexPath(row: 3, section: 2))
+        let toggle = cell.accessoryView as? UISwitch
+        #expect(toggle?.isOn == false, "precondition: the switch starts where the pref is")
+
+        toggle?.setOn(true, animated: false)
+        toggle?.sendActions(for: .valueChanged)
+        #expect(prefs.showTranscriptionPreference == true,
+                "flipping the switch must write showTranscriptionPreference")
     }
 
     @Test func languageNameResolvesCodesAndFallsBack() {

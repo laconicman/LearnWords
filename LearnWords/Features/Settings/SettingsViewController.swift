@@ -86,6 +86,12 @@ final class SettingsViewController: UITableViewController {
         isOn: prefs.requireProductionForLearned
     ) { [weak self] in self?.prefs.requireProductionForLearned = $0 }
 
+    /// TD-36: the exercise reveal's footnote can also carry the answer's transcription.
+    private lazy var showTranscriptionCell = SwitchCell(
+        title: NSLocalizedString("Show transcription", comment: "setting"),
+        isOn: prefs.showTranscriptionPreference
+    ) { [weak self] in self?.prefs.showTranscriptionPreference = $0 }
+
     private lazy var remindersCell = SwitchCell(
         title: NSLocalizedString("Daily reminder", comment: "setting"),
         isOn: prefs.remindersEnabled
@@ -116,7 +122,7 @@ final class SettingsViewController: UITableViewController {
             (NSLocalizedString("Speech", comment: "Settings section: text-to-speech options"),
              [pitchCell, rateCell, pronounceAnswersCell, pronounceQuestionsCell]),
             (NSLocalizedString("Study", comment: "Settings section: study/learning options"),
-             [masteryHorizonCell, successfulDaysCell, requireProductionCell]),
+             [masteryHorizonCell, successfulDaysCell, requireProductionCell, showTranscriptionCell]),
             // Both rows, always. Adding and removing a row while handing out the *same*
             // cell instances left UIKit holding a hidden cell with no index path
             // ("Unable to obtain index path for accessory"), which is noise at best and a

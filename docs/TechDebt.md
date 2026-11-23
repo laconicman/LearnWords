@@ -1246,7 +1246,7 @@ it derives a schedule from half-merged rows. See [Design](Design.md) § "repair 
 derivation are two debounces". The overlapping-rebuild race this would otherwise expose is
 already closed by a generation counter.
 
-## TD-36 — The exercise screen shows one translation and no transcription
+## TD-36 — The exercise screen shows one translation and no transcription — **resolved (2026-11-23)**
 
 A meaning may hold several words per language and each `Term` may carry a `transcription`,
 but the exercise screen shows exactly one answer and never a transcription. The learner is
@@ -1257,6 +1257,29 @@ own feature hidden at the moment it would teach something.
 secondary/footnote text style, and — behind a Settings switch — the transcription. Both
 follow the `noteLabel` pattern already on that screen: **absent means the view is not there
 at all**, never an empty row holding a gap.
+
+**What landed.** `Question` grew two read-only views of data it already carried:
+`otherAnswers` (`answers.dropFirst()` — the answer-language terms beyond the revealed one)
+and `expectedTranscription` (the shown term's `transcription`). The synonym scope is the
+answer language only, matching what the matcher accepts: `answers` is built by
+`sense.terms(in: answerLanguage)`, so a meaning's words in *other* languages never appear —
+the prompt side included. `ExerciseViewController` — the one reveal path all three surfaces
+share — gained `synonymsLabel` and `transcriptionLabel`, footnote-styled siblings of
+`noteLabel` in the content stack, filled in `reveal` and cleared in `askQuestion`. Each
+label's text is set to `nil` when there is nothing to say, so a hidden label never holds a
+gap. The transcription is gated on `LWUserDefaults.showTranscriptionPreference`, off by
+default like the other new bool prefs (absent from `defaultPreferences`, which only
+registers the older keys), with a `SwitchCell` in Settings' Study section.
+
+**Verified:** seven new cases in `ExerciseRevealTests` — synonyms under the reveal on all
+three exercises, absent with a single answer, transcription hidden by default and shown
+when the switch is on (and it is the *answer's* transcription, not the prompt's), every
+footnote absent when there is nothing to show, and the `Question` contract itself. Full
+suite on the pinned simulator: 496 passed, 4 skipped, and the same four pre-existing
+Match3 lemmatization failures that reproduce on `main`. Reasoned, not verified: the
+footnote's appearance is a synchronous set beside the answer's cross-dissolve rather than
+part of it — it pops rather than fades, and on a correct answer it is only up for the
+0.1 s advance. If that reads badly on device it is a polish pass, not a design change.
 
 ## TD-37 — Speech warm-up is unmeasured, and one attempt at it crashed the app
 
