@@ -1,8 +1,39 @@
 # Handoff — forks A through G, plus word entry and permissions
 
-Where the project stands as of 2026-07-27, what is proven, what is assumed, and what the
-next forks should pick up. Read [Roadmap](Roadmap.md) for priority and
-[TechDebt](TechDebt.md) for the register; this file is the state of play between them.
+Where the project stands, what is proven, what is assumed, and what the next forks
+should pick up. Sections are dated; the newest is first. Read [Roadmap](Roadmap.md)
+for priority and [TechDebt](TechDebt.md) for the register; this file is the state of
+play between them.
+
+## 2026-11-23 — post-1.3.0
+
+**1.3.0 (build 10) is live on the App Store** (tag `1.3.0`, shipped ~2026-09-29). The
+release batch was pronunciation fairness (N-best alternatives on retries, real-silence
+mic, aided Listen), lemmatised match-3, the require-production setting, double-tap
+lookup, and Anki re-import fixes — full list and validation record in
+[ReleaseNotes-1.3.0](ReleaseNotes-1.3.0.md). **1.4.0 content is chosen: TD-36**
+(exercise reveal shows remaining synonyms + optional transcription); milestone `1.4.0`
+on GitHub carries the candidate set as issues #44–#54.
+
+What changed since the 2026-07-27 snapshot below:
+
+* The TD-49…TD-53 learning-design batch, TD-57 (distinct-day gate as a preference,
+  default 5), TD-58 (context-menu previews), TD-63/64 (Anki re-import, synthesiser
+  silence) all landed; TD-65 and TD-66 were recorded from 1.3.0 review — TD-66's fix
+  sat uncommitted for seven weeks and is recovered as PR #55.
+* The iOS 15 floor shipped with 1.3.0, closing the iOS 12 surface (see Roadmap
+  § *Done (2026-09-29)*).
+* GitHub workflow adopted: squash PRs, PR/issue templates, branch protection with
+  conversation resolution, milestones per version, `techdebt`/`release-blocker`
+  labels, tests local-only by owner decision ([GitHubWorkflowProposal](GitHubWorkflowProposal.md)).
+
+**Still unverified, carried forward:** two-device CloudKit merge (deferred seeding,
+live refresh — issue #53), the DeviceTestPlan sections waived at 1.3.0 submission
+(§5 reminders tap-through, §6.1 persistence, §7 interruptions, §9.1 import picker —
+issue #54). Everything else in the proven/unproven table below that was ⚠️ on
+2026-07-27 either resolved or is named above.
+
+## 2026-07-27 — forks A through G, word entry, permissions
 
 ## What landed
 

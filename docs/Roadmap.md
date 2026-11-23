@@ -4,26 +4,20 @@ Priority-ordered. Rationale lives in [Design](Design.md); debt items in [TechDeb
 
 ## Now
 
-- **Raise the floor to iOS 15 and get a build accepted.** App Store Connect refused 1.2.2 (9)
-  with `90068` — *"MinimumOSVersion '12.1' is not acceptable"*, `state: FAILED` — so there is no
-  longer any way to deliver an iOS 12 build. [TASK-iOS15-migration](TASK-iOS15-migration.md) is
-  the plan; [Design](Design.md) § *the floor is iOS 15* is the decision. The unblocking release
-  also collapses the iOS 12 surface (owner, 2026-09-14), closing TD-7, TD-8, TD-10, TD-11, TD-45
-  and TD-46 in one pass. (TD-60 is **withdrawn**, not closed — review of the brief found the entry
-  was wrong: that widget reads the live store and always did.)
-  **Phase 0's code is done (2026-09-14):** every target builds at 15.0; the Today extension, the
-  iOS 12 life cycle, 41 dead availability guards, both weak-link flags and the Xcode 15 project are
-  gone; those six entries are closed in the register; 407 tests green. A clean Release archive
-  reports `MinimumOSVersion 15.0` in all three bundles. **What is left is the upload**, which only
-  the owner can make, and one question before it: the archive still says 1.2.2 (9), the build
-  number the refused upload carried, and whether App Store Connect takes that number twice after a
-  failed validation is unverified.
-- **Then TD-56, then TD-62.** Modern concurrency is what makes iOS 15 pay for itself rather than
-  merely unblock. TD-56 comes first because it is the one with a measurement — but the floor does
-  **not** pick its discharge: `REVIEW.md` forbids making `Lexicon` reads asynchronous, and that
-  rule guards a real bug, so TD-56's first deliverable is that contract decision rather than code
-  ([TASK-iOS15-migration](TASK-iOS15-migration.md) § Phase 1). TD-62 then loses both its
-  `#available` and the iOS 12 fallback path it would otherwise have to keep.
+- **1.4.0 — content chosen 2026-11-23: TD-36.** The exercise reveal shows the meaning's
+  remaining synonyms and, behind a Settings switch, the transcription — the discharge the
+  owner specified in the register. Milestone `1.4.0` on GitHub carries the
+  release-candidate set as issues (#44–#54); the release path is a What's New draft from
+  `git log 1.3.0..main`, `asc` pull/diff/preflight (swift-appstore's issue #17 is the
+  live LearnWords smoke test), archive, and the owner submits.
+- **Then TD-56, then TD-62.** Modern concurrency is what makes iOS 15 pay for itself rather
+  than merely unblock. TD-56 comes first because it is the one with a measurement — but the
+  floor does **not** pick its discharge: `REVIEW.md` treats synchronous `Lexicon` reads as
+  the current mechanism, not the rule — an asynchronous read is acceptable once the change
+  shows reads still see completed writes — so TD-56's first deliverable is that contract
+  decision rather than code ([TASK-iOS15-migration](TASK-iOS15-migration.md)
+  § Phase 1). TD-62 then loses both its `#available` and the iOS 12 fallback path it would
+  otherwise have to keep.
 
 ### Struck through by the refusal (2026-09-14)
 
@@ -35,6 +29,25 @@ reasoning behind them still explains what the floor change costs.
   further.
 - ~~**iOS 12 *behaviour* is still unverified.**~~ It remains unverified and stops mattering: the
   path is being deleted rather than tested, and TD-8's Xcode 15.2 toolchain retires with it.
+
+## Done (2026-09-29) — 1.3.0 on the App Store
+
+The iOS 15 floor shipped. App Store Connect had refused 1.2.2 (9) with `90068`
+(*MinimumOSVersion '12.1' is not acceptable*), so the floor rose to 15.0 and the whole
+iOS 12 surface went with it — closing TD-7, TD-8, TD-10, TD-11, TD-45 and TD-46 in one
+pass (TD-60 was **withdrawn**, not closed: review showed that widget always read the
+live store). Phase 0 of [TASK-iOS15-migration](TASK-iOS15-migration.md) deleted the
+Today extension, the iOS 12 life cycle, 41 dead availability guards, both weak-link
+flags and the Xcode 15 project; a clean Release archive reported `MinimumOSVersion
+15.0` in all three bundles.
+
+1.3.0 (build 10) followed on 2026-09-25→29 — fairer pronunciation retries (the
+recogniser's N-best alternatives credit retries only), a microphone that waits for
+real silence, Listen marked aided, lemmatised match-3 answers, the require-production
+setting for 'learned', double-tap lookup, Anki re-import fixes. What's New drafts and
+the validation record live in [ReleaseNotes-1.3.0](ReleaseNotes-1.3.0.md); tag
+`1.3.0`, GitHub release, milestone closed. The device pass was scenario-level and
+partial — the waived sections carry into the 1.4.0 device pass (issue #54).
 
 ## Done (2026-08-04) — iOS 12 launches
 
@@ -200,8 +213,8 @@ run — asset formats only Xcode 26 understands (TD-45), a hard link to Core Hap
     branch each; every item's state is its heading in [TechDebt](TechDebt.md), which is
     where to look rather than here. Scope and conventions are in
     [TASK-TD53-batch](TASK-TD53-batch.md) (self-contained: scope, the owner's UI asks, the
-    build flag that must not be used, and the review loop). TD-50/51 also owe the settings
-    switch for `requireProductionForLearned`; the slider minimum is done.
+    build flag that must not be used, and the review loop). ~~TD-50/51 also owe the settings
+    switch for `requireProductionForLearned`~~ — done 2026-09-25 (#35).
 - **CloudKit account setup — [step-by-step](CloudKitSetup.md).** **Done, 2026-09-14**: the
   container exists under team `WEJF495R4D` (Paul Buktab), Push Notifications is enabled on the
   App ID, and Production now matches `LearnWords.xcdatamodeld`. The drift this entry used to
@@ -236,19 +249,17 @@ run — asset formats only Xcode 26 understands (TD-45), a hard link to Core Hap
   production schema as of 2026-09-14 and nothing writes or reads it yet. When something does,
   fetching audio is long, discretionary and best done plugged in and idle — the `processing`
   mode's case rather than `fetch`'s, and the second of the two changes that would earn a mode.
-- **Confirm a reminder actually arrives.** The switch is owner-confirmed to request
-  permission, so the first half of the path is proven. What is still unwitnessed is the
-  second: schedule → deliver → tap → land on Exercises. No automated pass can do it
-  (TD-29), so it wants one evening on a device.
+- **Reminder tap-through.** Arrival itself is owner-confirmed on device (2026-08-09, see
+  [Handoff](Handoff.md)); what is still unwitnessed is tap → land on Exercises. No automated
+  pass can do it (TD-29), so it wants one evening on a device — folded into the 1.4.0 device
+  pass (issue #54).
 - **`SearchWordViewController`, the rest of TD-28.** Two of its four responsibilities are
   out. Rewriting it onto `WordInputViewController` — two pushes of one reusable screen —
   is now cheaper than cutting more out of it.
-- **TD-31** — `SpokenAnswerSurface` still owns a second copy of the audio-session
-  lifecycle that `DictationController` now expresses. Same condition that produced TD-15.
 - **Enrichment (TD-22) implementation** — [Enrichment](Enrichment.md) designs it. First
   measurement any implementing fork must take is the reduction ratio on one real kaikki
   file; every size estimate downstream is a guess until then. Whether FTS5 exists in the
-  system SQLite at the 12.1 floor needs an old device (TD-8 territory).
+  system SQLite at the iOS 15 floor needs an old device.
 - ~~**`Variety`, `Pronunciation` and `Tag.category`**~~ — **done (2026-08-07)**, plus
   `Language.wiktionaryCode`, which this list had missed. The framing here was wrong: the
   production deploy had already happened, so `Term.transcription` was vestigial before the
@@ -262,8 +273,11 @@ run — asset formats only Xcode 26 understands (TD-45), a hard link to Core Hap
 - **`CSSearchableItemActionType`** — words are indexed in Spotlight, but tapping a result
   does not route into the app.
 - ~~**TD-8 device verification**~~ — retired 2026-09-14 with the iOS 12 path itself.
-- **TD-26** — orphan collection still has no way to run. (**TD-24** is done: the 2026-09-14
-  archive carries `1.2.2 / 9` on the app and all three extensions.)
+- ~~**TD-26** — orphan collection still has no way to run.~~ Resolved 2026-08-01: removal
+  deletes a meaning its last set let go of, and `deleteOrphanedSenses` collects what other
+  paths strand (register § TD-26 — but the collector has no production caller yet; the
+  launch sweep Design describes is unwired). (**TD-24** is done: the 2026-09-14 archive
+  carries `1.2.2 / 9` on the app and all three extensions.)
 - Storyboard split (TD-5) is **likely YAGNI** at this size — prefer creator-injection on the
   existing storyboard where a screen needs a dependency; revisit only if the one storyboard
   actually hurts.
