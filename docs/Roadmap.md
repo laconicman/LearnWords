@@ -12,9 +12,10 @@ Priority-ordered. Rationale lives in [Design](Design.md); debt items in [TechDeb
   live LearnWords smoke test), archive, and the owner submits.
 - **Then TD-56, then TD-62.** Modern concurrency is what makes iOS 15 pay for itself rather
   than merely unblock. TD-56 comes first because it is the one with a measurement — but the
-  floor does **not** pick its discharge: `REVIEW.md` forbids making `Lexicon` reads
-  asynchronous, and that rule guards a real bug, so TD-56's first deliverable is that
-  contract decision rather than code ([TASK-iOS15-migration](TASK-iOS15-migration.md)
+  floor does **not** pick its discharge: `REVIEW.md` treats synchronous `Lexicon` reads as
+  the current mechanism, not the rule — an asynchronous read is acceptable once the change
+  shows reads still see completed writes — so TD-56's first deliverable is that contract
+  decision rather than code ([TASK-iOS15-migration](TASK-iOS15-migration.md)
   § Phase 1). TD-62 then loses both its `#available` and the iOS 12 fallback path it would
   otherwise have to keep.
 
@@ -273,8 +274,9 @@ run — asset formats only Xcode 26 understands (TD-45), a hard link to Core Hap
   does not route into the app.
 - ~~**TD-8 device verification**~~ — retired 2026-09-14 with the iOS 12 path itself.
 - ~~**TD-26** — orphan collection still has no way to run.~~ Resolved 2026-08-01: removal
-  deletes a meaning its last set let go of, and `Library.prepareForLaunch` collects the
-  rest once per launch (register § TD-26). (**TD-24** is done: the 2026-09-14 archive
+  deletes a meaning its last set let go of, and `deleteOrphanedSenses` collects what other
+  paths strand (register § TD-26 — but the collector has no production caller yet; the
+  launch sweep Design describes is unwired). (**TD-24** is done: the 2026-09-14 archive
   carries `1.2.2 / 9` on the app and all three extensions.)
 - Storyboard split (TD-5) is **likely YAGNI** at this size — prefer creator-injection on the
   existing storyboard where a screen needs a dependency; revisit only if the one storyboard

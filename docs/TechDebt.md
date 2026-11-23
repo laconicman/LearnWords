@@ -1018,8 +1018,13 @@ screen to look words up by *word* rather than by set.
 **Resolved by deciding the retention was never justified** (owner). See
 [Design](Design.md) § "a meaning nothing can reach is deleted". Removal now deletes when the
 set was the last one holding the meaning; `deleteOrphanedSenses` collects what other paths
-strand and no longer spares those with history; `Library.prepareForLaunch` runs it once per
-launch.
+strand and no longer spares those with history.
+
+**Residual (found 2026-11-23).** This entry previously claimed `Library.prepareForLaunch`
+runs the collector once per launch — it does not. `deleteOrphanedSenses` has no production
+caller; only tests invoke it, so meanings stranded by paths other than last-set removal
+still accumulate. Wiring the launch sweep is open work, small enough to fold into any
+nearby change.
 
 ## TD-27 — Constraint break from the system dictionary's own navigation bar
 
