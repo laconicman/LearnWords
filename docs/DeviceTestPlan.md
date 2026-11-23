@@ -58,7 +58,8 @@ status bar wherever a scenario touches the microphone; it is ground truth for "i
 | 5.1 | Settings → Study → toggle "require production" | Switch state persists across relaunch; learned-word status of a borderline word changes accordingly |
 | 5.2 | Change reminder time; kill the app; relaunch | Next reminder fires at the new time (verify in Settings →Notifications or by waiting for it) |
 | 5.3 | Relaunch the app twice without touching anything | Second launch is not visibly slower (the unconditional-rebuild cost is TD-62's target — note the launch time now so the improvement is measurable later) |
-| 5.4 | Let a reminder fire; tap its notification | App opens on the Exercises tab (`AppDelegate` routes the tap through `AppRoot.handle`) |
+| 5.4 | App running or backgrounded; tap a fired reminder notification | App comes to the foreground on the Exercises tab (`AppDelegate.didReceive` routes through `AppRoot.handle`) |
+| 5.5 | Force-quit the app; let a reminder fire; tap its notification | App launches on the Exercises tab — **suspected gap:** `SceneDelegate` reads `connectionOptions.urlContexts` but never `notificationResponse`, so the cold path likely lands on the default tab; a failure here is a bug, not a plan error |
 
 ## 6. Persistence & sync
 
