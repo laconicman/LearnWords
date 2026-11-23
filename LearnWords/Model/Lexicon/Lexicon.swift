@@ -659,6 +659,21 @@ enum LexiconError: Error {
     case lastTerm
 }
 
+extension LexiconError: LocalizedError {
+    /// The failure alerts show `localizedDescription` verbatim; the default
+    /// "operation couldn't be completed" says nothing about *what* was gone.
+    var errorDescription: String? {
+        switch self {
+        case .notFound:
+            return NSLocalizedString("LEXICON_NOT_FOUND",
+                                     comment: "Store item no longer exists — possibly deleted on another device")
+        case .lastTerm:
+            return NSLocalizedString("LEXICON_LAST_TERM",
+                                     comment: "Refused to remove a meaning's only word")
+        }
+    }
+}
+
 // MARK: - Snapshots
 //
 // Managed object → value type, in one place, so no caller is tempted to reach through a
