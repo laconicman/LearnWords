@@ -199,27 +199,33 @@ struct ExerciseRevealTests {
 
     /// The footnotes belong to the answer that was just revealed: when the sitting
     /// moves on, the next question must not inherit them. Both senses carry a
-    /// synonym so whichever the shuffle deals first populates the footnote.
+    /// synonym *and* a transcription on their shown term, with the switch pinned
+    /// on, so whichever the shuffle deals first populates both footnotes.
     @Test func footnotesClearWhenTheNextQuestionArrives() async throws {
         let restore = silenceSpeech()
         defer { restore() }
 
         let (vc, window) = try await screen(.dictation,
-            terms: [Term.Draft("fox", in: "en"), Term.Draft("tod", in: "en"),
+            terms: [Term.Draft("fox", in: "en", transcription: "fɒks"),
+                    Term.Draft("tod", in: "en"),
                     Term.Draft("лиса", in: "ru")],
-            extraSenses: [[Term.Draft("bear", in: "en"), Term.Draft("bruin", in: "en"),
+            extraSenses: [[Term.Draft("bear", in: "en", transcription: "bɛə"),
+                           Term.Draft("bruin", in: "en"),
                            Term.Draft("медведь", in: "ru")]])
         defer { window.isHidden = true }
+        vc.showsTranscription = { true }
 
         let firstSense = try #require(vc.session.current?.sense.id)
         vc.knowButton.sendActions(for: .touchUpInside)
 
         #expect(vc.synonymsLabel.isHidden == false,
-                "precondition: the reveal populated the footnote")
-        try await waitUntil { vc.synonymsLabel.isHidden }
+                "precondition: the reveal populated the synonym footnote")
+        #expect(vc.transcriptionLabel.isHidden == false,
+                "precondition: the reveal populated the transcription footnote")
+        try await waitUntil { vc.synonymsLabel.isHidden && vc.transcriptionLabel.isHidden }
         #expect(vc.session.current?.sense.id != firstSense,
                 "precondition: the sitting advanced to the second question")
         #expect(vc.synonymsLabel.text == nil)
-        #expect(vc.transcriptionLabel.isHidden)
+        #expect(vc.transcriptionLabel.text == nil)
     }
 }
