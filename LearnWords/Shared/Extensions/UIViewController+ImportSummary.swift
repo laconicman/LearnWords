@@ -67,10 +67,24 @@ extension UIViewController {
     /// "Nothing imported: nothing in the file could be read as a word", a confident wrong
     /// answer about their file. Reported by review, PR #12.
     func presentImportFailure(_ error: Error) {
-        let alert = UIAlertController(
-            title: NSLocalizedString("IMPORT_FAIL_TITLE", comment: "Title for failed import"),
-            message: error.localizedDescription,
-            preferredStyle: .alert)
+        presentFailure(title: NSLocalizedString("IMPORT_FAIL_TITLE", comment: "Title for failed import"),
+                       error: error)
+    }
+
+    /// A store write that did not happen — a set not added, renamed or deleted (TD-66).
+    ///
+    /// The list behind the alert is the truth the learner already sees; what they cannot
+    /// see is *why* their tap changed nothing, and a silent `try?` left them tapping
+    /// again. The store's own description is the message: it is the only account of the
+    /// failure there is.
+    func presentSaveFailure(_ error: Error) {
+        presentFailure(title: NSLocalizedString("SAVE_FAIL_TITLE", comment: "Title for a failed store write"),
+                       error: error)
+    }
+
+    private func presentFailure(title: String, error: Error) {
+        let alert = UIAlertController(title: title, message: error.localizedDescription,
+                                      preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: ""), style: .default))
         present(alert, animated: true)
     }

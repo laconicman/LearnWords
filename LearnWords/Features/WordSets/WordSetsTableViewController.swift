@@ -13,7 +13,9 @@ import UniformTypeIdentifiers
 
 final class WordSetsTableViewController: UITableViewController, UIDocumentPickerDelegate {
 
-    private let library = Library.shared
+    /// Settable so a test can hand the screen its own library; the storyboard instance
+    /// keeps the shared one.
+    var library = Library.shared
     private var lexicon: Lexicon { library.lexicon }
 
     /// The rows, read once per appearance. A snapshot rather than a live fetch: the table
@@ -46,6 +48,24 @@ final class WordSetsTableViewController: UITableViewController, UIDocumentPicker
     private func reload() {
         sets = (try? lexicon.wordSets()) ?? []
         tableView.reloadData()
+    }
+
+    /// Runs a store write and reports a refusal instead of swallowing it (TD-66).
+    ///
+    /// Every mutation on this screen used `try?`, so a write that did not happen looked
+    /// exactly like a tap that did not land — the learner tapped "Add" again for no
+    /// visible reason. On failure the list is also re-read: whatever the store actually
+    /// holds is the truth to show, whether the set was refused or had already gone
+    /// (`LexiconError.notFound` — deleted on another device meanwhile). `then` runs only
+    /// on success, so a row is never removed the store did not agree to remove.
+    private func attempt(_ write: () throws -> Void, then: () -> Void) {
+        do {
+            try write()
+        } catch {
+            presentSaveFailure(error)
+            return reload()
+        }
+        then()
     }
 
     // MARK: - Table view data source
@@ -236,8 +256,7 @@ final class WordSetsTableViewController: UITableViewController, UIDocumentPicker
                   let name = ac?.textFields?.first?.text?
                       .trimmingCharacters(in: .whitespacesAndNewlines), !name.isEmpty
             else { return }
-            try? self.lexicon.renameWordSet(set.id, to: name)
-            self.reload()
+            self.renameSet(set, to: name)
         })
         ac.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: "AlertAction title"),
                                    style: .cancel))
@@ -253,11 +272,16 @@ final class WordSetsTableViewController: UITableViewController, UIDocumentPicker
 
     /// The meanings survive: they may live in other sets, and their history is evidence of
     /// work done. `Lexicon.deleteOrphanedSenses` collects the rest, deliberately (TD-26).
-    private func deleteSet(at indexPath: IndexPath) {
-        try? lexicon.deleteWordSet(sets[indexPath.row].id)
-        sets.remove(at: indexPath.row)
-        tableView.deleteRows(at: [indexPath], with: .automatic)
-        tableView.reloadData()          // the selection may have fallen back to another set
+    func deleteSet(at indexPath: IndexPath) {
+        attempt { try lexicon.deleteWordSet(sets[indexPath.row].id) } then: {
+            sets.remove(at: indexPath.row)
+            tableView.deleteRows(at: [indexPath], with: .automatic)
+            tableView.reloadData()      // the selection may have fallen back to another set
+        }
+    }
+
+    func renameSet(_ set: WordSet, to name: String) {
+        attempt { try lexicon.renameWordSet(set.id, to: name) } then: { reload() }
     }
 
     // MARK: - Adding
@@ -273,17 +297,20 @@ final class WordSetsTableViewController: UITableViewController, UIDocumentPicker
             title: NSLocalizedString("Add", comment: "AlertAction title"),
             style: .default) { [weak self, weak ac] _ in
                 guard let self, let name = ac?.textFields?.first?.text, !name.isEmpty else { return }
-                // A new set covers the languages the user is studying; adding a word in a
-                // third language widens it on its own.
-                let pair = LanguagePair.current
-                _ = try? self.lexicon.addWordSet(named: name,
-                                                 languages: [pair.primary, pair.secondary])
-                self.reload()
+                self.addSet(named: name)
             }
         ac.addAction(submit)
         ac.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: "AlertAction title"),
                                    style: .cancel))
         present(ac, animated: true)
+    }
+
+    /// A new set covers the languages the user is studying; adding a word in a third
+    /// language widens it on its own.
+    func addSet(named name: String) {
+        let pair = LanguagePair.current
+        attempt { try lexicon.addWordSet(named: name, languages: [pair.primary, pair.secondary]) }
+            then: { reload() }
     }
 
     // MARK: - Export

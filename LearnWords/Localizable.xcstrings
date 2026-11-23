@@ -2971,6 +2971,29 @@
         }
       }
     },
+    "SAVE_FAIL_TITLE" : {
+      "comment" : "Title for a failed store write",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn’t Save"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo guardar"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не удалось сохранить"
+          }
+        }
+      }
+    },
     "Save" : {
       "comment" : "AlertAction title\nBar button",
       "localizations" : {
