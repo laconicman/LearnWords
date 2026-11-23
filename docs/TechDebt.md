@@ -2640,11 +2640,25 @@ schema field — the alternatives list, or a credited-response field — on the 
 log; deliberate, not inline. Related: the near-miss judge ladder (ProgressModel §R5)
 will want the alternatives kept anyway when real re-judging lands.
 
-## TD-66 — A failed "new set" tap reports nothing (2026-09-27)
+## TD-66 — A failed "new set" tap reports nothing — **resolved (2026-11-23)**
 
-`WordSetsTableViewController` adds a set with `_ = try? lexicon.addWordSet(...)`: a
-store failure leaves the list unchanged and the learner tapping "Add" again for no
+`WordSetsTableViewController` added a set with `_ = try? lexicon.addWordSet(...)`: a
+store failure left the list unchanged and the learner tapping "Add" again for no
 visible reason. The discard was made explicit when the deprecation warnings were
-cleared — the silence itself is older (Devin Review on PR #39). The fix is the same
-alert the import path already shows on failure; small, just not part of a
-deprecation pass.
+cleared — the silence itself is older (Devin Review on PR #39).
+
+**Discharge.** Every mutation on the screen — add, rename, delete — now runs through
+`attempt(_:then:)`: a thrown error presents `SAVE_FAIL_TITLE` with the store's own
+description via `presentSaveFailure` (the same alert shape `presentImportFailure`
+already used), and the list is re-read so it shows what the store actually holds —
+which also covers `LexiconError.notFound`, a set deleted on another device meanwhile.
+`then` runs only on success, so a row is never removed the store did not agree to
+remove. The three mutations are `func` rather than `private` so
+`WordSetsScreenTests` drives them against an in-memory `Library` — four cases: a
+refused delete reported *and* the list resynced, a refused rename reported, and the
+two clean paths saying nothing. Strings landed in all three locales.
+
+**History worth keeping:** the fix itself was written 2026-09-29/30 and then sat
+*uncommitted* in the iCloud working copy for seven weeks — recovered and landed
+2026-11-23. Uncommitted work in a synced folder is one sync conflict from gone;
+this entry is the reason the recovery was found at all.

@@ -1613,6 +1613,52 @@
         }
       }
     },
+    "LEXICON_LAST_TERM" : {
+      "comment" : "Refused to remove a meaning's only word",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A meaning needs at least one word — delete the meaning instead."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un significado necesita al menos una palabra; elimina el significado."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Значению нужно хотя бы одно слово — удалите само значение."
+          }
+        }
+      }
+    },
+    "LEXICON_NOT_FOUND" : {
+      "comment" : "Store item no longer exists — possibly deleted on another device",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "It may have been deleted on another device, or is already gone."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es posible que ya no exista — por ejemplo, si se eliminó en otro dispositivo."
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Возможно, объект уже удалён — в том числе на другом устройстве."
+          }
+        }
+      }
+    },
     "Language to study" : {
       "comment" : "setting",
       "localizations" : {
@@ -2967,6 +3013,29 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Русский"
+          }
+        }
+      }
+    },
+    "SAVE_FAIL_TITLE" : {
+      "comment" : "Title for a failed store write",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn’t Save"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No se pudo guardar"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Не удалось сохранить"
           }
         }
       }
