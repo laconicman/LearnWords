@@ -3091,6 +3091,23 @@
         }
       }
     },
+    "Show transcription" : {
+      "comment" : "setting",
+      "localizations" : {
+        "es" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Mostrar transcripción"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "needs_review",
+            "value" : "Показывать транскрипцию"
+          }
+        }
+      }
+    },
     "Shown during practice when the word alone is ambiguous." : {
       "comment" : "Meaning editor note footer",
       "localizations" : {

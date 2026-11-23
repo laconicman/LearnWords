@@ -69,6 +69,8 @@ final class ExerciseViewController: UIViewController, ExerciseScreen {
     private(set) var progressView = UIProgressView(progressViewStyle: .default)
     private(set) var promptLabel = LWWordLabel()
     private(set) var noteLabel = UILabel()
+    private(set) var synonymsLabel = UILabel()
+    private(set) var transcriptionLabel = UILabel()
     private(set) var lookUpButton = LWButton(type: .system)
     private(set) var listenButton = LWButton(type: .system)
     private(set) var forgotButton = LWButton(type: .system)
@@ -137,6 +139,16 @@ final class ExerciseViewController: UIViewController, ExerciseScreen {
         noteLabel.numberOfLines = 0
         noteLabel.adjustsFontForContentSizeCategory = true
 
+        // The reveal's footnotes (TD-36) — smaller than the note, same secondary
+        // colour, and each stays absent rather than holding a gap when empty.
+        [synonymsLabel, transcriptionLabel].forEach {
+            $0.font = .preferredFont(forTextStyle: .footnote)
+            $0.textColor = .lwTextSecondary
+            $0.textAlignment = .center
+            $0.numberOfLines = 0
+            $0.adjustsFontForContentSizeCategory = true
+        }
+
         configure(lookUpButton, title: "Look Up", purpose: .utility, action: #selector(lookUpTapped))
         configure(listenButton, title: "Listen", purpose: .utility, action: #selector(listenTapped))
         configure(forgotButton, title: "Forgot", purpose: .negative, action: #selector(forgotTapped))
@@ -147,6 +159,8 @@ final class ExerciseViewController: UIViewController, ExerciseScreen {
             promptLabel,
             noteLabel,
             surface.answerView,
+            synonymsLabel,
+            transcriptionLabel,
             row(lookUpButton, listenButton),
             row(forgotButton, knowButton),
         ]
@@ -196,6 +210,8 @@ final class ExerciseViewController: UIViewController, ExerciseScreen {
         // hold a gap on every screen.
         noteLabel.text = question.note
         noteLabel.isHidden = question.note == nil
+        // The footnotes belong to the *answer* — the next question has none yet.
+        clearFootnotes()
 
         if LWUserDefaults.standard.pronounceQuestionsPreference {
             // Queued, not interrupting: a correct answer's reveal is still being spoken
@@ -247,6 +263,7 @@ final class ExerciseViewController: UIViewController, ExerciseScreen {
 
     private func reveal(_ question: PracticeSession.Question, isPositive: Bool) {
         let text = question.expected
+        updateFootnotes(for: question)
 
         UIView.transition(with: surface.answerView,
                           duration: isPositive ? 0.75 : 1.0,
@@ -263,6 +280,27 @@ final class ExerciseViewController: UIViewController, ExerciseScreen {
             SpeechManager.shared.speak(NSAttributedString(string: text),
                                        language: languages.answerLanguage, owner: self)
         }
+    }
+
+    /// The footnote under the revealed answer (TD-36): the other words that also
+    /// counted as correct, and — when the learner asked for it in Settings — how the
+    /// shown one sounds. Each stays absent rather than holding a gap when empty.
+    private func updateFootnotes(for question: PracticeSession.Question) {
+        let others = question.otherAnswers.map(\.text).joined(separator: ", ")
+        synonymsLabel.text = others.isEmpty ? nil : others
+        synonymsLabel.isHidden = others.isEmpty
+
+        let transcription = LWUserDefaults.standard.showTranscriptionPreference
+            ? question.expectedTranscription : nil
+        transcriptionLabel.text = transcription
+        transcriptionLabel.isHidden = transcription == nil
+    }
+
+    private func clearFootnotes() {
+        synonymsLabel.text = nil
+        synonymsLabel.isHidden = true
+        transcriptionLabel.text = nil
+        transcriptionLabel.isHidden = true
     }
 
     private func setAnswerButtons(enabled: Bool, dimming isPositive: Bool) {
