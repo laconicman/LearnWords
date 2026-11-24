@@ -8,8 +8,9 @@ Priority-ordered. Rationale lives in [Design](Design.md); debt items in [TechDeb
   remaining synonyms and, behind a Settings switch, the transcription — the discharge the
   owner specified in the register. Milestone `1.4.0` on GitHub carries the
   release-candidate set as issues (#44–#54); the release path is a What's New draft from
-  `git log 1.3.0..main`, `asc` pull/diff/preflight (swift-appstore's issue #17 is the
-  live LearnWords smoke test), archive, and the owner submits.
+  `git log 1.3.0..main` — [ReleaseNotes-1.4.0](ReleaseNotes-1.4.0.md) — then `asc`
+  pull/diff/preflight (swift-appstore's issue #17 is the live LearnWords smoke test),
+  archive, and the owner submits.
 - **Then TD-56, then TD-62.** Modern concurrency is what makes iOS 15 pay for itself rather
   than merely unblock. TD-56 comes first because it is the one with a measurement — but the
   floor does **not** pick its discharge: `REVIEW.md` treats synchronous `Lexicon` reads as
