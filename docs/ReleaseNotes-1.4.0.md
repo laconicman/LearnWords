@@ -58,10 +58,11 @@ Correcciones:
   knowing if two devices share one iCloud account.
 - TD-65: the review log does not record which recognizer reading matched or on which attempt —
   retry leniency is invisible to future analysis until that's added.
-- TD-36: the reveal's footnotes appear in a synchronous set beside the answer's cross-dissolve
-  rather than as part of it — they pop rather than fade, and on a correct answer they are only
-  up for the 0.1 s advance. Reasoned, not verified on device; if it reads badly it is a polish
-  pass (register § TD-36).
+- TD-36: the reveal's footnotes are siblings of the answer view, not part of its
+  cross-dissolve — they pop in before the dissolve starts and stay up through the dissolve,
+  the delay and the fade-out until the next question (about 1.4 s after a correct answer,
+  3.5 s after a wrong one). Read from the code path, not verified on device; if it reads
+  badly it is a polish pass (register § TD-36).
 - TD-26: the launch sweep waits on `whenInitialSyncSettled`, which fires on the first import
   event or an 8 s timeout — not proof the first import finished. During a large first sync a
   meaning can arrive before the set holding it, and an empty local set list could read as a

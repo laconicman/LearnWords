@@ -1285,10 +1285,13 @@ three exercises, absent with a single answer, transcription hidden by default an
 when the switch is on (and it is the *answer's* transcription, not the prompt's), every
 footnote absent when there is nothing to show, and the `Question` contract itself. Full
 suite on the pinned simulator: 496 passed, 4 skipped, and the same four pre-existing
-Match3 lemmatization failures that reproduce on `main`. Reasoned, not verified: the
-footnote's appearance is a synchronous set beside the answer's cross-dissolve rather than
-part of it — it pops rather than fades, and on a correct answer it is only up for the
-0.1 s advance. If that reads badly on device it is a polish pass, not a design change.
+Match3 lemmatization failures that reproduce on `main`. The footnotes' timing, read from
+the code path (correcting the earlier guess — Devin Review on PR #60): they are siblings
+of `surface.answerView`, not inside its cross-dissolve — `updateFootnotes` sets them
+before the transition starts, so they pop in instantly and stay up through the dissolve,
+the delay and the fade-out until `askQuestion` clears them (≈1.4 s correct, ≈3.5 s
+wrong). Whether that reads well is still unverified on device; if it reads badly it is a
+polish pass, not a design change.
 
 ## TD-37 — Speech warm-up is unmeasured, and one attempt at it crashed the app
 
