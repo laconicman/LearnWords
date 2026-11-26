@@ -29,6 +29,13 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         if let url = connectionOptions.urlContexts.first?.url {
             AppRoot.handle(url, on: window)
         }
+
+        // A cold launch from a tapped reminder arrives here, not reliably through
+        // `AppDelegate`'s `didReceive` — which can fire before this window is key.
+        // `AppRoot` routes the response once; the `didReceive` copy is then a no-op.
+        if let response = connectionOptions.notificationResponse {
+            AppRoot.handle(response, on: window)
+        }
     }
 
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {

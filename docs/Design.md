@@ -124,7 +124,10 @@ what turns TD-56's deferred "if the floor rises, do it properly" branch into the
 `AppRoot` (`AppRoot.swift`) is the composition root: it builds the root view controller
 from `Main.storyboard` (`makeRoot()`) and interprets `learnWords://` URLs (`handle(_:on:)`).
 `SceneDelegate.scene(_:willConnectTo:)` creates the window, sets the tint, and calls
-`AppRoot`; `AppDelegate` calls the same `handle(_:on:)` when a reminder is tapped. Keeping
+`AppRoot`; `AppDelegate` calls the same `handle(_:on:)` when a reminder is tapped. A
+reminder tapped on a **cold launch** is delivered twice — in `connectionOptions.notificationResponse`
+and again to `didReceive`, which can fire before the scene's window is key — so
+`AppRoot.handleTap` routes each tap once, whichever path has a window first. Keeping
 the construction in one place is DRY and dependency-inversion in practice, and it is where
 shared controllers get injected as the app grows. `AppDelegate` stays thin and owns no
 window: app-level launch work in `didFinishLaunching`, and `configurationForConnecting`.

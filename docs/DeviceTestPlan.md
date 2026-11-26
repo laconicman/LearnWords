@@ -59,7 +59,7 @@ status bar wherever a scenario touches the microphone; it is ground truth for "i
 | 5.2 | Change reminder time; kill the app; relaunch | Next reminder fires at the new time (verify in Settings →Notifications or by waiting for it) |
 | 5.3 | Relaunch the app twice without touching anything | Second launch is not visibly slower (the unconditional-rebuild cost is TD-62's target — note the launch time now so the improvement is measurable later) |
 | 5.4 | App running or backgrounded; tap a fired reminder notification | App comes to the foreground on the Exercises tab (`AppDelegate.didReceive` routes through `AppRoot.handle`) |
-| 5.5 | Force-quit the app; let a reminder fire; tap its notification | App launches on the Exercises tab — **suspected gap:** `SceneDelegate` reads `connectionOptions.urlContexts` but never `notificationResponse`, so the cold path likely lands on the default tab; a failure here is a bug, not a plan error |
+| 5.5 | Force-quit the app; let a reminder fire; tap its notification | App launches on the Exercises tab. Cold-launch taps route through `SceneDelegate`'s `connectionOptions.notificationResponse` — `didReceive` alone can fire before the window is key — and `AppRoot` delivers each tap once. **Verified:** the `userInfo["url"]` → Exercises decision, the once-per-tap rule, and the no-window pass-through, in unit tests. **Pending:** the launch wiring itself — notification taps cannot be driven headlessly (TD-29), so this row still needs one human run |
 
 ## 6. Persistence & sync
 

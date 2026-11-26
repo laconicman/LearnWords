@@ -8,6 +8,7 @@
 //
 
 import UIKit
+import UserNotifications
 
 /// The single place that constructs the app's root UI and interprets custom-scheme URLs.
 enum AppRoot {
@@ -87,5 +88,48 @@ enum AppRoot {
             return true
         }
         return false
+    }
+
+    /// The `identifier|delivery-date` of the last notification tap routed into a window.
+    ///
+    /// A cold-launch tap is delivered **twice** — once in `SceneDelegate`'s
+    /// `connectionOptions.notificationResponse`, and again to `AppDelegate`'s
+    /// `didReceive`. The pair names one firing: identifiers repeat daily, a delivery
+    /// timestamp does not. If the keys ever failed to match, the second delivery would
+    /// re-run `handle(_:on:)` — idempotent by design, so the dedup is a courtesy, not
+    /// the correctness mechanism.
+    private static var routedTapKey: String?
+
+    /// Routes a tapped notification's `userInfo["url"]`, at most once per delivery.
+    ///
+    /// The decision lives on plain values because `UNNotificationResponse` has no
+    /// public initializer — a test cannot fabricate one, but it can fabricate these.
+    /// `handle(_:on:)` adapts the response to them.
+    ///
+    /// A delivery that finds no window is **not** consumed: on a cold launch
+    /// `didReceive` can fire before the scene's window exists, and the scene path —
+    /// which always has one — must still be able to route the same tap.
+    @discardableResult
+    static func handleTap(identifier: String, date: Date,
+                          userInfo: [AnyHashable: Any], on window: UIWindow?) -> Bool {
+        let key = "\(identifier)|\(date.timeIntervalSince1970)"
+        guard routedTapKey != key,
+              let string = userInfo["url"] as? String,
+              let url = URL(string: string),
+              window != nil else { return false }
+        routedTapKey = key
+        return handle(url, on: window)
+    }
+
+    /// The notification-response half of the routing: adapts a `UNNotificationResponse`
+    /// to `handleTap`, so `SceneDelegate` (cold launch) and `AppDelegate` (warm tap)
+    /// share one path and cannot drift.
+    @discardableResult
+    static func handle(_ response: UNNotificationResponse, on window: UIWindow?) -> Bool {
+        let notification = response.notification
+        return handleTap(identifier: notification.request.identifier,
+                         date: notification.date,
+                         userInfo: notification.request.content.userInfo,
+                         on: window)
     }
 }
