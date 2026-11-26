@@ -112,13 +112,15 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
 extension AppDelegate: UNUserNotificationCenterDelegate {
 
     /// A tapped reminder lands on the Exercises tab, in the connected scene's window.
+    ///
+    /// Warm taps arrive here; a cold launch's tap is routed by `SceneDelegate` from
+    /// `connectionOptions.notificationResponse`, which can precede — or follow — this
+    /// callback. `AppRoot` delivers each response once whichever path has a window.
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 didReceive response: UNNotificationResponse,
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
         defer { completionHandler() }
-        guard let string = response.notification.request.content.userInfo["url"] as? String,
-              let url = URL(string: string) else { return }
-        AppRoot.handle(url, on: keyWindow)
+        AppRoot.handle(response, on: keyWindow)
     }
 
     /// Reminders are shown even while the app is open.
